@@ -1,0 +1,22 @@
+<schema system="QueryTestSystem">
+    <tables>
+        <!--
+            Table   : asset_type
+            Columns : typeid (asset_type_pk)
+
+            Stores a list of installed asset types. Some basic information is
+            stored along with the typeid so that it can be easily retrieved.
+        -->
+        <table name="test_table">
+            <columns>
+                <column type="VARCHAR" size="50" allow-null="false">id</column>
+                <column type="VARCHAR" size="50" allow-null="false">name</column>
+            </columns>
+            <constraints>
+                <primary-key name="id_pk">
+                    <column>id</column>
+                </primary-key>
+            </constraints>
+        </table>
+    </tables>
+</schema>

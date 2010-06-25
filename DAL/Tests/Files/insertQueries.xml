@@ -1,0 +1,51 @@
+<queries>
+    <query>
+        <insert>
+            <fields table="link_table">
+                <field>linkid</field>
+                <field>childid</field>
+            </fields>
+           <values>
+                <value column="linkid">1</value>
+                <value column="childid">234</value>
+            </values>
+        </insert>
+    </query>
+
+    <query>
+        <insert>
+            <fields table="link_table">
+                <field>linkid</field>
+                <field>parentid</field>
+                <field>childid</field>
+                <field>link_type</field>
+            </fields>
+            <select>
+                <from>
+                    <table>link_cache</table>
+                </from>
+                <fields>
+                    <field table="link_cache" column="linkid" />
+                    <field table="link_cache" column="parentid" />
+                    <field table="link_cache" column="childid" />
+                    <value>1</value>
+                </fields>
+                <where>
+                    <in table="link_cache" column="linkid">
+                        <select>
+                        <from>
+                            <table>link_cache</table>
+                        </from>
+                            <fields>
+                                <field table="link_tree" column="linkid" />
+                            </fields>
+                            <where>
+                                <like table="link_tree" column="treeid">000%</like>
+                            </where>
+                        </select>
+                    </in>
+                </where>
+            </select>
+        </insert>
+    </query>
+</queries>

@@ -1,0 +1,64 @@
+<queries system="MergeSys1">
+    <query id="getLinks">
+        <primary>
+            <select>
+                <fields>
+                    <field table="link_table_one" column="childid" />
+                </fields>
+                <from>
+                    <table>link_table_one</table>
+                </from>
+                <where>
+                    <equal table="link_table_one" column="parentid">123</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+    <query id="getLinksTwo">
+        <primary>
+            <select>
+                <fields>
+                    <field table="link_table_two" column="childid" />
+                </fields>
+                <from>
+                    <table>link_table_two</table>
+                </from>
+                <where>
+                    <equal table="link_table_two" column="parentid">49000</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+    <query id="getLinksThree">
+        <primary>
+            <select>
+                <fields>
+                    <field table="link_table_three" column="childid" />
+                </fields>
+                <from>
+                    <table>link_table_three</table>
+                </from>
+                <where>
+                    <equal table="link_table_three" column="parentid">:parentId</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+    <query id="getLinksFour">
+        <primary>
+            <select>
+                <fields>
+                    <field table="link_table_four" column="childid" />
+                </fields>
+                <from>
+                    <table>link_table_four</table>
+                </from>
+                <where>
+                    <equal table="link_table_four" column="parentid">:parentIdTwo</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+</queries>
+
+

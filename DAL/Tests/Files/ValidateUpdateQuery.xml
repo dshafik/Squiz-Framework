@@ -1,0 +1,122 @@
+<queries system="linking">
+
+    <!-- Update Tag is missing -->
+    <query id="getLinks">
+    </query>
+
+
+    <!-- Update query must have fields tag -->
+    <query id="getLinks">
+        <update>
+            <values>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+            </values>
+            <where>
+                <equal table="link_table" column="linkid">1</equal>
+            </where>
+        </update>
+    </query>
+
+
+    <!-- Fields tag with no field tags -->
+    <query id="getLinks">
+       <update>
+            <fields table="link_table">
+            </fields>
+            <values>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+            </values>
+            <where>
+                <equal table="link_table" column="linkid">1</equal>
+            </where>
+        </update>
+    </query>
+
+
+     <!-- Field with no value. -->
+    <query id="getLinks">
+       <update>
+            <fields table="link_table">
+                <field></field>
+                <field>childid</field>
+            </fields>
+            <values>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+            </values>
+            <where>
+                <equal table="link_table" column="linkid">1</equal>
+            </where>
+        </update>
+    </query>
+
+
+     <!-- No values tag -->
+    <query id="getLinks">
+       <update>
+            <fields table="link_table">
+                <field>parentid</field>
+                <field>childid</field>
+            </fields>
+            <where>
+                <equal table="link_table" column="linkid">1</equal>
+            </where>
+        </update>
+    </query>
+
+
+    <!-- Vlues tag with no value tags -->
+    <query id="getLinks">
+       <update>
+            <fields table="link_table">
+                <field>parentid</field>
+                <field>childid</field>
+            </fields>
+            <values>
+            </values>
+            <where>
+                <equal table="link_table" column="linkid">1</equal>
+            </where>
+        </update>
+    </query>
+
+
+    <!-- Value tag column attr is missing -->
+    <query id="getLinks">
+       <update>
+            <fields table="link_table">
+                <field>parentid</field>
+                <field>childid</field>
+            </fields>
+            <values>
+                <value >123</value>
+                <value column="childid">234</value>
+            </values>
+            <where>
+                <equal table="link_table" column="linkid">1</equal>
+            </where>
+        </update>
+    </query>
+
+
+    <!-- Found invalid WHERE condition type -->
+    <query id="getLinks">
+       <update>
+            <fields table="link_table">
+                <field>parentid</field>
+                <field>childid</field>
+            </fields>
+            <values>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+            </values>
+            <where>
+                <equals table="link_table" column="linkid">1</equals>
+            </where>
+        </update>
+    </query>
+
+
+</queries>

@@ -1,0 +1,37 @@
+<queries system="TestDalSys1">
+
+    <query id="dalTestExecute">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset" column="typeid" />
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <equal table="asset" column="assetid">:assetid</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="dalTestExecuteQuery">
+        <primary>
+            <update>
+                <fields table="asset">
+                    <field>assetid</field>
+                </fields>
+                <values>
+                    <value column="assetid">:newid</value>
+                </values>
+                <where>
+                    <equal table="asset" column="assetid">:assetid</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+</queries>
+
+

@@ -1,0 +1,22 @@
+<queries>
+    <query>
+        <delete>
+            <where>
+                    <equal table="link_table" column="linkid">1</equal>
+                    <in table="link_table" column="parentid">
+                        <select>
+                            <from>
+                                <table>link_table</table>
+                            </from>
+                            <fields>
+                                <field table="link_cache" column="parentid" />
+                            </fields>
+                            <where>
+                                <equal table="link_cache" column="childid">234</equal>
+                            </where>
+                        </select>
+                    </in>
+            </where>
+        </delete>
+    </query>
+</queries>

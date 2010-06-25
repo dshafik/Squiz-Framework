@@ -1,0 +1,104 @@
+<queries system="linking">
+
+    <!-- Insert tag is missing -->
+    <query id="getLinks">
+    </query>
+
+    <!-- Insert with no fields tag -->
+    <query id="getLinks">
+        <insert>
+            <values>
+                <value column="linkid">1</value>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+                <value column="link_type">1</value>
+            </values>
+        </insert>
+    </query>
+
+
+    <!-- Fields tag with no field tags -->
+    <query id="getLinks">
+        <insert>
+            <fields table="link_table">
+            </fields>
+            <values>
+                <value column="linkid">1</value>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+                <value column="link_type">1</value>
+            </values>
+        </insert>
+    </query>
+
+
+    <!-- Field with no value -->
+    <query id="getLinks">
+        <insert>
+            <fields table="link_table">
+                <field></field>
+                <field>parentid</field>
+                <field>childid</field>
+                <field>link_type</field>
+            </fields>
+            <values>
+                <value column="linkid">1</value>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+                <value column="link_type">1</value>
+            </values>
+        </insert>
+    </query>
+
+
+    <!-- Fields with no table attr -->
+    <query id="getLinks">
+        <insert>
+            <fields >
+                <field>linkid</field>
+                <field>parentid</field>
+                <field>childid</field>
+                <field>link_type</field>
+            </fields>
+            <values>
+                <value column="linkid">1</value>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+                <value column="link_type">1</value>
+            </values>
+        </insert>
+    </query>
+
+
+    <!-- Insert query must have values or select tag. -->
+    <query id="getLinks">
+        <insert>
+            <fields table="link_table">
+                <field>linkid</field>
+                <field>parentid</field>
+                <field>childid</field>
+                <field>link_type</field>
+            </fields>
+        </insert>
+    </query>
+
+
+    <!-- Value tag must have column attr. -->
+    <query id="getLinks">
+        <insert>
+            <fields table="link_table">
+                <field>linkid</field>
+                <field>parentid</field>
+                <field>childid</field>
+                <field>link_type</field>
+            </fields>
+            <values>
+                <value >1</value>
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+                <value column="link_type">1</value>
+            </values>
+        </insert>
+    </query>
+
+</queries>

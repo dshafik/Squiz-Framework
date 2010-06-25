@@ -1,0 +1,613 @@
+<schema system="asset">
+ <udts>
+  <udt type="INTEGER">ASSETID</udt>
+  <udt-import system="asset_type">TYPECODE</udt-import>
+ </udts>
+ <tables>
+  <table name="asset">
+   <columns>
+   </columns>
+
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+  <!-- Column with no type attribute -->
+  <table name="asset">
+   <columns>
+    <column allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+
+    <!--Numeric column with no size attribute  -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+
+    <!-- Column with no name -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false"></column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+
+  <!-- Table Indexe with no name -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index >
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+
+    <!-- Table index with no column  -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- No Primary key -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- Primary key with no name -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key >
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- Primary key with no column -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- Foreign key with no name -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- Foreign key with no foreign-table attr. -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- Unique with no name -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <unique >
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- Unique with no column -->
+  <table name="asset">
+   <columns>
+   <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <unique name="unique_constraint">
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- No COnstraints  -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+   <!-- Sequence with no name -->
+  <table name="asset">
+   <columns>
+   <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence />
+    </sequences>
+  </table>
+
+
+   <!-- Foreign key with colum that has no references attr -->
+  <table name="asset">
+   <columns>
+    <column type="ASSETID" allow-null="true">assetid</column>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column >status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+
+
+    <!-- Primary key that references a non-defined column -->
+  <table name="asset">
+   <columns>
+    <column type="TYPECODE" allow-null="true">type_code</column>
+    <column type="ASSETID" allow-null="false">status_changed_userid</column>
+    <column type="NUMERIC" allow-null="false" size="5" scale="7">numberuno</column>
+   </columns>
+   <!-- Indexes -->
+   <indexes>
+    <index name="asset_type_code">
+     <column>type_code</column>
+    </index>
+   </indexes>
+   <!-- Constraints -->
+   <constraints>
+    <primary-key name="asset_pk">
+        <column>assetid</column>
+        <column>type_code</column>
+    </primary-key>
+    <foreign-key name="asset_fk1" foreign-table="asset_type" on-delete="NO ACTION">
+        <column references="type_code">type_code</column>
+    </foreign-key>
+    <foreign-key name="asset_fk5" foreign-table="asset" >
+        <column references="assetid">status_changed_userid</column>
+    </foreign-key>
+    <unique name="unique_constraint">
+        <column>assetid</column>
+    </unique>
+   </constraints>
+
+   <!-- Sequence -->
+    <sequences>
+        <sequence name="assetid_seq" />
+    </sequences>
+  </table>
+
+ </tables>
+</schema>
+
+

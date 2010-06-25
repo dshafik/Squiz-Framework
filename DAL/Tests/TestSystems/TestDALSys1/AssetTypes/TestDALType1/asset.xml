@@ -1,0 +1,6 @@
+<asset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="asset.xsd">
+       <type_code>testdaltype1</type_code>
+       <name>Dal test 1 system type 1</name>
+       <parent_type>asset</parent_type>
+</asset>

@@ -1,0 +1,152 @@
+<queries>
+   <query id="getLinks">
+        <select>
+            <fields>
+                <field table="link_table" column="linkid" />
+                <field table="asset_table" column="assetid" />
+            </fields>
+            <from>
+                <table>link_table</table>
+                <table>asset_table</table>
+                <hook id="UNIQUE_HOOK_ID_123" />
+            </from>
+            <where>
+            <hook id="UNIQUE_HOOK_ID_123" />
+                <in table="asset_table" column="type_code">
+                    <value>page_standard</value>
+                </in>
+            </where>
+        </select>
+    </query>
+
+    <query id="getLinks">
+        <select>
+            <fields>
+                <hook id="UNIQUE_HOOK_ID_123" />
+                <function function="CONCAT">
+                    <arg>CON</arg>
+                    <arg>:assetid</arg>
+                </function>
+                <field table="link_table" column="childid">id</field>
+                <field table="perms_table" column="granted" />
+                <value>:assetid</value>
+                <hook id="UNIQUE_HOOK_ID_123" />
+            </fields>
+            <from>
+                <hook id="UNIQUE_HOOK_ID_123" />
+                <hook id="UNIQUE_HOOK_ID_124" />
+                <table>link_table</table>
+                <table>perm_table</table>
+                <table>asset_table</table>
+            </from>
+            <where>
+                <hook id="WHERE_CLAUSE_HOOK_1" />
+                <hook id="WHERE_CLAUSE_HOOK_2" />
+                <in table="asset_table" column="type_code">
+                    <value>:page_standard</value>
+                    <value>:folder</value>
+                </in>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                <hook id="UNIQUE_HOOK_ID_123" />
+                    <equal table="link_table" column="or_col2">123</equal>
+                    <and>
+                        <equal table="link_table" column="or_col1">123</equal>
+                        <equal table="link_table" column="or_col2">123</equal>
+                    </and>
+                </or>
+                <equal table="perm_table" column="granted">1</equal>
+                <in table="asset_table11" column="type_code">
+                     <select>
+                        <fields>
+                            <field table="table2" column="col2" />
+                        </fields>
+                        <from>
+                            <table>link_table</table>
+                        </from>
+                        <where>
+                            <hook id="UNIQUE_HOOK_ID_123" />
+                            <in table="asset_table1" column="type_code">
+                                <hook id="UNIQUE_HOOK_ID_123" />
+                                <value>page_standard</value>
+                            </in>
+                        </where>
+                     </select>
+                </in>
+                <hook id="UNIQUE_HOOK_ID_123" />
+            </where>
+            <joins>
+                <hook id="UNIQUE_HOOK_ID_123" />
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+            <order-by>
+                 <hook id="UNIQUE_HOOK_ID_123" />
+                <field table="link_table" column="childid" />
+            </order-by>
+            <group-by>
+                <hook id="UNIQUE_HOOK_ID_123" />
+                <field table="asset_table" column="type_code" />
+                <field table="link_table" column="childid" />
+            </group-by>
+            <limit offset="0">10</limit>
+        </select>
+    </query>
+
+   <query>
+        <select>
+            <fields>
+                <field table="a" column="assetid" />
+                <field table="a" column="attributeid" />
+                <field table="a" column="value" />
+            </fields>
+            <from>
+                <union-all alias="a">
+                    <select>
+                        <fields>
+                            <field table="a" column="assetid" />
+                            <field table="a" column="attributeid" />
+                            <field table="a" column="value" />
+                        </fields>
+                        <from>
+                            <table>asset</table>
+                        </from>
+                        <where>
+                            <and>
+                                <greater table="a" column="assetid">120150</greater>
+                                <less table="a" column="assetid">120200</less>
+                            </and>
+                        </where>
+                    </select>
+                    <select>
+                        <fields>
+                            <field table="a" column="assetid" />
+                            <field table="a" column="attributeid" />
+                            <field table="a" column="value" />
+                        </fields>
+                        <from>
+                            <table>asset</table>
+                        </from>
+                        <where>
+                            <and>
+                                <greater table="a" column="assetid">120150</greater>
+                                <less table="a" column="assetid">120200</less>
+                            </and>
+                        </where>
+                    </select>
+                </union-all>
+            </from>
+            <where>
+                <greater table="a" column="assetid">120150</greater>
+                <less table="a" column="assetid">120200</less>
+            </where>
+        </select>
+    </query>
+
+</queries>

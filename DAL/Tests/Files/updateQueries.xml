@@ -1,0 +1,34 @@
+<queries>
+    <query>
+        <update>
+            <values table="link_table">
+                <value column="parentid">123</value>
+                <value column="childid">234</value>
+            </values>
+            <fields table="link_table">
+                <field>linkid</field>
+                <field>parentid</field>
+            </fields>
+            <where>
+                <equal table="link_table" column="linkid">1</equal>
+                <in table="my_table" column="my_col">
+                    <select>
+                        <fields>
+                            <field table="table2" column="col2" />
+                        </fields>
+                        <from>
+                            <table>link_table</table>
+                        </from>
+                        <where>
+                            <equal table="table2" column="col2">value</equal>
+                            <in table="asset_table" column="type_code">
+                                <value>page_standard</value>
+                                <value>folder</value>
+                            </in>
+                        </where>
+                    </select>
+                </in>
+            </where>
+        </update>
+    </query>
+</queries>

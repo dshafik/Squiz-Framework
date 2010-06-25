@@ -1,0 +1,50 @@
+<queries system="QueryTestSystem">
+    <query id="getTestNames">
+        <primary>
+            <select>
+                <fields>
+                    <field table="test_table" column="name" />
+                </fields>
+                <from>
+                    <table>test_table</table>
+                </from>
+            </select>
+        </primary>
+    </query>
+
+    <query id="insertTestNames">
+        <primary>
+            <insert>
+                <fields table="test_table">
+                    <field>id</field>
+                    <field>name</field>
+                </fields>
+                <values>
+                    <value column="id">:id</value>
+                    <value column="name">:name</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <query id="getTestNamesWithWhere">
+        <primary>
+            <select>
+                <fields>
+                    <field table="test_table" column="name" />
+                </fields>
+                <from>
+                    <table>test_table</table>
+                </from>
+                <where>
+                    <in table="test_table" column="name">
+                        <value>:names</value>
+                    </in>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+</queries>
+
+

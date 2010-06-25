@@ -1,0 +1,277 @@
+<queries system="linking">
+
+    <!-- Select Tag is missing -->
+    <query id="getLinks">
+
+    </query>
+
+
+    <!-- No fields tag -->
+    <query id="getLinks">
+        <select>
+            <from>
+                <table>link_table</table>
+                <table>asset_table</table>
+            </from>
+            <where>
+                <equal table="link_table" column="parentid">123</equal>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                    <in table="asset_table" column="type_code">
+                        <value>page_standard</value>
+                        <value>folder</value>
+                    </in>
+                    <equal table="asset_table" column="type_code">site</equal>
+                </or>
+            </where>
+            <joins>
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+        </select>
+    </query>
+
+
+    <!-- Field does not have table attribute -->
+    <query id="getLinks">
+        <select>
+            <fields>
+                <field column="childid">id</field>
+                <field table="asset_table" column="type_code">type</field>
+            </fields>
+            <from>
+                <table>link_table</table>
+                <table>asset_table</table>
+            </from>
+            <where>
+                <equal table="link_table" column="parentid">123</equal>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                    <in table="asset_table" column="type_code">
+                        <value>page_standard</value>
+                        <value>folder</value>
+                    </in>
+                    <equal table="asset_table" column="type_code">site</equal>
+                </or>
+            </where>
+            <joins>
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+        </select>
+    </query>
+
+
+
+    <!-- Field does not have column attribute -->
+    <query id="getLinks">
+        <select>
+            <fields>
+                <field table="link_table" >id</field>
+                <field table="asset_table" column="type_code">type</field>
+            </fields>
+            <from>
+                <table>link_table</table>
+                <table>asset_table</table>
+            </from>
+            <where>
+                <equal table="link_table" column="parentid">123</equal>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                    <in table="asset_table" column="type_code">
+                        <value>page_standard</value>
+                        <value>folder</value>
+                    </in>
+                    <equal table="asset_table" column="type_code">site</equal>
+                </or>
+            </where>
+            <joins>
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+        </select>
+    </query>
+
+
+    <!-- No table tags in from tag -->
+    <query id="getLinks">
+        <select>
+            <fields>
+                <field table="link_table" column="childid">id</field>
+                <field table="asset_table" column="type_code">type</field>
+            </fields>
+            <from>
+            </from>
+            <where>
+                <equal table="link_table" column="parentid">123</equal>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                    <in table="asset_table" column="type_code">
+                        <value>page_standard</value>
+                        <value>folder</value>
+                    </in>
+                    <equal table="asset_table" column="type_code">site</equal>
+                </or>
+            </where>
+            <joins>
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+        </select>
+    </query>
+
+
+
+    <!-- Table tag without a name -->
+    <query id="getLinks">
+        <select>
+            <fields>
+                <field table="link_table" column="childid">id</field>
+                <field table="asset_table" column="type_code">type</field>
+            </fields>
+            <from>
+                <table></table>
+                <table>asset_table</table>
+            </from>
+            <where>
+                <equal table="link_table" column="parentid">123</equal>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                    <in table="asset_table" column="type_code">
+                        <value>page_standard</value>
+                        <value>folder</value>
+                    </in>
+                    <equal table="asset_table" column="type_code">site</equal>
+                </or>
+            </where>
+            <joins>
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+        </select>
+    </query>
+
+
+    <!-- Invalid condition type equals  -->
+    <query id="getLinks">
+        <select>
+            <fields>
+                <field table="link_table" column="childid">id</field>
+                <field table="asset_table" column="type_code">type</field>
+            </fields>
+            <from>
+                <table>link_table</table>
+                <table>asset_table</table>
+            </from>
+            <where>
+                <equals table="link_table" column="parentid">123</equals>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                    <in table="asset_table" column="type_code">
+                        <value>page_standard</value>
+                        <value>folder</value>
+                    </in>
+                    <equal table="asset_table" column="type_code">site</equal>
+                </or>
+            </where>
+            <joins>
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+        </select>
+    </query>
+
+
+    <!-- Where cond. with no table attr  -->
+    <query id="getLinks">
+        <select>
+            <fields>
+                <field table="link_table" column="childid">id</field>
+                <field table="asset_table" column="type_code">type</field>
+            </fields>
+            <from>
+                <table>link_table</table>
+                <table>asset_table</table>
+            </from>
+            <where>
+                <equal column="parentid">123</equal>
+                <equal-or-greater table="perm_table" column="perm">1</equal-or-greater>
+                <or>
+                    <in table="asset_table" column="type_code">
+                        <value>page_standard</value>
+                        <value>folder</value>
+                    </in>
+                    <equal table="asset_table" column="type_code">site</equal>
+                </or>
+            </where>
+            <joins>
+                <join>
+                    <field table="asset_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+                <join>
+                    <field table="perm_table" column="assetid" />
+                    <field table="link_table" column="childid" />
+                </join>
+            </joins>
+        </select>
+    </query>
+
+<!-- Union and Union-All must have one or more select queries -->
+    <query id="getLinks">
+        <select>
+            <fields>
+                <field table="a" column="assetid" />
+                <field table="a" column="attributeid" />
+                <field table="a" column="value" />
+            </fields>
+            <from>
+                <union-all alias="a">
+                </union-all>
+            </from>
+            <where>
+                <and>
+                    <equal-or-greater table="a" column="assetid">120150</equal-or-greater>
+                    <equal-or-less table="a" column="assetid">120200</equal-or-less>
+                </and>
+            </where>
+        </select>
+    </query>
+
+</queries>

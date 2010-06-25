@@ -1,0 +1,120 @@
+<queries system="trash">
+  <query id="validPrimaryQuery">
+    <primary>
+      <except>
+        <select>
+            <fields>
+              <field table="asset_link" column="childid" alias="assetid"/>
+            </fields>
+            <from>
+              <table>asset_link</table>
+            </from>
+            <where>
+              <equal table="asset_link" column="active">false</equal>
+              <in table="asset_link" column="childid">:assetids</in>
+            </where>
+        </select>
+        <select>
+            <fields>
+              <field table="asset_link" column="childid" alias="assetid"/>
+            </fields>
+            <from>
+              <table>asset_link</table>
+            </from>
+            <where>
+              <equal table="asset_link" column="active">true</equal>
+            </where>
+        </select>
+      </except>
+    </primary>
+  </query>
+
+  <query id="invalidPrimaryQuery">
+    <primary>
+      <except>
+        <select>
+            <fields>
+              <field table="asset_link" column="childid" alias="assetid"/>
+            </fields>
+            <from>
+              <table>asset_link</table>
+            </from>
+            <where>
+              <equal table="asset_link" column="active">true</equal>
+            </where>
+        </select>
+      </except>
+    </primary>
+  </query>
+
+  <query id="invalidQuery">
+    <primary>
+      <except>
+        <select>
+            <fields>
+              <field table="asset_link" column="childid" alias="assetid"/>
+            </fields>
+            <from>
+              <table>asset_link</table>
+            </from>
+            <where>
+              <equal table="asset_link" column="active">true</equal>
+            </where>
+        </select>
+      </except>
+    </primary>
+  </query>
+
+  <query id="validSubQuery">
+    <primary>
+      <delete>
+        <where>
+        <in table="role_permission" column="roleid, userid, assetid">
+            <except>
+                <select>
+                    <fields>
+                        <field table="role_permission" column="roleid" />
+                        <field table="role_permission" column="userid" />
+                        <field table="role_permission" column="assetid" />
+                    </fields>
+                    <from>
+                        <table>role_permission</table>
+                    </from>
+                    <where>
+                        <equal table="role_permission" column="assetid">:assetid</equal>
+                        <equal table="role_permission" column="cascade">'t'</equal>
+                    </where>
+                </select>
+                <select>
+                    <fields>
+                        <field table="role_permission" column="roleid" />
+                        <field table="role_permission" column="userid" />
+                        <value column="assetid">[assetid]</value>
+                    </fields>
+                    <from>
+                        <table>role_permission</table>
+                    </from>
+                    <where>
+                        <in table="role_permission" column="assetid">:parentids</in>
+                    </where>
+                </select>
+            </except>
+        </in>
+        </where>
+      </delete>
+    </primary>
+  </query>
+
+  <query id="invalidSubQuery">
+    <primary>
+      <delete>
+        <where>
+        <in table="role_permission" column="roleid, userid, assetid">
+            <except>
+            </except>
+        </in>
+        </where>
+      </delete>
+    </primary>
+  </query>
+</queries>

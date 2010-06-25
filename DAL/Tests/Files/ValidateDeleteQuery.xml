@@ -1,0 +1,40 @@
+<queries system="linking">
+
+    <!-- Delete Tag is missing -->
+    <query id="getLinks">
+    </query>
+
+
+    <!-- Where condition with no table attr -->
+    <query id="getLinks">
+        <delete>
+            <where>
+                <or>
+                    <equal column="linkid">1</equal>
+                    <in table="link_table" column="parentid">
+                        <select>
+                            <from>
+                               <table>link_table</table>
+                               <table>perm_table</table>
+                            </from>
+                            <fields>
+                                <field table="link_cache" column="parentid" />
+                            </fields>
+                            <where>
+                                <equal table="link_cache" column="childid">234</equal>
+                            </where>
+                        </select>
+                    </in>
+                </or>
+            </where>
+        </delete>
+    </query>
+
+
+    <!-- Delete with no Where condition -->
+    <query id="getLinks">
+        <delete>
+        </delete>
+    </query>
+
+</queries>
