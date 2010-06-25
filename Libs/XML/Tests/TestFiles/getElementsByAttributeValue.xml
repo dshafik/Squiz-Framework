@@ -1,0 +1,8 @@
+<test>
+    <sub_test name="cool"></sub_test>
+    <sub_test name="not cool">
+        <sub_sub_test name="cool"></sub_sub_test>
+    </sub_test>
+    <sub_test></sub_test>
+    <sub_test name="cool"></sub_test>
+</test>

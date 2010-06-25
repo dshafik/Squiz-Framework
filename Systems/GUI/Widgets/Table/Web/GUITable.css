@@ -1,0 +1,32 @@
+.GUITable th, .GUITable td {
+    font-family: arial;
+    font-weight: normal;
+    font-size: 12px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.GUITable th {
+    background: url('table_header_bg.png') repeat-x;
+    color: #656464;
+    border-top: 1px solid #CECECE;
+    line-height: 33px;
+}
+
+.GUITable-firstcol {
+    border-left: 1px solid #CECECE;
+}
+
+.GUITable-lastcol {
+    border-right: 1px solid #CECECE;
+}
+
+.GUITable-firstcol, .GUITable th.GUITable-middlecol {
+    border-right: 1px solid #FFF;
+}
+
+.GUITable td {
+    border-bottom: 1px solid #CECECE;
+    border-right: 1px solid #CECECE;
+    line-height: 30px;
+}

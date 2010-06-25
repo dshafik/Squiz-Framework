@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+    <blocker>
+      <required>yes</required>
+      <method>serveWebFile</method>
+      <action>MySource::init</action>
+    </blocker>
+  </plugs>
+</system>

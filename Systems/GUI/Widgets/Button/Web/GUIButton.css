@@ -1,0 +1,29 @@
+.GUIButton {
+    overflow: hidden;
+}
+
+.GUIButton-left, .GUIButton-right, .GUIButton-mid {
+    height: 22px;
+    float: left;
+}
+
+.GUIButton-left, .GUIButton-right {
+    width: 9px;
+}
+
+.GUIButton-left {
+    background: transparent url(black_left.png) no-repeat;
+}
+
+
+.GUIButton-right {
+    background: transparent url(black_right.png) no-repeat;
+}
+
+.GUIButton-mid {
+    font-family: arial;
+    font-size: 12px;
+    color: #EEE;
+    background: transparent url(black_mid.png) repeat-x;
+    border: none;
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<systems>
+    <system name="Url" path="/Systems/Url" enabled="yes"/>
+    <system name="Assets" path="/Systems/Assets" enabled="yes"/>
+    <system name="Asset_Types" path="/Systems/Asset_Types" enabled="yes"/>
+    <system name="Permissions" path="/Systems/Permissions" enabled="yes"/>
+    <system name="Designs" path="/Systems/Designs" enabled="yes"/>
+</systems>
