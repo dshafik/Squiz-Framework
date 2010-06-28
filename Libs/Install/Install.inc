@@ -104,6 +104,7 @@ class Install
      */
     public static function prepareDataDir($rootDir, $url, $id='')
     {
+        $rootDir = realpath($rootDir);
         $dataDir = self::getDataDirPath($rootDir, $id);
 
         if (file_exists($dataDir) === FALSE) {
