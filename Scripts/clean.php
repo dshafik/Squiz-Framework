@@ -16,7 +16,11 @@ if ((php_sapi_name() !== 'cli')) {
     exit();
 }
 
-$rootdir = dirname(__FILE__);
+$rootdir = $argv[1];
+if (is_dir($rootdir) === FALSE) {
+    echo "Please specify the root directory.\n";
+    exit();
+}
 
 // Change to mysource mini root directory.
 chdir($rootdir);
@@ -65,19 +69,91 @@ system('rm grant_privileges.db');
 echoDone();
 
 echo '9. Running rebake.php for installation              '."\n";
-system('/usr/bin/php rebake.php');
+$url = 'http://framework.labs.squiz.net';
 
-require_once dirname(__FILE__).'/data/init.inc';
-require_once 'Channels/Channels.inc';
-require_once 'Systems/BaseSystem.inc';
+require_once $rootdir.'/Libs/Install/Install.inc';
+require_once $rootdir.'/Channels/ChannelsBaker.inc';
+require_once $rootdir.'/DAL/DALBaker.inc';
+require_once $rootdir.'/Libs/FileSystem/FileSystem.inc';
 
-echo '12. Give error_log 777 permission for developers    ';
+// Work out what systems to install/reinstall.
+$systemNames = Install::getInstallOptions(FALSE, FALSE);
+
+// Clean up data and oven dir before full install.
+echo '10. Clean data & oven dir.              '."\n";
+system('rm -rf ./data/* >> /dev/null 2>&1');
+system('rm -rf '.$rootdir.'/DAL/QueryStore/* >> /dev/null 2>&1');
+system('rm -rf '.$rootdir.'/DAL/Oven/* >> /dev/null 2>&1');
+system('rm -rf '.$rootdir.'/Channels/Oven/* >> /dev/null 2>&1');
+
+echo '11. Preparing data directories.              '."\n";
+Install::prepareDataDir($rootdir, $url);
+
+echo '12. Rebaking Oven              '."\n";
+Install::rebakeOven($rootdir, $url);
+
+echo '13. Installing queries              '."\n";
+Install::installQueries($systemNames);
+
+echo '14. Installing SQL functions              '."\n";
+Install::installSqlFunctions($systemNames);
+
+echo '15. Running system install methods              '."\n";
+Install::runSystemInstallMethods($systemNames);
+
+echo '16. Copying web files              '."\n";
+Install::copyWebFiles();
+
+require_once $rootdir.'/data/init.inc';
+require_once $rootdir.'/Channels/Channels.inc';
+require_once $rootdir.'/Systems/BaseSystem.inc';
+
+echo '17. Give error_log 777 permission for developers    ';
 if (file_exists($rootdir.'/error_log') === FALSE) {
     file_put_contents($rootdir.'/error_log', '');
 }//end if
 
 system('chmod 777 '.$rootdir.'/error_log');
 echoDone();
+
+/**
+ * Returns an array of system names passed from the rebake script.
+ *
+ * If the system has nested widget system, it will be worked out.
+ * (e.g. LocalCache, CacheAdminScreenWidget).
+ *
+ * @param string $rootDir The root path.
+ *
+ * @since  4.0.0
+ * @return array
+ */
+function getSelectedSystems($rootDir, $system)
+{
+    $systemNames   = array();
+    $nestedSystems = array();
+
+    $selectedSys = explode(' ', $system);
+    $realSys     = Install::getRealSystems();
+    foreach ($selectedSys as $sys) {
+        if (isset($realSys[$sys]) === TRUE) {
+            $systemNames[$sys] = $realSys[$sys];
+
+            // This part gets the nested widget systems.
+            $nested = Install::getRealSystems($rootDir.'/Systems/'.$sys);
+            if (empty($nested) === FALSE) {
+                $nestedSystems[] = $nested;
+            }
+        }
+    }
+
+    foreach ($nestedSystems as $nested) {
+        $systemNames = array_merge($systemNames, $nested);
+    }
+
+    return $systemNames;
+
+}//end getSelectedSystems()
+
 
 /**
  * Echo done function.
