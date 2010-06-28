@@ -250,9 +250,8 @@ class ChannelsBaker
         $result        = self::_categoriseSystems($realSystems);
         $concretes     = $result['concretes'];
         $systemSummary = $result['systemSummary'];
-        sort($realSystems);
-        foreach ($realSystems as $sysPath) {
-            $sysName = basename($sysPath);
+        asort($realSystems);
+        foreach ($realSystems as $sysName => $sysPath) {
             if (isset($systemSummary[$sysName]) === FALSE) {
                 // System name does not exist in $systemSummary array,
                 // which means it is a concrete system.
@@ -326,8 +325,7 @@ class ChannelsBaker
         }
 
         self::addToSystemList($realSystems, TRUE, $systemSummary);
-        foreach ($realSystems as $systemPath) {
-            $systemName = basename($systemPath);
+        foreach ($realSystems as $systemName => $systemPath) {
             if (self::_bakeSystemData($systemName) === FALSE) {
                 return FALSE;
             }
@@ -351,11 +349,9 @@ class ChannelsBaker
         $result                  = array();
         $result['concretes']     = array();
         $result['systemSummary'] = array();
-        foreach ($realSystems as $sysPath) {
-            $sysName     = basename($sysPath);
+        foreach ($realSystems as $sysName => $sysPath) {
             $parents     = array();
             $isExclusive = self::$_systemsInfo[$sysName]['exclusive'];
-
             $actionClass = $sysName.'Actions';
             include_once $sysPath.'/'.$actionClass.'.inc';
             $ref = new ReflectionClass($actionClass);
@@ -413,8 +409,7 @@ class ChannelsBaker
     ) {
         $realSystems   = array();
         $currentDbType = DAL::getDbType();
-        foreach ($allSystems as $sysPath) {
-            $sysName  = basename($sysPath);
+        foreach ($allSystems as $sysName => $sysPath) {
             $sysClass = $sysName.'System';
             include_once $sysPath.'/'.$sysClass.'.inc';
 
@@ -438,7 +433,7 @@ class ChannelsBaker
             // This system is valid for this system, add it to our array.
             // Check if it was one of the systems we wanted to add first.
             if (in_array($sysPath, $systems) === TRUE) {
-                $realSystems[] = $sysPath;
+                $realSystems[$sysName] = $sysPath;
             }
         }//end foreach
 
@@ -620,18 +615,11 @@ class ChannelsBaker
         }
 
         self::$_systemsInfo = array();
-        foreach ($systems as $systemPath) {
-            $path       = '';
-            $systemName = '';
-
+        foreach ($systems as $systemName => $systemPath) {
+            $path = '';
             if (file_exists($systemPath) === TRUE) {
                 // Absolute path.
-                $path       = $systemPath;
-                $systemName = basename($systemPath);
-            } else {
-                // In System's dir.
-                $path       = Channels::getSystemsPath().'/'.$systemPath;
-                $systemName = $systemPath;
+                $path = $systemPath;
             }
 
             // Check if system is already in the system list.
@@ -3038,7 +3026,12 @@ class ChannelsBaker
             return TRUE;
         }
 
-        $res = file_exists(Channels::getSystemsPath($systemName));
+        $res     = TRUE;
+        $sysPath = Channels::getSystemsPath($systemName);
+        if (empty($sysPath) === TRUE) {
+            $res = FALSE;
+        }
+
         return $res;
 
     }//end systemExists()
