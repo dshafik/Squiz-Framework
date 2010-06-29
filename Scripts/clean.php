@@ -68,7 +68,6 @@ system('psql -U postgres < ./grant_privileges.db >> /dev/null 2>&1');
 system('rm grant_privileges.db');
 echoDone();
 
-echo '9. Running rebake.php for installation              '."\n";
 $url = 'http://framework.labs.squiz.net';
 
 require_once $rootdir.'/Libs/Install/Install.inc';
