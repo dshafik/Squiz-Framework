@@ -808,18 +808,21 @@ class DAL
     public static function beginTransaction()
     {
         if (self::$_transactionCount > 0 && self::$_inTransaction === FALSE) {
-            // This meas that we were in a transaction before so thats why we have a
-            // non zero counter. Unless there are other cases which satisfy this
-            // condition then we dont need a new flag.
+            // We were in a transaction (counter is non-zero) but someone set the
+            // transaction flag back to FALSE, so something bad has happened.
             throw new DALException('Could not start a transaction when counter is not 0.');
         }
 
-        self::$_transactionCount++;
         if (self::$_inTransaction === FALSE) {
             $dbh = self::getDb();
             $dbh->beginTransaction();
             self::$_inTransaction = TRUE;
         }
+
+        // This must happen after the block above
+        // in case we are creating a connection, which would
+        // set this counter back to zero.
+        self::$_transactionCount++;
 
     }//end beginTransaction()
 
