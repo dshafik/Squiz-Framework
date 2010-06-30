@@ -60,34 +60,34 @@ class Util
     {
         $startIndex = 0;
         $endIndex   = 0;
-        $iemac      = false;
-        $preserve   = false;
+        $iemac      = FALSE;
+        $preserve   = FALSE;
         $i          = 0;
 
         // Remove all comment blocks...
-        while (($startIndex = strpos($cssContents, '/*', $startIndex)) !== false) {
-            $preserve = strlen($cssContents) > $startIndex + 2 && $cssContents[$startIndex + 2] === '!';
-            $endIndex = strpos($cssContents, "*/", $startIndex + 2);
+        while (($startIndex = strpos($cssContents, '/*', $startIndex)) !== FALSE) {
+            $preserve = strlen($cssContents) > ($startIndex + 2) && $cssContents[($startIndex + 2)] === '!';
+            $endIndex = strpos($cssContents, '*/', ($startIndex + 2));
             if ($endIndex < 0) {
-                if (!$preserve) {
+                if ($preserve === FALSE) {
                     $cssContents = substr($cssContents, 0, $startIndex);
                 }
-            } else if ($endIndex >= $startIndex + 2) {
-                if ($cssContents[$endIndex - 1] === '\\') {
+            } else if ($endIndex >= ($startIndex + 2)) {
+                if ($cssContents[($endIndex - 1)] === '\\') {
                     // Looks like a comment to hide rules from IE Mac.
                     // Leave this comment, and the following one, alone...
-                    $startIndex = $endIndex + 2;
-                    $iemac = true;
-                } else if ($iemac) {
-                    $startIndex = $endIndex + 2;
-                    $iemac = false;
-                } else if (!$preserve) {
-                    $cssContents = substr($cssContents, 0, $startIndex).substr($cssContents, $endIndex + 2);
+                    $startIndex = ($endIndex + 2);
+                    $iemac      = TRUE;
+                } else if ($iemac === TRUE) {
+                    $startIndex = ($endIndex + 2);
+                    $iemac      = FALSE;
+                } else if ($preserve === FALSE) {
+                    $cssContents = substr($cssContents, 0, $startIndex).substr($cssContents, ($endIndex + 2));
                 } else {
-                    $startIndex = $endIndex + 2;
+                    $startIndex = ($endIndex + 2);
                 }
             }
-        }
+        }//end while
 
         $cssContents = str_replace("\n\r", "\n", $cssContents);
         $cssContents = str_replace("\r", "\n", $cssContents);
@@ -383,7 +383,7 @@ class Util
                     }
 
                     $css .= $response."\n";
-                }
+                }//end if
             }//end foreach
         }//end if
 
@@ -431,7 +431,7 @@ class Util
         $ampersands     = array();
         if ($attributes->length > 0) {
             foreach ($attributes as $attribute) {
-                $attrName = $attribute->name;
+                $attrName     = $attribute->name;
                 $ampersands[] = $attribute->name.'="'.$attribute->value.'"';
             }
         }//end if
@@ -450,8 +450,8 @@ class Util
         $value   = substr($content, 134, -16);
 
         // Okay. Painful handling for '&' character in remoteid type of asset.
-        // Above the list of & included href or src has been collected. It now needs to go
-        // back to raw '&' char to make keyword work.
+        // Above the list of & included href or src has been collected.
+        // It now needs to go back to raw '&' char to make keyword work.
         if (empty($ampersands) === FALSE) {
             foreach ($ampersands as $ampStr) {
                 $value = str_replace($ampStr, rawurldecode($ampStr), $value);
