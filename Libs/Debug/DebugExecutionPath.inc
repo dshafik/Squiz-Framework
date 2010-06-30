@@ -152,7 +152,7 @@ class DebugExecutionPath
             }
 
             $file = self::$_reportDir.'report_'.$pid.'.inc';
-            file_put_contents($file, print_r(self::$_stack,1));
+            file_put_contents($file, print_r(self::$_stack, 1));
             self::process($pid, $file);
         }
 
@@ -334,10 +334,10 @@ class DebugExecutionPath
                     $pc = (number_format(($fn['time'] / $info['fnTimes']), 2) * 100);
                 }
 
-                $time     = number_format($fn['time'], 5).'('.$pc.'%)';
-                $color    = '#000000';
-                $type     = $fn['type'];
-                $style    = 'solid';
+                $time  = number_format($fn['time'], 5).'('.$pc.'%)';
+                $color = '#000000';
+                $type  = $fn['type'];
+                $style = 'solid';
 
                 if ($fnCount > 1 && $pc > 30) {
                     $style = 'bold';

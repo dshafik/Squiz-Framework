@@ -196,7 +196,10 @@ class DebugChannels
             if ($caller !== 'index.php') {
                 // This usually happens due to inheritance or a function calls another right at the beginning.
                 $callerInfo = self::_getCallInfo($bt, ($offset + 1));
-                if (!isset($callerInfo['method'])) return;
+                if (isset($callerInfo['method']) === FALSE) {
+                    return;
+                }
+
                 self::_startCall($caller, $callerInfo['method'], $startTime, $bt, ($offset + 1));
             }
         }
