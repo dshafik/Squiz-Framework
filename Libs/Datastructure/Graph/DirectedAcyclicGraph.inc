@@ -439,7 +439,7 @@ class DirectedAcyclicGraph extends AbstractGraph
 
         if ($toIdInFromNodes === TRUE && $fromIdInToNodes === TRUE) {
             $isLinked = TRUE;
-        } else if (($toIdInFromNodes || $fromIdInToNodes) === TRUE) {
+        } else if ($toIdInFromNodes === TRUE || $fromIdInToNodes === TRUE) {
             $msg = 'Fix Me. From Id: '.$fromid.' To Id: '.$toid;
             throw new Exception($msg);
         }
