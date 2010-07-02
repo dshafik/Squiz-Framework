@@ -470,6 +470,32 @@ class Util
     }//end getHTML()
 
 
+    /**
+     * Return TRUE if an array is an associative array.
+     *
+     * @param array $array Array to determine.
+     *
+     * @since  4.0.0
+     * @return boolean
+     */
+    public static function isAssoc(array $array)
+    {
+        if (is_array($array) === FALSE) {
+            return FALSE;
+        }
+
+        $keyComp      = array_keys(array_keys($array));
+        $diffKey      = array_diff_key($array, $keyComp);
+        $diffKeyCount = count($diffKey);
+        if ($diffKeyCount !== 0) {
+            return TRUE;
+        }
+
+        return FALSE;
+
+    }//end isAssoc()
+
+
 }//end class
 
 ?>
