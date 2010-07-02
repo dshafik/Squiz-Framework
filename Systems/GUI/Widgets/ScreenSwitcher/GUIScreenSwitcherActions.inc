@@ -55,7 +55,7 @@ class GUIScreenSwitcherActions
             // Work out the name of the template and web icon we expect from the
             // system we are referencing.
             $screenBaseName  = ucwords($screen['name']);
-            $screenBaseName  = preg_replace('/[ _\-]/', '', $screen['name']);
+            $screenBaseName  = preg_replace('/[ _\-]/', '', $screenBaseName);
             $screenBaseName .= 'Screen';
 
             $path  = '/__web/'.GUI::getSystemWebPath($screen['system']).'/';

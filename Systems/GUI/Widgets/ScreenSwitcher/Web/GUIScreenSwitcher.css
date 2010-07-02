@@ -1,0 +1,123 @@
+.GUIScreenSwitcher {
+
+}
+
+.GUIScreenSwitcher-switcher {
+    background-image: url(menu_mid.png);
+    background-repeat: repeat-x;
+}
+
+.GUIScreenSwitcher-contents {
+    margin: 10px 20px;
+    border: 1px dotted #CCC;
+}
+
+.GUIScreenSwitcher-switcher-left {
+    display: inline-block;
+    vertical-align: top;
+    width: 21px;
+    height: 134px;
+    background-image: url(menu_left.png);
+    background-repeat: none;
+}
+
+.GUIScreenSwitcher-switcher-right {
+    display: inline-block;
+    vertical-align: top;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 21px;
+    height: 134px;
+    background-image: url(menu_right.png);
+    background-repeat: none;
+}
+
+.GUIScreenSwitcher-switcher-button {
+    margin-top: 10px;
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 115px;
+    height: 137px;
+}
+
+.GUIScreenSwitcher-switcher-divider {
+    position: absolute;
+    right: 0;
+    width: 1px;
+    top: 23px;
+    height: 53px;
+    background-color: #D7D7D7;
+}
+
+.GUIScreenSwitcher-switcher-icon {
+    margin-top: 8px;
+    height: 75px;
+    background-position: 50% 0px;
+}
+
+.GUIScreenSwitcher-switcher-icon.up-to-date {
+    background-image: url(sample_up_to_date.png);
+}
+
+.GUIScreenSwitcher-switcher-icon.cron {
+    background-image: url(sample_cron.png);
+}
+
+.GUIScreenSwitcher-switcher-icon.backup {
+    background-image: url(sample_backup.png);
+}
+
+.GUIScreenSwitcher-switcher-status-inactive .GUIScreenSwitcher-switcher-icon {
+    background-position: 50% -75px;
+}
+
+.GUIScreenSwitcher-switcher-status-disabled .GUIScreenSwitcher-switcher-icon {
+    background-position: 50% -75px;
+    opacity: 0.3;
+}
+
+.GUIScreenSwitcher-switcher-text {
+    font-family: arial;
+    font-size: 13px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.GUIScreenSwitcher-switcher-status-selected .GUIScreenSwitcher-switcher-text {
+    font-weight: bold;
+}
+
+.GUIScreenSwitcher-switcher-status-disabled .GUIScreenSwitcher-switcher-text {
+    opacity: 0.3;
+}
+
+.GUIScreenSwitcher-switcher-arrow {
+    margin-top: 9px;
+    height: 27px;
+    background-image: url(menu_arrow.png);
+    background-repeat: no-repeat;
+    background-position: 50% top;
+    visibility: hidden;
+}
+
+.GUIScreenSwitcher-switcher-status-selected .GUIScreenSwitcher-switcher-arrow {
+    visibility: visible;
+}
+
+.GUIScreenSwitcher-switcher-no-entry {
+    position: absolute;
+    top: 58px;
+    height: 27px;
+    width: 28px;
+    left: 43px;
+    background-image: url(screen_no_access.png);
+    display: none;
+}
+
+.GUIScreenSwitcher-switcher-status-disabled .GUIScreenSwitcher-switcher-no-entry {
+    display: block;
+}
