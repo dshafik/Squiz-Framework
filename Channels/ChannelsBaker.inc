@@ -1243,15 +1243,29 @@ class ChannelsBaker
      */
     private static function _bakeMethod($system, array $method, $displayName)
     {
+        $docComment = '';
+        if ($system !== 'MySource') {
+            Channels::requireSystemActions($system);
+            $refM       = new ReflectionMethod($system.'Actions', $method['name']);
+            $docComment = $refM->getDocComment();
+        }
+
         $fileName       = self::getEventFilePath($system.'::'.$method['name']);
         $systemTypeData = self::_getSystemTypeData($system);
-        $methodContents = 'public static function '.$method['name'];
-        $parentMethod   = FALSE;
+
+        $methodContents = '';
+        if (empty($docComment) === FALSE) {
+            $methodContents = '    '.$docComment."\n";
+        }
+
+        $methodContents .= 'public static function '.$method['name'];
+        $parentMethod    = FALSE;
         if ($system !== $method['system']) {
             // An inherited method.
             $parentMethod = TRUE;
             $fileName     = self::getEventFilePath($method['system'].'::'.$method['name']);
         }
+
 
         // Get all the plug info.
         $doc = new DomDocument();
