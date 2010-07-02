@@ -1,18 +1,9 @@
 .GUIScreenSwitcher {
-
-}
-
-.GUIScreenSwitcher-switcher {
     background-image: url(menu_mid.png);
     background-repeat: repeat-x;
 }
 
-.GUIScreenSwitcher-contents {
-    margin: 10px 20px;
-    border: 1px dotted #CCC;
-}
-
-.GUIScreenSwitcher-switcher-left {
+.GUIScreenSwitcher-left {
     display: inline-block;
     vertical-align: top;
     width: 21px;
@@ -21,7 +12,7 @@
     background-repeat: none;
 }
 
-.GUIScreenSwitcher-switcher-right {
+.GUIScreenSwitcher-right {
     display: inline-block;
     vertical-align: top;
     position: absolute;
@@ -33,7 +24,7 @@
     background-repeat: none;
 }
 
-.GUIScreenSwitcher-switcher-button {
+.GUIScreenSwitcher-button {
     margin-top: 10px;
     display: inline-block;
     vertical-align: top;
@@ -44,7 +35,7 @@
     height: 137px;
 }
 
-.GUIScreenSwitcher-switcher-divider {
+.GUIScreenSwitcher-divider {
     position: absolute;
     right: 0;
     width: 1px;
@@ -53,49 +44,37 @@
     background-color: #D7D7D7;
 }
 
-.GUIScreenSwitcher-switcher-icon {
+.GUIScreenSwitcher-icon {
     margin-top: 8px;
     height: 75px;
     background-position: 50% 0px;
 }
 
-.GUIScreenSwitcher-switcher-icon.up-to-date {
-    background-image: url(sample_up_to_date.png);
-}
-
-.GUIScreenSwitcher-switcher-icon.cron {
-    background-image: url(sample_cron.png);
-}
-
-.GUIScreenSwitcher-switcher-icon.backup {
-    background-image: url(sample_backup.png);
-}
-
-.GUIScreenSwitcher-switcher-status-inactive .GUIScreenSwitcher-switcher-icon {
+.GUIScreenSwitcher-button.inactive .GUIScreenSwitcher-icon {
     background-position: 50% -75px;
 }
 
-.GUIScreenSwitcher-switcher-status-disabled .GUIScreenSwitcher-switcher-icon {
+.GUIScreenSwitcher-button.disabled .GUIScreenSwitcher-icon {
     background-position: 50% -75px;
     opacity: 0.3;
 }
 
-.GUIScreenSwitcher-switcher-text {
+.GUIScreenSwitcher-text {
     font-family: arial;
     font-size: 13px;
     margin-top: 8px;
     text-align: center;
 }
 
-.GUIScreenSwitcher-switcher-status-selected .GUIScreenSwitcher-switcher-text {
+.GUIScreenSwitcher-button.selected .GUIScreenSwitcher-text {
     font-weight: bold;
 }
 
-.GUIScreenSwitcher-switcher-status-disabled .GUIScreenSwitcher-switcher-text {
+.GUIScreenSwitcher-button.disabled .GUIScreenSwitcher-text {
     opacity: 0.3;
 }
 
-.GUIScreenSwitcher-switcher-arrow {
+.GUIScreenSwitcher-arrow {
     margin-top: 9px;
     height: 27px;
     background-image: url(menu_arrow.png);
@@ -104,11 +83,11 @@
     visibility: hidden;
 }
 
-.GUIScreenSwitcher-switcher-status-selected .GUIScreenSwitcher-switcher-arrow {
+.GUIScreenSwitcher-button.selected .GUIScreenSwitcher-arrow {
     visibility: visible;
 }
 
-.GUIScreenSwitcher-switcher-no-entry {
+.GUIScreenSwitcher-no-entry {
     position: absolute;
     top: 58px;
     height: 27px;
@@ -118,6 +97,6 @@
     display: none;
 }
 
-.GUIScreenSwitcher-switcher-status-disabled .GUIScreenSwitcher-switcher-no-entry {
+.GUIScreenSwitcher-button.disabled .GUIScreenSwitcher-no-entry {
     display: block;
 }
