@@ -1,0 +1,26 @@
+<schema system="API">
+    <tables>
+        <table name="api">
+            <columns>
+                <column type="VARCHAR" allow-null="false" size="50">system</column>
+                <column type="VARCHAR" allow-null="false" size="50">action</column>
+                <column type="VARCHAR" allow-null="false" size="5">type</column>
+                <column type="CLOB" allow-null="true">options</column>
+            </columns>
+            <indexes>
+                <index name="api_idx1">
+                  <column>system</column>
+                </index>
+                <index name="api_idx2">
+                  <column>action</column>
+                </index>
+            </indexes>
+            <constraints>
+                <primary-key name="api_pk">
+                    <column>system</column>
+                    <column>action</column>
+                </primary-key>
+            </constraints>
+        </table>
+    </tables>
+</schema>

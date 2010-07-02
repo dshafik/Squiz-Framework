@@ -1,0 +1,83 @@
+<queries system="API">
+    <!-- Case Insensitive Match! -->
+    <query id="getAPI">
+        <primary>
+            <select>
+                <fields>
+                    <field table="api" column="system" />
+                    <field table="api" column="action" />
+                    <field table="api" column="type" />
+                    <field table="api" column="options" />
+                </fields>
+                <from>
+                    <table>api</table>
+                </from>
+                <where>
+                    <equal>
+                        <function function="lower">
+                            <arg><field table="api" column="system" /></arg>
+                        </function>
+                        <function function="lower">
+                            <value>:system</value>
+                        </function>
+                    </equal>
+                    <equal>
+                        <function function="lower">
+                            <arg><field table="api" column="action" /></arg>
+                        </function>
+                        <function function="lower">
+                            <value>:action</value>
+                        </function>
+                    </equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="addAPI">
+        <primary>
+            <insert>
+                <fields table="api">
+                    <field>system</field>
+                    <field>action</field>
+                    <field>type</field>
+                    <field>options</field>
+                </fields>
+                <values>
+                    <value column="system">:system</value>
+                    <value column="action">:action</value>
+                    <value column="type">:type</value>
+                    <value column="options">:options</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <query id="removeAPI">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="api" column="system">:system</equal>
+                    <equal table="api" column="action">:action</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="updateAPI">
+        <primary>
+            <update>
+                <fields table="api">
+                    <field>options</field>
+                </fields>
+                <values>
+                    <value column="options">:options</value>
+                </values>
+                <where>
+                    <equal table="api" column="system">:system</equal>
+                    <equal table="api" column="action">:action</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+</queries>

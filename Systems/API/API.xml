@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<system>
+    <plugs>
+        <switcher>
+            <required>no</required>
+            <method>isAPIRequest</method>
+            <parameters/>
+            <switch_event>API::processRequest</switch_event>
+            <action>MySource::init</action>
+            <fatal>no</fatal>
+        </switcher>
+    </plugs>
+</system>
