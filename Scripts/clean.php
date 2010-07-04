@@ -47,8 +47,8 @@ system('find '.$rootdir.' -name "._*" -exec rm {} \; >> /dev/null 2>&1');
 echoDone();
 
 echo '6. Fix file system permissions for broken systems   ';
-system('chown -R root:root '.$rootdir.'/..');
-system('chmod -R 755 '.$rootdir.'/..');
+system('chown -R root:root '.$rootdir);
+system('chmod -R 755 '.$rootdir);
 echoDone();
 
 echo '7. Re-creating database                             ';
