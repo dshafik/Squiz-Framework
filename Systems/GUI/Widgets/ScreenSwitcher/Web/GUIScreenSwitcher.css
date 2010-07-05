@@ -33,6 +33,11 @@
     left: 0;
     width: 115px;
     height: 137px;
+    cursor: pointer;
+}
+
+.GUIScreenSwitcher-button.disabled {
+    cursor: auto;
 }
 
 .GUIScreenSwitcher-divider {
