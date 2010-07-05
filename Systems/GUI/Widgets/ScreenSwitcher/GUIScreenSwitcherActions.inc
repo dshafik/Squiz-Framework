@@ -129,7 +129,7 @@ class GUIScreenSwitcherActions
 
         $contents = '';
         ob_start();
-            GUI::printTemplate($systemName, $screenId);
+            GUI::printTemplate($systemName, $screenId.'.tpl');
             $contents = ob_get_contents();
         ob_end_clean();
 
