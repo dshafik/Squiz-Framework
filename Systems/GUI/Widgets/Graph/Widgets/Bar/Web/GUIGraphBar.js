@@ -4,6 +4,6 @@ function GUIGraphBar(id, settings) {
 
 }
 
-GUIList.prototype = {
+GUIGraphBar.prototype = {
 
 };
