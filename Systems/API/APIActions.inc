@@ -90,6 +90,9 @@ class APIActions
             exit;
         }
 
+        $assetid            = API::getAssetid();
+        $request['assetid'] = $assetid;
+
         // Is the requested service available?
         $api = API::getAPI($request['system'], $request['action']);
         $responseContent['system']  = $request['system'];
@@ -129,10 +132,7 @@ class APIActions
         $outputFormat = $request['outputFormat'];
 
         // Permission and locking check should come here.
-        Channels::includeSystem('Role');
-        Channels::includeSystem('Authentication');
-        $userid = Authentication::getCurrentUserId();
-        $perm   = Role::checkPermission($assetid, $userid, $api['options']['privilege']);
+        $perm = API::checkPermission($assetid, $api['options']);
         if ($perm === FALSE) {
             // Permission denied.
             self::_sendHeader(401);
@@ -154,6 +154,39 @@ class APIActions
         self::_sendResponse($responseContent, $outputFormat);
 
     }//end processRequest()
+
+
+    /**
+     * Check whether the caller can perform the requested action.
+     *
+     * @param float $assetid Assetid to check the permission.
+     * @param array $options Request Method, GET or POST.
+     *
+     * @since  4.0.0
+     * @return boolean
+     */
+    public static function checkPermission($assetid, $options)
+    {
+        return TRUE;
+
+    }//end checkPermission()
+
+
+    /**
+     * Get assetid for the requested action if applicable.
+     *
+     * @param float $assetid Assetid to check the permission.
+     * @param float $userid  Request Method, GET or POST.
+     * @param array $options Request Method, GET or POST.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function getAssetid()
+    {
+        return NULL;
+
+    }//end getAssetid()
 
 
     /**
@@ -192,9 +225,6 @@ class APIActions
                 $serviceEndPos = $queryStrPos - 1;
             }
 
-            Channels::includeSystem('Lookup');
-            $assetid = Lookup::getAssetFromUrl($currUrl);
-
             // Now, find the system and action names for the requested service.
             // By default it checks '_serviceWebPath/SYSTEM_NAME/ACTION_NAME/' format.
             // Optionally, output format can be included prior to SYSTEM_NAME like following.
@@ -223,23 +253,16 @@ class APIActions
         } else if ($requestMethod === 'post') {
             // POST request is much simpler.
             include_once 'Libs/Security/Security.inc';
-            Channels::includeSystem('Lookup');
-            $assetid = Lookup::getAssetFromUrl($currUrl);
 
             $default    = NULL;
             $jsonDecode = FALSE;
             $system     = Security::getReuqestData('_system', $default, $jsonDecode, $requestMethod);
             $action     = Security::getReuqestData('_action', $default, $jsonDecode, $requestMethod);
             $format     = Security::getReuqestData('_format', self::$_outputFormat, $jsonDecode, $requestMethod);
-            $aid        = Security::getReuqestData('_assetid', $default, $jsonDecode, $requestMethod);
-            if ($aid !== NULL) {
-                $assetid = $aid;
-            }
         }
 
         $result['system']       = strtolower($system);
         $result['action']       = strtolower($action);
-        $result['assetid']      = $assetid;
         $result['outputFormat'] = $format;
         return $result;
 
@@ -270,8 +293,8 @@ class APIActions
     {
         $requiredParams = array();
 
-        Channels::includeSystem('Attribute');
-        $method     = new ReflectionMethod('Attribute', $action);
+        Channels::includeSystem($system);
+        $method     = new ReflectionMethod($system, $action);
         $parameters = $method->getParameters();
         foreach ($parameters as $parameter) {
             $requiredParams[] = array(
