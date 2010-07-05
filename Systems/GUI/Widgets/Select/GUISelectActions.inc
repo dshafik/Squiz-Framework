@@ -95,16 +95,51 @@ class GUISelectActions
     {
         $selected = Util::getArrayIndex($data, 'selected');
         $options  = $data['options'];
+        $depths   = array();
 
-        foreach ($options as $optionKey => $option) {
-            echo '<option value="'.$optionKey.'"';
+        while (count($options) > 0) {
+            reset($options);
+            $optionKey = key($options);
+            $option    = array_shift($options);
 
-            if ($selected === $optionKey) {
-                echo ' selected="selected"';
-            }
+            if (count($depths) === 0) {
+                $depth = 0;
+            } else {
+                $depthEl = array_pop($depths);
+                $depth   = $depthEl[0];
 
-            echo '>'.$option.'</option>';
-        }//end foreach item
+                if ($depthEl[1] > 1) {
+                    $depthEl[1]--;
+                    $depths[] = $depthEl;
+                }
+            }//end if no depths stored
+
+            // If this is an array, store the depths of the next elements so we
+            // know when to switch back to the next lower level.
+            // Then add the sub elements to the start of the options so we know
+            // to work with them first. Ignore the key provided.
+            if (is_array($option) === TRUE) {
+                $newLength = count($depths) + count($option);
+                $depths[]  = array($depth + 1, count($option));
+                $options   = $option + $options;
+            } else {
+                echo '<option value="'.$optionKey.'"';
+
+                if ($selected === $optionKey) {
+                    echo ' selected="selected"';
+                }
+
+                echo '>';
+
+                if ($depth > 0) {
+                    echo str_repeat('&nbsp;', ($depth - 1) * 4 + 1);
+                    echo '--&nbsp;';
+                }
+
+                echo $option.'</option>';
+            }//end if option is array or single value
+
+        }//end while items still exist
 
     }//end paintItems()
 
