@@ -90,7 +90,7 @@ class APIActions
             exit;
         }
 
-        $assetid            = API::getAssetid();
+        $assetid            = API::getAssetid($requestMethod);
         $request['assetid'] = $assetid;
 
         // Is the requested service available?
@@ -175,18 +175,37 @@ class APIActions
     /**
      * Get assetid for the requested action if applicable.
      *
-     * @param float $assetid Assetid to check the permission.
-     * @param float $userid  Request Method, GET or POST.
-     * @param array $options Request Method, GET or POST.
+     * @param string $requestMethod GET or POST request.
      *
      * @since  4.0.0
      * @return mixed
      */
-    public static function getAssetid()
+    public static function getAssetid($requestMethod)
     {
         return NULL;
 
     }//end getAssetid()
+
+
+    /**
+     * Return the current URL without service web path.
+     *
+     * @param string $url URL to process.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getRealURL($url)
+    {
+        $serviceStartPos = strpos($url, '/'.self::$_serviceWebPath.'/');
+        if ($serviceStartPos === FALSE) {
+            return $url;
+        }
+
+        $currUrl = substr($url, 0, $serviceStartPos);
+        return $currUrl;
+
+    }//end getRealURL()
 
 
     /**
