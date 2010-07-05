@@ -309,7 +309,7 @@ class GUIActions
 
             // Create the script tag that contains JS init codes.
             $jsElem = $head->ownerDocument->createElement('script');
-            $js     = implode('', self::$_js);
+            $js     = implode("\n", self::$_js);
 
             // All these needs to be wrapped with onLoad.
             $js = "dfx.addLoadEvent(function() {\n\t".$js."\n});";
