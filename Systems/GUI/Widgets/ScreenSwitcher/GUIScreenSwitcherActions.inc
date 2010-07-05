@@ -111,6 +111,31 @@ class GUIScreenSwitcherActions
     }//end prepareBake()
 
 
+    /**
+     * Get the requested template for a system's screen.
+     *
+     * @param string $systemName The name of the system providing the screen.
+     * @param string $screenId   The ID of the screen.
+     *
+     * @api    read
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getScreenContents($systemName, $screenId)
+    {
+        Channels::includeSystem('GUI');
+
+        $contents = '';
+        ob_start();
+            GUI::printTemplate($systemName, $screenId);
+            $contents = ob_get_contents();
+        ob_end_clean();
+
+        return $contents;
+
+    }//end getScreenContents()
+
+
 }//end class
 
 ?>
