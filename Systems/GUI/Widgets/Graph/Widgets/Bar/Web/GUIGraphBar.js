@@ -1,4 +1,5 @@
-function GUIGraphBar(id, settings) {
+function GUIGraphBar(id, settings)
+{
     this.id       = id;
     this.settings = settings;
 

@@ -20,6 +20,56 @@ require_once 'Systems/BaseSystem.inc';
 class GUIGraphBarActions
 {
 
+    /**
+     * Default height of the graph.
+     *
+     * Overridden using 'height' setting.
+     *
+     * @var   string
+     * @since 4.0.0
+     */
+    private static $_defaultGraphHeight = '500';
+
+    /**
+     * Default height of top-of-bar labels, in pixels.
+     *
+     * @var   integer
+     * @since 4.0.0
+     */
+    private static $_topLabelHeight = 13;
+
+    /**
+     * Default height of a flag.
+     *
+     * @var   integer
+     * @since 4.0.0
+     */
+    private static $_defaultFlagHeight = 8;
+
+    /**
+     * Height of an X-axis that contains at least one value.
+     *
+     * @var   integer
+     * @since 4.0.0
+     */
+    private static $_xAxisHeight = 18;
+
+    /**
+     * Height of an empty X-axis.
+     *
+     * @var   integer
+     * @since 4.0.0
+     */
+    private static $_xAxisEmptyHeight = 3;
+
+    /**
+     * Height of spacing between flags.
+     *
+     * @var   integer
+     * @since 4.0.0
+     */
+    private static $_flagSpacing = 2;
+
 
     /**
      * Returns this widgets content.
@@ -37,7 +87,11 @@ class GUIGraphBarActions
         );
 
         // Get the total height of the graph.
-        $graphHeight = Util::getArrayIndex($settings, 'height', '500');
+        $graphHeight = Util::getArrayIndex(
+            $settings,
+            'height',
+            self::$_defaultGraphHeight
+        );
         $graphHeight = (int) $graphHeight;
 
         // Set a fixed set of colours that we can automatically assign
@@ -205,13 +259,6 @@ class GUIGraphBarActions
         $id,
         $class
     ) {
-        // Required size of a top label.
-        $topLabelSize = 13;
-
-        // Required height for the x-axis when full, and when blank.
-        $xAxisHeight   = 18;
-        $noXAxisHeight = 3;
-
         /*
             Calculate the maximum bar total overall, and the maximum bar total
             that contains a label.
@@ -256,10 +303,10 @@ class GUIGraphBarActions
             $flags[$flagIndex]['height'] = (int) Util::getArrayIndex(
                 $flag,
                 'height',
-                8
+                self::$_defaultFlagHeight
             );
 
-            $flagHeight += ($flags[$flagIndex]['height'] + 2);
+            $flagHeight += ($flags[$flagIndex]['height'] + self::$_flagSpacing);
         }
 
         $heightDiff = 0;
@@ -267,8 +314,10 @@ class GUIGraphBarActions
         // If we could not have a label on our tallest stacks without stretching the
         // graph, shrink the stacks until we can.
         if (($maxValueWithLabel !== NULL) && ($maxValue > 0)) {
-            $labelPct  = ($maxValueWithLabel / $maxValue);
-            $maxHeight = ceil(($labelPct * ($height - $flagHeight) + $topLabelSize));
+            $labelPct   = ($maxValueWithLabel / $maxValue);
+            $maxHeight  = ($labelPct * ($height - $flagHeight));
+            $maxHeight += self::$_topLabelHeight;
+            $maxHeight  = ceil($maxHeight);
 
             if ($maxHeight > ($height - $flagHeight)) {
                 $heightDiff = ($maxHeight - ($height - $flagHeight));
@@ -286,9 +335,9 @@ class GUIGraphBarActions
             $totalHeight  = floor(($rowTotal / $maxValue * $maxBarHeight));
 
             if ($hasXAxis === TRUE) {
-                $totalHeight -= $xAxisHeight;
+                $totalHeight -= self::$_xAxisHeight;
             } else {
-                $totalHeight -= $noXAxisHeight;
+                $totalHeight -= self::$_xAxisEmptyHeight;
             }
 
             $barHeight = $totalHeight;
@@ -296,7 +345,7 @@ class GUIGraphBarActions
             // Make room for a label.
             if (array_key_exists('label', $dataRow) === TRUE) {
                 if ($dataRow['label'] !== '') {
-                    $barHeight += $topLabelSize;
+                    $barHeight += self::$_topLabelHeight;
                 }
             }
 
