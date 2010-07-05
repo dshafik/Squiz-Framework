@@ -5,6 +5,6 @@ function GUISelect(id, settings)
 
 }
 
-GUIList.prototype = {
+GUISelect.prototype = {
 
 };
