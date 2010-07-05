@@ -52,15 +52,15 @@
 .GUIScreenSwitcher-icon {
     margin-top: 8px;
     height: 75px;
-    background-position: 50% 0px;
+    background-position: 50% -75px;
 }
 
-.GUIScreenSwitcher-button.inactive .GUIScreenSwitcher-icon {
-    background-position: 50% -75px;
+.GUIScreenSwitcher-button.selected .GUIScreenSwitcher-icon,
+.GUIScreenSwitcher-button.inactive.hover .GUIScreenSwitcher-icon {
+    background-position: 50% 0;
 }
 
 .GUIScreenSwitcher-button.disabled .GUIScreenSwitcher-icon {
-    background-position: 50% -75px;
     opacity: 0.3;
 }
 
@@ -71,7 +71,8 @@
     text-align: center;
 }
 
-.GUIScreenSwitcher-button.selected .GUIScreenSwitcher-text {
+.GUIScreenSwitcher-button.selected .GUIScreenSwitcher-text,
+.GUIScreenSwitcher-button.inactive.hover .GUIScreenSwitcher-text {
     font-weight: bold;
 }
 
