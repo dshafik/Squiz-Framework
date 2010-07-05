@@ -20,6 +20,43 @@ require_once 'Systems/BaseSystem.inc';
 class BackupActions
 {
 
+
+    /**
+     * Returns the contents of the widget (or in this case, template).
+     *
+     * @param array  $settings The list of settings for this widget.
+     * @param string $tplFile  The template file to use.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getTemplateContent(array $settings=array(), $tplFile=NULL)
+    {
+        $content = '';
+        if ($tplFile !== NULL) {
+            $content = file_get_contents($tplFile);
+        }
+
+        return $content;
+
+    }//end getTemplateContent()
+
+
+    /**
+     * Prepare for baking.
+     *
+     * @param DOMNode $htmlTpl The HTML content of the widget.
+     *
+     * @since  4.0.0
+     * @return DOMNode
+     */
+    public static function prepareBake(DOMNode $htmlTpl)
+    {
+        return $htmlTpl;
+
+    }//end prepareBake()
+
+
 }//end class
 
 ?>
