@@ -27,9 +27,6 @@ GUIToggleButton.prototype = {
 					// move to true
 					self.setValue(true);
 				}
-				// when the trasition finishes,
-					// fire event
-					//self.fireToggleOnCallbacks();
 		});
 
     }, 
