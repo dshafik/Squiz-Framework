@@ -1,0 +1,116 @@
+<queries system="Role">
+
+    <query id="addRole">
+        <primary>
+            <insert>
+                <fields table="role">
+                    <field>roleid</field>
+                    <field>name</field>
+                    <field>description</field>
+                </fields>
+                <values>
+                    <value column="roleid">:roleid</value>
+                    <value column="name">:name</value>
+                    <value column="description">:description</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <query id="deleteRole">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="role" column="roleid">:roleid</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="updateRole">
+        <primary>
+            <update>
+                <fields table="role">
+                    <field>[attrName]</field>
+                </fields>
+                <values>
+                    <value column="[attrName]">:attrValue</value>
+                </values>
+                <where>
+                    <equal table="role" column="roleid">:roleid</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="grantPrivilegeToRole">
+        <primary>
+            <insert>
+                <fields table="role_privilege">
+                    <field table="role_privilege">roleid</field>
+                    <field table="role_privilege">privilege</field>
+                </fields>
+                <values>
+                    <value column="roleid">:roleid</value>
+                    <value column="privilege">:privilege</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <query id="removePrivilegeFromRole">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="role_privilege" column="roleid">:roleid</equal>
+                    <equal table="role_privilege" column="privilege">:privilege</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="getPrivilegesByRole">
+        <primary>
+            <select>
+                <fields table="role_privilege">
+                    <field table="role_privilege" column="roleid" />
+                    <field table="role_privilege" column="privilege" />
+                </fields>
+                <from>
+                    <table>role_privilege</table>
+                </from>
+                <where>
+                    <equal table="role_privilege" column="roleid">:roleid</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getRolesByPrivilege">
+        <primary>
+            <select>
+                <fields table="role_privilege">
+                    <field table="role_privilege" column="roleid" />
+                    <field table="role_privilege" column="privilege" />
+                </fields>
+                <from>
+                    <table>role_privilege</table>
+                </from>
+                <where>
+                    <equal table="role_privilege" column="privilege">:privilege</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="deletePrivilege">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="role_privilege" column="privilege">:privilege</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+</queries>

@@ -1,0 +1,42 @@
+<schema system="Role">
+    <udts>
+        <udt type="INTEGER">ROLEID</udt>
+        <udt type="VARCHAR" size="255">PRIVILEGE</udt>
+    </udts>
+
+    <tables>
+        <table name="role">
+            <columns>
+                <column type="ROLEID" allow-null="false">roleid</column>
+                <column type="VARCHAR" size="255" allow-null="false">name</column>
+                <column type="CLOB">description</column>
+            </columns>
+            <constraints>
+                <primary-key name="role_roleid_pk">
+                    <column>roleid</column>
+                </primary-key>
+            </constraints>
+            <sequences>
+                <sequence name="seq_roleid" />
+            </sequences>
+        </table>
+
+        <table name="role_privilege">
+            <columns>
+                <column type="ROLEID" allow-null="false">roleid</column>
+                <column type="PRIVILEGE" allow-null="false">privilege</column>
+            </columns>
+            <constraints>
+               <primary-key name="role_privilege_pk">
+                    <column>roleid</column>
+                    <column>privilege</column>
+               </primary-key>
+               <foreign-key name="role_privilege_fk1" foreign-table="role">
+                    <column references="roleid">roleid</column>
+               </foreign-key>
+            </constraints>
+        </table>
+    </tables>
+</schema>
+
+
