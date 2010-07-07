@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<queries system="SquizSuite">
+  <!-- Product Queries -->
+  <query id="registerProduct">
+    <primary>
+      <insert>
+        <fields table="suite_product">
+          <field>productid</field>
+          <field>name</field>
+          <field>type</field>
+          <field>connection</field>
+        </fields>
+        <values>
+          <value column="productid">:productid</value>
+          <value column="name">:name</value>
+          <value column="type">:type</value>
+          <value column="connection">:connection</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+  <query id="modifyProduct">
+    <primary>
+        <update>
+            <fields table="suite_product">
+                <field>[attrName]</field>
+            </fields>
+            <values>
+                <value column="[attrName]">:attrValue</value>
+            </values>
+            <where>
+                <equal table="suite_product" column="productid">:productid</equal>
+            </where>
+        </update>
+    </primary>
+  </query>
+  <query id="removeProduct">
+    <primary>
+      <delete>
+        <where>
+            <equal column="productid" table="suite_product">:productid</equal>
+            <equal column="current" table="suite_product">false</equal>
+        </where>
+      </delete>
+    </primary>
+  </query>
+  <query id="getProductInformation">
+    <primary>
+       <select>
+        <fields>
+           <field table="p1" column="productid"/>
+           <field table="p1" column="name"/>
+           <field table="p1" column="type"/>
+           <field table="p1" column="status"/>
+           <field table="p1" column="current"/>
+           <field table="p1" column="connection"/>
+        </fields>
+        <from>
+          <table alias="p1">suite_product</table>
+        </from>
+        <where>
+          <equal table="p1" column="productid">:productid</equal>
+        </where>
+      </select>
+    </primary>
+    <alternate>
+        <assert-null data="productid">
+          <select>
+            <fields>
+               <field table="p1" column="productid"/>
+               <field table="p1" column="name"/>
+               <field table="p1" column="type"/>
+               <field table="p1" column="status"/>
+               <field table="p1" column="current"/>
+               <field table="p1" column="connection"/>
+            </fields>
+            <from>
+              <table alias="p1">suite_product</table>
+            </from>
+          </select>
+        </assert-null>
+    </alternate>
+  </query>
+  <query id="getProductDetail">
+    <primary>
+       <select>
+        <fields>
+           <field table="p1" column="[attrName]"/>
+        </fields>
+        <from>
+          <table alias="p1">suite_product_information</table>
+        </from>
+        <where>
+          <equal table="p1" column="productid">:productid</equal>
+        </where>
+    </select>
+  </primary>
+ </query>
+</queries>
