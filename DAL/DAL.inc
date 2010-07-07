@@ -1359,6 +1359,48 @@ class DAL
     }//end clearLoggedQueries()
 
 
+    /**
+     * Returns the next sequence value.
+     *
+     * @param string $seqName Name of the sequence.
+     *
+     * @since  4.0.0
+     * @return integer
+     */
+    public static function seqNextVal($seqName)
+    {
+        $dbh  = self::getDb();
+        $sql  = 'SELECT nextVal(:seqName)';
+        $stmt = $dbh->prepare($sql);
+        $stmt->bindValue(':seqName', $seqName);
+        $stmt->execute();
+        $result = $stmt->fetchColumn();
+        return $result;
+
+    }//end seqNextVal()
+
+
+    /**
+     * Returns the current sequence value.
+     *
+     * @param string $seqName Name of the sequence.
+     *
+     * @since  4.0.0
+     * @return integer
+     */
+    public static function seqCurrVal($seqName)
+    {
+        $dbh  = self::getDb();
+        $sql  = 'SELECT currVal(:seqName)';
+        $stmt = $dbh->prepare($sql);
+        $stmt->bindValue(':seqName', $seqName);
+        $stmt->execute();
+        $result = $stmt->fetchColumn();
+        return $result;
+
+    }//end seqCurrVal()
+
+
 }//end class
 
 ?>
