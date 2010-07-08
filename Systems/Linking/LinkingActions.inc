@@ -46,7 +46,6 @@ class LinkingActions
         $childid,
         $sortOrder
     ) {
-        Channels::includeSystem('Linking');
         foreach ($parentids as $parentid) {
             Linking::createLink($parentid, $childid, $sortOrder);
         }
@@ -73,7 +72,6 @@ class LinkingActions
         $sortOrder=0,
         $showMenu=TRUE
     ) {
-        Channels::includeSystem('Linking');
         return Linking::createLink($parentid, $childid, $sortOrder, $showMenu, TRUE);
 
     }//end activateLink()
@@ -166,7 +164,6 @@ class LinkingActions
 
             if ($activated === 0) {
                 $status = 0;
-                Channels::includeSystem('Linking');
                 $childrenQ = Linking::getChildren($childid);
                 $children  = array_keys(DAL::getGrouped($childrenQ));
 
@@ -238,13 +235,13 @@ class LinkingActions
      */
     private static function _getUserData()
     {
-        include_once 'Libs/String/String.inc';
-        Channels::includeSystem('Authentication');
-        $userid = Authentication::getCurrentUserid();
+        Channels::includeSystem('User');
+        $userid = User::getCurrentUserid();
         if ($userid === 0) {
             $userid = NULL;
         }
 
+        include_once 'Libs/String/String.inc';
         $ret = array(
                 'userid' => $userid,
                 'time'   => String::tsIso8601(time()),
@@ -323,7 +320,6 @@ class LinkingActions
      */
     public static function createLinkOnlyPlug($parentid, $childid)
     {
-        Channels::includeSystem('Linking');
         Channels::includeSystem('Context');
         $prevContext = Context::setCurrentContext('');
         $retVal      = Linking::createLinkOnly($parentid, $childid);
@@ -351,7 +347,6 @@ class LinkingActions
         $sortOrder,
         $showMenu
     ) {
-        Channels::includeSystem('Linking');
         Linking::updateSortOrders($parentid, $childid, $parentid, $sortOrder);
         $userData = self::_getUserData();
         Channels::addToBasket('userid', $userData['userid']);
@@ -454,7 +449,6 @@ class LinkingActions
             }
 
             // If this is the last link then use Linking::trashAsset().
-            Channels::includeSystem('Linking');
             $baseQuery = DAL::getDALQuery(
                 'Linking',
                 'deleteLink',
@@ -515,7 +509,6 @@ class LinkingActions
         Channels::addToBasket('lastUpdated', $userData['time']);
 
         Channels::includeSystem('Context');
-        Channels::includeSystem('Linking');
         $context = Context::getCurrentContext();
         Channels::addToBasket('context', NULL);
         $result = FALSE;
@@ -568,7 +561,6 @@ class LinkingActions
     public static function updateLinkShowMenu($parentid, $childid, $showMenu)
     {
         Channels::includeSystem('Context');
-        Channels::includeSystem('Linking');
         $parentid = Context::getAssetid($parentid);
         Channels::modifyBasket('parentid', $parentid);
 
@@ -858,7 +850,6 @@ class LinkingActions
     public static function replaceContextRemoveLinks($oldContext, $newContext, $assetid)
     {
         Channels::includeSystem('Context');
-        Channels::includeSystem('Linking');
         $originalContext = Context::setCurrentContext($oldContext, TRUE);
 
         try {
@@ -917,7 +908,6 @@ class LinkingActions
     public static function replaceContextCreateLinks($oldContext, $newContext, $assetid)
     {
         Channels::includeSystem('Context');
-        Channels::includeSystem('Linking');
         $originalContext = Context::setCurrentContext($oldContext, TRUE);
 
         try {
