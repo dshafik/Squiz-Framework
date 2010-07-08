@@ -259,6 +259,292 @@ class AssetActions
     }//end getDataPath()
 
 
+    /**
+     * Creates a new asset type.
+     *
+     * @param string $typeid     The unique identifier of the type code to
+     *                           install.
+     * @param string $typeName   The readable name of the new type.
+     * @param string $category   The category this asset type belongs to.
+     * @param string $parentType The type the new asset inherits from.
+     * @param string $isCustom   Set to TRUE if this is a custom asset type.
+     *
+     * @since  4.0.0
+     * @return void
+     * @throws 
+     */
+    public static function createType(
+        $typeid,
+        $name,
+        $category,
+        $parentType,
+        $isCustom=FALSE
+    ) {
+        try {
+            DAL::beginTransaction();
+
+            // Add this asset type to asset_type table.
+            DAL::executeQuery('Asset', 'addAssetType');
+
+            // Add level 0.
+            self::_addAssetTypeTree($typeid, $typeid, 0);
+
+            // For each parent type add a new row to asset_type_tree.
+            if ($typeid !== $parentType) {
+                self::_addAssetTypeTree($typeid, $parentType, 1);
+            }
+
+            // Get parent type's ancestors.
+            $ancestors = Asset::getParentTypes($parentType);
+            foreach ($ancestors as $typeInfo) {
+                // Add it to asset_type_tree.
+                self::_addAssetTypeTree(
+                    $typeid,
+                    $typeInfo['typeid'],
+                    ($typeInfo['lvl'] + 1)
+                );
+            }
+
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollBack();
+            throw new ChannelActionException('DB Error: '.$e->getMessage());
+        }
+
+    }//end createAssetType()
+
+
+    /**
+     * Adds a single row to asset_type_tree.
+     *
+     * @param string  $typeid       Id of the new asset type.
+     * @param string  $parentTypeid Id of the parent type.
+     * @param integer $lvl          Number of levels between new type and
+     *                              this parent.
+     *
+     * @since  4.0.0
+     * @return void
+     * @throws ChannelActionException If there is a database error.
+     */
+    private static function _addAssetTypeTree($typeid, $parentTypeid, $lvl)
+    {
+        Channels::createEventBasket();
+        Channels::addToBasket('typeid', $typeid);
+        Channels::addToBasket('parentTypeid', $parentTypeid);
+        Channels::addToBasket('lvl', $lvl);
+        DAL::executeQuery('Asset', 'addAssetTypeTree');
+        Channels::removeEventBasket();
+
+    }//end _addAssetTypeTree()
+
+
+    /**
+     * Returns TRUE if asset is of specified type or child of specified type.
+     *
+     * For example: if asset is a page asset and $type is 'file' then method
+     * will return FALSE, if asset is 'image' and $type is file then method will
+     * return TRUE.
+     *
+     * @param integer $assetid The id of the asset to check.
+     * @param string  $typeid  The type id.
+     *
+     * @since  4.0.0
+     * @return boolean
+     */
+    public static function isTypeOf($assetid, $typeid)
+    {
+        $typeCode = Asset::getTypes($assetid);
+        if ($typeCode === $typeid) {
+            return TRUE;
+        }
+
+        $typeAncestors = Asset::getTypeAncestors($typeCode);
+        foreach ($typeAncestors as $typeInfo) {
+            if ($typeInfo['typeid'] === $typeid) {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+
+    }//end isTypeOf()
+
+
+    /**
+     * Check if the passed asset type exists in the asset_type tree.
+     *
+     * Returns TRUE if the type is already installed.
+     *
+     * @param string $typeid Typeid to check.
+     *
+     * @since  4.0.0
+     * @return boolean
+     */
+    public static function typeExists($typeid)
+    {
+        $ret = DAL::executeAssoc('Asset', 'typeExists');
+        if (empty($ret) === TRUE) {
+            return FALSE;
+        }
+
+        return TRUE;
+
+    }//end typeExists()
+
+
+    /**
+     * Returns the asset type information.
+     *
+     * @param string $typeid Asset typeid to check.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function getTypeInfo($typeid)
+    {
+        $result = DAL::executeAssoc('Asset', 'getAssetTypeInfo');
+        $result = array_pop($result);
+        return $result;
+
+    }//end getAssetTypeInfo()
+
+
+    /**
+     * Returns the list of parent asset types.
+     *
+     * @param string $typeid Asset typeid to check.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function getParentTypes($typeid)
+    {
+        $result = DAL::executeAssoc('Asset', 'getParentTypes');
+        return $result;
+
+    }//end getTypeAncestors()
+
+
+    /**
+     * Returns the list of child asset types.
+     *
+     * @param string  $typeid Asset typeid to check.
+     * @param integer $lvl    Level restriction to filter.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function getChildTypes($typeid, $lvl=NULL)
+    {
+        $q = DAL::getDALQuery('Asset', 'getChildTypes', '');
+        echo $q."\n";
+        
+        $children = DAL::executeAssoc('Asset', 'getChildTypes');
+        return $children;
+
+    }//end getChildTypes()
+
+
+    /**
+     * Returns given asset type's icon path.
+     *
+     * If typeid not given then returns base icons web dir path.
+     *
+     * @param string  $typeid          Id of the asset type.
+     * @param boolean $defaultToParent If TRUE and given type does not have an
+     *                                 icon then first parent that has an icon
+     *                                 is returned.
+     * @param string  $type            Type of icon (small, medium or large).
+     * @param integer $assetid         Optional assetid can be passed. In fact
+     *                                 this assetid intended to be used in other
+     *                                 plugs only rather than real action.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getTypeIconPath(
+        $typeid='',
+        $defaultToParent=TRUE,
+        $type='small',
+        $assetid=NULL
+    ) {
+        $webPath  = Init::WEB_DIR;
+        $webPath .= str_replace(
+            dirname(dirname(dirname(__FILE__))),
+            '',
+            dirname(__FILE__)
+        );
+        $webPath .= '/icons/';
+
+        $suffix = '';
+        if ($type !== NULL) {
+            $suffix = '_'.$type;
+        }
+
+        $fileName = $typeid.$suffix.'.png';
+
+        if ($typeid !== '') {
+            $webPath .= $fileName;
+            if ($defaultToParent === TRUE && file_exists($webPath) === FALSE) {
+                // File does not exist, return parent type's path.
+                $ancestors = Asset::getParentTypes($typeid);
+                $ancestors = array_reverse($ancestors);
+                foreach ($ancestors as $parent) {
+                    $parentPath = Asset::getTypeIconPath(
+                        $parent['typeid'],
+                        FALSE,
+                        $type
+                    );
+                    if (file_exists($parentPath) === TRUE) {
+                        $webPath = $parentPath;
+                    }
+                }
+            }
+        }
+
+        return $webPath;
+
+    }//end getTypeIconPath()
+
+
+    /**
+     * Returns given asset type's icon URL.
+     *
+     * If typeid not given then returns base icons URL.
+     *
+     * @param string  $typeid          Id of the asset type.
+     * @param boolean $defaultToParent If TRUE and given type does not have an
+     *                                 icon then first parent that has an icon
+     *                                 is returned.
+     * @param string  $type            Type of icon (small, medium or large).
+     * @param integer $assetid         Optional assetid can be passed. In fact
+     *                                 this assetid intended to be used in other
+     *                                 plugs only rather than real action.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getTypeIconUrl(
+        $typeid='',
+        $defaultToParent=TRUE,
+        $type='small',
+        $assetid=NULL
+    ) {
+        $baseUrl  = Init::getWebURL();
+        $iconPath = Asset::getTypeIconPath(
+            $typeid,
+            $defaultToParent,
+            $type,
+            $assetid
+        );
+        $iconPath = str_replace(Init::WEB_DIR, '', $iconPath);
+        $baseUrl .= $iconPath;
+
+        return $baseUrl;
+
+    }//end getTypeIconUrl()
+
+
 }//end class
 
 ?>

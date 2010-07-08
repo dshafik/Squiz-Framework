@@ -151,4 +151,202 @@
         </alternate>
     </query>
 
+    <!--
+        Inserts a single asset type to asset_type table.
+        Binds   : typeid, name
+    -->
+    <query id="addAssetType">
+        <primary>
+            <insert>
+                <fields table="asset_type">
+                    <field>typeid</field>
+                    <field>name</field>
+                    <field>category</field>
+                    <field>is_custom</field>
+                </fields>
+                <values>
+                    <value column="typeid">:typeid</value>
+                    <value column="name">:name</value>
+                    <value column="category">:category</value>
+                    <value column="is_custom">:isCustom</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <!--
+        Inserts a single asset type tree row.
+        Binds   : typeid, parentTypeid, lvl
+    -->
+    <query id="addAssetTypeTree">
+        <primary>
+            <insert>
+                <fields table="asset_type_tree">
+                    <field>typeid</field>
+                    <field>parent_typeid</field>
+                    <field>lvl</field>
+                </fields>
+                <values>
+                    <value column="typeid">:typeid</value>
+                    <value column="parent_typeid">:parentTypeid</value>
+                    <value column="lvl">:lvl</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <!--
+        Retrieves this type code from the table.
+    -->
+    <query id="typeExists">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset_type" column="typeid" />
+                </fields>
+                <from>
+                    <table>asset_type</table>
+                </from>
+                <where>
+                    <equal table="asset_type" column="typeid">:typeid</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <!--
+        Retrieves information about the specified asset type.
+        Fields: typeid, name, category
+        Binds: typeid
+    -->
+    <query id="getAssetTypeInfo">
+        <primary>
+        <select>
+            <fields>
+                <field table="asset_type" column="typeid" />
+                <field table="asset_type" column="name" />
+                <field table="asset_type" column="category" />
+                <field table="asset_type" column="is_custom" />
+            </fields>
+            <from>
+                <table>asset_type</table>
+            </from>
+            <where>
+                <equal table="asset_type" column="typeid"><value>:typeid</value></equal>
+            </where>
+        </select>
+        </primary>
+    </query>
+
+    <!--
+        Retrieves the name of an asset type.
+        Fields  : name
+        Binds   : typeid
+    -->
+    <query id="getTypeName">
+        <primary>
+        <select>
+            <fields>
+                <field table="asset_type" column="name" />
+            </fields>
+            <from>
+                <table>asset_type</table>
+            </from>
+            <where>
+                <equal table="asset_type" column="typeid"><value>:typeid</value></equal>
+            </where>
+        </select>
+        </primary>
+    </query>
+
+    <!--
+        Returns all ancestors of the given asset type.
+        Fields  : typeid
+        Binds   : typeid
+    -->
+    <query id="getParentTypes">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset_type_tree" column="parent_typeid">typeid</field>
+                    <field table="asset_type_tree" column="lvl" />
+                </fields>
+                <from>
+                    <table>asset_type_tree</table>
+                </from>
+                <where>
+                    <equal table="asset_type_tree" column="typeid">:typeid</equal>
+                    <greater table="asset_type_tree" column="lvl">0</greater>
+                </where>
+                <order-by direction="ASC">
+                    <field table="asset_type_tree" column="lvl" />
+                </order-by>
+            </select>
+        </primary>
+    </query>
+
+    <!--
+        Returns all asset types that inherit directly from the given asset type.
+        Fields  : typeid, name
+        Binds   : typeid
+    -->
+    <query id="getChildTypes">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset_type" column="typeid" />
+                    <field table="asset_type" column="name" />
+                </fields>
+                <from>
+                    <table>asset_type</table>
+                </from>
+                <where>
+                    <in table="asset_type" column="typeid">
+                        <select>
+                            <fields>
+                                <field table="asset_type_tree" column="typeid" />
+                            </fields>
+                            <from>
+                                <table>asset_type_tree</table>
+                            </from>
+                            <where>
+                                <equal table="asset_type_tree" column="parent_typeid">:typeid</equal>
+                                <equal table="asset_type_tree" column="lvl">:lvl</equal>
+                            </where>
+                        </select>
+                    </in>
+                </where>
+            </select>
+        </primary>
+        <alternate>
+            <assert-null data="lvl">
+                <select>
+                    <fields>
+                        <field table="asset_type" column="typeid" />
+                        <field table="asset_type" column="name" />
+                    </fields>
+                    <from>
+                        <table>asset_type</table>
+                    </from>
+                    <where>
+                        <in table="asset_type" column="typeid">
+                            <select>
+                                <fields>
+                                    <field table="asset_type_tree" column="typeid" />
+                                </fields>
+                                <from>
+                                    <table>asset_type_tree</table>
+                                </from>
+                                <where>
+                                    <equal table="asset_type_tree" column="parent_typeid">:typeid</equal>
+                                    <not-equal table="asset_type_tree" column="typeid">:typeid</not-equal>
+                                </where>
+                            </select>
+                        </in>
+                    </where>
+                </select>
+            </assert-null>
+        </alternate>
+    </query>
+
 </queries>
