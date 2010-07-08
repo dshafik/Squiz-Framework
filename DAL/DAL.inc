@@ -319,7 +319,7 @@ class DAL
      * @since  4.0.0
      * @return array
      */
-    public static function getDALQuery($systemid, $queryid, $method)
+    public static function getDALQuery($systemid, $queryid, $method='')
     {
         $queryArray = self::getQuery($systemid, $queryid, FALSE);
         // Add the method data to the query array, as this will allow
