@@ -1,0 +1,93 @@
+<schema system="Asset">
+    <udts>
+        <udt type="FLOAT">ASSETID</udt>
+        <udt type="VARCHAR" size="50">TYPEID</udt>
+    </udts>
+
+    <tables>
+        <!--
+            Table   : asset
+            Columns : assetid (asset_pk)
+                      typeid -> asset_type.typeid (asset_fk1)
+
+            Stores a list of created assets. Each asset stores its type so that
+            the Asset system knows which code template to use.
+        -->
+        <table name="asset">
+            <columns>
+                <column type="ASSETID" allow-null="false">assetid</column>
+                <column type="TYPEID" allow-null="false">typeid</column>
+            </columns>
+            <constraints>
+               <primary-key name="asset_pk">
+                    <column>assetid</column>
+               </primary-key>
+            </constraints>
+            <indexes>
+                <index name="asset_typeid_idx">
+                    <column>typeid</column>
+                </index>
+           </indexes>
+            <sequences>
+                <sequence name="seq_assetid" />
+            </sequences>
+        </table>
+
+        <!--
+            Table   : asset_type
+            Columns : typeid (asset_type_pk)
+
+            Stores a list of installed asset types. Some basic information is
+            stored along with the typeid so that it can be easily retrieved.
+        -->
+        <table name="asset_type">
+            <columns>
+                <column type="TYPEID" allow-null="false">typeid</column>
+                <column type="VARCHAR" size="50" allow-null="false">name</column>
+                <column type="VARCHAR" size="100" allow-null="true">category</column>
+                <column type="BOOLEAN" allow-null="false" default="'0'">is_custom</column>
+            </columns>
+            <constraints>
+                <primary-key name="asset_type_pk">
+                    <column>typeid</column>
+                </primary-key>
+            </constraints>
+        </table>
+
+        <!--
+            Table   : asset_type_tree
+            Columns : typeid, parent_typeid (asset_type_tid_pk)
+                      typeid        -> asset_type.typeid (asset_type_tid_fk1)
+                      parent_typeid -> asset_type.typeid (asset_type_tid_fk2)
+
+            The asset type tree table is used to provide a tree representation
+            of asset type inheritance. This tree will commonly be joined to
+            provide asset type filtering at a database level.
+        -->
+        <table name="asset_type_tree">
+            <columns>
+                <column type="TYPEID" allow-null="false">typeid</column>
+                <column type="TYPEID" allow-null="false">parent_typeid</column>
+                <column type="SMALLINT" allow-null="false">lvl</column>
+            </columns>
+            <indexes>
+                <index name="asset_type_tree_idx">
+                    <column>parent_typeid</column>
+                </index>
+            </indexes>
+            <constraints>
+                <primary-key name="asset_type_tid_pk">
+                    <column>typeid</column>
+                    <column>parent_typeid</column>
+                </primary-key>
+
+                <foreign-key name="asset_type_tid_fk1" foreign-table="asset_type" on-delete="CASCADE">
+                    <column references="typeid">typeid</column>
+                </foreign-key>
+                <foreign-key name="asset_type_tid_fk2" foreign-table="asset_type">
+                    <column references="typeid">parent_typeid</column>
+                </foreign-key>
+            </constraints>
+        </table>
+    </tables>
+</schema>

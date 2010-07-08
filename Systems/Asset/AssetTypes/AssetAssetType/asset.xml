@@ -1,0 +1,7 @@
+<asset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="asset.xsd">
+       <type_code>asset</type_code>
+       <name>Asset</name>
+       <category></category>
+       <parent_type>asset</parent_type>
+</asset>

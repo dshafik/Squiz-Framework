@@ -1,0 +1,158 @@
+<queries system="Asset">
+    <!--
+        Adds a new row to the asset table. Assetid comes from assetid sequence.
+        Typeid must exist in the asset_type else this query will fail.
+        Binds   : typeid
+    -->
+    <query id="addAsset">
+        <primary>
+            <insert>
+                <fields table="asset">
+                    <field>assetid</field>
+                    <field>typeid</field>
+                </fields>
+                <values>
+                    <value column="assetid">:assetid</value>
+                    <value column="typeid">:typeid</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <!--
+        Deletes a single asset from the asset table.
+        Binds   : assetid
+    -->
+    <query id="deleteAsset">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="asset" column="assetid">:assetid</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="assetExists">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset" column="assetid" />
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <equal table="asset" column="assetid">:assetid</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getAssetCount">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset" column="typeid" />
+                    <function function="count" alias="assetCount">
+                        <arg><field table="asset" column="assetid" /></arg>
+                    </function>
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <in table="asset" column="typeid">:typeids</in>
+                </where>
+                <group-by>
+                    <field table="asset" column="typeid" />
+                </group-by>
+                <order-by direction="DESC">
+                    <field table="" column="assetCount" />
+                </order-by>
+            </select>
+        </primary>
+        <alternate>
+            <assert-null data="typeids">
+                <select>
+                    <fields>
+                        <function function="count">
+                            <arg><field table="asset" column="assetid" /></arg>
+                        </function>
+                    </fields>
+                    <from>
+                        <table>asset</table>
+                    </from>
+                </select>
+            </assert-null>
+        </alternate>
+    </query>
+
+
+    <query id="getTypes">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset" column="assetid" />
+                    <field table="asset" column="typeid" />
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <in table="asset" column="assetid">:assetids</in>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getAssets">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset" column="assetid" />
+                    <field table="asset" column="typeid" />
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <in table="asset" column="typeid">:typeids</in>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getTypeQuery">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset" column="typeid" />
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <equal table="asset" column="assetid">:assetid</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getAssetsQuery">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset" column="assetid" />
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <in table="asset" column="typeid">:typeids</in>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+</queries>
