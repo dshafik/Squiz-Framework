@@ -16,9 +16,14 @@ if ((php_sapi_name() !== 'cli')) {
     exit();
 }
 
+if (isset($argv[1]) === FALSE) {
+    echo "Please specify the root directory.\n";
+    exit();
+}
+
 $rootdir = $argv[1];
 if (is_dir($rootdir) === FALSE) {
-    echo "Please specify the root directory.\n";
+    echo "The specified root directory does not exist.\n";
     exit();
 }
 
