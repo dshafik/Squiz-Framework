@@ -15,7 +15,6 @@ $enableDebugging = FALSE;
 
 error_reporting(E_ALL | E_STRICT);
 ini_set('error_log', 'error_log');
-date_default_timezone_set('Australia/Sydney');
 include_once dirname(__FILE__).'/Systems/BaseSystem.inc';
 include_once BaseSystem::getDataDir().'/init.inc';
 ini_set('include_path', ini_get('include_path').':'.Init::ROOT_DIR);
