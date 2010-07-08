@@ -65,6 +65,8 @@ class DALBaker
                                        'assert-equal',
                                        'assert-greater-than',
                                        'assert-less-than',
+                                       'assert-array',
+                                       'assert-not-array',
                                       );
 
     /**
@@ -1424,15 +1426,23 @@ class DALBaker
             break;
 
             case 'assert-empty':
-                // Can't call empty on function return value, do extra stuffs.
                 $initCode   = '$empty = '.$methodCall.';'."\n";
                 $methodCall = '(empty($empty) === TRUE)';
             break;
 
             case 'assert-not-empty':
-                // Can't call empty on function return value, do extra stuffs.
                 $initCode   = '$empty = '.$methodCall.';'."\n";
                 $methodCall = '(empty($empty) === FALSE)';
+            break;
+
+            case 'assert-array':
+                $initCode   = '$array = '.$methodCall.';'."\n";
+                $methodCall = '(is_array($array) === TRUE)';
+            break;
+
+            case 'assert-not-array':
+                $initCode   = '$array = '.$methodCall.';'."\n";
+                $methodCall = '(is_array($array) === FALSE)';
             break;
 
             case 'assert-equal':
