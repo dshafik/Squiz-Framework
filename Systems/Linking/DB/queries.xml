@@ -1,0 +1,905 @@
+<queries system="Linking" >
+
+    <query id="createLink">
+        <primary>
+            <insert>
+                <fields table="asset_link">
+                    <field>childid</field>
+                    <field>parentid</field>
+                    <field>sort_order</field>
+                    <field>show_menu</field>
+                    <field>userid</field>
+                    <field>last_updated</field>
+                </fields>
+                <values>
+                    <value column="childid">:childid</value>
+                    <value column="parentid">:parentid</value>
+                    <value column="sort_order">:sortOrder</value>
+                    <value column="show_menu">:showMenu</value>
+                    <value column="userid">:userid</value>
+                    <value column="last_updated">:lastUpdated</value>
+                </values>
+            </insert>
+        </primary>
+        <alternate>
+            <assert-equal data="sortOrder" value="0">
+                <insert>
+                    <fields table="asset_link">
+                        <field>childid</field>
+                        <field>parentid</field>
+                        <field>sort_order</field>
+                        <field>show_menu</field>
+                        <field>userid</field>
+                        <field>last_updated</field>
+                    </fields>
+                    <select>
+                        <fields>
+                            <value column="childid">:childid</value>
+                            <value column="parentid">:parentid</value>
+                            <math-op>
+                                <add>
+                                    <function function="coalesce">
+                                        <arg>
+                                            <function function="MAX">
+                                                <arg><field table="asset_link" column="sort_order" /></arg>
+                                            </function>
+                                        </arg>
+                                        <arg>
+                                            <value type="integer">0</value>
+                                        </arg>
+                                    </function>
+                                    <value>1</value>
+                                </add>
+                            </math-op>
+                            <value column="show_menu">:showMenu</value>
+                            <value column="userid">:userid</value>
+                            <value column="last_updated">:lastUpdated</value>
+                        </fields>
+                        <from>
+                            <table>asset_link</table>
+                        </from>
+                        <where>
+                            <equal table="asset_link" column="parentid">:parentid</equal>
+                        </where>
+                    </select>
+                </insert>
+           </assert-equal>
+        </alternate>
+    </query>
+
+    <query id="activateLink">
+        <primary>
+            <update>
+                <fields table="asset_link">
+                    <field>active</field>
+                    <field>show_menu</field>
+                    <field>userid</field>
+                    <field>last_updated</field>
+                </fields>
+                <values>
+                    <value column="active" type="boolean">1</value>
+                    <value column="show_menu">:showMenu</value>
+                    <value column="userid">:userid</value>
+                    <value column="last_updated">:lastUpdated</value>
+                </values>
+                <where>
+                    <equal table="asset_link" column="parentid">:parentid</equal>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                    <equal table="asset_link" column="active">false</equal>
+                </where>
+            </update>
+         </primary>
+    </query>
+
+    <query id="deleteLink">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="asset_link" column="parentid">:parentid</equal>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                </where>
+            </delete>
+        </primary>
+        <alternate>
+            <assert-not-null data="context">
+                <insert>
+                    <fields table="asset_link">
+                        <field>childid</field>
+                        <field>parentid</field>
+                        <field>sort_order</field>
+                        <field>active</field>
+                        <field>userid</field>
+                        <field>last_updated</field>
+                    </fields>
+                    <values>
+                        <value column="childid">:childid</value>
+                        <value column="parentid">:parentid</value>
+                        <value column="sort_order">:sortOrder</value>
+                        <value column="active">:active</value>
+                        <value column="userid">:userid</value>
+                        <value column="last_updated">:lastUpdated</value>
+                    </values>
+                </insert>
+            </assert-not-null>
+        </alternate>
+    </query>
+
+    <query id="turnOffLink">
+        <primary>
+            <update>
+                <fields table="asset_link">
+                    <field>active</field>
+                </fields>
+                <values>
+                    <value column="active">false</value>
+                </values>
+                <where>
+                    <equal table="asset_link" column="parentid">:parentid</equal>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="updateLink">
+        <primary>
+            <update>
+                <fields table="asset_link">
+                    <field>sort_order</field>
+                    <field>userid</field>
+                    <field>last_updated</field>
+                </fields>
+                <values>
+                    <value column="sort_order">:sortOrder</value>
+                    <value column="userid">:userid</value>
+                    <value column="last_updated">:lastUpdated</value>
+                </values>
+                <where>
+                    <equal table="asset_link" column="parentid">:parentid</equal>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                    <equal table="asset_link" column="show_menu">:showMenu</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="deleteParentLinks">
+        <primary>
+            <update>
+                <fields table="asset_link">
+                    <field>active</field>
+                    <field>userid</field>
+                    <field>last_updated</field>
+                </fields>
+                <values>
+                    <value column="active" type="boolean">0</value>
+                    <value column="userid">:userid</value>
+                    <value column="last_updated">:lastUpdated</value>
+                </values>
+                <where>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                    <equal table="asset_link" column="active">true</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="getShowMenuLinksOnly">
+        <primary>
+            <select>
+                <fields>
+                    <field table="a" column="childid" />
+                </fields>
+                <from>
+                    <table alias="a">
+                        <select>
+                            <distinct-on>
+                                <field table="asset_link" column="childid" />
+                            </distinct-on>
+                            <fields>
+                                <field table="asset_link" column="childid" />
+                                <field table="asset_link" column="parentid" />
+                                <field table="asset_link" column="show_menu" />
+                                <field table="asset_link" column="active" />
+                                <field table="asset_link" column="sort_order" />
+                            </fields>
+                            <from>
+                                <table>asset_link</table>
+                            </from>
+                            <where>
+                                <in table="asset_link" column="childid">:children</in>
+                                <in table="asset_link" column="parentid">
+                                   <select>
+                                      <fields>
+                                          <field table="" column="*" />
+                                      </fields>
+                                      <from>
+                                        <function function="getContextAssetids">
+                                            <arg>:parentid</arg>
+                                        </function>
+                                      </from>
+                                   </select>
+                                </in>
+                            </where>
+                            <order-by>
+                                <field table="asset_link" column="childid" />
+                            </order-by>
+                            <order-by direction="abs-DESC">
+                                <field table="asset_link" column="parentid" />
+                            </order-by>
+                        </select>
+                    </table>
+                </from>
+                <where>
+                    <equal table="a" column="show_menu">:showMenu</equal>
+                    <equal table="a" column="active">true</equal>
+                </where>
+                <order-by>
+                    <field table="a" column="sort_order" />
+                </order-by>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getLinkShowMenu">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset_link" column="show_menu" />
+                </fields>
+                <from>
+                    <table>asset_link</table>
+                </from>
+                <where>
+                    <in table="asset_link" column="parentid">
+                       <select>
+                          <fields>
+                              <field table="" column="*" />
+                          </fields>
+                          <from>
+                            <function function="getContextAssetids">
+                                <arg>:parentid</arg>
+                            </function>
+                          </from>
+                       </select>
+                    </in>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                </where>
+                <order-by direction="abs-DESC">
+                    <field table="asset_link" column="parentid" />
+                </order-by>
+                <limit offset="0">1</limit>
+            </select>
+        </primary>
+    </query>
+
+    <query id="updateLinkShowMenu">
+        <primary>
+            <update>
+                <fields table="asset_link">
+                    <field>show_menu</field>
+                    <field>userid</field>
+                    <field>last_updated</field>
+                </fields>
+                <values>
+                    <value column="show_menu">:showMenu</value>
+                    <value column="userid">:userid</value>
+                    <value column="last_updated">:lastUpdated</value>
+                </values>
+                <where>
+                    <equal table="asset_link" column="parentid">:parentid</equal>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="getImmediateParents">
+        <primary>
+          <select distinct="true">
+            <fields>
+                <field table="" column="getdirectparents" alias="parentid" />
+            </fields>
+            <from>
+                <function function="getDirectParents">
+                    <arg>:childid</arg>
+                </function>
+            </from>
+          </select>
+         </primary>
+         <!--alternate>
+            <assert-not-null data="notParentid">
+               <select distinct="true">
+                 <fields>
+                     <field table="" column="getdirectparents" alias="parentid" />
+                 </fields>
+                 <from>
+                     <function function="getDirectParents">
+                         <arg>:childid</arg>
+                     </function>
+                 </from>
+                <where>
+                    <not-equal table="getdirectparents" column="">:notParentid</not-equal>
+                </where>
+               </select>
+           </assert-not-null>
+         </alternate-->
+    </query>
+
+    <query id="getImmediateChildren">
+        <primary>
+            <select>
+                <fields>
+                    <field table="getDirectChildren" column="childid" />
+                </fields>
+                <from>
+                    <function function="getDirectChildren">
+                        <arg>:parentid</arg>
+                    </function>
+                </from>
+                <order-by direction="ASC">
+                  <field table="getDirectChildren" column="sort_order" />
+                </order-by>
+            </select>
+        </primary>
+        <alternate>
+          <assert-true data="withSortOrder">
+            <select>
+                <fields>
+                    <field table="getDirectChildren" column="childid" />
+                    <field table="getDirectChildren" column="sort_order" />
+                </fields>
+                <from>
+                    <function function="getDirectChildren">
+                        <arg>:parentid</arg>
+                    </function>
+                </from>
+                <order-by direction="ASC">
+                  <field table="getDirectChildren" column="sort_order" />
+                </order-by>
+            </select>
+          </assert-true>
+        </alternate>
+    </query>
+
+    <query id="getLevelImmediateChildren">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset_link" column="parentid" />
+                    <field table="asset_link" column="childid" />
+                </fields>
+                <from>
+                    <table>asset_link</table>
+                </from>
+                <where>
+                    <in table="asset_link" column="parentid">:parentids</in>
+                    <equal table="asset_link" column="active">true</equal>
+                </where>
+                <order-by direction="ASC">
+                  <field table="asset_link" column="sort_order" />
+                </order-by>
+            </select>
+        </primary>
+        <alternate>
+          <assert-true data="withSortOrder">
+            <select>
+              <fields>
+                <field table="asset_link" column="parentid" />
+                <field table="asset_link" column="childid" />
+                <field table="asset_link" column="sort_order" />
+              </fields>
+              <from>
+                <table>asset_link</table>
+              </from>
+              <where>
+                  <in table="asset_link" column="parentid">:parentids</in>
+                  <equal table="asset_link" column="active">true</equal>
+              </where>
+              <order-by direction="ASC">
+                <field table="asset_link" column="sort_order" />
+              </order-by>
+            </select>
+          </assert-true>
+        </alternate>
+    </query>
+
+    <!-- Sort order updat queries -->
+    <query id="getSortOrder">
+        <primary>
+            <select>
+                <fields>
+                    <function function="floor" alias="sort_order">
+                        <arg><field table="asset_link" column="sort_order" /></arg>
+                    </function>
+                </fields>
+                <from>
+                    <table>asset_link</table>
+                </from>
+                <where>
+                    <in table="asset_link" column="parentid">
+                       <select>
+                          <fields>
+                              <field table="" column="*" />
+                          </fields>
+                          <from>
+                            <function function="getContextAssetids">
+                                <arg>:parentid</arg>
+                            </function>
+                          </from>
+                       </select>
+                    </in>
+                    <equal table="asset_link" column="childid">:childid</equal>
+                </where>
+                <order-by direction="abs-DESC">
+                    <field table="asset_link" column="parentid" />
+                </order-by>
+                <limit offset="0">1</limit>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getChildSortOrders">
+        <primary>
+            <select>
+                <fields>
+                    <field table="getDirectChildren" column="childid" />
+                    <function function="floor" alias="sort_order">
+                        <arg><field table="getDirectChildren" column="sort_order" /></arg>
+                    </function>
+                </fields>
+                <from>
+                    <function function="getDirectChildren">
+                        <arg>:parentid</arg>
+                    </function>
+                </from>
+                <order-by direction="ASC">
+                    <field table="getDirectChildren" column="sort_order" />
+                </order-by>
+            </select>
+        </primary>
+    </query>
+
+    <query id="updateSortOrder">
+        <primary>
+            <select>
+                <fields>
+                    <function function="updateSortOrder">
+                        <arg>:parentid</arg>
+                        <arg>:childid</arg>
+                        <arg>:sortOrder</arg>
+                        <arg>'update'</arg>
+                    </function>
+                </fields>
+            </select>
+        </primary>
+    </query>
+
+    <query id="updateSortOrderRemove">
+        <primary>
+            <update>
+                <fields table="asset_link">
+                    <field>sort_order</field>
+                </fields>
+                <values>
+                    <value table="asset_link" column="sort_order">
+                        <math-op>
+                            <subtract>
+                                <field table="asset_link" column="sort_order" />
+                                <value>1</value>
+                            </subtract>
+                        </math-op>
+                    </value>
+                </values>
+                <where>
+                    <greater table="asset_link" column="sort_order">:sortOrder</greater>
+                    <equal table="asset_link" column="parentid">:parentid</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="updateSortOrderAdd">
+        <primary>
+            <update>
+                <fields table="asset_link">
+                    <field>sort_order</field>
+                </fields>
+                <values>
+                    <value table="asset_link" column="sort_order">
+                        <math-op>
+                            <add>
+                                <field table="asset_link" column="sort_order" />
+                                <value>1</value>
+                            </add>
+                        </math-op>
+                    </value>
+                </values>
+                <where>
+                    <equal-or-greater table="asset_link" column="sort_order">:sortOrder</equal-or-greater>
+                    <equal table="asset_link" column="parentid">:newParentid</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="linkExists">
+        <primary>
+            <select>
+                <fields>
+                    <field table="a" column="parentid" />
+                </fields>
+                <from>
+                    <table alias="a">
+                        <select>
+                            <fields>
+                                <field table="asset_link" column="parentid" />
+                                <field table="asset_link" column="active" />
+                            </fields>
+                            <from>
+                                <table>asset_link</table>
+                            </from>
+                            <where>
+                                <equal table="asset_link" column="childid">:childid</equal>
+                                <in table="asset_link" column="parentid">:parentid</in>
+                            </where>
+                            <order-by direction="abs-DESC">
+                                <field table="asset_link" column="parentid" />
+                            </order-by>
+                            <limit offset="0">1</limit>
+                        </select>
+                    </table>
+                </from>
+                <where>
+                     <equal table="a" column="active">true</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="removeAssetInTrashFromList">
+        <primary>
+            <select>
+                <fields table="asset_link">
+                    <field table="asset_link" column="childid" />
+                </fields>
+                <from>
+                    <table>asset_link</table>
+                </from>
+                <where>
+                    <in table="asset_link" column="childid">:assetids</in>
+                    <equal table="asset_link" column="active">true</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="contextCleanAssetLink">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="asset_link" column="childid">:assetid</equal>
+                    <equal>
+                        <function function="getContext">
+                            <arg><field table="asset_link" column="parentid" /></arg>
+                        </function>
+                        <value>:oldContext</value>
+                    </equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="contextCleanAssetLinkTree">
+      <primary>
+        <delete>
+            <where>
+                <or>
+                    <and>
+                        <equal table="asset_link_tree" column="assetid">:assetid</equal>
+                        <equal table="asset_link_tree" column="owner">:oldContext</equal>
+                    </and>
+                    <and>
+                        <like table="asset_link_tree" column="path">:path</like>
+                        <equal table="asset_link_tree" column="owner">:oldContext</equal>
+                    </and>
+                </or>
+            </where>
+        </delete>
+       </primary>
+    </query>
+
+    <query id="removeLinkContextData">
+        <!-- Removed context data from asset_link table for specific asset and context -->
+        <primary>
+            <delete>
+                <where>
+                  <or>
+                    <equal table="asset_link" column="parentid">:contextAssetid</equal>
+                    <and>
+                        <equal table="asset_link" column="childid">:assetid</equal>
+                        <equal>
+                            <function function="getContext">
+                                <arg><field table="asset_link" column="parentid" /></arg>
+                            </function>
+                            <value>:context</value>
+                        </equal>
+                    </and>
+                  </or>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="removeLinkTreeContextData">
+        <!-- Removed context data from asset_link_tree table for specific asset and context -->
+        <primary>
+            <delete>
+                <where>
+                  <or>
+                    <and>
+                        <equal table="asset_link_tree" column="assetid">:assetid</equal>
+                        <equal table="asset_link_tree" column="owner">:context</equal>
+                    </and>
+                    <and>
+                        <like table="asset_link_tree" column="path">:path</like>
+                        <equal table="asset_link_tree" column="owner">:context</equal>
+                    </and>
+                  </or>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="removeAllLinkTreeContextData">
+        <!-- Removed context data from asset_link_tree table for context level -->
+        <primary>
+            <delete from="asset_link_tree">
+                <where>
+                    <like>
+                        <field  table="asset_link_tree" column="owner"/>
+                        <value>:context</value>
+                    </like>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+
+    <query id="removeAllLinkContextData">
+        <!-- Removed context data from asset_link table for context level -->
+        <primary>
+            <delete from="asset_link">
+                <where>
+                    <like>
+                        <function function="getContext">
+                            <arg><field  table="asset_link" column="parentid"/></arg>
+                        </function>
+                        <value>:context</value>
+                    </like>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+
+    <query id="getParents">
+        <primary>
+            <select distinct="true">
+                <fields>
+                    <field table="" column="getParents" alias="parentid" />
+                </fields>
+                <from>
+                    <function function="getParents">
+                        <arg>:childid</arg>
+                    </function>
+                    <hook id="getparents_tables_filter" />
+                </from>
+                <where>
+                    <hook id="getparents_assets_filter" />
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getAssetids">
+        <primary>
+            <select distinct="true">
+                <fields>
+                    <field table="asset" column="assetid" />
+                </fields>
+                <from>
+                    <table>asset</table>
+                </from>
+                <where>
+                    <in table="asset" column="assetid">:assetids</in>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getChildren">
+        <primary>
+            <select>
+                <fields>
+                    <field table="getChildren" column="assetid" />
+                </fields>
+                <from>
+                    <function function="getChildren">
+                        <arg>:parentid</arg>
+                        <arg>:minLevel</arg>
+                        <arg>:maxLevel</arg>
+                    </function>
+                    <hook id="getchildren_tables_filter" />
+                </from>
+                <where>
+                    <hook id="getchildren_assets_filter" />
+                </where>
+                <order-by direction="DESC">
+                    <field column="assetid" table="getChildren" />
+                </order-by>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getAssetChildPath">
+        <primary>
+            <select>
+                <fields>
+                    <function function="concat" alias="childpath">
+                        <arg><field column="path" table="asset_link_tree" /></arg>
+                        <arg>'[childid]/'</arg>
+                    </function>
+                    <field column="depth" table="asset_link_tree" />
+                </fields>
+                <from>
+                    <table>asset_link_tree</table>
+                </from>
+                <where>
+                    <equal table="asset_link_tree" column="assetid">:childid</equal>
+                </where>
+                <limit offset="0">1</limit>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getChildrenByLevel">
+        <primary>
+            <select>
+                <fields>
+                    <math-op alias="level">
+                        <subtract>
+                            <field column="depth" table="asset_link_tree" />
+                            <value>[level]</value>
+                        </subtract>
+                    </math-op>
+                    <function function="count">
+                        <arg>
+                            <field column="assetid" table="asset_link_tree" />
+                        </arg>
+                    </function>
+                </fields>
+                <from>
+                    <table>asset_link_tree</table>
+                </from>
+                <where>
+                    <like table="asset_link_tree" column="path">
+                        <function function="concat">
+                            <arg>:path</arg>
+                            <arg>'%'</arg>
+                        </function>
+                    </like>
+                </where>
+                <group-by>
+                    <alias name="level" />
+                </group-by>
+                <order-by>
+                    <alias name="level" />
+                </order-by>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getAssetLineages">
+        <primary>
+            <select>
+                <fields>
+                    <field table="asset_link_tree" column="path" />
+                    <field table="asset_link_tree" column="owner" />
+                    <field table="asset_link_tree" column="active" />
+                    <field table="asset_link_tree" column="depth" />
+                </fields>
+                <from>
+                    <table>asset_link_tree</table>
+                </from>
+                <where>
+                    <equal table="asset_link_tree" column="assetid">:assetid</equal>
+                    <in table="asset_link_tree" column="owner">:owner</in>
+                </where>
+                <order-by direction="DESC">
+                    <field table="asset_link_tree" column="owner" />
+                </order-by>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getAssetPath">
+        <primary>
+            <select>
+                <fields>
+                    <function function="concat">
+                        <arg><field column="path" table="asset_link_tree" /></arg>
+                        <arg><field column="assetid" table="asset_link_tree" /></arg>
+                    </function>
+                </fields>
+                <from>
+                    <table>asset_link_tree</table>
+                </from>
+                <where>
+                    <equal table="asset_link_tree" column="assetid">:assetid</equal>
+                </where>
+                <limit offset="0">:limit</limit>
+            </select>
+        </primary>
+    </query>
+
+    <query id="isChildOf">
+        <primary>
+          <select>
+            <fields>
+              <field column="assetid" table="asset_link_tree" />
+            </fields>
+            <from>
+                <table>asset_link_tree</table>
+            </from>
+            <where>
+                <in table="asset_link_tree" column="assetid">:assetids</in>
+                <like table="asset_link_tree" column="path">
+                    <function function="concat">
+                        <arg>:parentPath</arg>
+                        <arg>'/%'</arg>
+                    </function>
+                </like>
+            </where>
+          </select>
+        </primary>
+    </query>
+
+    <query id="isChildOfByParentId">
+      <primary>
+        <select>
+          <fields>
+            <function function="cast" alias="isChildOf">
+              <arg><value>true</value></arg>
+              <arg>boolean</arg>
+            </function>
+          </fields>
+          <from>
+              <table>asset_link_tree</table>
+          </from>
+          <where>
+            <equal table="asset_link_tree" column="assetid">:assetid</equal>
+            <like table="asset_link_tree" column="path">
+              <function function="concat">
+                <arg>'%/'</arg>
+                <arg>:parentid</arg>
+                <arg>'/%'</arg>
+              </function>
+            </like>
+          </where>
+          <limit offset="0">1</limit>
+        </select>
+      </primary>
+    </query>
+
+    <query id="removeAssetFromLinkTree">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="asset_link_tree" column="assetid">:assetid</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+</queries>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+    <initial_gatherer>
+      <required>yes</required>
+      <action>Asset::create</action>
+      <field>parentid</field>
+      <default>NULL</default>
+      <fatal>yes</fatal>
+    </initial_gatherer>
+  </plugs>
+</system>

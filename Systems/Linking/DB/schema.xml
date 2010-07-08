@@ -1,0 +1,57 @@
+<schema system="Linking">
+    <udts>
+        <udt-import system="Asset">ASSETID</udt-import>
+    </udts>
+    <tables>
+        <table name="asset_link">
+            <columns>
+                <column type="ASSETID" allow-null="false">parentid</column>
+                <column type="ASSETID" allow-null="false">childid</column>
+                <column type="FLOAT" allow-null="false">sort_order</column>
+                <column type="BOOLEAN" allow-null="false" default="'1'">show_menu</column>
+                <column type="BOOLEAN" allow-null="false" default="'1'">active</column>
+                <column type="ASSETID" allow-null="true">userid</column>
+                <column type="TIMESTAMP WITH TIME ZONE" allow-null="true">last_updated</column>
+            </columns>
+            <constraints>
+                <primary-key name="asset_link_pk">
+                    <column>parentid</column>
+                    <column>childid</column>
+                </primary-key>
+                <indexes>
+                  <index name="asset_link_childid">
+                    <column>childid</column>
+                  </index>
+                </indexes>
+                <foreign-key name="asset_link_fk2" foreign-table="asset" on-delete="NO ACTION">
+                  <column references="assetid">childid</column>
+                </foreign-key>
+            </constraints>
+        </table>
+
+        <table name="asset_link_tree">
+            <columns>
+                <column type="ASSETID" allow-null="false">assetid</column>
+                <column type="VARCHAR" size="500" allow-null="false">path</column>
+                <column type="INTEGER" allow-null="false">depth</column>
+                <column type="BOOLEAN" allow-null="false" default="'t'">active</column>
+                <column type="VARCHAR" size="8" allow-null="false" default="00000000">owner</column>
+            </columns>
+            <indexes>
+                <index name="asset_lt_2_idx">
+                    <column>path</column>
+                </index>
+            </indexes>
+            <constraints>
+                <primary-key name="asset_link_tree_pk">
+                    <column>assetid</column>
+                    <column>path</column>
+                    <column>owner</column>
+                </primary-key>
+                <foreign-key name="asset_link_tree_fk1" foreign-table="asset" on-delete="CASCADE">
+                    <column references="assetid">assetid</column>
+                </foreign-key>
+            </constraints>
+        </table>
+    </tables>
+</schema>
