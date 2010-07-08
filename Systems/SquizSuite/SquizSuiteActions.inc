@@ -100,14 +100,14 @@ class SquizSuiteActions
     /**
      * Modify a project in the Suite.
      *
-     * @param string $productID The ID of the Product.
+     * @param string $productid The ID of the Product.
      * @param string $attrName  The name of the field to change.
      * @param string $attrValue The new value.
      *
      * @since  4.0.0
      * @return boolean
      */
-    public static function modifyProduct($productID, $attrName, $attrValue)
+    public static function modifyProduct($productid, $attrName, $attrValue)
     {
         $result = DAL::executeQuery('SquizSuite', 'modifyProduct');
         return $result;
