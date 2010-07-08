@@ -34,14 +34,8 @@ BEGIN
             FROM asset_link_tree
             WHERE assetid = parentMaster
         );
-
-        -- Now, there might be child link in asset_link table which needs to be
-        -- imported to asset_link_tree table.
-        IF newParentid <> 0 THEN
-            PERFORM syncLinkTreeChildren(newChildid, _owner, newActive);
-        END IF;
     ELSE
-    	childPath = regexp_replace(childPath, E'\\.\\d+', '', 'g');
+        childPath = regexp_replace(childPath, E'\\.\\d+', '', 'g');
 
         -- The child already exists in the tree, so insert it under all the
         -- locations of the parent, and insert all its children under this new
@@ -75,14 +69,17 @@ BEGIN
         RETURN;
     END IF;
 
-    -- If we couldn't insert into the tree, then we must be inserting at
-    -- the root level. Ensure that the parentid is 0.
+    -- If we couldn't insert into the tree, then we must be inserting at the root level.
     IF NOT FOUND THEN
         IF newParentid <> 0 THEN
-            RAISE EXCEPTION 'Could not find parent path for asset %',
-             newParentid;
+            -- Our parent needs to be inserted at the root level
+            -- and we need to be inserted under the parent.
+            INSERT INTO asset_link_tree VALUES (newParentid, '/', 1, true, _owner);
+            INSERT INTO asset_link_tree VALUES (newChildid, '/' || newParentid || '/', 2, true, _owner);
+        ELSE
+            -- Inserting at the root level.
+            INSERT INTO asset_link_tree VALUES (newChildid, '/', 1, true, _owner);
         END IF;
-        INSERT INTO asset_link_tree VALUES (newChildid, '/', 1, true, '00000000');
     END IF;
 
 END
