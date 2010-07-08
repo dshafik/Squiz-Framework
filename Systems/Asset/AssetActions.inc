@@ -393,9 +393,9 @@ class AssetActions
 
 
     /**
-     * Returns the asset type information.
+     * Get an asset type information.
      *
-     * @param string $typeid Asset typeid to check.
+     * @param string $typeid The type of assets to get.
      *
      * @since  4.0.0
      * @return array
@@ -410,9 +410,9 @@ class AssetActions
 
 
     /**
-     * Returns the list of parent asset types.
+     * Get a list of typeids of parent asset types.
      *
-     * @param string $typeid Asset typeid to check.
+     * @param string $typeid The type of assets to get.
      *
      * @since  4.0.0
      * @return array
@@ -426,9 +426,9 @@ class AssetActions
 
 
     /**
-     * Returns the list of child asset types.
+     * Returns a list of typeids of child asset types.
      *
-     * @param string  $typeid Asset typeid to check.
+     * @param string  $typeid The type of assets to get.
      * @param integer $lvl    Level restriction to filter.
      *
      * @since  4.0.0
