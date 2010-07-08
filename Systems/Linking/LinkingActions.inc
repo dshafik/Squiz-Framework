@@ -1030,6 +1030,311 @@ class LinkingActions
     }//end removeAllContextData()
 
 
+
+    /**
+     * Returns getParents Query object.
+     *
+     * @param string $childid  The asset ID of the asset to link to.
+     * @param string $minLevel The minimum level to get parent for.
+     * @param string $maxLevel The maximum level to get parent for.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function getParents($childid, $minLevel, $maxLevel)
+    {
+        if ($minLevel === 1 && $maxLevel === 1) {
+            Channels::includeSystem('Context');
+            $childid = Context::getAssetid($childid, NULL, TRUE);
+            Channels::modifyBasket('childid', $childid);
+
+            $baseQuery = DAL::getDALQuery(
+                'Linking',
+                'getImmediateParents',
+                'executeQuery'
+            );
+
+            return $baseQuery;
+        }
+
+        Channels::includeSystem('Context');
+        $childid = Context::getAssetid($childid, NULL, TRUE);
+        Channels::modifyBasket('childid', $childid);
+
+        $baseQuery = DAL::getDALQuery('Linking', 'getParents', 'Assoc');
+        return $baseQuery;
+
+    }//end getParents()
+
+
+    /**
+     * Returns getAssetids Query object.
+     *
+     * This method turns assetids array into a query object,
+     * this object can later be binded to another query object.
+     *
+     * @param string $assetids The assetids to get Query object for.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function getAssetids($assetids)
+    {
+        $baseQuery = DAL::getDALQuery('Linking', 'getAssetids', 'Assoc');
+        return $baseQuery;
+
+    }//end getAssetids()
+
+
+    /**
+     * Returns getChildren Query object.
+     *
+     * @param string $parentid The asset ID of the asset to link the new asset underneath.
+     * @param string $minLevel The minimum level to get the children.
+     * @param string $maxLevel The maximum level to get the children.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function getChildren($parentid, $minLevel=0, $maxLevel=0)
+    {
+        Channels::includeSystem('Context');
+        $parentid = Context::getAssetid($parentid, NULL, TRUE);
+        Channels::modifyBasket('parentid', $parentid);
+
+        $baseQuery = DAL::getDALQuery('Linking', 'getChildren', 'Assoc');
+        return $baseQuery;
+
+    }//end getChildren()
+
+
+    /**
+     * Returns batchGetChildren Query object (not implemented).
+     *
+     * @param integer $parentid The asset ID of the asset to link the new asset
+     *                          underneath.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function batchGetChildren($parentid)
+    {
+        $baseQuery = DAL::getDALQuery('Linking', 'batchGetChildren', 'All');
+        return $baseQuery;
+
+    }//end batchGetChildren()
+
+
+    /**
+     * Returns getAssetChildPath Query object.
+     *
+     * @param string $childid The asset ID of the asset to link to.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function getAssetChildPath($childid)
+    {
+        $baseQuery = DAL::getDALQuery('Linking', 'getAssetChildPath', 'Assoc');
+        return $baseQuery;
+
+    }//end getAssetChildPath()
+
+
+    /**
+     * Returns getChildrenByLevel Query object.
+     *
+     * @param string $path  The path to child asset.
+     * @param string $level The level to get children.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function getChildrenByLevel($path, $level)
+    {
+        $baseQuery = DAL::getDALQuery('Linking', 'getChildrenByLevel', 'Assoc');
+        return $baseQuery;
+
+    }//end getChildrenByLevel()
+
+
+    /**
+     * Retrieves an array of information about the children of this asset.
+     *
+     * The information will contain an entry for level underneath this asset
+     * and a count of assets that are linked at that level.
+     * This method works when asset has more than 1 asset_link_tree entry,
+     * as we select the first tree, use pattern matching to find out all kids
+     * under this tree, and then use depth to arrange result into level array.
+     *
+     * @param integer $assetid The asset to get information underneath.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function getChildLevelInfo($assetid)
+    {
+        Channels::includeSystem('Linking');
+        $path = DAL::getAssoc(Linking::getAssetChildPath($assetid));
+        if (empty($path) === TRUE) {
+            return array();
+        }
+
+        // Get the first element in the Association, although the query will
+        // only return one row.
+        $path      = current($path);
+        $childPath = $path['childpath'];
+        $depth     = ($path['depth'] + 1);
+        $info      = Linking::getChildrenByLevel($childPath, $depth);
+        $levelInfo = DAL::getAssoc($info);
+        return $levelInfo;
+
+    }//end getChildLevelInfo()
+
+
+    /**
+     * Returns the lineages for the specified asset.
+     *
+     * @param string $assetid The assetid.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function getAssetLineages($assetid)
+    {
+        Channels::includeSystem('Context');
+        $owner = Context::getContexts();
+        Channels::addToBasket('owner', $owner);
+
+        $baseQuery = DAL::getDALQuery(
+            'Linking',
+            'getAssetLineages',
+            'Assoc'
+        );
+        $result    = DAL::getAssoc($baseQuery);
+        $lineages  = array();
+
+        if (empty($result) === TRUE) {
+            // Failed to get the lineage.
+            return $lineages;
+        }
+
+        // When a path is inactive it is added to this array so that a context below
+        // cannot re-activate it.
+        $inactivePaths = array();
+
+        foreach ($result as $path) {
+            // Get the parentids from the link path.
+            $parentids = explode('/', trim($path['path'], '/'));
+
+            // Convert all ids to master.
+            foreach ($parentids as $index => $parentid) {
+                $parentids[$index] = Context::getMasterid($parentid);
+            }
+
+            // Re-construct the lineage.
+            $linPath = '/'.implode('/', $parentids).'/';
+
+            if ($path['active'] !== TRUE) {
+                // This lineage is not active.
+                $inactivePaths[$linPath] = 1;
+            } else if (isset($inactivePaths[$linPath]) === FALSE
+                && isset($lineages[$linPath]) === FALSE
+            ) {
+                // This lineage is active and was not deactivated by a child context.
+                $lineages[$linPath] = $parentids;
+            }
+        }//end foreach
+
+        return $lineages;
+
+    }//end getAssetLineages()
+
+
+    /**
+     * Removes the specified asset record from asset_link_tree table.
+     *
+     * @param integer $assetid Asset id.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function removeAssetFromLinkTree($assetid)
+    {
+        Dal::executeQuery('Linking', 'removeAssetFromLinkTree');
+
+    }//end removeAssetFromLinkTree()
+
+
+    /**
+     * Returns DAL query to get asset link path.
+     *
+     * By default it limits the number of result to one.
+     *
+     * @param integer $assetid Asset id.
+     * @param integer $limit   The limit of number of result rows.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function getAssetPath($assetid, $limit=1)
+    {
+        $baseQuery = Dal::getDALQuery(
+            'Linking',
+            'getAssetPath',
+            'Assoc'
+        );
+
+        return $baseQuery;
+
+    }//end getAssetPath()
+
+
+    /**
+     * Returns DAL query to filter assets that are children of given parent path.
+     *
+     * @param mixed $parentPath Parent asset's link path. Typically useful with
+     *                          getAssetPath() query.
+     * @param mixed $assetids   List of assetids to filter.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function filterChildOf($parentPath, $assetids)
+    {
+        $baseQuery = Dal::getDALQuery(
+            'Linking',
+            'isChildOf',
+            'Assoc'
+        );
+
+        return $baseQuery;
+
+    }//end filterChildOf()
+
+
+    /**
+     * Returns DAL query to determine whether the asset belongs to parentid.
+     *
+     * @param mixed $assetid  Assetid of the asset to determine.
+     * @param mixed $parentid Assetid of the asset belongs under.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    public static function isChildOf($assetid, $parentid)
+    {
+        $baseQuery = Dal::getDALQuery(
+            'Linking',
+            'isChildOfByParentid',
+            'Assoc'
+        );
+
+        return $baseQuery;
+
+    }//end isChildOf()
+
+
 }//end class
 
 ?>
