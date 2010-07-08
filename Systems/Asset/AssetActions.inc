@@ -156,93 +156,83 @@ class AssetActions
 
 
     /**
-     * Returns the typeid(s) of asset(s).
+     * Get the type of an asset.
      *
-     * When a single assetid is quried, one typeid will be returned. If an
-     * array of assetids are passed in, it returns an array of assetid => typeid
-     * pairs.
+     * If you pass in a single assetid, this function will return
+     * a single asset type as a string. If you pass in an array of
+     * assetids, this function will return an array in the form
+     * [assetid] => [typeid].
      *
-     * @param float|array $assetids Single or array of assetids to get types.
+     * @param float|array $assetid Assetid to get the type of.
      *
      * @since  4.0.0
-     * @return string
+     * @return string|array
      */
-    public static function getTypes($assetids)
+    public static function getTypeOfAsset($assetid)
     {
-        $result = array();
-        $query  = DAL::getDALQuery('Asset', 'getTypes', '');
-        $assets = DAL::getAssoc($query);
-        if (is_array($assetids) === TRUE) {
-            foreach ($assets as $asset) {
-                $result[$asset['assetid']] = $asset['typeid'];
+        $query = Asset::getTypeOfAssetQuery($assetid);
+        if (is_array($assetid) === TRUE) {
+            $result = DAL::getAssoc($query);
+            $types  = array();
+            foreach ($result as $row) {
+                $types[$row['assetid']] = $row['typeid'];
             }
+
+            return $types;
         } else {
-            $asset  = array_pop($assets);
-            $result = $asset['typeid'];
+            $type = DAL::getOne($query);
+            return $type;
         }
 
-        return $result;
-
-    }//end getTypes()
+    }//end getTypeOfAsset()
 
 
     /**
-     * Returns the assetid(s) of type(s).
+     * Get getTypeOfAsset query object.
      *
-     * When a single typeid is quried, one assetid will be returned. If an
-     * array of typeids are passed in, it returns an array of assetid => typeid
-     * pairs.
+     * @param float|array $assetid Assetid to get the type of.
      *
-     * @param string|array $typeids Typeid(s) to get the assets.
+     * @since  4.0.0
+     * @return object
+     */
+    public static function getTypeOfAssetQuery($assetid)
+    {
+        $query = DAL::getDALQuery('Asset', 'getTypeOfAsset');
+        return $query;
+
+    }//end getTypeOfAssetQuery()
+
+
+    /**
+     * Get a list of assetids of a given type.
+     *
+     * If you supply an array of typeids, this function will still
+     * return a single array of assetids. If you need to know
+     * which assets are of each type, you must call this function
+     * multiple times.
+     *
+     * @param string|array $typeid The type of assets to get.
      *
      * @since  4.0.0
      * @return array
      */
-    public static function getAssets($typeids)
+    public static function getAssetsByType($typeid)
     {
-        $result = array();
-        $query  = DAL::getDALQuery('Asset', 'getAssets', '');
-        $assets = DAL::getAssoc($query);
-        if (is_array($typeids) === TRUE) {
-            foreach ($assets as $asset) {
-                $result[$asset['assetid']] = $asset['typeid'];
-            }
-        } else {
-            foreach ($assets as $asset) {
-                $result[] = $asset['assetid'];
-            }
-        }
+        $assets = DAL::getAll(Asset::getAssetsByTypeQuery($typeid));
+        return $assets;
 
-        return $result;
-
-    }//end getAssets()
+    }//end getAssetsByType()
 
 
     /**
-     * Returns getTypeQuery Query object.
+     * Get getAssetsByType query object.
      *
-     * @params float $assetid Assetid to get the typeid.
+     * @params string|array $typeid The type of assets to get.
      *
      * @since  4.0.0
      * @return object
      */
-    public static function getTypeQuery($assetid)
-    {
-        $query = DAL::getTypeQuery('Asset', 'getTypeQuery', '');
-        return $query;
-
-    }//end getTypeQuery()
-
-
-    /**
-     * Returns getAssetsQuery Query object.
-     *
-     * @params string|array $typeids Typeids to get the assets.
-     *
-     * @since  4.0.0
-     * @return object
-     */
-    public static function getAssetsQuery($typeids)
+    public static function getAssetsByTypeQuery($typeid)
     {
         $query = DAL::getDALQuery('Asset', 'getAssetsQuery', '');
         return $query;

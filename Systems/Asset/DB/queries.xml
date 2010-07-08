@@ -88,42 +88,7 @@
         </alternate>
     </query>
 
-
-    <query id="getTypes">
-        <primary>
-            <select>
-                <fields>
-                    <field table="asset" column="assetid" />
-                    <field table="asset" column="typeid" />
-                </fields>
-                <from>
-                    <table>asset</table>
-                </from>
-                <where>
-                    <in table="asset" column="assetid">:assetids</in>
-                </where>
-            </select>
-        </primary>
-    </query>
-
-    <query id="getAssets">
-        <primary>
-            <select>
-                <fields>
-                    <field table="asset" column="assetid" />
-                    <field table="asset" column="typeid" />
-                </fields>
-                <from>
-                    <table>asset</table>
-                </from>
-                <where>
-                    <in table="asset" column="typeid">:typeids</in>
-                </where>
-            </select>
-        </primary>
-    </query>
-
-    <query id="getTypeQuery">
+    <query id="getTypeOfAsset">
         <primary>
             <select>
                 <fields>
@@ -137,9 +102,25 @@
                 </where>
             </select>
         </primary>
+        <alternate>
+            <assert-array data="assetid">
+                <select>
+                    <fields>
+                        <field table="asset" column="assetid" />
+                        <field table="asset" column="typeid" />
+                    </fields>
+                    <from>
+                        <table>asset</table>
+                    </from>
+                    <where>
+                        <in table="asset" column="assetid">:assetid</in>
+                    </where>
+                </select>
+            </assert-array>
+        </alternate>
     </query>
 
-    <query id="getAssetsQuery">
+    <query id="getAssetsByType">
         <primary>
             <select>
                 <fields>
@@ -149,10 +130,25 @@
                     <table>asset</table>
                 </from>
                 <where>
-                    <in table="asset" column="typeid">:typeids</in>
+                    <equal table="asset" column="typeid">:typeid</equal>
                 </where>
             </select>
         </primary>
+        <alternate>
+            <assert-array data="typeid">
+                <select>
+                    <fields>
+                        <field table="asset" column="assetid" />
+                    </fields>
+                    <from>
+                        <table>asset</table>
+                    </from>
+                    <where>
+                        <in table="asset" column="typeid">:typeid</in>
+                    </where>
+                </select>
+            </assert-array>
+        </alternate>
     </query>
 
 </queries>
