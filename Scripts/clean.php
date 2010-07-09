@@ -27,6 +27,8 @@ if (is_dir($rootdir) === FALSE) {
     exit();
 }
 
+$rootdir = realpath($rootdir);
+
 // Change to mysource mini root directory.
 chdir($rootdir);
 
