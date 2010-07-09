@@ -1,0 +1,3 @@
+<attributes>
+  <attribute id="email" type="text" data_source="AttributeDataSource" unique="false" required="false" default_val="" assetid="0"/>
+</attributes>

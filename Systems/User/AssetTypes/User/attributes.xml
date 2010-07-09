@@ -1,0 +1,8 @@
+<attributes>
+  <attribute id="first_name" type="text" data_source="AttributeDataSource" unique="false" required="true" default_val="" assetid="0"/>
+  <attribute id="last_name" type="text" data_source="AttributeDataSource" unique="false" required="true" default_val="" assetid="0"/>
+  <attribute id="email" type="text" data_source="AttributeDataSource" unique="false" required="false" default_val="" assetid="0"/>
+  <attribute id="username" type="text" data_source="AttributeDataSource" unique="true" required="true" default_val="" assetid="0"/>
+  <attribute id="password" type="text" data_source="AttributeDataSource" unique="false" required="true" default_val="" assetid="0"/>
+  <attribute id="last_login" type="datetime" data_source="AttributeDataSource" unique="false" required="true" default_val="" assetid="0"/>
+</attributes>
