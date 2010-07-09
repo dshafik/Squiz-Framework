@@ -54,14 +54,17 @@ class SquizSuiteActions
     /**
      * Get Product's Connection details.
      *
-     * @param string $productID The ID of the Product.
+     * @param string $productid The ID of the Product.
      *
      * @since  4.0.0
      * @return array
      */
-    public static function getProductConnection($productID)
+    public static function getProductConnection($productid)
     {
-        return array();
+	    $result = DAL::executeAll('SquizSuite', 'getProductInformation');
+	    $connection = Util::getArrayIndex($result, 'connection', array());
+
+	return $connection;
 
     }//end getProductConnection()
 
@@ -69,15 +72,41 @@ class SquizSuiteActions
     /**
      * Get information about the Product.
      *
-     * @param string $productid The ID of the Product.
+     * @param array|string $productid The ID of the Product.
      *
      * @since  4.0.0
      * @return array
      */
     public static function getProductInformation($productid)
     {
-        $result = DAL::executeAll('SquizSuite', 'getProductInformation');
-        return $result;
+        $clean_results = Array();
+        $real_results = DAL::executeAll('SquizSuite', 'getProductInformation');
+
+        // Formatting the results
+        foreach ($real_results as $results) {
+            $productid = NULL;
+            $formatted_result = Array();
+            foreach ($results as $key => $result) {
+                // Locating the Product ID
+                if ($key === 'productid') {
+                    $productid = $result;
+                    continue;
+                }//end if
+
+                // Strip out any DB assoc values
+                if (is_int($key) === FALSE) {
+                    $formatted_result[$key] = $result;
+                }//end if
+            }//end foreach
+
+            // No Product ID must mean no product
+            if ($productid === NULL) continue;
+
+            // Finally, set the clean results
+            $clean_results[$productid] = $formatted_result;
+        }//end foreach
+
+        return $clean_results;
 
     }//end getProductInformation()
 
@@ -91,8 +120,8 @@ class SquizSuiteActions
     public static function getSuiteProducts()
     {
         $productid = NULL;
-        $result    = SquizSuite::getProductInformation($productid);
-        return $result;
+        $results   = SquizSuite::getProductInformation($productid);
+        return $results;
 
     }//end getSuiteProducts()
 

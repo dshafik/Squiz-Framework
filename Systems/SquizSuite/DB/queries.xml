@@ -59,7 +59,7 @@
           <table alias="p1">suite_product</table>
         </from>
         <where>
-          <equal table="p1" column="productid">:productid</equal>
+          <in table="p1" column="productid">:productid</in>
         </where>
       </select>
     </primary>
