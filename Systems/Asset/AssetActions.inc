@@ -264,6 +264,7 @@ class AssetActions
      *                           install.
      * @param string $typeName   The readable name of the new type.
      * @param string $category   The category this asset type belongs to.
+     * @param string $system     The system name of an asset type.
      * @param string $parentType The type the new asset inherits from.
      * @param string $isCustom   Set to TRUE if this is a custom asset type.
      *
@@ -275,6 +276,7 @@ class AssetActions
         $typeid,
         $name,
         $category,
+        $system,
         $parentType,
         $isCustom=FALSE
     ) {
@@ -301,6 +303,18 @@ class AssetActions
                     $typeInfo['typeid'],
                     ($typeInfo['lvl'] + 1)
                 );
+            }
+
+            // Include Asset Type and call its install method.
+            if (Asset::includeAsset($typeid) === TRUE) {
+                $func = array(
+                         ucfirst($typeid).'AssetType',
+                         'install',
+                        );
+
+                if (is_callable($func) === TRUE) {
+                    call_user_func($func);
+                }
             }
 
             DAL::commit();
@@ -369,6 +383,28 @@ class AssetActions
 
 
     /**
+     * Includes the asset class file for the given typeid.
+     *
+     * @param string $typeid Asset type code.
+     *
+     * @since  4.0.0
+     * @return boolean
+     */
+    public static function includeAsset($typeid)
+    {
+        $assetPath      = Asset::getTypeDirPath($typeid);
+        $assetClassPath = $assetPath.'/'.ucfirst($typeid).'AssetType.inc';
+        if (file_exists($assetClassPath) === TRUE) {
+            include_once $assetClassPath;
+            return TRUE;
+        }
+
+        return FALSE;
+
+    }//end includeAsset()
+
+
+    /**
      * Check if the passed asset type exists in the asset_type tree.
      *
      * Returns TRUE if the type is already installed.
@@ -393,6 +429,8 @@ class AssetActions
     /**
      * Get an asset type information.
      *
+     * Returns NULL if the given type does not exist.
+     *
      * @param string $typeid The type of assets to get.
      *
      * @since  4.0.0
@@ -401,6 +439,10 @@ class AssetActions
     public static function getTypeInfo($typeid)
     {
         $result = DAL::executeAssoc('Asset', 'getAssetTypeInfo');
+        if (empty($result) === TRUE) {
+            return NULL;
+        }
+
         $result = array_pop($result);
         return $result;
 
@@ -434,9 +476,6 @@ class AssetActions
      */
     public static function getChildTypes($typeid, $lvl=NULL)
     {
-        $q = DAL::getDALQuery('Asset', 'getChildTypes', '');
-        echo $q."\n";
-        
         $children = DAL::executeAssoc('Asset', 'getChildTypes');
         return $children;
 
@@ -444,103 +483,71 @@ class AssetActions
 
 
     /**
-     * Returns given asset type's icon path.
-     *
-     * If typeid not given then returns base icons web dir path.
+     * Get the given asset type's directory path.
      *
      * @param string  $typeid          Id of the asset type.
+     * @param string  $size            Type of icon (small, medium or large).
      * @param boolean $defaultToParent If TRUE and given type does not have an
      *                                 icon then first parent that has an icon
      *                                 is returned.
-     * @param string  $type            Type of icon (small, medium or large).
-     * @param integer $assetid         Optional assetid can be passed. In fact
-     *                                 this assetid intended to be used in other
-     *                                 plugs only rather than real action.
      *
      * @since  4.0.0
      * @return string
      */
-    public static function getTypeIconPath(
-        $typeid='',
-        $defaultToParent=TRUE,
-        $type='small',
-        $assetid=NULL
-    ) {
-        $webPath  = Init::WEB_DIR;
-        $webPath .= str_replace(
-            dirname(dirname(dirname(__FILE__))),
-            '',
-            dirname(__FILE__)
-        );
-        $webPath .= '/icons/';
+    public static function getTypeDirPath($typeid)
+    {
+        $typeInfo   = Asset::getTypeInfo($typeid);
+        $system     = $typeInfo['system'];
+        $assetPath  = Init::ROOT_DIR.'/Systems/'.$system;
+        $assetPath .= '/AssetTypes/'.ucfirst($typeInfo['typeid']);
+        return $assetPath;
 
-        $suffix = '';
-        if ($type !== NULL) {
-            $suffix = '_'.$type;
-        }
-
-        $fileName = $typeid.$suffix.'.png';
-
-        if ($typeid !== '') {
-            $webPath .= $fileName;
-            if ($defaultToParent === TRUE && file_exists($webPath) === FALSE) {
-                // File does not exist, return parent type's path.
-                $ancestors = Asset::getParentTypes($typeid);
-                $ancestors = array_reverse($ancestors);
-                foreach ($ancestors as $parent) {
-                    $parentPath = Asset::getTypeIconPath(
-                        $parent['typeid'],
-                        FALSE,
-                        $type
-                    );
-                    if (file_exists($parentPath) === TRUE) {
-                        $webPath = $parentPath;
-                    }
-                }
-            }
-        }
-
-        return $webPath;
-
-    }//end getTypeIconPath()
+    }//end getTypeDirPath()
 
 
     /**
-     * Returns given asset type's icon URL.
-     *
-     * If typeid not given then returns base icons URL.
+     * Get given asset type's icon path.
      *
      * @param string  $typeid          Id of the asset type.
+     * @param string  $size            Type of icon (small, medium or large).
      * @param boolean $defaultToParent If TRUE and given type does not have an
      *                                 icon then first parent that has an icon
      *                                 is returned.
-     * @param string  $type            Type of icon (small, medium or large).
-     * @param integer $assetid         Optional assetid can be passed. In fact
-     *                                 this assetid intended to be used in other
-     *                                 plugs only rather than real action.
      *
      * @since  4.0.0
      * @return string
      */
-    public static function getTypeIconUrl(
-        $typeid='',
-        $defaultToParent=TRUE,
-        $type='small',
-        $assetid=NULL
-    ) {
-        $baseUrl  = Init::getWebURL();
-        $iconPath = Asset::getTypeIconPath(
-            $typeid,
-            $defaultToParent,
-            $type,
-            $assetid
-        );
-        $iconPath = str_replace(Init::WEB_DIR, '', $iconPath);
-        $baseUrl .= $iconPath;
+    public static function getTypeIconPath($typeid, $size='small', $defaultToParent=TRUE)
+    {
+        $assetPath = Asset::getTypeDirPath($typeid);
+        $iconPath  = $assetPath.'/'.$typeid.'_'.$size.'.png';
+        if ($defaultToParent === TRUE && file_exists($iconPath) === FALSE) {
+            // File does not exist, return parent type's path.
+            $parents = Asset::getParentTypes($typeid);
+            $parents = array_reverse($parents);
+            $found   = FALSE;
+            foreach ($parents as $parent) {
+                $parentPath = Asset::getTypeIconPath(
+                    $parent['typeid'],
+                    $size,
+                    FALSE
+                );
 
-        return $baseUrl;
+                if (file_exists($parentPath) === TRUE) {
+                    $found    = TRUE;
+                    $iconPath = $parentPath;
+                    break;
+                }
+            }
 
-    }//end getTypeIconUrl()
+            if ($found === FALSE) {
+                $iconPath = NULL;
+            }
+        }//end if
+
+        return $iconPath;
+
+    }//end getTypeIconPath()
 
 
 }//end class

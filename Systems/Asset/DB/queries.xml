@@ -179,12 +179,14 @@
                     <field>typeid</field>
                     <field>name</field>
                     <field>category</field>
+                    <field>system</field>
                     <field>is_custom</field>
                 </fields>
                 <values>
                     <value column="typeid">:typeid</value>
                     <value column="name">:name</value>
                     <value column="category">:category</value>
+                    <value column="system">:system</value>
                     <value column="is_custom">:isCustom</value>
                 </values>
             </insert>
@@ -243,6 +245,7 @@
                 <field table="asset_type" column="typeid" />
                 <field table="asset_type" column="name" />
                 <field table="asset_type" column="category" />
+                <field table="asset_type" column="system" />
                 <field table="asset_type" column="is_custom" />
             </fields>
             <from>

@@ -45,6 +45,7 @@
                 <column type="TYPEID" allow-null="false">typeid</column>
                 <column type="VARCHAR" size="50" allow-null="false">name</column>
                 <column type="VARCHAR" size="100" allow-null="true">category</column>
+                <column type="VARCHAR" size="100" allow-null="true">system</column>
                 <column type="BOOLEAN" allow-null="false" default="'0'">is_custom</column>
             </columns>
             <constraints>
