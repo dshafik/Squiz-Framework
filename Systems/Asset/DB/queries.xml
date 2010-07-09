@@ -49,12 +49,11 @@
         </primary>
     </query>
 
-    <query id="getAssetCount">
+    <query id="count">
         <primary>
             <select>
                 <fields>
-                    <field table="asset" column="typeid" />
-                    <function function="count" alias="assetCount">
+                    <function function="count">
                         <arg><field table="asset" column="assetid" /></arg>
                     </function>
                 </fields>
@@ -62,18 +61,36 @@
                     <table>asset</table>
                 </from>
                 <where>
-                    <in table="asset" column="typeid">:typeids</in>
+                    <equal table="asset" column="typeid">:typeid</equal>
                 </where>
-                <group-by>
-                    <field table="asset" column="typeid" />
-                </group-by>
-                <order-by direction="DESC">
-                    <field table="" column="assetCount" />
-                </order-by>
             </select>
         </primary>
         <alternate>
-            <assert-null data="typeids">
+            <assert-array data="typeid">
+                <select>
+                    <fields>
+                        <field table="asset" column="typeid" />
+                        <function function="count" alias="num">
+                            <arg><field table="asset" column="assetid" /></arg>
+                        </function>
+                    </fields>
+                    <from>
+                        <table>asset</table>
+                    </from>
+                    <where>
+                        <in table="asset" column="typeid">:typeid</in>
+                    </where>
+                    <group-by>
+                        <field table="asset" column="typeid" />
+                    </group-by>
+                    <order-by direction="DESC">
+                        <field table="" column="num" />
+                    </order-by>
+                </select>
+            </assert-array>
+        </alternate>
+        <alternate>
+            <assert-null data="typeid">
                 <select>
                     <fields>
                         <function function="count">

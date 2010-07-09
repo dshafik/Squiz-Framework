@@ -121,35 +121,33 @@ class AssetActions
 
 
     /**
-     * Returns the number of assets of specified asset type(s).
+     * Get a count of all assets or assets of a given type.
      *
-     * It can take a single typeid in string or an array of typeids.
-     * When a single typeid is quried, it returns an integer number of asset
-     * types. If an array is passed in, it returns 'typeid' => number pairs.
+     * By default, this function will return the total number of assets in the local
+     * database. If you pass in a single asset type, the function will return the
+     * number of assets of that type. If you pass in an array of asset types, the
+     * function will return an array in the form [typeid] => [count] in descending
+     * order based on the count.
      *
-     * @param string|array|NULL $typeids Type ID(s) of asset to count.
+     * @param string|array $typeid The type of assets to count.
      *
      * @since  4.0.0
      * @return integer|array
      */
-    public static function count($typeids=NULL)
+    public static function count($typeid=NULL)
     {
-        $result = array();
-        $query  = DAL::getDALQuery('Asset', 'getAssetCount', '');
-        $result = DAL::getAssoc($query);
-        if ($typeids === NULL) {
-            // No typeid is specified. Return an integer value of
-            // sum of all assets
-            $result = DAL::getOne($query);
-            return $result;
-        } else {
-            // Return 'typeid' => sum(*) array structure for each type.
-            $newResult = array();
-            foreach ($result as $typeArr) {
-                $newResult[$typeArr['typeid']] = $typeArr['assetcount'];
+        $query = DAL::getDALQuery('Asset', 'count');
+        if (is_array($typeid) === TRUE) {
+            $result = DAL::getAssoc($query);
+            $counts = array();
+            foreach ($result as $row) {
+                $counts[$row['typeid']] = $row['num'];
             }
 
-            return $newResult;
+            return $counts;
+        } else {
+            $count = DAL::getOne($query);
+            return $count;
         }
 
     }//end count()
