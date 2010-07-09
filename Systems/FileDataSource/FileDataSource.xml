@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+
+    <runner>
+      <required>yes</required>
+      <method>replaceContext</method>
+      <parameters>
+        <parameter>oldContext</parameter>
+        <parameter>newContext</parameter>
+        <parameter>assetid</parameter>
+      </parameters>
+      <action listen="before">Context::replaceContext</action>
+      <fatal>yes</fatal>
+    </runner>
+
+    <runner>
+      <required>yes</required>
+      <method>removeContextData</method>
+      <parameters>
+        <parameter>context</parameter>
+        <parameter>assetid</parameter>
+      </parameters>
+      <action listen="before">Context::removeContextData</action>
+      <fatal>yes</fatal>
+    </runner>
+
+    <runner>
+      <required>yes</required>
+      <method>removeAllContextData</method>
+      <parameters>
+        <parameter>context</parameter>
+      </parameters>
+      <action listen="before">Context::removeAllContextData</action>
+      <fatal>yes</fatal>
+    </runner>
+
+  </plugs>
+</system>

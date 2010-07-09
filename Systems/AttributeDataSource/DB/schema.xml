@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<schema system="AttributeDataSource">
+  <udts>
+    <udt-import system="Asset">ASSETID</udt-import>
+    <udt-import system="Attribute">ATTRIBUTEID</udt-import>
+  </udts>
+  <tables>
+    <table name="attribute_text">
+      <columns>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="VARCHAR" size="255" allow-null="true">value</column>
+        <column type="BOOLEAN" allow-null="false">is_default</column>
+      </columns>
+      <indexes>
+        <index name="attr_text_attributeid">
+          <column>attributeid</column>
+        </index>
+      </indexes>
+      <constraints>
+        <primary-key name="attr_text_pk">
+          <column>assetid</column>
+          <column>attributeid</column>
+        </primary-key>
+        <foreign-key name="attr_text_fk1" foreign-table="asset" on-delete="CASCADE">
+          <column references="assetid">assetid</column>
+        </foreign-key>
+      </constraints>
+    </table>
+    <table name="attribute_long_text">
+      <columns>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="CLOB" allow-null="true">value</column>
+        <column type="BOOLEAN" allow-null="false">is_default</column>
+      </columns>
+      <constraints>
+        <primary-key name="attr_long_text_pk">
+          <column>assetid</column>
+          <column>attributeid</column>
+        </primary-key>
+        <foreign-key name="attr_long_text_fk1" foreign-table="asset" on-delete="CASCADE">
+          <column references="assetid">assetid</column>
+        </foreign-key>
+      </constraints>
+      <indexes>
+        <index name="attr_longtext_attributeid">
+          <column>attributeid</column>
+        </index>
+      </indexes>
+    </table>
+    <table name="attribute_integer">
+      <columns>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="INTEGER" allow-null="false">value</column>
+        <column type="BOOLEAN" allow-null="false">is_default</column>
+      </columns>
+      <constraints>
+        <primary-key name="attr_int_pk">
+          <column>assetid</column>
+          <column>attributeid</column>
+        </primary-key>
+        <foreign-key name="attr_int_fk1" foreign-table="asset" on-delete="CASCADE">
+          <column references="assetid">assetid</column>
+        </foreign-key>
+      </constraints>
+      <indexes>
+        <index name="attr_int_attributeid">
+          <column>attributeid</column>
+        </index>
+      </indexes>
+    </table>
+    <table name="attribute_float">
+      <columns>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="REAL" allow-null="false">value</column>
+        <column type="BOOLEAN" allow-null="false">is_default</column>
+      </columns>
+      <constraints>
+        <primary-key name="attr_float_pk">
+          <column>assetid</column>
+          <column>attributeid</column>
+        </primary-key>
+        <foreign-key name="attr_float_fk1" foreign-table="asset" on-delete="CASCADE">
+          <column references="assetid">assetid</column>
+        </foreign-key>
+      </constraints>
+      <indexes>
+        <index name="attr_float_attributeid">
+          <column>attributeid</column>
+        </index>
+      </indexes>
+    </table>
+    <table name="attribute_datetime">
+      <columns>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="TIMESTAMP WITH TIME ZONE" allow-null="false">value</column>
+        <column type="BOOLEAN" allow-null="false">is_default</column>
+      </columns>
+      <constraints>
+        <primary-key name="attr_date_pk">
+          <column>assetid</column>
+          <column>attributeid</column>
+        </primary-key>
+        <foreign-key name="attr_date_fk1" foreign-table="asset" on-delete="CASCADE">
+          <column references="assetid">assetid</column>
+        </foreign-key>
+      </constraints>
+      <indexes>
+        <index name="attr_date_attributeid">
+          <column>attributeid</column>
+        </index>
+      </indexes>
+    </table>
+  </tables>
+</schema>

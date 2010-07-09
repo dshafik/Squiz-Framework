@@ -1,0 +1,607 @@
+<?xml version="1.0"?>
+<queries system="Attribute">
+<!--
+        Adds a new row to the attribute table.
+        Binds   : attributeid, assetType, attributeType, dataSource, is_unique, initialVal
+    -->
+  <query id="addAttribute">
+    <primary>
+      <insert>
+        <fields table="attribute">
+          <field>attributeid</field>
+          <field>asset_type</field>
+          <field>attribute_type</field>
+          <field>data_source</field>
+          <field>initial_val</field>
+          <field>default_val</field>
+          <field>is_unique</field>
+          <field>required</field>
+          <field>assetid</field>
+          <field>is_custom</field>
+          <field>system</field>
+        </fields>
+        <values>
+          <value column="attributeid">:attributeid</value>
+          <value column="asset_type">:assetType</value>
+          <value column="attribute_type">:attributeType</value>
+          <value column="data_source">:dataSource</value>
+          <value column="initial_val">:initialVal</value>
+          <value column="default_val">:defaultVal</value>
+          <value column="is_unique">:isUnique</value>
+          <value column="required">:required</value>
+          <value column="assetid">:assetid</value>
+          <value column="is_custom">:isCustom</value>
+          <value column="system">:system</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+<!--
+        Checks if specified attribute exists in the database.
+        Fields  : attributeid
+        Binds   : attributeid, assetType
+    -->
+  <query id="attributeExists">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="attributeid"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+<!--
+        Retrieves all the information for a specified attribute.
+        Fields  : attributeid, asset_type, attribute_type, data_source, is_unique, initial_val
+        Binds   : attributeid, assetType
+    -->
+  <query id="getAttributeInfo">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="attributeid"/>
+          <field table="attribute" column="asset_type"/>
+          <field table="attribute" column="attribute_type"/>
+          <field table="attribute" column="data_source"/>
+          <field table="attribute" column="is_unique"/>
+          <field table="attribute" column="initial_val"/>
+          <field table="attribute" column="default_val"/>
+          <field table="attribute" column="required"/>
+          <field table="attribute" column="assetid"/>
+          <field table="attribute" column="is_custom"/>
+          <field table="attribute" column="system"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+<!--
+        Retrieves all the information for a specified attribute using assetid.
+        Fields  : attributeid, asset_type, attribute_type, data_source, is_unique, initial_val
+        Binds   : attributeid, assetid
+    -->
+  <query id="getAttributeInfoUsingAssetid">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="attributeid"/>
+          <field table="attribute" column="asset_type"/>
+          <field table="attribute" column="attribute_type"/>
+          <field table="attribute" column="data_source"/>
+          <field table="attribute" column="is_unique"/>
+          <field table="attribute" column="initial_val"/>
+          <field table="attribute" column="default_val"/>
+          <field table="attribute" column="required"/>
+          <field table="attribute" column="assetid"/>
+          <field table="attribute" column="is_custom"/>
+          <field table="attribute" column="system"/>
+        </fields>
+        <from>
+<!--<table>attribute</table>-->
+          <table>asset</table>
+        </from>
+        <joins>
+          <join>
+            <field table="asset" column="typeid"/>
+            <field table="attribute" column="asset_type"/>
+          </join>
+        </joins>
+        <where>
+          <equal table="asset" column="assetid">:assetid</equal>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <!--
+      Retrieves list of attribute ids for a specified asset type.
+      Fields  : attributeid
+      Binds   : assetType
+  -->
+  <query id="getAttributesByAssetType">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="attributeid"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+    <alternate>
+      <assert-true data="systemOnly">
+        <assert-false data="standardOnly">
+          <assert-false data="customOnly">
+            <select>
+              <fields>
+                <field table="attribute" column="attributeid"/>
+              </fields>
+              <from>
+                <table>attribute</table>
+              </from>
+              <where>
+                <equal table="attribute" column="asset_type">:assetType</equal>
+                <equal table="attribute" column="is_custom">:isCustom</equal>
+                <not-null>
+                  <field table="attribute" column="system"/>
+                </not-null>
+              </where>
+            </select>
+          </assert-false>
+        </assert-false>
+      </assert-true>
+    </alternate>
+    <alternate>
+      <assert-false data="standardOnly">
+        <assert-true data="customOnly">
+          <select>
+            <fields>
+              <field table="attribute" column="attributeid"/>
+            </fields>
+            <from>
+              <table>attribute</table>
+            </from>
+            <where>
+              <equal table="attribute" column="asset_type">:assetType</equal>
+              <equal table="attribute" column="is_custom">:isCustom</equal>
+            </where>
+          </select>
+        </assert-true>
+      </assert-false>
+    </alternate>
+    <alternate>
+      <assert-false data="customOnly">
+        <assert-true data="standardOnly">
+          <select>
+            <fields>
+              <field table="attribute" column="attributeid"/>
+            </fields>
+            <from>
+              <table>attribute</table>
+            </from>
+            <where>
+              <equal table="attribute" column="asset_type">:assetType</equal>
+              <equal table="attribute" column="is_custom">:isCustom</equal>
+            </where>
+          </select>
+        </assert-true>
+      </assert-false>
+    </alternate>
+  </query>
+<!--
+        Retrieves list of attribute ids for a specified attribute type.
+        Fields  : attributeid
+        Binds   : attributeType
+    -->
+  <query id="getAttributesByType">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="attributeid"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <equal table="attribute" column="attribute_type">:attributeType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+<!--
+        Gets the data source for a specified attribute and assetid.
+        Fields  : data_source
+        Binds   : attributeid, assetid
+    -->
+  <query id="getAttributeDataSourcesByAssetid">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="data_source"/>
+          <field table="attribute" column="attributeid"/>
+          <field table="attribute" column="attribute_type"/>
+        </fields>
+        <from>
+<!--<table>attribute</table>-->
+          <table>asset</table>
+        </from>
+        <joins>
+          <join>
+            <field table="asset" column="typeid"/>
+            <field table="attribute" column="asset_type"/>
+          </join>
+        </joins>
+        <where>
+          <equal table="asset" column="assetid">:assetid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+<!--
+        Gets the data source for a specified attribute and assetid.
+        Fields  : data_source
+        Binds   : attributeid, assetid
+    -->
+  <query id="getAttributeDataSourceByAssetid">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="data_source"/>
+        </fields>
+        <from>
+<!--<table>attribute</table>-->
+          <table>asset</table>
+        </from>
+        <joins>
+          <join>
+            <field table="asset" column="typeid"/>
+            <field table="attribute" column="asset_type"/>
+          </join>
+        </joins>
+        <where>
+          <equal table="asset" column="assetid">:assetid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+<!--
+        Updates the attribute table's unique column value.
+        Binds   : attributeid, assetType, unique
+    -->
+  <query id="setAttributeUniqueness">
+    <primary>
+      <update>
+        <fields table="attribute">
+          <field>is_unique</field>
+        </fields>
+        <values>
+          <value column="is_unique">:unique</value>
+        </values>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="setAttributeRequired">
+    <primary>
+      <update>
+        <fields table="attribute">
+          <field>required</field>
+        </fields>
+        <values>
+          <value column="required">:required</value>
+        </values>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+<!--
+        Updates the initial_val column value of the attribute table.
+        Binds   : attributeid, assetType, newValue
+    -->
+  <query id="updateAttributeInitialValue">
+    <primary>
+      <update>
+        <fields table="attribute">
+          <field>initial_val</field>
+        </fields>
+        <values>
+          <value column="initial_val">:newValue</value>
+        </values>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+<!--
+        Updates the attribute table's Data Source.
+        Binds   : attributeid, assetType, newDataSource
+    -->
+  <query id="setAttributeDataSource">
+    <primary>
+      <update>
+        <fields table="attribute">
+          <field>data_source</field>
+        </fields>
+        <values>
+          <value column="data_source">:newDataSource</value>
+        </values>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="getAttributeDataSource">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="data_source"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+<!--
+        Removes a specified attribute.
+        Binds: attributeid, assetType
+    -->
+  <query id="removeAttribute">
+    <primary>
+      <delete>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </delete>
+    </primary>
+  </query>
+<!--
+        Updates a specific attribute's attribute type (data type).
+        Binds: newDataType, attributeid, assetType
+    -->
+  <query id="updateAttributeType">
+    <primary>
+      <update>
+        <fields table="attribute">
+          <field>attribute_type</field>
+        </fields>
+        <values>
+          <value column="attribute_type">:newDataType</value>
+        </values>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+<!--
+        Updates a specific attribute's asset type.
+        Binds: newAssetType, attributeid, assetType
+    -->
+  <query id="updateAttributeAssetType">
+    <primary>
+      <update>
+        <fields table="attribute">
+          <field>asset_type</field>
+        </fields>
+        <values>
+          <value column="asset_type">:newAssetType</value>
+        </values>
+        <where>
+          <equal table="attribute" column="attributeid">:attributeid</equal>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+<!--
+        Drop table query for the Attribute table.
+    -->
+  <query id="dropAttributeTable">
+    <primary>
+      <drop table="attribute"/>
+    </primary>
+  </query>
+<!--
+        Drop table query for the Attribute Role table.
+    -->
+  <query id="dropAttributeRuleTable">
+    <primary>
+      <drop table="attribute_rule"/>
+    </primary>
+  </query>
+<!--
+        Adds a rule to an attribute.
+    -->
+  <query id="addAttributeRule">
+    <primary>
+      <insert>
+        <fields table="attribute_rule">
+          <field>attributeid</field>
+          <field>asset_type</field>
+          <field>ruleid</field>
+        </fields>
+        <values>
+          <value column="attributeid">:attributeid</value>
+          <value column="asset_type">:assetType</value>
+          <value column="ruleid">:ruleid</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+<!--
+        Remove a rule from attribute.
+    -->
+  <query id="removeAttributeRule">
+    <primary>
+      <delete>
+        <where>
+          <equal table="attribute_rule" column="attributeid">:attributeid</equal>
+          <equal table="attribute_rule" column="asset_type">:assetType</equal>
+          <equal table="attribute_rule" column="ruleid">:ruleid</equal>
+        </where>
+      </delete>
+    </primary>
+  </query>
+<!--
+        Get the data source of multiple attributes and asset types.
+    -->
+  <query id="batchGetAttributeDataSource">
+    <primary>
+      <select distinct="true">
+        <fields>
+          <field table="attribute" column="data_source"/>
+          <field table="attribute" column="attributeid"/>
+          <field table="attribute" column="attribute_type"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <in table="attribute" column="asset_type">
+            <value>:assetTypes</value>
+          </in>
+          <in table="attribute" column="attributeid">
+            <value>:attributeids</value>
+          </in>
+        </where>
+      </select>
+    </primary>
+  </query>
+<!--
+        Retreives attribute info using one or more attribute ids.
+        Fields  : attributeid, asset_type, attribute_type, data_source, is_unique, initial_val
+        Binds   : assetids
+    -->
+  <query id="batchGetAttributeInfo">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="attributeid"/>
+          <field table="attribute" column="asset_type"/>
+          <field table="attribute" column="attribute_type"/>
+          <field table="attribute" column="data_source"/>
+          <field table="attribute" column="is_unique"/>
+          <field table="attribute" column="initial_val"/>
+          <field table="attribute" column="default_val"/>
+          <field table="attribute" column="required"/>
+          <field table="attribute" column="assetid"/>
+          <field table="attribute" column="system"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <in table="attribute" column="attributeid">:attributeids</in>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="findAssetsWithValue">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute_text" column="assetid"/>
+        </fields>
+        <from>
+          <table>attribute_text</table>
+        </from>
+        <where>
+          <equal table="attribute_text" column="attributeid">
+            <value>name</value>
+          </equal>
+          <like>
+            <function function="lower">
+              <arg>
+                <field table="attribute_text" column="value"/>
+              </arg>
+            </function>
+            <function function="lower">
+              <arg>
+                <function function="concat">
+                  <arg>'%'</arg>
+                  <arg>:value</arg>
+                  <arg>'%'</arg>
+                </function>
+              </arg>
+            </function>
+          </like>
+        </where>
+        <order-by direction="ASC">
+          <field column="value" table="attribute_text"/>
+        </order-by>
+      </select>
+    </primary>
+    <alternate>
+        <assert-not-null data="inList">
+            <select>
+                <fields>
+                  <field table="attribute_text" column="assetid"/>
+                </fields>
+                <from>
+                  <table>attribute_text</table>
+                </from>
+                <where>
+                  <equal table="attribute_text" column="attributeid">
+                    <value>name</value>
+                  </equal>
+                  <like>
+                    <function function="lower">
+                      <arg>
+                        <field table="attribute_text" column="value"/>
+                      </arg>
+                    </function>
+                    <function function="lower">
+                      <arg>
+                        <function function="concat">
+                          <arg>'%'</arg>
+                          <arg>:value</arg>
+                          <arg>'%'</arg>
+                        </function>
+                      </arg>
+                    </function>
+                  </like>
+                  <in table="attribute_text" column="assetid">:inList</in>
+                </where>
+                <order-by direction="ASC">
+                  <field column="value" table="attribute_text"/>
+                </order-by>
+          </select>
+        </assert-not-null>
+    </alternate>
+  </query>
+</queries>

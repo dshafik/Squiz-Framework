@@ -1,0 +1,390 @@
+<?xml version="1.0"?>
+<queries system="AttributeDataSource">
+  <query id="getAttributeValue">
+    <primary>
+      <select>
+        <fields>
+          <field table="[tableName]" column="value" />
+        </fields>
+        <from>
+          <table>[tableName]</table>
+        </from>
+        <where>
+          <equal table="[tableName]" column="attributeid">:attributeid</equal>
+          <in table="[tableName]" column="assetid">:assetid</in>
+        </where>
+        <order-by direction="DESC">
+             <field table="[tableName]" column="assetid" />
+        </order-by>
+        <limit offset="0">1</limit>
+      </select>
+    </primary>
+  </query>
+  <query id="setAttributeValue">
+    <primary>
+      <update>
+        <fields table="[tableName]">
+          <field>value</field>
+        </fields>
+        <values>
+          <value column="value">:value</value>
+        </values>
+        <where>
+          <equal table="[tableName]" column="assetid">:assetid</equal>
+          <equal table="[tableName]" column="attributeid">:attributeid</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="addAttributeValue">
+    <primary>
+      <insert>
+        <fields table="[tableName]">
+          <field>assetid</field>
+          <field>attributeid</field>
+          <field>value</field>
+          <field>is_default</field>
+        </fields>
+        <values>
+          <value column="assetid">:assetid</value>
+          <value column="attributeid">:attributeid</value>
+          <value column="value">:value</value>
+          <value column="is_default">:isDefault</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+  <query id="deleteAttribute">
+    <primary>
+      <delete>
+        <where>
+          <equal table="[tableName]" column="assetid">:assetid</equal>
+          <equal table="[tableName]" column="attributeid">:attributeid</equal>
+        </where>
+      </delete>
+    </primary>
+  </query>
+  <query id="tableExists">
+    <primary>
+      <function function="TableExists">
+        <arg>:tableName</arg>
+      </function>
+    </primary>
+  </query>
+  <query id="duplicateValueCount">
+    <primary>
+      <select>
+        <fields>
+          <function function="COUNT" alias="count">
+            <arg>asset.assetid</arg>
+          </function>
+        </fields>
+        <from>
+          <table>asset</table>
+        </from>
+        <where>
+          <equal table="attribute_[attrType]" column="attributeid">:attributeid</equal>
+          <equal table="asset" column="typeid">:assetType</equal>
+        </where>
+        <joins>
+          <join>
+            <field table="asset" column="assetid" />
+            <field table="attribute_[attrType]" column="assetid" />
+          </join>
+        </joins>
+        <group-by>
+          <field table="attribute_[attrType]" column="value" />
+        </group-by>
+        <having>
+          <greater>
+            <function function="COUNT">
+              <arg>asset.assetid</arg>
+            </function>
+            <value>1</value>
+          </greater>
+        </having>
+      </select>
+    </primary>
+  </query>
+  <query id="getAllAttributeValues">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute_[attrType]" column="assetid" />
+          <field table="attribute_[attrType]" column="value" />
+        </fields>
+        <from>
+          <table>asset</table>
+        </from>
+        <where>
+          <equal table="attribute_[attrType]" column="attributeid">:attributeid</equal>
+          <equal table="asset" column="typeid">:assetType</equal>
+        </where>
+        <joins>
+          <join>
+            <field table="asset" column="assetid" />
+            <field table="attribute_[attrType]" column="assetid" />
+          </join>
+        </joins>
+      </select>
+    </primary>
+  </query>
+  <query id="getAssetsByAttributeValue">
+    <primary>
+      <select>
+        <fields>
+          <function function="getMasterAssetid" alias="assetid">
+            <arg><field table="asset" column="assetid" /></arg>
+          </function>
+        </fields>
+        <from>
+          <table>asset</table>
+        </from>
+        <where>
+          <equal table="attribute_[attrType]" column="attributeid">:attributeid</equal>
+          <equal table="attribute_[attrType]" column="value">:value</equal>
+          <in table="asset" column="typeid">:assetType</in>
+        </where>
+        <joins>
+          <join>
+            <field table="asset" column="assetid" />
+            <field table="attribute_[attrType]" column="assetid" />
+          </join>
+        </joins>
+      </select>
+    </primary>
+  </query>
+  <query id="updateAttributeid">
+    <primary>
+      <update>
+        <fields table="attribute_[attributeType]">
+          <field>attributeid</field>
+        </fields>
+        <values>
+          <value column="attributeid">:newId</value>
+        </values>
+        <where>
+          <equal table="attribute_[attributeType]" column="attributeid">:attributeid</equal>
+          <in table="attribute_[attributeType]" column="assetid">
+            <select>
+              <fields>
+                <field table="asset" column="assetid" />
+              </fields>
+              <from>
+                <table>asset</table>
+              </from>
+              <where>
+                <equal table="asset" column="typeid">:assetType</equal>
+              </where>
+            </select>
+          </in>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="updateAttributeDataType">
+    <primary>
+      <insert>
+        <fields table="attribute_[newDataType]">
+          <field>assetid</field>
+          <field>attributeid</field>
+          <field>value</field>
+          <field>is_default</field>
+        </fields>
+        <values>
+          <select>
+            <fields>
+              <field table="attribute_[attributeType]" column="assetid" />
+              <field table="attribute_[attributeType]" column="attributeid" />
+              <field table="attribute_[attributeType]" column="value" />
+              <field table="attribute_[attributeType]" column="is_default" />
+            </fields>
+            <from>
+              <table>asset</table>
+            </from>
+            <where>
+              <equal table="asset" column="typeid">:assetType</equal>
+              <equal table="attribute_[attributeType]" column="attributeid">:attributeid</equal>
+            </where>
+            <joins>
+              <join>
+                <field table="asset" column="assetid" />
+                <field table="attribute_[attributeType]" column="assetid" />
+              </join>
+            </joins>
+          </select>
+        </values>
+      </insert>
+    </primary>
+  </query>
+  <query id="removeAttributeValues">
+    <primary>
+      <delete>
+        <where>
+          <equal table="attribute_[attributeType]" column="attributeid">:attributeid</equal>
+          <in table="attribute_[attributeType]" column="assetid">
+            <select>
+              <fields>
+                <field table="asset" column="assetid" />
+              </fields>
+              <from>
+                <table>asset</table>
+              </from>
+              <where>
+                <equal table="asset" column="typeid">:assetType</equal>
+              </where>
+            </select>
+          </in>
+        </where>
+      </delete>
+    </primary>
+  </query>
+  <query id="attributeValueExists">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute_[attrType]" column="assetid" />
+        </fields>
+        <from>
+          <table>attribute_[attrType]</table>
+        </from>
+        <where>
+          <equal table="attribute_[attrType]" column="assetid">:assetid</equal>
+          <equal table="attribute_[attrType]" column="attributeid">:attributeid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+
+  <query id="batchGetAttributeValue">
+    <primary>
+      <select>
+        <distinct-on>
+            <function function="getMasterAssetid">
+                <arg><field table="a" column="assetid" /></arg>
+            </function>
+            <field table="a" column="attributeid" />
+        </distinct-on>
+        <fields>
+          <function function="getMasterAssetid" alias="assetid">
+            <arg><field table="a" column="assetid" /></arg>
+          </function>
+          <field table="a" column="attributeid" />
+          <field table="a" column="value" />
+        </fields>
+        <from>
+          <table alias="a">attribute_[attrType]</table>
+        </from>
+        <where>
+          <in table="a" column="assetid">
+            <value>:assetids</value>
+          </in>
+          <in table="a" column="attributeid">
+            <value>:attributeids</value>
+          </in>
+        </where>
+        <order-by direction="DESC">
+            <function function="getMasterAssetid">
+                <arg><field table="a" column="assetid" /></arg>
+            </function>
+        </order-by>
+        <order-by direction="DESC">
+            <field table="a" column="attributeid" />
+        </order-by>
+        <order-by direction="DESC">
+            <field table="a" column="assetid" />
+        </order-by>
+      </select>
+    </primary>
+  </query>
+
+  <query id="dropAttributeTextTable">
+    <primary>
+      <drop table="attribute_text" />
+    </primary>
+  </query>
+  <query id="dropAttributeLongTextTable">
+    <primary>
+      <drop table="attribute_long_text" />
+    </primary>
+  </query>
+  <query id="dropAttributeDateTable">
+    <primary>
+      <drop table="attribute_date" />
+    </primary>
+  </query>
+  <query id="dropAttributeFloatTable">
+    <primary>
+      <drop table="attribute_float" />
+    </primary>
+  </query>
+  <query id="dropAttributeIntTable">
+    <primary>
+      <drop table="attribute_int" />
+    </primary>
+  </query>
+
+  <query id="removeContextValsForAsset">
+    <primary>
+      <delete>
+        <where>
+            <equal table="[tableName]" column="assetid">:newContextAssetid</equal>
+            <exists>
+                <select>
+                    <fields>
+                        <literal>1</literal>
+                    </fields>
+                    <from>
+                        <table alias="a2">[tableName]</table>
+                    </from>
+                    <where>
+                        <equal table="a2" column="assetid">
+                            <function function="getContextAssetid">
+                                <arg><field table="[tableName]" column="assetid" /></arg>
+                                <arg>:oldContext</arg>
+                                <arg>true</arg>
+                            </function>
+                        </equal>
+                        <equal table="a2" column="attributeid">
+                            <field table="[tableName]" column="attributeid" />
+                        </equal>
+                    </where>
+                </select>
+            </exists>
+        </where>
+    </delete>
+    </primary>
+  </query>
+
+  <query id="replaceContextValsForAsset">
+    <primary>
+      <update>
+         <fields table="[tableName]">
+             <field>assetid</field>
+         </fields>
+         <values>
+             <value column="assetid">:newContextAssetid</value>
+         </values>
+         <where>
+             <equal table="[tableName]" column="assetid">:oldContextAssetid</equal>
+         </where>
+      </update>
+    </primary>
+  </query>
+
+  <query id="removeAllContextData">
+    <primary>
+        <delete from="[tableName]">
+            <where>
+                <like>
+                    <function function="getContext">
+                        <arg><field  table="[tableName]" column="assetid"/></arg>
+                    </function>
+                    <value>:context</value>
+                </like>
+            </where>
+        </delete>
+    </primary>
+  </query>
+
+</queries>
