@@ -65,31 +65,6 @@ class AssetAssetType
 
 
     /**
-     * Returns the widget which displays information about the file asset.
-     *
-     * @param integer $assetid Id of the file asset.
-     *
-     * @since  4.0.0
-     * @return object
-     */
-    public static function getAssetEditContents($assetid)
-    {
-        Channels::includeSystem('Widget');
-        $id   = 'assetEdit_'.$assetid;
-        $main = Widget::getWidget(
-            'AssetAssetEditContents',
-            array(
-             $id,
-             NULL,
-             $assetid,
-            )
-        );
-        return $main;
-
-    }//end getAssetEditContents()
-
-
-    /**
      * Returns the system name the asset belongs to.
      *
      * @since  4.0.0
