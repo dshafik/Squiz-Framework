@@ -24,12 +24,12 @@ class SquizSuiteActions
     /**
      * Activate a product to the Suite.
      *
-     * @param string $productID The ID of the Product.
+     * @param string $productid The ID of the Product.
      *
      * @since  4.0.0
      * @return boolean
      */
-    public static function activateProduct($productID)
+    public static function activateProduct($productid)
     {
         return TRUE;
 
@@ -39,12 +39,12 @@ class SquizSuiteActions
     /**
      * Collect the Product Statistics.
      *
-     * @param string $productID The ID of the Product.
+     * @param string $productid The ID of the Product.
      *
      * @since  4.0.0
      * @return boolean
      */
-    public static function collectProductStatistic($productID)
+    public static function collectProductStatistic($productid)
     {
         return TRUE;
 
@@ -61,10 +61,10 @@ class SquizSuiteActions
      */
     public static function getProductConnection($productid)
     {
-	    $result = DAL::executeAll('SquizSuite', 'getProductInformation');
-	    $connection = Util::getArrayIndex($result, 'connection', array());
+        $result     = DAL::executeAll('SquizSuite', 'getProductInformation');
+        $connection = Util::getArrayIndex($result, 'connection', array());
 
-	return $connection;
+        return $connection;
 
     }//end getProductConnection()
 
@@ -79,34 +79,36 @@ class SquizSuiteActions
      */
     public static function getProductInformation($productid)
     {
-        $clean_results = Array();
-        $real_results = DAL::executeAll('SquizSuite', 'getProductInformation');
+        $cleanResults = array();
+        $realResults  = DAL::executeAll('SquizSuite', 'getProductInformation');
 
-        // Formatting the results
-        foreach ($real_results as $results) {
-            $productid = NULL;
-            $formatted_result = Array();
+        // Formatting the results.
+        foreach ($realResults as $results) {
+            $productid       = NULL;
+            $formattedResult = array();
             foreach ($results as $key => $result) {
-                // Locating the Product ID
+                // Locating the Product ID.
                 if ($key === 'productid') {
                     $productid = $result;
                     continue;
                 }//end if
 
-                // Strip out any DB assoc values
+                // Strip out any DB assoc values.
                 if (is_int($key) === FALSE) {
-                    $formatted_result[$key] = $result;
+                    $formattedResult[$key] = $result;
                 }//end if
             }//end foreach
 
-            // No Product ID must mean no product
-            if ($productid === NULL) continue;
+            // No Product ID must mean no product.
+            if ($productid === NULL) {
+                continue;
+            }
 
-            // Finally, set the clean results
-            $clean_results[$productid] = $formatted_result;
+            // Finally, set the clean results.
+            $cleanResults[$productid] = $formattedResult;
         }//end foreach
 
-        return $clean_results;
+        return $cleanResults;
 
     }//end getProductInformation()
 
