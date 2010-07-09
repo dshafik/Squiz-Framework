@@ -317,6 +317,27 @@ class AssetActions
                 }
             }
 
+            // Attributes for a new type.
+            Channels::includeSystem('Attribute');
+            if ($typeid !== $parentType) {
+                $attributes = Attribute::getAttributes($parentType);
+                foreach ($attributes as $attrid => $details) {
+                    Attribute::addAttribute(
+                        $typeid,
+                        $attrid,
+                        $details['type'],
+                        $details['data_source'],
+                        $details['unique'],
+                        $details['initial_val'],
+                        $details['default_val'],
+                        $details['required'],
+                        $details['assetid']
+                    );
+                }
+            }
+
+            Attribute::installAssetTypeAttributes($typeid);
+
             DAL::commit();
         } catch (DALException $e) {
             DAL::rollBack();
