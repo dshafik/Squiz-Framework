@@ -218,6 +218,56 @@ class ContextActions
     }//end getMasterContext()
 
 
+    /**
+     * Replaces specified context with another one.
+     *
+     * Other systems can hookin to this channel to do the extra processing.
+     *
+     * @param string $oldContext The context to get values from.
+     * @param string $newContext The context to override.
+     * @param string $assetid    Asset id to use.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function replaceContext($oldContext, $newContext, $assetid=NULL)
+    {
+
+    }//end replaceContext()
+
+
+    /**
+     * Removes the context data for the specified context and asset.
+     *
+     * Other systems can hookin to this channel to do the extra processing.
+     *
+     * @param string $context The context to remove.
+     * @param string $assetid Asset id to use.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function removeContextData($context, $assetid=NULL)
+    {
+
+    }//end removeContextData()
+
+
+    /**
+     * Systems should hookin to this method to remove context data.
+     *
+     * @param string $context Context string that could be used in LIKE queries.
+     *                        E.g. _____01__ .
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function removeAllContextData($context)
+    {
+
+    }//end removeAllContextData()
+
+
 }//end class
 
 ?>
