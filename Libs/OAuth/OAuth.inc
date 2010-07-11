@@ -99,7 +99,7 @@ class OAuth
             $clientSecret,
             '',
             '',
-            'GET',
+            'POST',
             $extraHeaders,
             array(),
             $signMethod
@@ -167,7 +167,7 @@ class OAuth
             $clientSecret,
             $tempToken,
             $tempSecret,
-            'GET',
+            'POST',
             $extraHeaders,
             array(),
             $signMethod
