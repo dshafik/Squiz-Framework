@@ -69,16 +69,16 @@ class OAuth
     /**
      * Get the temporary credentials (previously known as a "request token").
      *
-     * @param string $endpointUrl  The REST endpoint that issues the temporary
-     *                             credentials.
-     * @param string $clientKey    The "consumer key" part of client credentials.
-     * @param string $clientSecret The shared secret part of client credentials.
-     * @param string $callbackUrl  The URL to return to after the resource owner
-     *                             approves the client.
-     * @param array  $extraHeaders Extra header items to go into the Authorization
-     *                             header.
-     * @param string $signMethod   The method used to sign the request. Understands
-     *                             "PLAINTEXT" and "HMAC-SHA1".
+     * @param string $endpointUrl    The REST endpoint that issues the temporary
+     *                               credentials.
+     * @param string $clientKey      The "consumer key" part of client credentials.
+     * @param string $clientSecret   The shared secret part of client credentials.
+     * @param string $callbackUrl    The URL to return to after the resource owner
+     *                               approves the client.
+     * @param array  $extraAuthItems Extra header items to go into the Authorization
+     *                               header.
+     * @param string $signMethod     The method used to sign the request. Understands
+     *                               "PLAINTEXT" and "HMAC-SHA1".
      *
      * @since  4.0.0
      * @return array
@@ -88,10 +88,11 @@ class OAuth
         $clientKey,
         $clientSecret,
         $callbackUrl,
-        array $extraHeaders=array(),
+        array $extraAuthItems=array(),
         $signMethod='HMAC-SHA1'
     ) {
-        $extraHeaders['oauth_callback'] = $callbackUrl;
+        // Add callback to the Authorization header first, then call the request.
+        $extraAuthItems['oauth_callback'] = $callbackUrl;
 
         $result = self::doRequest(
             $endpointUrl,
@@ -100,11 +101,13 @@ class OAuth
             '',
             '',
             'POST',
-            $extraHeaders,
+            $extraAuthItems,
             array(),
             $signMethod
         );
 
+        // Was the request good? If so, break out the result so the temporary
+        // credentials can be more easily accessed.
         if ($result['status'] === 200) {
             parse_str($result['output'], $returnedToken);
             $result['tempToken']  = $returnedToken['oauth_token'];
@@ -158,8 +161,9 @@ class OAuth
         $verifier,
         $signMethod='HMAC-SHA1'
     ) {
-        $extraHeaders = array();
-        $extraHeaders['oauth_verifier'] = $verifier;
+        // Add the verifier to the Authorization header.
+        $extraAuthItems = array();
+        $extraAuthItems['oauth_verifier'] = $verifier;
 
         $result = self::doRequest(
             $endpointUrl,
@@ -168,11 +172,13 @@ class OAuth
             $tempToken,
             $tempSecret,
             'POST',
-            $extraHeaders,
+            $extraAuthItems,
             array(),
             $signMethod
         );
 
+        // Was the request good? If so, break out the result so the token
+        // credentials can be more easily accessed.
         if ($result['status'] === 200) {
             parse_str($result['output'], $returnedToken);
             $result['token']       = $returnedToken['oauth_token'];
@@ -257,12 +263,16 @@ class OAuth
         $authHeaderParams['oauth_timestamp']        = time();
 
         foreach ($authHeaderParams as $key => $value) {
-            $baseStringParams[] = array(
-                                   $key,
-                                   $value,
-                                  );
+            // Realm part of Authorization header is excluded [RFC sect. 3.4.1.3.1].
+            if ($key !== 'realm') {
+                $baseStringParams[] = array(
+                                       $key,
+                                       $value,
+                                      );
+            }
         }
 
+        // Build the base string, and the request's signature.
         $baseString = self::getBaseString($baseUrl, $method, $baseStringParams);
         $signature  = self::getSignature(
             $baseString,
@@ -273,6 +283,7 @@ class OAuth
 
         $authHeaderParams['oauth_signature'] = $signature;
 
+        // Build the "Authorization" header.
         $authString = array();
 
         foreach ($authHeaderParams as $key => $value) {
@@ -284,6 +295,7 @@ class OAuth
         $authString = implode(', ', $authString);
         $authString = 'Authorization: OAuth '.$authString;
 
+        // Start building the CURL request.
         $curl = curl_init($endpointUrl);
 
         if ($method === 'POST') {
@@ -309,6 +321,17 @@ class OAuth
 
     /**
      * Build a normalised base string for signing OAuth requests with.
+     *
+     * The base string is defined as:
+     * - the uppercased method of the request (eg. GET, POST),
+     * - the base URL of the request (excluding query string), including port if it
+     *   is non-standard (ie. not port 80 if HTTP, port 443 if HTTPS),
+     * - all parameters passed to the request. See also normaliseParams() for
+     *   details of sources.
+     *
+     * These are each urlencoded, and concatenated (in this order) with a "&".
+     * This may result in double-encoded values since parameters are urlencoded in
+     * the normalisation process - this is normal.
      *
      * @param string $baseUrl Base URL of request.
      * @param string $method  HTTP request method.
@@ -341,8 +364,9 @@ class OAuth
      * - the query string,
      * - fields to be placed into the "Authorization" header,
      * - post fields if the body is of the correct format;
-     * Except that the "oauth_signature" parameter needs to be excluded.
-     * Values to be urldecoded where necessary.
+     * Except that the "oauth_signature" and "realm" parameters of the Authorization
+     * header needs to be excluded.
+     * Values to be urldecoded where necessary before normalising.
      *
      * Parameters are then handled in the following order:
      * - Encode name and value according to RFC 3986.
@@ -363,6 +387,7 @@ class OAuth
      */
     public static function normaliseParams(array $params)
     {
+        // Encode the values we have.
         foreach ($params as &$param) {
             $param[0] = self::encodeValue($param[0]);
             $param[1] = self::encodeValue($param[1]);
@@ -371,6 +396,7 @@ class OAuth
         // Unset foreach-by-reference param.
         unset($param);
 
+        // Sort them using our user-defined function that sorts by keys, then values.
         usort(
             $params,
             array(
@@ -379,6 +405,7 @@ class OAuth
             )
         );
 
+        // Now put it all together.
         $paramStr = array();
 
         foreach ($params as $param) {
