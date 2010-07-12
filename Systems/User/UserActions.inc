@@ -53,6 +53,29 @@ class UserActions
      */
     public static function createUser($username, $firstName, $lastName, $email, $password)
     {
+        try {
+            DAL::beginTransaction();
+            Channels::includeSystem('Asset');
+            Channels::includeSystem('Attribute');
+            include_once 'Libs/Security/Security.inc';
+
+            $userid = Asset::create('user');
+            $name   = ucfirst($firstName).' '.ucfirst($lastName);
+            Attribute::setAttributeValue($userid, 'username', $username);
+            Attribute::setAttributeValue($userid, 'name', $name);
+            Attribute::setAttributeValue($userid, 'email', $email);
+            Attribute::setAttributeValue($userid, 'first_name', $firstName);
+            Attribute::setAttributeValue($userid, 'last_name', $lastName);
+            Attribute::setAttributeValue($userid, 'password', Security::hashUserPassword($password));
+            DAL::commit();
+        } catch (Exception $e) {
+            $msg  = 'Failed to create a new user.'."\n";
+            $msg .= $e->getMessage();
+            DAL::rollback();
+            throw new ChannelException();
+        }
+
+        return $userid;
 
     }//end createUser()
 
@@ -69,6 +92,8 @@ class UserActions
      */
     public static function deleteUser($userid)
     {
+        Channels::includeSystem('Asset');
+        Asset::delete($userid);
 
     }//end deleteUser()
 
