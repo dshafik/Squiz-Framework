@@ -43,12 +43,44 @@ class AttributeActions
 
 
     /**
+     * Retrieves the value of specified attribute from a specified asset.
+     *
+     * The attribute is examined and the processing passed to the relevant
+     * data source. The value returned will be a PHP data type, which will have
+     * been converted from the stored data type by the data source. More than
+     * one attributeids can be passed in, it will return an array of attribute values.
+     *
+     * @param integer      $assetid     The asset to find the value for.
+     * @param string|array $attributeid The attribute(s) to find.
+     *
+     * @api           read
+     * @api-privilege asset.read.content
+     * @api-mustlock  false
+     * @since         4.0.0
+     * @return        mixed
+     */
+    public static function getAttributeValue($assetid, $attributeid)
+    {
+        if (is_array($attributeid) === TRUE) {
+            $result = array();
+            foreach ($attributeid as $attrid) {
+                $result[$attrid] = self::_getAttributeValue($assetid, $attrid);
+            }
+        } else if (is_string($attributeid) === TRUE) {
+            $result = self::_getAttributeValue($assetid, $attributeid);
+        }
+
+        return $result;
+
+    }//end getAttributeValue()
+
+
+    /**
      * Retrieves the value of a specified attribute from a specified asset.
      *
      * The attribute is examined and the processing passed to the relevant
      * data source. The value returned will be a PHP data type, which will have
      * been converted from the stored data type by the data source.
-     * Throws a ChannelException if the value cannot be retrieved.
      *
      * @param integer $assetid     The asset to find the value for.
      * @param string  $attributeid The attribute to find.
@@ -58,10 +90,8 @@ class AttributeActions
      * @api-mustlock  false
      * @since         4.0.0
      * @return        mixed
-     * @throws        ChannelException If the attribute is not found for the
-     *                                 passed asset.
      */
-    public static function getAttributeValue($assetid, $attributeid)
+    private static function _getAttributeValue($assetid, $attributeid)
     {
         Channels::includeSystem('Context');
         $infoAssetid = $assetid;
@@ -110,7 +140,7 @@ class AttributeActions
 
         return $value;
 
-    }//end getAttributeValue()
+    }//end _getAttributeValue()
 
 
     /**
