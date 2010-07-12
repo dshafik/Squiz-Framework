@@ -81,42 +81,6 @@ class UserActions
 
 
     /**
-     * Delete a user.
-     *
-     * Returns the number of users being deleted.
-     *
-     * @param integer $userid ID of the user.
-     *
-     * @since  4.0.0
-     * @return integer
-     */
-    public static function deleteUser($userid)
-    {
-        Channels::includeSystem('Asset');
-        Asset::delete($userid);
-
-    }//end deleteUser()
-
-
-    /**
-     * Update user details.
-     *
-     * Returns the number of users being updated.
-     *
-     * @param integer $userid    ID of the user.
-     * @param string  $attrName  Attribute name to update.
-     * @param string  $attrValue New value for the attribute.
-     *
-     * @since  4.0.0
-     * @return integer
-     */
-    public static function updateUser($userid, $attrName, $attrValue)
-    {
-
-    }//end updateUser()
-
-
-    /**
      * Create a new user group.
      *
      * Returns an groupid.
@@ -127,44 +91,27 @@ class UserActions
      * @since  4.0.0
      * @return integer
      */
-    public static function createUserGroup($name, $email=NULL)
+    public static function createUserGroup($name, $groupName=NULL)
     {
+        try {
+            DAL::beginTransaction();
+            Channels::includeSystem('Asset');
+            Channels::includeSystem('Attribute');
+            include_once 'Libs/Security/Security.inc';
+
+            $userid = Asset::create('userGroup');
+            Attribute::setAttributeValue($userid, 'name', $groupName);
+            DAL::commit();
+        } catch (Exception $e) {
+            $msg  = 'Failed to create a new user.'."\n";
+            $msg .= $e->getMessage();
+            DAL::rollback();
+            throw new ChannelException();
+        }
+
+        return $userid;
 
     }//end createUserGroup()
-
-
-    /**
-     * Delete a user group.
-     *
-     * Returns the number of user groups being deleted.
-     *
-     * @param integer $groupid ID of the user group.
-     *
-     * @since  4.0.0
-     * @return integer
-     */
-    public static function deleteUserGroup($groupid)
-    {
-
-    }//end deleteUserGroup()
-
-
-    /**
-     * Update user group details.
-     *
-     * Returns the number of user groups being updated.
-     *
-     * @param integer $groupid   ID of the user group.
-     * @param string  $attrName  Attribute name to update.
-     * @param string  $attrValue New value for the attribute.
-     *
-     * @since  4.0.0
-     * @return integer
-     */
-    public static function updateUserGroup($groupid, $attrName, $attrValue)
-    {
-
-    }//end updateUserGroup()
 
 
     /**
@@ -177,10 +124,21 @@ class UserActions
      * @since  4.0.0
      * @return integer
      */
-    public static function getUserInfo($userid)
+    public static function getUserById($userid)
     {
+        Channels::includeSystem('Asset');
+        $userExists = Asset::exists($userid);
+        if ($userExists === FALSE) {
+            return NULL;
+        }
 
-    }//end getUserInfo()
+        Channels::includeSystem('Attribute');
+        $attributes   = Attribute::getAttributes(Asset::getTypeOfAsset($userid));
+        $attributeids = array_keys($attributes);
+        $userInfo     = Attribute::getAttributeValue($userid, $attributeids);
+        return $userInfo;
+
+    }//end getUserById()
 
 
     /**
@@ -193,132 +151,174 @@ class UserActions
      * @since  4.0.0
      * @return integer
      */
-    public static function getUserInfoByUsername($username)
+    public static function getUserByUsername($username)
     {
+        Channels::includeSystem('Asset');
+        Channels::includeSystem('Attribute');
+        $users = Attribute::getAssetsByAttributeValue(
+            'user',
+            'username',
+            $username
+        );
 
-    }//end getUserInfoByUsername()
+        if (empty($users) === TRUE) {
+            return NULL;
+        }
+
+        $userid       = array_pop($users);
+        $result       = User::getUserById($userid);
+        $result['id'] = $userid;
+        return $result;
+
+    }//end getUserByUsername()
 
 
     /**
-     * Get the user group details.
+     * Returns TRUE if the given username already exists.
      *
-     * Returns the information of the user group.
-     *
-     * @param integer $groupid ID of the user group.
+     * @param string $username Username to check.
      *
      * @since  4.0.0
-     * @return integer
+     * @return boolean
      */
-    public static function getUserGroupInfo($groupid)
+    public static function usernameExists($username)
     {
+        Channels::includeSystem('Attribute');
+        $users = Attribute::getAssetsByAttributeValue(
+            'user',
+            'username',
+            $username
+        );
 
-    }//end getUserGroupInfo()
+        if (empty($users) === TRUE) {
+            return FALSE;
+        }
+
+        return TRUE;
+
+    }//end usernameExists()
 
 
     /**
-     * Add a user to the group.
+     * Return TRUE if the given userid belongs to the given user group.
      *
-     * Returns the number of users being added.
-     *
-     * @param integer $userid  ID of the user to add to the group.
-     * @param integer $groupid ID of the user group.
+     * @param float $userid  Userid to check.
+     * @param float $groupid Groupid to check against the userid.
      *
      * @since  4.0.0
-     * @return integer
+     * @return boolean
      */
-    public static function addUserToGroup($userid, $groupid)
-    {
-
-    }//end addUserToGroup()
-
-
-    /**
-     * Remove a user from the group.
-     *
-     * Returns the number of users being removed.
-     *
-     * @param integer $userid  ID of the user to add to the group.
-     * @param integer $groupid ID of the user group.
-     *
-     * @since  4.0.0
-     * @return integer
-     */
-    public static function removeUserFromGroup($userid, $groupid)
-    {
-
-    }//end removeUserFromGroup()
-
-
     public static function isMemberOf($userid, $groupid)
     {
+        Channels::includeSystem('Linking');
+        $childrenQ = Linking::getChildren($groupid);
+        $userids   = DAL::getAssoc($childrenQ, 0);
+        if (in_array($userid, $userids) === TRUE) {
+            return TRUE;
+        }
 
         return FALSE;
 
     }//end isMemberOf()
 
 
+    /**
+     * Return the list of user groups which the given user belongs to.
+     *
+     * @param float $userid Userid to check.
+     *
+     * @since  4.0.0
+     * @return array
+     */
     public static function getUserGroups($userid)
     {
+        Channels::includeSystem('Linking');
+        $parentQ  = Linking::getParents($userid, 0, 65525, array('userGroup'));
+        $groupids = DAL::getAssoc($parentQ, 0);
+        return $groupids;
 
     }//end getUserGroups()
 
 
-    public static function getGroupMembers($groupid)
-    {
-
-    }//end getGroupMembers()
-
-
     /**
+     * Log in the user with the given password.
      *
+     * If the username is not found or the password is not matched,
+     * it returns FALSE. Otherwise, it returns TRUE and sets the session
+     * as a logged in user.
      *
-     * @param 
+     * @param string $username Username of the user to log in.
+     * @param string $password Password of the user to log in.
      *
+     * @api    read
      * @since  4.0.0
-     * @return 
+     * @return boolean
      */
-    public static function loginUser($userid, $password)
+    public static function loginUser($username, $password)
     {
+        $user = User::getUserByUsername($username);
+        if ($user === NULL) {
+            // No user exists with the given username.
+            return FALSE;
+        }
+
+        $userid       = $user['id'];
+        $currPassword = $user['password'];
+
+        // Password Matched.
+        include_once 'Libs/Security/Security.inc';
+        if ($currPassword !== Security::hashUserPassword($password)) {
+            return FALSE;
+        }
+
+        Channels::includeSystem('Session');
+        Session::setSessionData(
+            'User',
+            'CurrentUserid',
+            $userid
+        );
+
+        return TRUE;
+
     }//end loginUser()
 
 
     /**
+     * Log out the currently logged in user.
      *
-     *
-     * @param 
-     *
+     * @api    read
      * @since  4.0.0
-     * @return 
+     * @return boolean
      */
     public static function logoutUser()
     {
+        $userid = User::getCurrentUserid();
+        if ($userid === NULL) {
+            return FALSE;
+        }
+
+        Channels::includeSystem('Session');
+        Session::setSessionData('User', 'CurrentUserid', NULL);
+
+        return TRUE ;
+
     }//end logoutUser()
 
 
     /**
+     * Return the userid of the currently logged in user.
      *
-     *
-     * @param 
-     *
+     * @api    read
      * @since  4.0.0
-     * @return 
+     * @return float
      */
     public static function getCurrentUserid()
     {
+        Channels::includeSystem('Session');
+        $userid = Session::getSessionData('User', 'CurrentUserid');
+        return $userid;
+
     }//end getCurrentUserid()
-
-
-    /**
-     *
-     *
-     * @param 
-     *
-     * @since  4.0.0
-     * @return 
-     */
-    public static function getCurrentUserInfo()
-    {
-    }//end getCurrentUserInfo()
 
 
 }//end class
