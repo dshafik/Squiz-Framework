@@ -143,7 +143,7 @@ class APIActions
 
         Channels::includeSystem($system);
         try {
-            $responseContent['result'] = self::_getActionResult($system, $action, $params);
+            $responseContent['result'] = API::getActionResult($system, $action, $params);
             $response = 200;
         } catch (Exception $e) {
             $responseContent['exception'] = $e->getMessage();
@@ -366,7 +366,7 @@ class APIActions
      * @since  4.0.0
      * @return mixed
      */
-    private static function _getActionResult($system, $action, $params)
+    public static function getActionResult($system, $action, $params)
     {
         $callback = array(
                      $system,
@@ -386,7 +386,7 @@ class APIActions
 
         return $result;
 
-    }//end _getActionResult()
+    }//end getActionResult()
 
 
     /**
