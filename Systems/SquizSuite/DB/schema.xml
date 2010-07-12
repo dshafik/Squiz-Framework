@@ -1,32 +1,32 @@
 <schema system="SquizSuite">
-	<udts>
-		<udt type="INTEGER">PRODUCTID</udt>
-	</udts>
-	<tables>
-		<table name="suite_product">
-			<columns>
-				<column type="PRODUCTID" allow-null="false">productid</column>
-				<column type="VARCHAR" size="100" allow-null="false">name</column>
-				<column type="VARCHAR" size="50" allow-null="false">type</column>
-				<column type="BOOLEAN" allow-null="false" default="'0'">status</column>
-				<column type="BOOLEAN" allow-null="false" default="'0'">current</column>
-				<column type="CLOB" allow_null="true">connection</column>
-			</columns>
-			<constraints>
-				<primary-key name="suite_product_pk">
-					<column>productid</column>
-				</primary-key>
-			</constraints>
-			<indexes>
-				<index name="suite_product_idx">
-					<column>productid</column>
-					<column>type</column>
-					<column>status</column>
-				</index>
-			</indexes>
-			<sequences>
-				<sequence name="seq_productid" />
-			</sequences>
-		</table>
-	</tables>
+    <udts>
+        <udt type="INTEGER">PRODUCTID</udt>
+    </udts>
+    <tables>
+        <table name="suite_product">
+            <columns>
+                <column type="PRODUCTID" allow-null="false">productid</column>
+                <column type="VARCHAR" size="100" allow-null="false">name</column>
+                <column type="VARCHAR" size="50" allow-null="false">type</column>
+                <column type="BOOLEAN" allow-null="false" default="'0'">status</column>
+                <column type="BOOLEAN" allow-null="false" default="'0'">current</column>
+                <column type="CLOB" allow_null="true">connection</column>
+            </columns>
+            <constraints>
+                <primary-key name="suite_product_pk">
+                    <column>productid</column>
+                </primary-key>
+            </constraints>
+            <indexes>
+                <index name="suite_product_idx">
+                    <column>productid</column>
+                    <column>type</column>
+                    <column>status</column>
+                </index>
+            </indexes>
+            <sequences>
+                <sequence name="seq_productid" />
+            </sequences>
+        </table>
+    </tables>
 </schema>
