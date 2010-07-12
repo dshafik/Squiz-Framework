@@ -86,35 +86,42 @@ require_once $rootdir.'/Libs/FileSystem/FileSystem.inc';
 $systemNames = Install::getInstallOptions(FALSE, FALSE);
 
 // Clean up data and oven dir before full install.
-echo '10. Clean data & oven dir.              '."\n";
+echo '9. Clean data & oven dir.                           ';
 system('rm -rf ./data/* >> /dev/null 2>&1');
 system('rm -rf '.$rootdir.'/DAL/QueryStore/* >> /dev/null 2>&1');
 system('rm -rf '.$rootdir.'/DAL/Oven/* >> /dev/null 2>&1');
 system('rm -rf '.$rootdir.'/Channels/Oven/* >> /dev/null 2>&1');
+echoDone();
 
-echo '11. Preparing data directories.              '."\n";
+echo '10. Preparing data directories.                     ';
 Install::prepareDataDir($rootdir, $url);
+echoDone();
 
-echo '12. Rebaking Oven              '."\n";
+echo '11. Rebaking Oven                                   ';
 Install::rebakeOven($rootdir, $url);
+echoDone();
 
-echo '13. Installing queries              '."\n";
+echo '12. Installing queries                              ';
 Install::installQueries($systemNames);
+echoDone();
 
-echo '14. Installing SQL functions              '."\n";
+echo '13. Installing SQL functions                        ';
 Install::installSqlFunctions($systemNames);
+echoDone();
 
-echo '15. Running system install methods              '."\n";
+echo '14. Running system install methods                  ';
 Install::runSystemInstallMethods($systemNames);
+echoDone();
 
-echo '16. Copying web files              '."\n";
+echo '15. Copying web files                               ';
 Install::copyWebFiles();
+echoDone();
 
 require_once $rootdir.'/data/init.inc';
 require_once $rootdir.'/Channels/Channels.inc';
 require_once $rootdir.'/Systems/BaseSystem.inc';
 
-echo '17. Give error_log 777 permission for developers    ';
+echo '16. Give error_log 777 permission for developers    ';
 if (file_exists($rootdir.'/error_log') === FALSE) {
     file_put_contents($rootdir.'/error_log', '');
 }//end if
