@@ -361,18 +361,18 @@ class APIActions
      *
      * @param string $system System name where action resides.
      * @param string $action Action name to call.
-     * @param array  $params Parameters to pass to the action.
+     * @param array  $args   Parameters to pass to the action.
      *
      * @since  4.0.0
      * @return mixed
      */
-    public static function getActionResult($system, $action, $params)
+    public static function getActionResult($system, $action, $args)
     {
         $callback = array(
                      $system,
                      $action,
                     );
-        $result   = call_user_func_array($callback, $params);
+        $result   = call_user_func_array($callback, $args);
 
         // DAL Query has been returned! In general this should not happen as
         // we don't want the product's API return DAL Query. If this happens,
