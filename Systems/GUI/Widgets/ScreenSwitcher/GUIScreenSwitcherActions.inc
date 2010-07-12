@@ -31,14 +31,14 @@ class GUIScreenSwitcherActions
      */
     public static function getTemplateContent(array $settings=array())
     {
-        $content  = '<div id="%id%" class="%class%">';
+        Channels::includeSystem('GUI');
 
+        $content  = '<div id="%id%" class="%class%">';
         $content .= '<div class="%class%-left">';
         $content .= '</div>';
 
         $firstScreen = TRUE;
         foreach ($settings['screens'] as $screen) {
-
             if (strtolower($screen['disabled']) === 'true') {
                 $content .= '<div class="%class%-button disabled">';
             } else {
@@ -86,7 +86,7 @@ class GUIScreenSwitcherActions
             $content .= '</div>';
 
             $firstScreen = FALSE;
-        }//end foreach screen
+        }//end foreach
 
         $content .= '<div class="%class%-right">';
         $content .= '</div>';
@@ -119,9 +119,9 @@ class GUIScreenSwitcherActions
      * @param string $systemName The name of the system providing the screen.
      * @param string $screenId   The ID of the screen.
      *
-     * @api    read
      * @since  4.0.0
      * @return string
+     * @api    read
      */
     public static function getScreenContents($systemName, $screenId)
     {

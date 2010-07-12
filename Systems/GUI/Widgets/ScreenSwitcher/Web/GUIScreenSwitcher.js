@@ -1,6 +1,4 @@
-function GUIScreenSwitcher(id, setting) {
-
-}
+function GUIScreenSwitcher(id, setting) {}
 
 GUIScreenSwitcher.prototype = {
 }

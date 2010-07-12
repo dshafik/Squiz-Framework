@@ -163,7 +163,7 @@ class LinkingActions
             $activated = DAL::executeQuery('Linking', 'activateLink');
 
             if ($activated === 0) {
-                $status = 0;
+                $status    = 0;
                 $childrenQ = Linking::getChildren($childid);
                 $children  = array_keys(DAL::getGrouped($childrenQ));
 
@@ -399,8 +399,10 @@ class LinkingActions
      * Linking::deleteLink is called then this method will switch the channel to
      * Linking::trashAsset.
      *
+     * @param integer $assetid The asset ID to check.
+     *
      * @since  4.0.0
-     * @return void
+     * @return boolean
      */
     public static function isLastLink($assetid)
     {
@@ -917,6 +919,7 @@ class LinkingActions
             $oldParents = self::$_oldContextParents['parents'];
             $children   = self::$_oldContextParents['children'];
             $showInMenu = self::$_oldContextParents['showInMenu'];
+
             self::$_oldContextParents = array();
 
             // Get the new parents.
@@ -1028,7 +1031,6 @@ class LinkingActions
         }
 
     }//end removeAllContextData()
-
 
 
     /**

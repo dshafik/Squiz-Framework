@@ -1,77 +1,77 @@
 .GUIToggleButton {
-	cursor: pointer;
-	font-family: verdana;
-	font-size: 11px;
-	height: 31px;
-	line-height: 20px;
-	overflow: hidden;
+    cursor: pointer;
+    font-family: verdana;
+    font-size: 11px;
+    height: 31px;
+    line-height: 20px;
+    overflow: hidden;
     position: relative;
     width: 98px;
 }
 
 .GUIToggleButton.left {
-	background: url('toggle-slider-left.png') no-repeat scroll 0 0 transparent;
-	float: left;
-	height: 31px;
-	margin-top: 4px;
-	width: 3px;
+    background: url('toggle-slider-left.png') no-repeat scroll 0 0 transparent;
+    float: left;
+    height: 31px;
+    margin-top: 4px;
+    width: 3px;
 }
 
 .GUIToggleButton.middle {
-	background: url('toggle-slider-mid.png') repeat-x scroll 0 0 transparent;
-	float: left;
-	height: 31px;
-	margin-top: 4px;
-	position: relative;
-	width: 90px;
+    background: url('toggle-slider-mid.png') repeat-x scroll 0 0 transparent;
+    float: left;
+    height: 31px;
+    margin-top: 4px;
+    position: relative;
+    width: 90px;
 }
 
 .GUIToggleButton.right {
-	background: url('toggle-slider-right.png') no-repeat scroll 0 0 transparent;
-	float: left;
-	height: 31px;
-	margin-top: 4px;
-	width: 3px;
+    background: url('toggle-slider-right.png') no-repeat scroll 0 0 transparent;
+    float: left;
+    height: 31px;
+    margin-top: 4px;
+    width: 3px;
 }
 
 .GUIToggleButton.option {
-	margin-top: 1px;
-	position: absolute;
+    margin-top: 1px;
+    position: absolute;
 }
 
 .GUIToggleButton.yes {
-	left: 12px;
+    left: 12px;
 }
 
 .GUIToggleButton.no {
-	left: 56px;
+    left: 56px;
 }
 
 .GUIToggleButton.smallYes {
-	left: 15px;
+    left: 15px;
 }
 
 .GUIToggleButton.smallNo {
-	left: 59px;
+    left: 59px;
 }
 
 .GUIToggleButton.toggle {
     background: url('toggle-slider-glow.png') no-repeat scroll 0 0 transparent;
-	height: 31px;
-	position: absolute;
-	width: 40px;
-	z-index: 99;
+    height: 31px;
+    position: absolute;
+    width: 40px;
+    z-index: 99;
 }
 
 .GUIToggleButton.toggleY {
-	left: 6px;
+    left: 6px;
 }
 
 .GUIToggleButton.toggleN {
-	left: 50px;
+    left: 50px;
 }
 
 .GUIToggleButton.selected {
-  color: #000000;
-  font-weight: bold;
+    color: #000000;
+    font-weight: bold;
 }

@@ -20,8 +20,9 @@ require_once 'Systems/BaseSystem.inc';
 class GUITextBoxActions
 {
 
-	private static $defaultValue = '';
-	private static $width = '30';
+    private static $defaultValue = '';
+    private static $width = '30';
+
 
     /**
      * Returns this widgets content.
@@ -33,41 +34,42 @@ class GUITextBoxActions
      */
     public static function getTemplateContent(array $settings=array())
     {
-		$content  = '<div class="%class% container" id="%id%">';
-		$content .= '<?php ';
-		if (isset($settings['dataProvider'])) {
-			list($providerSystem, $providerMethod) = explode('::', $settings['dataProvider']);
-			$content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-			$content .= '$value = '.$settings['dataProvider'].'();';
-		} else {
-			$content .= '$value = '.Util::getArrayIndex($settings, 'default', self::$defaultValue).';';
-		}
-		$content .= ' ?>';
+        $content  = '<div class="%class% container" id="%id%">';
+        $content .= '<?php ';
+        if (isset($settings['dataProvider']) === TRUE) {
+            list($providerSystem, $providerMethod) = explode('::', $settings['dataProvider']);
+            $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
+            $content .= '$value = '.$settings['dataProvider'].'();';
+        } else {
+            $content .= '$value = '.Util::getArrayIndex($settings, 'default', self::$defaultValue).';';
+        }
 
-		$width = Util::getArrayIndex($settings, 'width', self::$width);
-		$maxLengthProp = Util::getArrayIndex($settings, 'maxlength', 0);
-		$nameProp = Util::getArrayIndex($settings, 'name', '');
+        $content .= ' ?>';
 
-		// Add in the name property if needed
-		$name = '';
-		if (empty($nameProp) === FALSE) {
-			$name = ' name="'.$nameProp.'"';
-		}//end if
+        $width         = Util::getArrayIndex($settings, 'width', self::$width);
+        $maxLengthProp = Util::getArrayIndex($settings, 'maxlength', 0);
+        $nameProp      = Util::getArrayIndex($settings, 'name', '');
 
-		// Add in the maxlength property if needed
-		$maxlength = '';
-		if ($maxLengthProp !== 0) {
-			$maxlength = ' maxlength="'.$maxLengthProp.'"';
-		}//end if
+        // Add in the name property if needed.
+        $name = '';
+        if (empty($nameProp) === FALSE) {
+            $name = ' name="'.$nameProp.'"';
+        }
 
-		// The input field
-		$content .= '<input class="%class% input"'.$name.' type="text" value="&lt;?php echo $value; ?&gt;" size="'.$width.'"'.$maxlength.' />';
+        // Add in the maxlength property if needed.
+        $maxlength = '';
+        if ($maxLengthProp !== 0) {
+            $maxlength = ' maxlength="'.$maxLengthProp.'"';
+        }
 
-		$content .= '</div>';
+        // The input field.
+        $content .= '<input class="%class% input"'.$name.' type="text" value="&lt;?php echo $value; ?&gt;" size="'.$width.'"'.$maxlength.' />';
 
-		return $content;
+        $content .= '</div>';
 
-	}//end getTemplateContent()
+        return $content;
+
+    }//end getTemplateContent()
 
 
     /**

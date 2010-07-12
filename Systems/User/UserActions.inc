@@ -50,9 +50,15 @@ class UserActions
      *
      * @since  4.0.0
      * @return integer
+     * @throws ChannelException If the user fails to create.
      */
-    public static function createUser($username, $firstName, $lastName, $email, $password)
-    {
+    public static function createUser(
+        $username,
+        $firstName,
+        $lastName,
+        $email,
+        $password
+    ) {
         try {
             DAL::beginTransaction();
             Channels::includeSystem('Asset');
@@ -73,7 +79,7 @@ class UserActions
             $msg .= $e->getMessage();
             DAL::rollback();
             throw new ChannelException();
-        }
+        }//end try
 
         return $userid;
 
@@ -83,15 +89,15 @@ class UserActions
     /**
      * Create a new user group.
      *
-     * Returns an groupid.
+     * Returns the asset ID of the new group.
      *
-     * @param string $name  Name of user group.
-     * @param string $email Optional user group email.
+     * @param string $name Name of user group.
      *
      * @since  4.0.0
      * @return integer
+     * @throws ChannelException If the group fails to create.
      */
-    public static function createUserGroup($name, $groupName=NULL)
+    public static function createUserGroup($name)
     {
         try {
             DAL::beginTransaction();
@@ -100,7 +106,7 @@ class UserActions
             include_once 'Libs/Security/Security.inc';
 
             $userid = Asset::create('userGroup');
-            Attribute::setAttributeValue($userid, 'name', $groupName);
+            Attribute::setAttributeValue($userid, 'name', $name);
             DAL::commit();
         } catch (Exception $e) {
             $msg  = 'Failed to create a new user.'."\n";
@@ -146,14 +152,13 @@ class UserActions
      *
      * Returns the information of the user.
      *
-     * @param integer $userid ID of the user.
+     * @param integer $username Username of the user.
      *
      * @since  4.0.0
      * @return integer
      */
     public static function getUserByUsername($username)
     {
-        Channels::includeSystem('Asset');
         Channels::includeSystem('Attribute');
         $users = Attribute::getAssetsByAttributeValue(
             'user',
@@ -250,9 +255,9 @@ class UserActions
      * @param string $username Username of the user to log in.
      * @param string $password Password of the user to log in.
      *
-     * @api    read
      * @since  4.0.0
      * @return boolean
+     * @api    read
      */
     public static function loginUser($username, $password)
     {
@@ -286,9 +291,9 @@ class UserActions
     /**
      * Log out the currently logged in user.
      *
-     * @api    read
      * @since  4.0.0
      * @return boolean
+     * @api    read
      */
     public static function logoutUser()
     {
@@ -300,7 +305,7 @@ class UserActions
         Channels::includeSystem('Session');
         Session::setSessionData('User', 'CurrentUserid', NULL);
 
-        return TRUE ;
+        return TRUE;
 
     }//end logoutUser()
 
@@ -308,9 +313,9 @@ class UserActions
     /**
      * Return the userid of the currently logged in user.
      *
-     * @api    read
      * @since  4.0.0
      * @return float
+     * @api    read
      */
     public static function getCurrentUserid()
     {
