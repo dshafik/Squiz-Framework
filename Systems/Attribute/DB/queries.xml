@@ -126,85 +126,8 @@
       </select>
     </primary>
   </query>
-  <!--
-      Retrieves list of attribute ids for a specified asset type.
-      Fields  : attributeid
-      Binds   : assetType
-  -->
-  <query id="getAttributesByAssetType">
-    <primary>
-      <select>
-        <fields>
-          <field table="attribute" column="attributeid"/>
-        </fields>
-        <from>
-          <table>attribute</table>
-        </from>
-        <where>
-          <equal table="attribute" column="asset_type">:assetType</equal>
-        </where>
-      </select>
-    </primary>
-    <alternate>
-      <assert-true data="systemOnly">
-        <assert-false data="standardOnly">
-          <assert-false data="customOnly">
-            <select>
-              <fields>
-                <field table="attribute" column="attributeid"/>
-              </fields>
-              <from>
-                <table>attribute</table>
-              </from>
-              <where>
-                <equal table="attribute" column="asset_type">:assetType</equal>
-                <equal table="attribute" column="is_custom">:isCustom</equal>
-                <not-null>
-                  <field table="attribute" column="system"/>
-                </not-null>
-              </where>
-            </select>
-          </assert-false>
-        </assert-false>
-      </assert-true>
-    </alternate>
-    <alternate>
-      <assert-false data="standardOnly">
-        <assert-true data="customOnly">
-          <select>
-            <fields>
-              <field table="attribute" column="attributeid"/>
-            </fields>
-            <from>
-              <table>attribute</table>
-            </from>
-            <where>
-              <equal table="attribute" column="asset_type">:assetType</equal>
-              <equal table="attribute" column="is_custom">:isCustom</equal>
-            </where>
-          </select>
-        </assert-true>
-      </assert-false>
-    </alternate>
-    <alternate>
-      <assert-false data="customOnly">
-        <assert-true data="standardOnly">
-          <select>
-            <fields>
-              <field table="attribute" column="attributeid"/>
-            </fields>
-            <from>
-              <table>attribute</table>
-            </from>
-            <where>
-              <equal table="attribute" column="asset_type">:assetType</equal>
-              <equal table="attribute" column="is_custom">:isCustom</equal>
-            </where>
-          </select>
-        </assert-true>
-      </assert-false>
-    </alternate>
-  </query>
+
+
 <!--
         Retrieves list of attribute ids for a specified attribute type.
         Fields  : attributeid
@@ -604,4 +527,87 @@
         </assert-not-null>
     </alternate>
   </query>
+
+  <!--
+      Retrieves list of attribute ids for a specified asset type.
+      Fields  : attributeid
+      Binds   : assetType
+  -->
+  <query id="getAttributesByAssetType">
+    <primary>
+      <select>
+        <fields>
+          <field table="attribute" column="attributeid"/>
+        </fields>
+        <from>
+          <table>attribute</table>
+        </from>
+        <where>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+    <alternate>
+      <assert-true data="systemOnly">
+        <assert-false data="standardOnly">
+          <assert-false data="customOnly">
+            <select>
+              <fields>
+                <field table="attribute" column="attributeid"/>
+              </fields>
+              <from>
+                <table>attribute</table>
+              </from>
+              <where>
+                <equal table="attribute" column="asset_type">:assetType</equal>
+                <equal table="attribute" column="is_custom">:isCustom</equal>
+                <not-null>
+                  <field table="attribute" column="system"/>
+                </not-null>
+              </where>
+            </select>
+          </assert-false>
+        </assert-false>
+      </assert-true>
+    </alternate>
+    <alternate>
+      <assert-false data="standardOnly">
+        <assert-true data="customOnly">
+          <select>
+            <fields>
+              <field table="attribute" column="attributeid"/>
+            </fields>
+            <from>
+              <table>attribute</table>
+            </from>
+            <where>
+              <equal table="attribute" column="asset_type">:assetType</equal>
+              <equal table="attribute" column="is_custom">:isCustom</equal>
+            </where>
+          </select>
+        </assert-true>
+      </assert-false>
+    </alternate>
+    <alternate>
+      <assert-false data="customOnly">
+        <assert-true data="standardOnly">
+          <select>
+            <fields>
+              <field table="attribute" column="attributeid"/>
+            </fields>
+            <from>
+              <table>attribute</table>
+            </from>
+            <where>
+              <equal table="attribute" column="asset_type">:assetType</equal>
+              <equal table="attribute" column="is_custom">:isCustom</equal>
+            </where>
+          </select>
+        </assert-true>
+      </assert-false>
+    </alternate>
+  </query>
+
+
+
 </queries>
