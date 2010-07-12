@@ -54,17 +54,20 @@ class SquizSuiteActions
     /**
      * Get Product's Connection details.
      *
-     * @param string $productid The ID of the Product.
+     * @param array|string $productid The ID of the Product.
      *
      * @since  4.0.0
      * @return array
      */
     public static function getProductConnection($productid)
     {
-        $result     = DAL::executeAll('SquizSuite', 'getProductInformation');
-        $connection = Util::getArrayIndex($result, 'connection', array());
+        $results     = SquizSuite::getProductInformation($productid);
+        $connections = array();
+        foreach ($results as $id => $info) {
+            $connections[$id] = Util::getArrayIndex($info, 'connection', array());
+        }//end foreach
 
-        return $connection;
+        return $connections;
 
     }//end getProductConnection()
 
@@ -84,8 +87,8 @@ class SquizSuiteActions
 
         // Formatting the results.
         foreach ($realResults as $results) {
-            $productid       = NULL;
-            $formattedResult = array();
+            $productid   = NULL;
+            $cleanResult = array();
             foreach ($results as $key => $result) {
                 // Locating the Product ID.
                 if ($key === 'productid') {
@@ -95,7 +98,11 @@ class SquizSuiteActions
 
                 // Strip out any DB assoc values.
                 if (is_int($key) === FALSE) {
-                    $formattedResult[$key] = $result;
+                    if ($key === 'connection') {
+                        $cleanResult[$key] = unserialize($result);
+                    } else {
+                        $cleanResult[$key] = $result;
+                    }//end if
                 }//end if
             }//end foreach
 
@@ -105,7 +112,7 @@ class SquizSuiteActions
             }
 
             // Finally, set the clean results.
-            $cleanResults[$productid] = $formattedResult;
+            $cleanResults[$productid] = $cleanResult;
         }//end foreach
 
         return $cleanResults;
