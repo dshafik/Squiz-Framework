@@ -251,11 +251,11 @@ class APIActions
             $matches        = array();
             $serviceUrlPart = substr($url, $serviceStartPos, ($serviceEndPos - $serviceStartPos) + 1);
 
-            $serviceUrlPattern           = '/\/'.self::$_serviceWebPath.'\/([^\/(xml)(json)]+)\/([^\/]+)/';
+            $serviceUrlPattern           = '/\/'.self::$_serviceWebPath.'\/([^\/]+)\/([^\/]+)/';
             $serviceUrlPatternWithFormat = '/\/'.self::$_serviceWebPath.'\/(xml|json)\/([^\/]+)\/([^\/]+)/';
-
             $res = preg_match($serviceUrlPattern, $serviceUrlPart, $matches);
-            if ($res === 1) {
+
+            if ($res === 1 && $matches[1] !== 'xml' && $matches[1] !== 'json') {
                 $system = $matches[1];
                 $action = $matches[2];
                 $format = self::$_outputFormat;
