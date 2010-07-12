@@ -336,7 +336,7 @@ class AssetActions
                 }
             }
 
-            Attribute::installAssetTypeAttributes($typeid);
+            self::_createAssetAttributes($typeid);
 
             DAL::commit();
         } catch (DALException $e) {
@@ -345,6 +345,124 @@ class AssetActions
         }
 
     }//end createAssetType()
+
+
+    /**
+     * Installs attributes for the given asset type.
+     *
+     * Runs after an asset type is installed.
+     *
+     * @param string $typeid Installed asset type.
+     *
+     * @since  4.0.0
+     * @return void
+     * @throws ChannelException If there was an installation error.
+     */
+    private static function _createAssetAttributes($typeid)
+    {
+        // Get the attributes for the given asset type.
+        $attributes = self::_readAssetAttributes($typeid);
+
+        Channels::includeSystem('Attribute');
+        foreach ($attributes as $id => $attr) {
+            // Check if the attribute already exists.
+            if (Attribute::attributeExists($id, $typeid) === TRUE) {
+                $msg = 'Attribute "'.$id.'" already exists for '.$typeid;
+                throw new ChannelException('Install Error: '.$msg);
+            }
+
+            // TODO: Check if attribute is a valid type for its data source.
+            if ($attr['required'] === 'false') {
+                $attr['required'] = 'f';
+            } else {
+                $attr['required'] = 't';
+            }
+
+            if ($attr['unique'] === 'false') {
+                $attr['unique'] = 'f';
+            } else {
+                $attr['unique'] = 't';
+            }
+
+            // Add attribute.
+            Attribute::addAttribute(
+                $typeid,
+                $id,
+                $attr['type'],
+                $attr['data_source'],
+                $attr['unique'],
+                $attr['initial_val'],
+                $attr['default_val'],
+                $attr['required'],
+                $attr['assetid']
+            );
+        }//end foreach
+
+    }
+
+
+    /**
+     * Returns list of attributes for a specific asset type.
+     *
+     * This function is only used at install time, it sources the
+     * attribute list from the attributes.xml file for an asset type
+     * and does not include any inherited attributes.
+     *
+     * Returned array structure:
+     * (attributeid)[type]
+     *              [data_source]
+     *              [unique]
+     *              [initial_val]
+     *
+     * @param string $assetType Type of the asset.
+     *
+     * @since  4.0.0
+     * @return array
+     * @throws ChannelException If the attribute file doesn't exist.
+     */
+    private static function _readAssetAttributes($assetType)
+    {
+        $attributes = array();
+        // Read the attributes.xml file for the given system.
+        $path = Asset::getTypeDirPath($assetType).'/attributes.xml';
+        if (file_exists($path) === TRUE) {
+            $doc = new DomDocument();
+            $doc->load($path);
+
+            if ($doc !== NULL) {
+                $attrs = $doc->getElementsByTagName('attribute');
+                foreach ($attrs as $attribute) {
+                    $id              = $attribute->getAttribute('id');
+                    $attributes[$id] = array();
+
+                    // Info for this attribute.
+                    $attributes[$id]['type']        = $attribute->getAttribute('type');
+                    $attributes[$id]['data_source'] = $attribute->getAttribute('data_source');
+                    $attributes[$id]['unique']      = $attribute->getAttribute('unique');
+                    $attributes[$id]['required']    = $attribute->getAttribute('required');
+                    $attributes[$id]['default_val'] = $attribute->getAttribute('default_val');
+                    $attributes[$id]['assetid']     = $attribute->getAttribute('assetid');
+
+                    // Get the initial value if there is one.
+                    $value      = '';
+                    $initialVal = $attribute->getElementsByTagName('initial_value')->item(0);
+                    if ($initialVal !== NULL) {
+                        $value = $initialVal->nodeValue;
+                    } else {
+                        $value = NULL;
+                    }
+
+                    $attributes[$id]['initial_val'] = $value;
+                }//end foreach
+            }//end if
+        } else {
+            $msg = 'Attribute file for '.$assetType.' does not exist!';
+            throw new ChannelException($msg);
+        }//end if
+
+        return $attributes;
+
+    }//end readAttributes()
 
 
     /**
