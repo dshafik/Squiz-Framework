@@ -141,8 +141,8 @@ class GUIGraphBarActions
                 }
 
                 $usedStyles[$groupKey]++;
-            }//end if colour exists
-        }//end foreach data group
+            }//end if
+        }//end foreach
 
         // Unset value after having run foreach by reference with it.
         unset($groupData);
@@ -189,13 +189,13 @@ class GUIGraphBarActions
                         // We found our colour.
                         $foundColour = TRUE;
                     }
-                }//end while colour not yet found
+                }//end while
 
                 // We found a free colour.
                 $groupData['colour'] = $thisColour;
                 $groupData['style']  = $thisStyle;
-            }//end if colour exists
-        }//end foreach data group
+            }//end if
+        }//end foreach
 
         // Unset value after having run foreach by reference with it.
         unset($groupData);
@@ -294,7 +294,7 @@ class GUIGraphBarActions
                     $hasXAxis = TRUE;
                 }
             }
-        }//end foreach data row
+        }//end foreach
 
         // Allow room for the flags at the bottom of the screen.
         $flagHeight = 0;
@@ -415,7 +415,7 @@ class GUIGraphBarActions
                     echo '</li>';
                     $liTexts[] = ob_get_contents();
                 ob_end_clean();
-            }//end foreach data point
+            }//end foreach
 
             // But we want the first group at the bottom, so reverse what we have
             // before printing it.
@@ -454,7 +454,7 @@ class GUIGraphBarActions
                 echo '<li class="'.$class.'-data-x-axis-empty">';
                 echo $emptyXAxisText;
                 echo '</li>';
-            }//end if has X axis
+            }//end if
 
             echo '</ul>';
 
@@ -492,7 +492,7 @@ class GUIGraphBarActions
                         if ($flagValue !== '') {
                             $showFlag = TRUE;
                         }
-                    }//end if type of flag value
+                    }//end if
 
                     ob_start();
                         echo '<li class="'.$class.'-data-flag';
@@ -525,19 +525,19 @@ class GUIGraphBarActions
                         } else {
                             echo '</span>';
                             echo $flagValue;
-                        }//end if type of flag value
+                        }//end if
 
                         echo '</li>';
                         $liTexts[] = ob_get_contents();
                     ob_end_clean();
-                }//end foreach flag
+                }//end foreach
 
                 echo implode('', $liTexts);
                 echo '</ul>';
-            }//end if there were flags existing
+            }//end if
 
             echo '</ul>';
-        }//end foreach data row
+        }//end foreach
 
     }//end paintGraph()
 

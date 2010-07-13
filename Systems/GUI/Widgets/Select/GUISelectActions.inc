@@ -112,7 +112,7 @@ class GUISelectActions
                     $depthEl[1]--;
                     $depths[] = $depthEl;
                 }
-            }//end if no depths stored
+            }//end if
 
             // If this is an array, store the depths of the next elements so we
             // know when to switch back to the next lower level.
@@ -137,9 +137,9 @@ class GUISelectActions
                 }
 
                 echo $option.'</option>';
-            }//end if option is array or single value
+            }//end if
 
-        }//end while items still exist
+        }//end while
 
     }//end paintItems()
 
