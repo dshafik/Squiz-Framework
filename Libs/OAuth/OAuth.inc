@@ -69,16 +69,19 @@ class OAuth
     /**
      * Get the temporary credentials (previously known as a "request token").
      *
+     * RFC 5849 requires the endpoint to be secure (HTTPS), however earlier standards
+     * only have this as a recommendation. Requests to get temporary credentials are
+     * made using POST.
+     *
      * @param string $endpointUrl    The REST endpoint that issues the temporary
      *                               credentials.
      * @param string $clientKey      The "consumer key" part of client credentials.
      * @param string $clientSecret   The shared secret part of client credentials.
      * @param string $callbackUrl    The URL to return to after the resource owner
      *                               approves the client.
+     * @param string $signMethod     The method used to sign the request.
      * @param array  $extraAuthItems Extra header items to go into the Authorization
      *                               header.
-     * @param string $signMethod     The method used to sign the request. Understands
-     *                               "PLAINTEXT" and "HMAC-SHA1".
      *
      * @since  4.0.0
      * @return array
@@ -88,8 +91,8 @@ class OAuth
         $clientKey,
         $clientSecret,
         $callbackUrl,
-        array $extraAuthItems=array(),
-        $signMethod='HMAC-SHA1'
+        $signMethod,
+        array $extraAuthItems=array()
     ) {
         // Add callback to the Authorization header first, then call the request.
         $extraAuthItems['oauth_callback'] = $callbackUrl;
@@ -101,9 +104,8 @@ class OAuth
             '',
             '',
             'POST',
-            $extraAuthItems,
-            array(),
-            $signMethod
+            $signMethod,
+            $extraAuthItems
         );
 
         // Was the request good? If so, break out the result so the temporary
@@ -140,14 +142,17 @@ class OAuth
     /**
      * Get the access token.
      *
+     * RFC 5849 requires the endpoint to be secure (HTTPS), however earlier standards
+     * only have this as a recommendation. Requests to get a token are made using
+     * POST.
+     *
      * @param string $endpointUrl  The endpoint URL of the "get token" web service.
      * @param string $clientKey    The "consumer key" part of client credentials.
      * @param string $clientSecret The shared secret part of client credentials.
      * @param string $tempToken    The identifier of the temporary credentials.
      * @param string $tempSecret   The shared secret of the temporary credentials.
      * @param string $verifier     The verifier provided from the auth redirect.
-     * @param string $signMethod   The method used to sign the request. Understands
-     *                             "PLAINTEXT" and "HMAC-SHA1".
+     * @param string $signMethod   The method used to sign the OAuth request.
      *
      * @since  4.0.0
      * @return array
@@ -159,7 +164,7 @@ class OAuth
         $tempToken,
         $tempSecret,
         $verifier,
-        $signMethod='HMAC-SHA1'
+        $signMethod
     ) {
         // Add the verifier to the Authorization header.
         $extraAuthItems = array();
@@ -172,8 +177,6 @@ class OAuth
             $tempToken,
             $tempSecret,
             'POST',
-            $extraAuthItems,
-            array(),
             $signMethod
         );
 
@@ -193,25 +196,26 @@ class OAuth
     /**
      * Do a signed OAuth request.
      *
-     * A timestamp value will be generated to add to the request. Some servers (eg.
-     * Google Data protocol) will reject a timestamp value from the client if it is
-     * too different from the server's time. Ensure time is synchronised using eg.
-     * NTP if relying on this. Also, be aware some older server implementations
-     * require that timestamps be equal or greater than previous timestamps (no
-     * longer required by RFC 5849).
+     * A timestamp and nonce will be automatically generated to add to the request.
+     * Some servers (eg. Google Data protocol) will reject a timestamp value from the
+     * client if it is too different from the server's time. Ensure time is
+     * synchronised using eg. NTP if relying on this.
      *
-     * @param string $endpointUrl      The endpoint URL we are accessing.
-     * @param string $clientKey        The "consumer key" part of client
-     *                                 credentials.
-     * @param string $clientSecret     The shared secret part of client credentials.
-     * @param string $token            The access token identifier.
-     * @param string $tokenSecret      The access token shared secret.
-     * @param string $method           The method used to call the request.
-     * @param array  $authHeaderParams Extra header items to go into the
-     *                                 "Authorization" header.
-     * @param array  $postFields       If POST, fields to be posted to the request.
-     * @param string $signMethod       The method used to sign the request.
-     *                                 Understands "PLAINTEXT" and "HMAC-SHA1".
+     * Also, be aware some older server implementations require that timestamps be
+     * equal or greater than previous timestamps (no longer required by RFC 5849).
+     *
+     * @param string $endpointUrl    The endpoint URL we are accessing.
+     * @param string $clientKey      The "consumer key" part of client credentials.
+     * @param string $clientSecret   The shared secret part of client credentials.
+     * @param string $token          The access token identifier.
+     * @param string $tokenSecret    The access token shared secret.
+     * @param string $method         The method used to call the request.
+     * @param string $signMethod     The method used to sign the OAuth request.
+     * @param array  $extraAuthItems Extra items to go into the "Authorization"
+     *                               header.
+     * @param array  $extraHeaders   Extra headers to be added to the request.
+     * @param array  $postFields     If method is POST, fields to be posted to the
+     *                               request, otherwise ignored.
      *
      * @since  4.0.0
      * @return array
@@ -222,10 +226,11 @@ class OAuth
         $clientSecret,
         $token,
         $tokenSecret,
-        $method='GET',
-        array $authHeaderParams=array(),
-        array $postFields=array(),
-        $signMethod='HMAC-SHA1'
+        $method,
+        $signMethod,
+        array $extraAuthItems=array(),
+        array $extraHeaders=array(),
+        array $postFields=array()
     ) {
         /*
             The getQueryStringParams() function uses parse_str() to decode the query
@@ -255,14 +260,14 @@ class OAuth
         $baseUrl = Web::stripUrlQueryString($endpointUrl);
 
         // Authentication header parameters.
-        $authHeaderParams['oauth_consumer_key']     = $clientKey;
-        $authHeaderParams['oauth_token']            = $token;
-        $authHeaderParams['oauth_signature_method'] = strtoupper($signMethod);
-        $authHeaderParams['oauth_version']          = '1.0';
-        $authHeaderParams['oauth_nonce']            = self::generateNonce();
-        $authHeaderParams['oauth_timestamp']        = time();
+        $extraAuthItems['oauth_consumer_key']     = $clientKey;
+        $extraAuthItems['oauth_token']            = $token;
+        $extraAuthItems['oauth_signature_method'] = strtoupper($signMethod);
+        $extraAuthItems['oauth_version']          = '1.0';
+        $extraAuthItems['oauth_nonce']            = self::generateNonce();
+        $extraAuthItems['oauth_timestamp']        = time();
 
-        foreach ($authHeaderParams as $key => $value) {
+        foreach ($extraAuthItems as $key => $value) {
             // Realm part of Authorization header is excluded [RFC sect. 3.4.1.3.1].
             if ($key !== 'realm') {
                 $baseStringParams[] = array(
@@ -281,19 +286,19 @@ class OAuth
             $signMethod
         );
 
-        $authHeaderParams['oauth_signature'] = $signature;
+        $extraAuthItems['oauth_signature'] = $signature;
 
         // Build the "Authorization" header.
         $authString = array();
 
-        foreach ($authHeaderParams as $key => $value) {
+        foreach ($extraAuthItems as $key => $value) {
             $newAuthString  = self::encodeValue($key);
             $newAuthString .= '="'.self::encodeValue($value).'"';
             $authString[]   = $newAuthString;
         }
 
         $authString = implode(', ', $authString);
-        $authString = 'Authorization: OAuth '.$authString;
+        $authString = 'OAuth '.$authString;
 
         // Start building the CURL request.
         $curl = curl_init($endpointUrl);
@@ -303,7 +308,18 @@ class OAuth
             curl_setopt($curl, CURLOPT_POSTFIELDS, $postFields);
         }
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array($authString));
+        // Override any existing Authorization header in the extra headers.
+        $extraHeaders['Authorization'] = $authString;
+
+        // Convert the headers to the required format.
+        $headerNames = array_keys($extraHeaders);
+        $headers     = array();
+
+        foreach ($headerNames as $headerName) {
+            $headers[] = $headerName.': '.$extraHeaders[$headerName];
+        }
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($curl);
 
