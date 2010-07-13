@@ -71,10 +71,10 @@ class GUIListActions
     /**
      * Paint the items of the list.
      *
-     * @param array  $items    An array of items to print.
-     * @param int    $sortable Should drag-handles be printed?
-     * @param string $id       The ID used by the list.
-     * @param string $class    The class used by the list.
+     * @param array   $items    An array of items to print.
+     * @param integer $sortable Should drag-handles be printed.
+     * @param string  $id       The ID used by the list.
+     * @param string  $class    The class used by the list.
      *
      * @since  4.0.0
      * @return void

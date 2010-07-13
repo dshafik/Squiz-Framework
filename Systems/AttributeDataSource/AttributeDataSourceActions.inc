@@ -52,17 +52,25 @@ class AttributeDataSourceActions implements DataSourceActions
      *
      * @param array|Query $assetids   List of asset ids.
      * @param array       $attributes List of attribute ids.
-     * @param array       $attrTypes  An array of all attribute types being retrieved.
+     * @param array       $attrTypes  All attribute types being retrieved.
      *
      * @since  4.0.0
      * @return mixed
      */
-    public static function batchGetAttributeValue($assetids, array $attributes, array $attrTypes)
-    {
+    public static function batchGetAttributeValue(
+        $assetids,
+        array $attributes,
+        array $attrTypes
+    ) {
         $values = array();
         foreach ($attrTypes as $attrType => $attrids) {
-            $dalQuery = AttributeDataSource::batchGetAttributeValueQc($assetids, $attrids, $attrType);
-            $retVal   = DAL::executeDALQuery($dalQuery, 'Assoc');
+            $dalQuery = AttributeDataSource::batchGetAttributeValueQc(
+                $assetids,
+                $attrids,
+                $attrType
+            );
+
+            $retVal = DAL::executeDALQuery($dalQuery, 'Assoc');
             foreach ($retVal as $result) {
                 $assetid = $result['assetid'];
                 if (isset($values[$assetid]) === FALSE) {
@@ -131,7 +139,11 @@ class AttributeDataSourceActions implements DataSourceActions
                     // Get attribute's type.
                     if (isset($attrTypes[$attrid]) === FALSE) {
                         Channels::includeSystem('Attribute');
-                        $attrInfo = Attribute::getAssetAttributeInfo($assetid, $attrid);
+                        $attrInfo = Attribute::getAssetAttributeInfo(
+                            $assetid,
+                            $attrid
+                        );
+
                         if (empty($attrInfo) === FALSE) {
                             $attrTypes[$attrid] = $attrInfo['attribute_type'];
                         } else {
@@ -141,11 +153,24 @@ class AttributeDataSourceActions implements DataSourceActions
                     }
 
                     // Try to update the attribute value.
-                    if (AttributeDataSource::setAttributeValue($assetid, $attrid, $attrTypes[$attrid], $value) === FALSE) {
+                    $result = AttributeDataSource::setAttributeValue(
+                        $assetid,
+                        $attrid,
+                        $attrTypes[$attrid],
+                        $value
+                    );
+
+                    if ($result === FALSE) {
                         // No rows were updated. Insert instead.
-                        AttributeDataSource::addAttributeValue($assetid, $attrid, $attrTypes[$attrid], $value, 'f');
+                        AttributeDataSource::addAttributeValue(
+                            $assetid,
+                            $attrid,
+                            $attrTypes[$attrid],
+                            $value,
+                            'f'
+                        );
                     }
-                }
+                }//end foreach
             }//end foreach
 
             DAL::commit();
@@ -175,14 +200,29 @@ class AttributeDataSourceActions implements DataSourceActions
      * @see    DataSourceActions::attributeValueExists()
      * @return boolean
      */
-    public static function addAttributeValue($assetid, $attributeid, $attrType, $value, $isDefault)
-    {
+    public static function addAttributeValue(
+        $assetid,
+        $attributeid,
+        $attrType,
+        $value,
+        $isDefault
+    ) {
         $className = self::_getAttributeTypeClassName($attrType);
         Channels::addToBasket('tableName', 'attribute_'.$attrType);
         $path = self::_getAttributeTypePath($className);
         include_once $path;
 
-        $rows = call_user_func(array($className, 'addAttributeValue'), $assetid, $attributeid, $value, $isDefault);
+        $rows = call_user_func(
+            array(
+             $className,
+             'addAttributeValue',
+            ),
+            $assetid,
+            $attributeid,
+            $value,
+            $isDefault
+        );
+
         return $rows;
 
     }//end addAttributeValue()
@@ -668,29 +708,31 @@ class AttributeDataSourceActions implements DataSourceActions
     public static function removeAllContextData($context)
     {
         Channels::includeSystem('Context');
-        if (Context::isMasterContext($context) !== TRUE) {
-            try {
-                $attrTypes = array(
-                              'text',
-                              'long_text',
-                              'integer',
-                              'float',
-                              'datetime',
-                             );
-
-                DAL::beginTransaction();
-                 foreach ($attrTypes as $attrType) {
-                    Channels::addToBasket('tableName', 'attribute_'.$attrType, TRUE);
-                    $query = DAL::getQuery('AttributeDataSource', 'removeAllContextData');
-                    DAL::executeQuery($query);
-                }
-
-                DAL::commit();
-            } catch (DALException $e) {
-                DAL::rollBack();
-                throw new ChannelException($e);
-            }
+        if (Context::isMasterContext($context) === TRUE) {
+            return;
         }
+
+        try {
+            $attrTypes = array(
+                          'text',
+                          'long_text',
+                          'integer',
+                          'float',
+                          'datetime',
+                         );
+
+            DAL::beginTransaction();
+            foreach ($attrTypes as $attrType) {
+                Channels::addToBasket('tableName', 'attribute_'.$attrType, TRUE);
+                $query = DAL::getQuery('AttributeDataSource', 'removeAllContextData');
+                DAL::executeQuery($query);
+            }
+
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollBack();
+            throw new ChannelException($e);
+        }//end try
 
     }//end removeAllContextData()
 

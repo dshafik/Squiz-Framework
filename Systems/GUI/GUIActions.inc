@@ -258,7 +258,7 @@ class GUIActions
                     $value[] = (array) $val;
                 }
             } else {
-                $value  = $node->getAttribute('value');
+                $value = $node->getAttribute('value');
             }
 
             // TODO: Make this work with array setting values.
@@ -325,7 +325,6 @@ class GUIActions
                     GUI::addCSS($cssSysName, $cssInclude, $head);
                 }
             }
-
         }//end if
 
         // Get the HTML string.
@@ -341,6 +340,7 @@ class GUIActions
         $htmlCont = str_replace('?&gt;', '?'.'>', $htmlCont);
 
         // Write to data file.
+        include_once 'Libs/FileSystem/FileSystem.inc';
         $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
         if (file_exists($syDataPath) === FALSE) {
             FileSystem::mkdir($syDataPath, 0755, TRUE);
@@ -600,7 +600,7 @@ class GUIActions
      * Adds CSS includes.
      *
      * @param string $systemName Name of the system.
-     * @param array  $jsFiles    List of CSS files to be included for the system.
+     * @param array  $cssFiles   List of CSS files to be included for the system.
      *
      * @since  4.0.0
      * @return void
@@ -735,12 +735,13 @@ class GUIActions
     }//end getSystemWebPath()
 
 
-
     /**
      * Serves the requested file.
      *
+     * If the file is not in the __web directory, will return FALSE.
+     *
      * @since  4.0.0
-     * @return void
+     * @return boolean
      */
     public static function serveWebFile()
     {
@@ -759,7 +760,7 @@ class GUIActions
 
         // File does not exist.
         if ($path === FALSE) {
-            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+            header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
             exit;
         }
 
@@ -767,7 +768,7 @@ class GUIActions
         if (substr($path, 0, strlen($systemsPath)) !== $systemsPath
             || strpos($url, '/Web/') === FALSE
         ) {
-            header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+            header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
             exit;
         }
 

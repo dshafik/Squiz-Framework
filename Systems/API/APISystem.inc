@@ -56,7 +56,7 @@ class APISystem extends BaseSystem
             }
 
             Channels::includeSystem($systemName);
-            $refl    = new ReflectionClass($systemName); 
+            $refl    = new ReflectionClass($systemName);
             $methods = $refl->getMethods();
             $result  = array();
             foreach ($methods as $method) {
@@ -73,7 +73,7 @@ class APISystem extends BaseSystem
 
             unset($refl);
             unset($methods);
-        }
+        }//end foreach
 
     }//end install()
 

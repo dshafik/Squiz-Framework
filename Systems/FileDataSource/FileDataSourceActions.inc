@@ -255,7 +255,7 @@ class FileDataSourceActions implements DataSourceActions
      *
      * @since  4.0.0
      * @return string
-     * @throws IllegalArgumentException If the attribute type is invalid.
+     * @throws ChannelException If the attribute type is invalid.
      */
     private static function _getAttributeTypeClassName($attrType)
     {
@@ -263,7 +263,7 @@ class FileDataSourceActions implements DataSourceActions
             return 'FileDataSourceFile';
         }
 
-        throw new IllegalArgumentException('Unknown Attribute type: '.$attrType);
+        throw new ChannelException('Unknown Attribute type: '.$attrType);
 
     }//end _getAttributeTypeClassName()
 

@@ -225,7 +225,7 @@ class AssetActions
     /**
      * Get getAssetsByType query object.
      *
-     * @params string|array $typeid The type of assets to get.
+     * @param string|array $typeid The type of assets to get.
      *
      * @since  4.0.0
      * @return object
@@ -235,7 +235,7 @@ class AssetActions
         $query = DAL::getDALQuery('Asset', 'getAssetsQuery', '');
         return $query;
 
-    }//end getAssetsQuery()
+    }//end getAssetsByTypeQuery()
 
 
     /**
@@ -262,7 +262,7 @@ class AssetActions
      *
      * @param string $typeid     The unique identifier of the type code to
      *                           install.
-     * @param string $typeName   The readable name of the new type.
+     * @param string $name       The readable name of the new type.
      * @param string $category   The category this asset type belongs to.
      * @param string $system     The system name of an asset type.
      * @param string $parentType The type the new asset inherits from.
@@ -270,7 +270,7 @@ class AssetActions
      *
      * @since  4.0.0
      * @return void
-     * @throws 
+     * @throws ChannelException If there was a DB error.
      */
     public static function createType(
         $typeid,
@@ -341,10 +341,10 @@ class AssetActions
             DAL::commit();
         } catch (DALException $e) {
             DAL::rollBack();
-            throw new ChannelActionException('DB Error: '.$e->getMessage());
-        }
+            throw new ChannelException('DB Error: '.$e->getMessage());
+        }//end try
 
-    }//end createAssetType()
+    }//end createType()
 
 
     /**
@@ -398,7 +398,7 @@ class AssetActions
             );
         }//end foreach
 
-    }
+    }//end _createAssetAttributes()
 
 
     /**
@@ -422,47 +422,49 @@ class AssetActions
      */
     private static function _readAssetAttributes($assetType)
     {
-        $attributes = array();
         // Read the attributes.xml file for the given system.
         $path = Asset::getTypeDirPath($assetType).'/attributes.xml';
-        if (file_exists($path) === TRUE) {
-            $doc = new DomDocument();
-            $doc->load($path);
-
-            if ($doc !== NULL) {
-                $attrs = $doc->getElementsByTagName('attribute');
-                foreach ($attrs as $attribute) {
-                    $id              = $attribute->getAttribute('id');
-                    $attributes[$id] = array();
-
-                    // Info for this attribute.
-                    $attributes[$id]['type']        = $attribute->getAttribute('type');
-                    $attributes[$id]['data_source'] = $attribute->getAttribute('data_source');
-                    $attributes[$id]['unique']      = $attribute->getAttribute('unique');
-                    $attributes[$id]['required']    = $attribute->getAttribute('required');
-                    $attributes[$id]['default_val'] = $attribute->getAttribute('default_val');
-                    $attributes[$id]['assetid']     = $attribute->getAttribute('assetid');
-
-                    // Get the initial value if there is one.
-                    $value      = '';
-                    $initialVal = $attribute->getElementsByTagName('initial_value')->item(0);
-                    if ($initialVal !== NULL) {
-                        $value = $initialVal->nodeValue;
-                    } else {
-                        $value = NULL;
-                    }
-
-                    $attributes[$id]['initial_val'] = $value;
-                }//end foreach
-            }//end if
-        } else {
-            $msg = 'Attribute file for '.$assetType.' does not exist!';
+        if (file_exists($path) === FALSE) {
+            $msg = 'Attribute file for '.$assetType.' does not exist';
             throw new ChannelException($msg);
-        }//end if
+        }
 
-        return $attributes;
+        $doc = new DomDocument();
+        $doc->load($path);
 
-    }//end readAttributes()
+        if ($doc === NULL) {
+            return array();
+        }
+
+        $attrs      = array();
+        $attributes = $doc->getElementsByTagName('attribute');
+        foreach ($attributes as $attribute) {
+            $id         = $attribute->getAttribute('id');
+            $attrs[$id] = array();
+
+            // Info for this attribute.
+            $attrs[$id]['type']        = $attribute->getAttribute('type');
+            $attrs[$id]['data_source'] = $attribute->getAttribute('data_source');
+            $attrs[$id]['unique']      = $attribute->getAttribute('unique');
+            $attrs[$id]['required']    = $attribute->getAttribute('required');
+            $attrs[$id]['default_val'] = $attribute->getAttribute('default_val');
+            $attrs[$id]['assetid']     = $attribute->getAttribute('assetid');
+
+            // Get the initial value if there is one.
+            $value      = '';
+            $initialVal = $attribute->getElementsByTagName('initial_value')->item(0);
+            if ($initialVal !== NULL) {
+                $value = $initialVal->nodeValue;
+            } else {
+                $value = NULL;
+            }
+
+            $attrs[$id]['initial_val'] = $value;
+        }//end foreach
+
+        return $attrs;
+
+    }//end _readAssetAttributes()
 
 
     /**
@@ -585,7 +587,7 @@ class AssetActions
         $result = array_pop($result);
         return $result;
 
-    }//end getAssetTypeInfo()
+    }//end getTypeInfo()
 
 
     /**
@@ -601,7 +603,7 @@ class AssetActions
         $result = DAL::executeAssoc('Asset', 'getParentTypes');
         return $result;
 
-    }//end getTypeAncestors()
+    }//end getParentTypes()
 
 
     /**
@@ -624,11 +626,7 @@ class AssetActions
     /**
      * Get the given asset type's directory path.
      *
-     * @param string  $typeid          Id of the asset type.
-     * @param string  $size            Type of icon (small, medium or large).
-     * @param boolean $defaultToParent If TRUE and given type does not have an
-     *                                 icon then first parent that has an icon
-     *                                 is returned.
+     * @param string $typeid Id of the asset type.
      *
      * @since  4.0.0
      * @return string
@@ -656,8 +654,11 @@ class AssetActions
      * @since  4.0.0
      * @return string
      */
-    public static function getTypeIconPath($typeid, $size='small', $defaultToParent=TRUE)
-    {
+    public static function getTypeIconPath(
+        $typeid,
+        $size='small',
+        $defaultToParent=TRUE
+    ) {
         $assetPath = Asset::getTypeDirPath($typeid);
         $iconPath  = $assetPath.'/'.$typeid.'_'.$size.'.png';
         if ($defaultToParent === TRUE && file_exists($iconPath) === FALSE) {

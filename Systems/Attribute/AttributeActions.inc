@@ -48,16 +48,17 @@ class AttributeActions
      * The attribute is examined and the processing passed to the relevant
      * data source. The value returned will be a PHP data type, which will have
      * been converted from the stored data type by the data source. More than
-     * one attributeids can be passed in, it will return an array of attribute values.
+     * one attributeids can be passed in, it will return an array of
+     * attribute values.
      *
      * @param integer      $assetid     The asset to find the value for.
      * @param string|array $attributeid The attribute(s) to find.
      *
+     * @since         4.0.0
+     * @return        mixed
      * @api           read
      * @api-privilege asset.read.content
      * @api-mustlock  false
-     * @since         4.0.0
-     * @return        mixed
      */
     public static function getAttributeValue($assetid, $attributeid)
     {
@@ -85,11 +86,11 @@ class AttributeActions
      * @param integer $assetid     The asset to find the value for.
      * @param string  $attributeid The attribute to find.
      *
+     * @since         4.0.0
+     * @return        mixed
      * @api           read
      * @api-privilege asset.read.content
      * @api-mustlock  false
-     * @since         4.0.0
-     * @return        mixed
      */
     private static function _getAttributeValue($assetid, $attributeid)
     {
@@ -184,9 +185,6 @@ class AttributeActions
      * @param string  $attributeid The id of the attribute to set.
      * @param string  $value       The new value to set for the attribute.
      *
-     * @api           write
-     * @api-privilege asset.edit.content
-     * @api-mustlock  false
      * @since         4.0.0
      * @see           DataSource::attributeValueExists()
      * @see           DataSource::setAttributeValue()
@@ -196,6 +194,9 @@ class AttributeActions
      *                                 asset.
      * @throws        ChannelException If there is a violation of the attribute's
      *                                 constraints.
+     * @api           write
+     * @api-privilege asset.edit.content
+     * @api-mustlock  false
      */
     public static function setAttributeValue($assetid, $attributeid, $value)
     {
@@ -358,8 +359,7 @@ class AttributeActions
         $attributesInfo = array();
 
         foreach ($attributesData as $attributeData) {
-            // For the time being lets mimic the output format of
-            // readAttributes().
+            // For the time being lets mimic the output format of readAttributes().
             $attributeInfo = array(
                               'id'          => $attributeData['attributeid'],
                               'type'        => $attributeData['attribute_type'],

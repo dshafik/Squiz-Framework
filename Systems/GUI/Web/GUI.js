@@ -5,26 +5,22 @@ var GUI = new function()
 
     this.getWidget = function(id) {
         return this.widgetStore[id];
-
     };
 
     this.addWidget = function(id, obj) {
         this.widgetStore[id] = obj;
-
     };
 
     this.getWidgetWebPath = function(widgetPath) {
         widgetPath = widgetPath.replace(/^\//, '');
         widgetPath = widgetPath.replace('/', '/Widgets/') + '/' + _publicDirName;
         return widgetPath;
-
     };
 
     this.getWidgetURL = function(widgetPath) {
         var url = window.location.href.replace(/\/+$/, '');
         url    += '/__web/Systems/' + GUI.getWidgetWebPath(widgetPath);
         return url;
-
     };
 
     /**
@@ -50,14 +46,14 @@ var GUI = new function()
             return;
         }
 
-        var addEvtid = 'add' + dfx.ucFirst(eventName) + 'Callback';
+        var addEvtid  = 'add' + dfx.ucFirst(eventName) + 'Callback';
         obj[addEvtid] = function(callback) {
             if (typeof callback === 'function') {
                 obj.__eventCallbacks[eventName].push(callback);
             }
         };
 
-        var fireEvtid = 'fire' + dfx.ucFirst(eventName) + 'Callbacks';
+        var fireEvtid  = 'fire' + dfx.ucFirst(eventName) + 'Callbacks';
         obj[fireEvtid] = function() {
             if (obj.__eventCallbacks) {
                 var len = obj.__eventCallbacks[eventName].length;
@@ -67,11 +63,10 @@ var GUI = new function()
             }
         };
 
-        var rmEvtid = 'removeAll' + dfx.ucFirst(eventName) + 'Callbacks';
+        var rmEvtid  = 'removeAll' + dfx.ucFirst(eventName) + 'Callbacks';
         obj[rmEvtid] = function() {
             obj.__eventCallbacks[eventName] = [];
         };
-
     };
 
 };

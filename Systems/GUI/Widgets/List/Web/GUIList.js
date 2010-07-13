@@ -1,5 +1,5 @@
-function GUIList(id, settings) {
-
+function GUIList(id, settings)
+{
     this.id       = id;
     this.settings = settings;
     this.init();
@@ -13,6 +13,7 @@ GUIList.prototype = {
         if (this.settings.sortable === 'true') {
             this.enableSorting();
         }
+
     },
 
     enableSorting: function()

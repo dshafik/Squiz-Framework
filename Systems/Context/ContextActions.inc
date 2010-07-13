@@ -115,7 +115,6 @@ class ContextActions
      */
     public static function getAssetid($assetid, $context=NULL, $noCreate=FALSE)
     {
-
         return $assetid;
 
     }//end getAssetid()
