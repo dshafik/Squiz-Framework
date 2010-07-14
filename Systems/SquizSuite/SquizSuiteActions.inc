@@ -193,8 +193,10 @@ class SquizSuiteActions
     // Decrypt the passed data with the current system's private key.
     public static function decryptMessage($data)
     {
-        $priKeyPath = BaseSystem::getDataDir('SquizSuite').'/privatekey';
-        $priKey     = openssl_pkey_get_private('file://'.$priKeyPath, 'aaa');
+        // Get the current product information.
+        $currProduct = SquizSuite::getProduct();
+        $priKeyPath  = BaseSystem::getDataDir('SquizSuite').'/privatekey';
+        $priKey      = openssl_pkey_get_private('file://'.$priKeyPath, $currProduct['systemid']);
 
         $decrypted = '';
         openssl_private_decrypt(
@@ -227,7 +229,7 @@ class SquizSuiteActions
 
         // Keys will be stored in SquizSuite data directory.
         $suiteDir = BaseSystem::getDataDir('SquizSuite');
-        openssl_pkey_export_to_file($keyGenerated, $suiteDir.'/privatekey', 'aaa');
+        openssl_pkey_export_to_file($keyGenerated, $suiteDir.'/privatekey', $currProduct['systemid']);
 
         $pubKey = openssl_pkey_get_details($keyGenerated);
         file_put_contents($suiteDir.'/publickey', $pubKey['key']);
