@@ -39,15 +39,16 @@ class GUIScreenSwitcherActions
 
         $firstScreen = TRUE;
         foreach ($settings['screens'] as $screen) {
+            $screenid = $settings['id'].'-'.$screen['id'];
             if (strtolower($screen['disabled']) === 'true') {
-                $content .= '<div class="%class%-button disabled">';
+                $content .= '<div id="'.$screenid.'" class="%class%-button disabled">';
             } else {
                 // Enable the first screen by default.
                 if ($firstScreen === TRUE) {
-                    $content .= '<div class="%class%-button selected">';
+                    $content .= '<div id="'.$screenid.'" class="%class%-button selected">';
                     $firstScreen === FALSE;
                 } else {
-                    $content .= '<div class="%class%-button inactive">';
+                    $content .= '<div id="'.$screenid.'" class="%class%-button inactive">';
                 }//end if first screen
             }//end if screen disabled
 
