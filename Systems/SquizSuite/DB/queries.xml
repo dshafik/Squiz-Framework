@@ -5,21 +5,19 @@
     <primary>
       <insert>
         <fields table="suite_product">
-          <field>productid</field>
-          <field>name</field>
+          <field>systemid</field>
           <field>type</field>
           <field>connection</field>
         </fields>
         <values>
-          <value column="productid">:productid</value>
-          <value column="name">:name</value>
+          <value column="systemid">:systemid</value>
           <value column="type">:type</value>
           <value column="connection">:connection</value>
         </values>
       </insert>
     </primary>
   </query>
-  <query id="modifyProduct">
+  <query id="updateProduct">
     <primary>
         <update>
             <fields table="suite_product">
@@ -29,7 +27,7 @@
                 <value column="[attrName]">:attrValue</value>
             </values>
             <where>
-                <equal table="suite_product" column="productid">:productid</equal>
+                <equal table="suite_product" column="systemid">:systemid</equal>
             </where>
         </update>
     </primary>
@@ -38,18 +36,17 @@
     <primary>
       <delete>
         <where>
-            <equal column="productid" table="suite_product">:productid</equal>
-            <equal column="current" table="suite_product">false</equal>
+            <equal table="suite_product" column="systemid">:systemid</equal>
+            <equal table="suite_product" column="current">false</equal>
         </where>
       </delete>
     </primary>
   </query>
-  <query id="getProductInformation">
+  <query id="getProduct">
     <primary>
        <select>
         <fields>
-           <field table="p1" column="productid"/>
-           <field table="p1" column="name"/>
+           <field table="p1" column="systemid"/>
            <field table="p1" column="type"/>
            <field table="p1" column="status"/>
            <field table="p1" column="current"/>
@@ -59,16 +56,15 @@
           <table alias="p1">suite_product</table>
         </from>
         <where>
-          <in table="p1" column="productid">:productid</in>
+          <in table="p1" column="systemid">:systemid</in>
         </where>
       </select>
     </primary>
     <alternate>
-        <assert-null data="productid">
+        <assert-null data="systemid">
           <select>
             <fields>
-               <field table="p1" column="productid"/>
-               <field table="p1" column="name"/>
+               <field table="p1" column="systemid"/>
                <field table="p1" column="type"/>
                <field table="p1" column="status"/>
                <field table="p1" column="current"/>
@@ -77,9 +73,28 @@
             <from>
               <table alias="p1">suite_product</table>
             </from>
+            <where>
+              <equal table="p1" column="current"><value>true</value></equal>
+            </where>
           </select>
         </assert-null>
     </alternate>
+  </query>
+  <query id="getAllProducts">
+    <primary>
+      <select>
+        <fields>
+           <field table="p1" column="systemid"/>
+           <field table="p1" column="type"/>
+           <field table="p1" column="status"/>
+           <field table="p1" column="current"/>
+           <field table="p1" column="connection"/>
+        </fields>
+        <from>
+          <table alias="p1">suite_product</table>
+        </from>
+      </select>
+    </primary>
   </query>
   <query id="getProductDetail">
     <primary>
@@ -91,7 +106,7 @@
           <table alias="p1">suite_product_information</table>
         </from>
         <where>
-          <equal table="p1" column="productid">:productid</equal>
+          <equal table="p1" column="systemid">:systemid</equal>
         </where>
     </select>
   </primary>
