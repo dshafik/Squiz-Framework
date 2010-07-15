@@ -361,15 +361,14 @@ class SquizSuiteActions
 
         switch ($msgType) {
             case 'CON_REQUEST':
-                // Send a request to other SquizSuite system to be registered.
+            case 'CON_REQUEST_ACK':
+                // Both of CON_REQUEST and CON_REQUEST_ACK will send
+                // the system's public key together.
                 $currProduct = SquizSuite::getProduct();
                 $pubKey      = $currProduct['connection']['publicKey'];
                 $pubkeyEl    = $dom->createElement('publicKey');
                 API::buildResponseXMLDom($pubkeyEl, $pubKey);
                 $msgEl->appendChild($pubkeyEl);
-            break;
-
-            case 'CON_REQUEST_ACK':
             break;
 
             case 'CON_CONFIRM':
@@ -446,6 +445,7 @@ class SquizSuiteActions
 
                 // Add the system and set the status as 'pending'.
 
+                // TODO: What if pub key is not gived?
                 // Anyway to validate the integrity of Public Key????
                 $pubKeyEl = $doc->getElementsByTagName('publicKey')->item(0);
                 $pubKey   = $pubKeyEl->nodeValue;
@@ -459,8 +459,20 @@ class SquizSuiteActions
             break;
 
             case 'CON_REQUEST_ACK':
-                // Request accepted.
-                // Set the status as 'waiting'.
+                $productInfo = SquizSuite::getProduct($systemid);
+                if (empty($productInfo) === TRUE) {
+                    // Who r u ? and y you sending this to me?
+                }
+
+                $pubKeyEl = $doc->getElementsByTagName('publicKey')->item(0);
+                $pubKey   = $pubKeyEl->nodeValue;
+
+                // TODO: What if pub key is not gived?
+                $productInfo['connection']['publicKey'] = $pubKey;
+
+                // Connection Request accepted.
+                SquizSuite::updateProduct($systemid, 'connection', $productInfo['connection']);
+                SquizSuite::updateProduct($systemid, 'status', 'live');
             break;
 
             case 'CON_CONFIRM':
