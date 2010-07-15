@@ -7,7 +7,7 @@
             <columns>
                 <column type="VARCHAR" size="150" allow-null="false">systemid</column>
                 <column type="VARCHAR" size="50" allow-null="false">type</column>
-                <column type="BOOLEAN" allow-null="false" default="'0'">status</column>
+                <column type="VARCHAR" size="50" allow-null="true">status</column>
                 <column type="BOOLEAN" allow-null="false" default="'0'">current</column>
                 <column type="CLOB" allow_null="true">connection</column>
             </columns>
