@@ -216,6 +216,7 @@ class SquizSuiteActions
         $currProduct = SquizSuite::getProduct();
         $priKeyPath  = BaseSystem::getDataDir('SquizSuite').'/privatekey.pem';
         $priKey      = openssl_pkey_get_private('file://'.$priKeyPath);
+        $password    = base64_decode($password);
 
         $decrypted = '';
         $result    = openssl_private_decrypt(
