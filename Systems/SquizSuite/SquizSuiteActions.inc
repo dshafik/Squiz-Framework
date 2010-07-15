@@ -176,15 +176,29 @@ class SquizSuiteActions
     // Returns encrypted string or FALSE for failure.
     public static function encryptMessage($systemid, $data)
     {
-        $encrypted  = NULL;
-        $product = SquizSuite::getProduct($systemid);
-        if (isset($product['connection']['publicKey']) === TRUE) {
-            $result = openssl_public_encrypt($data, $encrypted, $product['connection']['publicKey']);
-            if ($result === FALSE) {
+        $encrypted = NULL;
+        $product   = SquizSuite::getProduct($systemid);
+        if (isset($product['connection']['cert']) === TRUE) {
+            $certStr = $product['connection']['cert'];
+            $pubKey  = openssl_pkey_get_public($certStr);
+
+            $password     = sha1(microtime(true));
+            $encryptedMsg = self::_opensslEncrypt($data, 'blowfish', $password);
+            if ($encryptedMsg === FALSE) {
                 return FALSE;
             }
 
-            return $encrypted;
+            $success       = openssl_public_encrypt($password, $encryptedPass, $pubKey);
+            $encryptedPass = base64_encode($encryptedPass);
+            if ($success === FALSE) {
+                return FALSE;
+            }
+
+            $result = array(
+                       'encrypted' => $encryptedMsg,
+                       'password'  => $encryptedPass,
+                      );
+            return $result;
         }
 
         return FALSE;
@@ -194,7 +208,7 @@ class SquizSuiteActions
 
     // Decrypt the passed data with the current system's private key.
     // Returns decrypted string or FALSE for failure.
-    public static function decryptMessage($data)
+    public static function decryptMessage($data, $password)
     {
         // Get the current product information.
         $currProduct = SquizSuite::getProduct();
@@ -203,12 +217,17 @@ class SquizSuiteActions
 
         $decrypted = '';
         $result    = openssl_private_decrypt(
-            $data,
-            $decrypted,
+            $password,
+            $passdec,
             $priKey
         );
 
         if ($result === FALSE) {
+            return FALSE;
+        }
+
+        $decrypted = self::_opensslDecrypt($data, 'bf-cbc', $passdec);
+        if ($decrypted === FALSE) {
             return FALSE;
         }
 
@@ -239,10 +258,27 @@ class SquizSuiteActions
         openssl_pkey_export_to_file($keyGenerated, $suiteDir.'/privatekey', $currProduct['systemid']);
 
         $pubKey = openssl_pkey_get_details($keyGenerated);
+
+        $info = array(
+                 'countryName'            => 'AU',
+                 'stateOrProvinceName'    => 'NSW',
+                 'localityName'           => 'Sydney',
+                 'organizationName'       => 'Squiz Suite',
+                 'organizationalUnitName' => $currProduct['type'],
+                 'commonName'             => $currProduct['systemid'],
+                 'emailAddress'           => $currProduct['systemid'].'@squizsuite.com',
+                );
+        $csr = openssl_csr_new($info, $keyGenerated);
+        openssl_csr_export_to_file($csr, $suiteDir.'/system.csr');
+
+        $cert = openssl_csr_sign($csr, NULL, $keyGenerated, (365 * 10));
+        openssl_x509_export_to_file($cert, $suiteDir.'/system.crt');
+        openssl_x509_export($cert, $certStr);
+
         file_put_contents($suiteDir.'/publickey', $pubKey['key']);
 
         // Also update the current product connection information with public key in it.
-        $currProduct['connection']['publicKey'] = $pubKey['key'];
+        $currProduct['connection']['cert'] = $certStr;
         SquizSuite::updateProduct($currProduct['systemid'], 'connection', $currProduct['connection']);
 
         return $pubKey['key'];
@@ -281,13 +317,19 @@ class SquizSuiteActions
             self::_createSuiteMessageDOM($dom, $systemid, $productInfo, $msgType);
             $xml = $dom->saveXML();
 
-            $msg        = array();
-            $msg['xml'] = $xml;
+            $msg = array();
             if ($msgType === 'CON_REQUEST') {
                 $msg['con_request'] = 1;
             } else {
-                $msg['xml'] = SquizSuite::encryptMessage($systemid, $msg['xml']);
-                $msg['xml'] = base64_encode($msg['xml']);
+                $enc = SquizSuite::encryptMessage($systemid, $xml);
+                if ($enc === FALSE) {
+                    // TODO: Encrytion Failed!
+                    $errMsg = 'Encryting data to '.$systemid.' has failed.';
+                    throw new ChannelException($errMsg);
+                }
+
+                $msg['xml']      = $enc['encrypted'];
+                $msg['password'] = $enc['password'];
             }
 
             $ch = curl_init();
@@ -365,8 +407,8 @@ class SquizSuiteActions
                 // Both of CON_REQUEST and CON_REQUEST_ACK will send
                 // the system's public key together.
                 $currProduct = SquizSuite::getProduct();
-                $pubKey      = $currProduct['connection']['publicKey'];
-                $pubkeyEl    = $dom->createElement('publicKey');
+                $pubKey      = $currProduct['connection']['cert'];
+                $pubkeyEl    = $dom->createElement('cert');
                 API::buildResponseXMLDom($pubkeyEl, $pubKey);
                 $msgEl->appendChild($pubkeyEl);
             break;
@@ -403,11 +445,11 @@ class SquizSuiteActions
 
             include_once 'Libs/Security/Security.inc';
             $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
+            $password   = Security::getRequestData('password', NULL, FALSE, 'post');
             $conRequest = Security::getRequestData('con_request', NULL, FALSE, 'post');
             if ($conRequest === NULL) {
                 // Only the connection request comes unencrypted.
-                $xml = base64_decode($xml);
-                $xml = SquizSuite::decryptMessage($xml);
+                $xml = SquizSuite::decryptMessage($xml, $password);
                 if ($xml === FALSE) {
                     $errMsg = 'Squiz Suite message can not be decrypted.';
                     throw new ChannelException($errMsg);
@@ -447,12 +489,12 @@ class SquizSuiteActions
 
                 // TODO: What if pub key is not gived?
                 // Anyway to validate the integrity of Public Key????
-                $pubKeyEl = $doc->getElementsByTagName('publicKey')->item(0);
+                $pubKeyEl = $doc->getElementsByTagName('cert')->item(0);
                 $pubKey   = $pubKeyEl->nodeValue;
 
                 $connection              = array();
                 $connection['url']       = $systemUrl;
-                $connection['publicKey'] = $pubKey;
+                $connection['cert'] = $pubKey;
                 SquizSuite::registerProduct($systemid, $systemType, $connection);
                 SquizSuite::updateProduct($systemid, 'status', 'pending');
                 SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
@@ -464,11 +506,11 @@ class SquizSuiteActions
                     // Who r u ? and y you sending this to me?
                 }
 
-                $pubKeyEl = $doc->getElementsByTagName('publicKey')->item(0);
+                $pubKeyEl = $doc->getElementsByTagName('cert')->item(0);
                 $pubKey   = $pubKeyEl->nodeValue;
 
                 // TODO: What if pub key is not gived?
-                $productInfo['connection']['publicKey'] = $pubKey;
+                $productInfo['connection']['cert'] = $pubKey;
 
                 // Connection Request accepted.
                 SquizSuite::updateProduct($systemid, 'connection', $productInfo['connection']);
@@ -620,6 +662,53 @@ class SquizSuiteActions
         return $logFilePath;
 
     }
+
+    // TODO: Replace this with openssl_encrypt once PHP installation
+    // is upgrade to > 5.3.0
+    private static function _opensslEncrypt($data, $algorithm, $password)
+    {
+        $filename = uniqid().'.txt';
+        $filePath = BaseSystem::getDataDir('SquizSuite').'/'.$filename;
+        file_put_contents($filePath, $data);
+
+        $command  = '/usr/bin/openssl enc -'.$algorithm.' -a -salt -in '.$filePath;
+        $command .= ' -out '.$filePath.'.enc -pass pass:'.$password;
+        exec($command, $output, $returnVal);
+        if ($returnVal === 0 && file_exists($filePath.'.enc') === TRUE) {
+            $encrypted = file_get_contents($filePath.'.enc');
+            unlink($filePath);
+            unlink($filePath.'.enc');
+            return $encrypted;
+        }
+
+        return FALSE;
+
+    }//end _opensslEncrypt()
+
+
+    // TODO: Replace this with openssl_decrypt once PHP installation
+    // is upgrade to > 5.3.0
+    private static function _opensslDecrypt($data, $algorithm, $password)
+    {
+        $filename = uniqid().'.txt';
+        $filePath = BaseSystem::getDataDir('SquizSuite').'/'.$filename;
+        file_put_contents($filePath, $data);
+
+        $command  = '/usr/bin/openssl enc -d -'.$algorithm.' -a -salt -in '.$filePath;
+        $command .= ' -out '.$filePath.'.dec  -pass pass:'.$password;
+
+        exec($command, $output, $returnVal);
+        if ($returnVal === 0 && file_exists($filePath.'.dec') === TRUE) {
+            $encrypted = file_get_contents($filePath.'.dec');
+            unlink($filePath);
+            unlink($filePath.'.dec');
+            return $encrypted;
+        }
+
+        return FALSE;
+
+    }//end _opensslEncrypt()
+
 
 }//end class
 
