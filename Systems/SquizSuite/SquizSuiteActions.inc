@@ -270,6 +270,7 @@ class SquizSuiteActions
     public static function sendMessage($systemid, $msgType, $data=NULL)
     {
         try {
+            DAL::beginTransaction();
             $productInfo = SquizSuite::getProduct($systemid);
             if (empty($productInfo) === TRUE) {
                 $errMsg = $systemid.' is not known. Cannot send '.$msgType.' to it.';
@@ -303,14 +304,19 @@ class SquizSuiteActions
             if ($curlinfo['http_code'] === 200) {
                 self::_logSentMessage($systemid, $msgType);
             } else {
-                $errMsg = $curlinfo['http_code'].' returned.';
+                $errMsg = 'Sending '.$msgType.' to '.$systemid.' '.$curlinfo['http_code'].' returned.';
                 throw new ChannelException($errMsg);
             }
+
+            DAL::commit();
+            return TRUE;
         } catch (Exception $e) {
+            DAL::rollback();
             self::_logErrorMessage($e->getMessage());
+            return FALSE;
         }
 
-    }//end sendSuiteMessage()
+    }//end sendMessage()
 
 
     // Create DOM template for the message to send with the current
@@ -385,6 +391,7 @@ class SquizSuiteActions
     public static function processMessage()
     {
         try {
+            DAL::beginTransaction();
             $uaParts = self::_parseSystemUserAgent($_SERVER['HTTP_USER_AGENT']);
             if ($uaParts === FALSE) {
                 $errMsg = 'User-agent string can not be parsed.';
@@ -412,9 +419,11 @@ class SquizSuiteActions
             }
 
             self::_processMessage($systemid, $systemUrl, $systemType, $xml);
+            DAL::commit();
             self::_sendHeader(200);
         } catch (Exception $e) {
             self::_logErrorMessage($e->getMessage());
+            DAL::rollback();
             self::_sendHeader(500);
             exit;
         }
@@ -445,6 +454,7 @@ class SquizSuiteActions
                 $connection['url']       = $systemUrl;
                 $connection['publicKey'] = $pubKey;
                 SquizSuite::registerProduct($systemid, $systemType, $connection);
+                SquizSuite::updateProduct($systemid, 'status', 'pending');
                 SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
             break;
 
@@ -595,7 +605,7 @@ class SquizSuiteActions
     {
         $logFilePath  = BaseSystem::getDataDir('SquizSuite');
         $logFilePath .= '/message_log.txt';
-        return $logFilePath();
+        return $logFilePath;
 
     }
 
