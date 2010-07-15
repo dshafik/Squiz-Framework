@@ -31,6 +31,13 @@ class SquizSuiteSystem extends BaseSystem
     {
         parent::install();
 
+        $logFilePath  = BaseSystem::getDataDir('SquizSuite');
+        $logFilePath .= '/message_log.txt';
+
+        if (file_exists($logFilePath) === FALSE) {
+            touch($logFilePath);
+        }
+
     }//end install()
 
 

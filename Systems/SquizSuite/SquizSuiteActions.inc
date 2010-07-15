@@ -173,13 +173,18 @@ class SquizSuiteActions
 
 
     // Encrypt the passed data with the given system's public key.
+    // Returns encrypted string or FALSE for failure.
     public static function encryptMessage($systemid, $data)
     {
-        $result  = NULL;
+        $encrypted  = NULL;
         $product = SquizSuite::getProduct($systemid);
         if (isset($product['connection']['publicKey']) === TRUE) {
-            openssl_public_encrypt($data, $result, $product['connection']['publicKey']);
-            return $result;
+            $result = openssl_public_encrypt($data, $encrypted, $product['connection']['publicKey']);
+            if ($result === FALSE) {
+                return FALSE;
+            }
+
+            return $encrypted;
         }
 
         return FALSE;
@@ -187,10 +192,8 @@ class SquizSuiteActions
     }//end encryptMessage()
 
 
-    /*
-    TODO: PASSPHRASE NEEDS TO BE FIXED!
-     */
     // Decrypt the passed data with the current system's private key.
+    // Returns decrypted string or FALSE for failure.
     public static function decryptMessage($data)
     {
         // Get the current product information.
@@ -199,11 +202,15 @@ class SquizSuiteActions
         $priKey      = openssl_pkey_get_private('file://'.$priKeyPath, $currProduct['systemid']);
 
         $decrypted = '';
-        openssl_private_decrypt(
+        $result    = openssl_private_decrypt(
             $data,
             $decrypted,
             $priKey
         );
+
+        if ($result === FALSE) {
+            return FALSE;
+        }
 
         return $decrypted;
 
@@ -262,35 +269,46 @@ class SquizSuiteActions
     // TODO: $data?
     public static function sendMessage($systemid, $msgType, $data=NULL)
     {
-        $productInfo = SquizSuite::getProduct($systemid);
-        if (empty($productInfo) === TRUE) {
-            // No PRODUCT INFO!.
+        try {
+            $productInfo = SquizSuite::getProduct($systemid);
+            if (empty($productInfo) === TRUE) {
+                $errMsg = $systemid.' is not known. Cannot send '.$msgType.' to it.';
+                throw new ChannelException($errMsg);
+            }
+
+            $dom = self::_createSuiteMessageDOMTemplate();
+            self::_createSuiteMessageDOM($dom, $systemid, $productInfo, $msgType);
+            $xml = $dom->saveXML();
+
+            $msg        = array();
+            $msg['xml'] = $xml;
+            if ($msgType === 'CON_REQUEST') {
+                $msg['con_request'] = 1;
+            } else {
+                $msg['xml'] = SquizSuite::encryptMessage($systemid, $msg['xml']);
+                $msg['xml'] = base64_encode($msg['xml']);
+            }
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $productInfo['connection']['url']);
+            curl_setopt($ch, CURLOPT_POST, TRUE);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);  // RETURN THE CONTENTS OF THE CALL
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+            curl_setopt($ch, CURLOPT_USERAGENT, self::_getSystemUserAgent()); 
+
+            $result   = curl_exec($ch);
+            $curlinfo = curl_getinfo($ch);
+            curl_close($ch);
+            if ($curlinfo['http_code'] === 200) {
+                self::_logSentMessage($systemid, $msgType);
+            } else {
+                $errMsg = $curlinfo['http_code'].' returned.';
+                throw new ChannelException($errMsg);
+            }
+        } catch (Exception $e) {
+            self::_logErrorMessage($e->getMessage());
         }
-
-        $dom = self::_createSuiteMessageDOMTemplate();
-        self::_createSuiteMessageDOM($dom, $systemid, $productInfo, $msgType);
-        $xml = $dom->saveXML();
-
-        $msg        = array();
-        $msg['xml'] = $xml;
-        if ($msgType === 'CON_REQUEST') {
-            $msg['con_request'] = 1;
-        } else {
-            $msg['xml'] = SquizSuite::encryptMessage($systemid, $msg['xml']);
-            $msg['xml'] = base64_encode($msg['xml']);
-        }
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $productInfo['connection']['url']);
-        curl_setopt($ch, CURLOPT_POST, TRUE);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);  // RETURN THE CONTENTS OF THE CALL
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
-        curl_setopt($ch, CURLOPT_USERAGENT, self::_getSystemUserAgent()); 
-
-        $result   = curl_exec($ch);
-        $curlinfo = curl_getinfo($ch);
-        curl_close($ch);
 
     }//end sendSuiteMessage()
 
@@ -366,36 +384,37 @@ class SquizSuiteActions
     // Process the incoming SquizSuite message.
     public static function processMessage()
     {
-        $uaParts = self::_parseSystemUserAgent($_SERVER['HTTP_USER_AGENT']);
-        if ($uaParts === FALSE) {
-            self::_sendHeader(500);
-            exit;
-        }
+        try {
+            $uaParts = self::_parseSystemUserAgent($_SERVER['HTTP_USER_AGENT']);
+            if ($uaParts === FALSE) {
+                $errMsg = 'User-agent string can not be parsed.';
+                throw new ChannelException($errMsg);
+            }
 
-        $systemType = $uaParts['systemType'];
-        $systemUrl  = $uaParts['systemUrl'];
-        $systemid   = $uaParts['systemid'];
+            $systemType = $uaParts['systemType'];
+            $systemUrl  = $uaParts['systemUrl'];
+            $systemid   = $uaParts['systemid'];
 
-        include_once 'Libs/Security/Security.inc';
-        $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
-        $conRequest = Security::getRequestData('con_request', NULL, FALSE, 'post');
-        if ($conRequest === NULL) {
-            // Only the connection request comes unencrypted.
-            try {
+            include_once 'Libs/Security/Security.inc';
+            $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
+            $conRequest = Security::getRequestData('con_request', NULL, FALSE, 'post');
+            if ($conRequest === NULL) {
+                // Only the connection request comes unencrypted.
                 $xml = base64_decode($xml);
                 $xml = SquizSuite::decryptMessage($xml);
-            } catch (Exception $e) {
-                // CAN NOT DECRYPT THE MESSAGE.
-                // SOMETHING WENT WRONG!
-                self::_sendHeader(500);
-                exit;
+                if ($xml === FALSE) {
+                    $errMsg = 'Squiz Suite message can not be decrypted.';
+                    throw new ChannelException($errMsg);
+                }
+            } else {
+                // It comes as non-encrypted, HTML entity encoded format.
+                $xml = html_entity_decode($xml);
             }
-        }
 
-        try {
             self::_processMessage($systemid, $systemUrl, $systemType, $xml);
             self::_sendHeader(200);
         } catch (Exception $e) {
+            self::_logErrorMessage($e->getMessage());
             self::_sendHeader(500);
             exit;
         }
@@ -410,6 +429,7 @@ class SquizSuiteActions
 
         $msgTypeEl = $doc->getElementsByTagName('message_type')->item(0);
         $msgType   = $msgTypeEl->nodeValue;
+        self::_logReceivedMessage($systemid, $msgType);
         switch ($msgType) {
             case 'CON_REQUEST':
                 // TODO: Maximum daily request exceeded?
@@ -418,13 +438,12 @@ class SquizSuiteActions
                 // Add the system and set the status as 'pending'.
 
                 // Anyway to validate the integrity of Public Key????
-                $pubKeyEl = $doc->getElementsByTagName('pubKey')->item(0);
+                $pubKeyEl = $doc->getElementsByTagName('publicKey')->item(0);
                 $pubKey   = $pubKeyEl->nodeValue;
 
                 $connection              = array();
                 $connection['url']       = $systemUrl;
                 $connection['publicKey'] = $pubKey;
-
                 SquizSuite::registerProduct($systemid, $systemType, $connection);
                 SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
             break;
@@ -461,6 +480,10 @@ class SquizSuiteActions
                     Content-Type: text/xml; charset=utf-8
                     Content-Length: length
                 */
+            break;
+
+            case 500:
+                header('HTTP/1.1 500 Internal Server Error', FALSE, 500);
             break;
 
             default:
@@ -501,6 +524,80 @@ class SquizSuiteActions
 
     }//end _parseSystemUserAgent()
 
+
+    private static function _logReceivedMessage($systemid, $msgType)
+    {
+        /*
+            e.g)
+            [RECEIVED 02:23:18] CON_REQUEST from search (http://squiz-search.net) (172.293.283.281)
+            [SENT 02:23:18] CON_REQUEST to search (http://squiz-search.net) (172.293.283.281)
+        */
+
+        include_once 'Libs/String/String.inc';
+        $log  = '[RECEIVED '.String::easyDatetime(time()).'] '.$msgType;
+        $log .= ' from '.$systemid;
+
+        $productInfo = SquizSuite::getProduct($systemid);
+        if (empty($productInfo) === FALSE) {
+            $log .= ' ('.$productInfo['connection']['url'].')';
+            if (isset($_SERVER['REMOTE_ADDR']) === TRUE) {
+                $log .= ' ('.$_SERVER['REMOTE_ADDR'].')';
+            }
+        }
+
+        $log .= "\n";
+
+        file_put_contents(self::_getLogFilePath(), $log, FILE_APPEND);
+
+    }//end _logMessage()
+
+
+    private static function _logSentMessage($systemid, $msgType)
+    {
+        /*
+            e.g)
+            [RECEIVED 02:23:18] CON_REQUEST from search (http://squiz-search.net) (172.293.283.281)
+            [SENT 02:23:18] CON_REQUEST to search (http://squiz-search.net) (172.293.283.281)
+        */
+
+        include_once 'Libs/String/String.inc';
+        $log  = '[SENT '.String::easyDatetime(time()).'] '.$msgType;
+        $log .= ' to '.$systemid;
+        $productInfo = SquizSuite::getProduct($systemid);
+        if (empty($productInfo) === FALSE) {
+            $log .= ' ('.$productInfo['connection']['url'].')';
+        }
+
+        $log .= "\n";
+
+        file_put_contents(self::_getLogFilePath(), $log, FILE_APPEND);
+
+    }//end _logMessage()
+
+
+    private static function _logErrorMessage($errorMessage='')
+    {
+        /*
+            e.g)
+            [RECEIVED 02:23:18] CON_REQUEST from search (http://squiz-search.net) (172.293.283.281)
+            [SENT 02:23:18] CON_REQUEST to search (http://squiz-search.net) (172.293.283.281)
+        */
+        include_once 'Libs/String/String.inc';
+        $log  = '[ERROR '.String::easyDatetime(time()).'] '.$errorMessage;
+        $log .= "\n";
+
+        file_put_contents(self::_getLogFilePath(), $log, FILE_APPEND);
+
+    }//end _logMessage()
+
+
+    private static function _getLogFilePath()
+    {
+        $logFilePath  = BaseSystem::getDataDir('SquizSuite');
+        $logFilePath .= '/message_log.txt';
+        return $logFilePath();
+
+    }
 
 }//end class
 
