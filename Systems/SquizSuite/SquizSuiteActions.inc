@@ -340,11 +340,12 @@ class SquizSuiteActions
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
             curl_setopt($ch, CURLOPT_USERAGENT, self::_getSystemUserAgent()); 
 
+            self::_logSentMessage($systemid, $msgType);
             $result   = curl_exec($ch);
             $curlinfo = curl_getinfo($ch);
             curl_close($ch);
             if ($curlinfo['http_code'] === 200) {
-                self::_logSentMessage($systemid, $msgType);
+                //self::_logSentMessage($systemid, $msgType);
             } else {
                 $errMsg = 'Sending '.$msgType.' to '.$systemid.' '.$curlinfo['http_code'].' returned.';
                 throw new ChannelException($errMsg);
