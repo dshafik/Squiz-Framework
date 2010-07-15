@@ -23,6 +23,8 @@ class SquizSuiteActions
     // User Agent string prefix.
     private static $_userAgentPrefix = 'SquizSuite-';
 
+    private static $_opensslEncryptionAlgorithm = 'blowfish';
+
     // Product information cache.
     private static $_productCache    = array();
 
@@ -183,7 +185,7 @@ class SquizSuiteActions
             $pubKey  = openssl_pkey_get_public($certStr);
 
             $password     = sha1(microtime(true));
-            $encryptedMsg = self::_opensslEncrypt($data, 'blowfish', $password);
+            $encryptedMsg = self::_opensslEncrypt($data, self::$_opensslEncryptionAlgorithm, $password);
             if ($encryptedMsg === FALSE) {
                 return FALSE;
             }
@@ -212,8 +214,8 @@ class SquizSuiteActions
     {
         // Get the current product information.
         $currProduct = SquizSuite::getProduct();
-        $priKeyPath  = BaseSystem::getDataDir('SquizSuite').'/privatekey';
-        $priKey      = openssl_pkey_get_private('file://'.$priKeyPath, $currProduct['systemid']);
+        $priKeyPath  = BaseSystem::getDataDir('SquizSuite').'/privatekey.pem';
+        $priKey      = openssl_pkey_get_private('file://'.$priKeyPath);
 
         $decrypted = '';
         $result    = openssl_private_decrypt(
@@ -226,7 +228,7 @@ class SquizSuiteActions
             return FALSE;
         }
 
-        $decrypted = self::_opensslDecrypt($data, 'bf-cbc', $passdec);
+        $decrypted = self::_opensslDecrypt($data, self::$_opensslEncryptionAlgorithm, $passdec);
         if ($decrypted === FALSE) {
             return FALSE;
         }
@@ -255,7 +257,7 @@ class SquizSuiteActions
 
         // Keys will be stored in SquizSuite data directory.
         $suiteDir = BaseSystem::getDataDir('SquizSuite');
-        openssl_pkey_export_to_file($keyGenerated, $suiteDir.'/privatekey', $currProduct['systemid']);
+        openssl_pkey_export_to_file($keyGenerated, $suiteDir.'/privatekey.pem');
 
         $pubKey = openssl_pkey_get_details($keyGenerated);
 
@@ -316,10 +318,10 @@ class SquizSuiteActions
             $dom = self::_createSuiteMessageDOMTemplate();
             self::_createSuiteMessageDOM($dom, $systemid, $productInfo, $msgType);
             $xml = $dom->saveXML();
-
             $msg = array();
             if ($msgType === 'CON_REQUEST') {
                 $msg['con_request'] = 1;
+                $msg['xml']         = $xml;
             } else {
                 $enc = SquizSuite::encryptMessage($systemid, $xml);
                 if ($enc === FALSE) {
@@ -414,12 +416,6 @@ class SquizSuiteActions
                 $msgEl->appendChild($pubkeyEl);
             break;
 
-            case 'CON_CONFIRM':
-            break;
-
-            case 'CON_CONFIRM_ACK':
-            break;
-
             default:
             break;
         }//end switch
@@ -498,7 +494,7 @@ class SquizSuiteActions
                 $connection['cert'] = $pubKey;
                 SquizSuite::registerProduct($systemid, $systemType, $connection);
                 SquizSuite::updateProduct($systemid, 'status', 'pending');
-                SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
+                $success = SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
             break;
 
             case 'CON_REQUEST_ACK':
@@ -516,16 +512,18 @@ class SquizSuiteActions
                 // Connection Request accepted.
                 SquizSuite::updateProduct($systemid, 'connection', $productInfo['connection']);
                 SquizSuite::updateProduct($systemid, 'status', 'live');
+                $success = SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK_ACK');
             break;
 
-            case 'CON_CONFIRM':
-                // Request accepted.
-                // Set the status as 'live'.
-            break;
+            case 'CON_REQUEST_ACK_ACK':
+                $productInfo = SquizSuite::getProduct($systemid);
+                if (empty($productInfo) === TRUE) {
+                    // Who r u ? and y you sending this to me?
+                    // TODO: Do i have pending system waiting for the response from 
+                    // this system?
+                }
 
-            case 'CON_CONFIRM_ACK':
-                // Request accepted.
-                // Set the status as 'live'.
+                SquizSuite::updateProduct($systemid, 'status', 'live');
             break;
 
             default:
@@ -697,7 +695,6 @@ class SquizSuiteActions
 
         $command  = '/usr/bin/openssl enc -d -'.$algorithm.' -a -salt -in '.$filePath;
         $command .= ' -out '.$filePath.'.dec  -pass pass:'.$password;
-
         exec($command, $output, $returnVal);
         if ($returnVal === 0 && file_exists($filePath.'.dec') === TRUE) {
             $encrypted = file_get_contents($filePath.'.dec');
