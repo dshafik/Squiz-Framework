@@ -339,9 +339,9 @@ class SquizSuiteActions
             curl_setopt($ch, CURLOPT_URL, $productInfo['connection']['url']);
             curl_setopt($ch, CURLOPT_POST, TRUE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);  // RETURN THE CONTENTS OF THE CALL
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
-            curl_setopt($ch, CURLOPT_USERAGENT, self::_getSystemUserAgent()); 
+            curl_setopt($ch, CURLOPT_USERAGENT, self::_getSystemUserAgent());
 
             self::_logSentMessage($systemid, $msgType);
             $result   = curl_exec($ch);
@@ -431,15 +431,11 @@ class SquizSuiteActions
     {
         try {
             DAL::beginTransaction();
-            $uaParts = self::_parseSystemUserAgent($_SERVER['HTTP_USER_AGENT']);
-            if ($uaParts === FALSE) {
+            $systemType = self::_getsystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
+            if ($systemType === FALSE) {
                 $errMsg = 'User-agent string can not be parsed.';
                 throw new ChannelException($errMsg);
             }
-
-            $systemType = $uaParts['systemType'];
-            $systemUrl  = $uaParts['systemUrl'];
-            $systemid   = $uaParts['systemid'];
 
             include_once 'Libs/Security/Security.inc';
             $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
@@ -457,7 +453,7 @@ class SquizSuiteActions
                 $xml = html_entity_decode($xml);
             }
 
-            self::_processMessage($systemid, $systemUrl, $systemType, $xml);
+            self::_processMessage($systemType, $xml);
             DAL::commit();
             self::_sendHeader(200);
         } catch (Exception $e) {
@@ -470,10 +466,15 @@ class SquizSuiteActions
     }//end processSuiteMessage()
 
 
-    private static function _processMessage($systemid, $systemUrl, $systemType, $xml)
+    private static function _processMessage($systemType, $xml)
     {
         $doc = new DomDocument();
         $doc->loadXML($xml);
+
+        $sysidEl   = $doc->getElementsByTagName('systemid')->item(0);
+        $sysurlEl  = $doc->getElementsByTagName('system_url')->item(0);
+        $systemid  = $sysidEl->nodeValue;
+        $systemUrl = $sysurlEl->nodeValue;
 
         $msgTypeEl = $doc->getElementsByTagName('message_type')->item(0);
         $msgType   = $msgTypeEl->nodeValue;
@@ -560,31 +561,24 @@ class SquizSuiteActions
     // Returns the current system's User Agent string.
     private static function _getSystemUserAgent()
     {
-        $productInfo   = SquizSuite::getProduct();
-        $userAgentStr  = self::$_userAgentPrefix.$productInfo['type'].'/4.0 ';
-        $userAgentStr .= '('.$productInfo['connection']['url'].'; ';
-        $userAgentStr .= $productInfo['systemid'].')';
+        $productInfo  = SquizSuite::getProduct();
+        $userAgentStr = self::$_userAgentPrefix.$productInfo['type'].'/4.0';
         return $userAgentStr;
 
     }//end _getSystemUserAgent()
 
 
     // Parse the incoming SquizSuite User Agent string.
-    private static function _parseSystemUserAgent($userAgentStr)
+    private static function _getsystemTypeFromUserAgent($userAgentStr)
     {
         $matches = array();
-        $pattern = '/'.self::$_userAgentPrefix.'([^\/]+)\/4.0 \(http:\/\/([^ ]+); ([^\)]+)\)/';
+        $pattern = '/'.self::$_userAgentPrefix.'([^\/]+)\/4\.0/';
         preg_match_all($pattern, $userAgentStr, $matches);
         if (empty($matches) === TRUE) {
             return FALSE;
         }
 
-        $result = array(
-                   'systemType' => $matches[1][0],
-                   'systemUrl'  => $matches[2][0],
-                   'systemid'   => $matches[3][0],
-                  );
-        return $result;
+        return $matches[1][0];
 
     }//end _parseSystemUserAgent()
 
