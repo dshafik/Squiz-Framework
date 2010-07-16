@@ -44,13 +44,19 @@ sfapi._getCallback = null;
 sfapi.get = function(system, action, params, callback) {
     // Create script tag if it hasn't been created.
     var scriptTag = document.getElementById(sfapi.scriptTagid);
-    if (!scriptTag) {
-        scriptTag = document.createElement('script');
-        scriptTag.setAttribute('id', sfapi.scriptTagid);
-        scriptTag.setAttribute('type', 'text/javascript');
-        var head = document.getElementsByTagName("head").item(0);
-        head.appendChild(scriptTag);
+    var head = document.getElementsByTagName("head").item(0);
+
+    // TODO: Do we need to ever need to repeat an API call?
+    // If we do, then there is a problem if the same script tag is used - a lack of
+    // change in the script tag's src means it wouldn't run again.
+    if (scriptTag) {
+        head.removeChild(scriptTag);
     }
+
+    scriptTag = document.createElement('script');
+    scriptTag.setAttribute('id', sfapi.scriptTagid);
+    scriptTag.setAttribute('type', 'text/javascript');
+    head.appendChild(scriptTag);
 
     // Form URL to send the request.
     var src = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix + '/' + sfapi.outputDataFormat;
