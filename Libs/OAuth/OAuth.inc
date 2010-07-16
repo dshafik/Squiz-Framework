@@ -177,7 +177,8 @@ class OAuth
             $tempToken,
             $tempSecret,
             'POST',
-            $signMethod
+            $signMethod,
+            $extraAuthItems
         );
 
         // Was the request good? If so, break out the result so the token
