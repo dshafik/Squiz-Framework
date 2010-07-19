@@ -45,36 +45,11 @@ class SquizSuiteActions
 
 
     /**
-     * Activate a product to the Suite.
-     *
-     * @param string $systemid The ID of the Product.
+     * Get the list of all suite products.
      *
      * @since  4.0.0
-     * @return boolean
+     * @return array
      */
-    public static function activateProduct($systemid)
-    {
-        return TRUE;
-
-    }//end activateProduct()
-
-
-    /**
-     * Collect the Product Statistics.
-     *
-     * @param string $systemid The ID of the Product.
-     *
-     * @since  4.0.0
-     * @return boolean
-     */
-    public static function collectProductStatistic($systemid)
-    {
-        return TRUE;
-
-    }//end collectProductStatistic()
-
-
-    // Get all products.
     public static function getAllProducts()
     {
         $query  = DAL::getDALQuery('SquizSuite', 'getAllProducts');
@@ -84,8 +59,17 @@ class SquizSuiteActions
     }//end getAllProducts()
 
 
-    // Get specific product information. If systemid is null, the current
-    // product information will be returned.
+    /**
+     * Get the product information for the given systemid.
+     *
+     * If NULL is given for the systemid, then the current product
+     * will be returned.
+     *
+     * @param mixed $systemid Unique ID of the product.
+     *
+     * @since  4.0.0
+     * @return array
+     */
     public static function getProduct($systemid=NULL)
     {
         if (isset(self::$_productCache[$systemid]) === TRUE) {
@@ -109,14 +93,14 @@ class SquizSuiteActions
 
 
     /**
-     * Modify a project in the Suite.
+     * Update the product information for the given systemid.
      *
-     * @param string $systemid The ID of the Product.
-     * @param string $attrName  The name of the field to change.
-     * @param string $attrValue The new value.
+     * @param string $systemid  Unique ID of the product.
+     * @param string $attrName  Attribute name to update.
+     * @param mixed  $attrValue Attribute value to update.
      *
      * @since  4.0.0
-     * @return boolean
+     * @return mixed
      */
     public static function updateProduct($systemid, $attrName, $attrValue)
     {
@@ -132,11 +116,11 @@ class SquizSuiteActions
 
         return $result;
 
-    }//end modifyProduct()
+    }//end updateProduct()
 
 
     /**
-     * Register a product.
+     * Register a new product.
      *
      * @param string $systemid   The name of the product.
      * @param string $type       The type of the product to invite.
@@ -159,9 +143,9 @@ class SquizSuiteActions
 
 
     /**
-     * Remove a product from the Suite.
+     * Remove the product from the suite.
      *
-     * @param string $systemid The ID of the Product.
+     * @param string $systemid Unique ID of the product.
      *
      * @since  4.0.0
      * @return boolean
@@ -174,8 +158,20 @@ class SquizSuiteActions
     }//end removeProduct()
 
 
-    // Encrypt the passed data with the given system's public key.
-    // Returns encrypted string or FALSE for failure.
+    /**
+     * Encrypt the passed data with the public key of the given system.
+     *
+     * It encrypts the data with the password based encryption algorithm.
+     * Then the password will be encrypted with the public key of the
+     * given system. The returned array includes both of the password and
+     * encrypted data.
+     *
+     * @param string $systemid Unique ID of the product.
+     * @param mixed  $data     Data to encrypt.
+     *
+     * @since  4.0.0
+     * @return array
+     */
     public static function encryptMessage($systemid, $data)
     {
         $encrypted = NULL;
@@ -208,8 +204,19 @@ class SquizSuiteActions
     }//end encryptMessage()
 
 
-    // Decrypt the passed data with the current system's private key.
-    // Returns decrypted string or FALSE for failure.
+    /**
+     * Decrypt the passed data with the given password.
+     *
+     * It decrypts the given password with the current product's private
+     * key. Then it uses the decrypted password to decrypt the data.
+     * It returns the decrypted string or FALSE on error.
+     *
+     * @param string $data     Data to decrypt.
+     * @param string $password Key encrypted password.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
     public static function decryptMessage($data, $password)
     {
         // Get the current product information.
@@ -236,13 +243,19 @@ class SquizSuiteActions
 
         return $decrypted;
 
-    }//end decrypeMessage()
+    }//end decryptMessage()
 
 
-    /*
-    TODO: PASSPHRASE NEEDS TO BE FIXED!
+    /**
+     * Generates private/public RSA keypairs for the current product.
+     *
+     * It also creates a self signed certificate and stores it in DB.
+     * This certificate will be sent to other product as a part of sign-in
+     * process.
+     *
+     * @since  4.0.0
+     * @return void
      */
-    // Generate the pub/pri key pair for the current system.
     public static function generateSystemKeyPair()
     {
         // Get the current product information.
@@ -284,8 +297,6 @@ class SquizSuiteActions
         $currProduct['connection']['cert'] = $certStr;
         SquizSuite::updateProduct($currProduct['systemid'], 'connection', $currProduct['connection']);
 
-        return $pubKey['key'];
-
     }//end generateKeyPair()
 
 
@@ -320,6 +331,23 @@ class SquizSuiteActions
             self::_createSuiteMessageDOM($dom, $systemid, $productInfo, $msgType);
             $xml = $dom->saveXML();
             $msg = array();
+
+            $msg['_format'] = 'xml';
+            $msg['_system'] = 'SquizSuite';
+            switch ($msgType) {
+                case 'CON_REQUEST':
+                    $msg['_action'] = 'suiteConnect';
+                break;
+
+                case 'CON_REQUEST_ACK':
+                    $msg['_action'] = 'suiteConnectAck';
+                break;
+ 
+                case 'CON_REQUEST_ACK_ACK':
+                    $msg['_action'] = 'suiteConnectAckAck';
+                break;
+            }
+
             if ($msgType === 'CON_REQUEST') {
                 $msg['con_request'] = 1;
                 $msg['xml']         = $xml;
@@ -333,10 +361,11 @@ class SquizSuiteActions
 
                 $msg['xml']      = $enc['encrypted'];
                 $msg['password'] = $enc['password'];
+
             }
 
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $productInfo['connection']['url']);
+            curl_setopt($ch, CURLOPT_URL, $productInfo['connection']['url'].'/__api/');
             curl_setopt($ch, CURLOPT_POST, TRUE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);
@@ -347,6 +376,7 @@ class SquizSuiteActions
             $result   = curl_exec($ch);
             $curlinfo = curl_getinfo($ch);
             curl_close($ch);
+
             if ($curlinfo['http_code'] === 200) {
                 //self::_logSentMessage($systemid, $msgType);
             } else {
@@ -426,6 +456,116 @@ class SquizSuiteActions
     }//end _getSuiteMessageDOMTemplate()
 
 
+    /**
+     *
+     * @since  4.0.0
+     * @return void
+     * @api    read
+     */
+    public static function suiteConnect()
+    {
+        try {
+            DAL::beginTransaction();
+            $systemType = self::_getsystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
+            if ($systemType === FALSE) {
+                $errMsg = 'User-agent string can not be parsed.';
+                throw new ChannelException($errMsg);
+            }
+
+            include_once 'Libs/Security/Security.inc';
+            $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
+            $password   = Security::getRequestData('password', NULL, FALSE, 'post');
+            $conRequest = Security::getRequestData('con_request', NULL, FALSE, 'post');
+
+            $doc = new DomDocument();
+            $doc->loadXML($xml);
+
+            $sysidEl   = $doc->getElementsByTagName('systemid')->item(0);
+            $sysurlEl  = $doc->getElementsByTagName('system_url')->item(0);
+            $systemid  = $sysidEl->nodeValue;
+            $systemUrl = $sysurlEl->nodeValue;
+
+            $msgTypeEl = $doc->getElementsByTagName('message_type')->item(0);
+            $msgType   = $msgTypeEl->nodeValue;
+            self::_logReceivedMessage($systemid, $msgType);
+
+            // TODO: Maximum daily request exceeded?
+            // TODO: System already exists?
+
+            // Add the system and set the status as 'pending'.
+
+            // TODO: What if pub key is not given?
+            // Anyway to validate the integrity of Public Key????
+            $pubKeyEl = $doc->getElementsByTagName('cert')->item(0);
+            $pubKey   = $pubKeyEl->nodeValue;
+
+            $connection         = array();
+            $connection['url']  = $systemUrl;
+            $connection['cert'] = $pubKey;
+            SquizSuite::registerProduct($systemid, $systemType, $connection);
+            SquizSuite::updateProduct($systemid, 'status', 'pending');
+            $success = SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
+
+            DAL::commit();
+            self::_sendHeader(200);
+        } catch (Exception $e) {
+            self::_logErrorMessage($e->getMessage());
+            DAL::rollback();
+            self::_sendHeader(500);
+            exit;
+        }
+
+    }//end suiteConnect()
+
+
+    /**
+     *
+     * @since  4.0.0
+     * @return void
+     * @api    read
+     */
+    public static function suiteConnectAck()
+    {
+        try {
+            DAL::beginTransaction();
+
+
+            DAL::commit();
+            self::_sendHeader(200);
+        } catch (Exception $e) {
+            self::_logErrorMessage($e->getMessage());
+            DAL::rollback();
+            self::_sendHeader(500);
+            exit;
+        }
+
+    }//end suiteConnectAck()
+
+
+    /**
+     *
+     * @since  4.0.0
+     * @return void
+     * @api    read
+     */
+    public static function suiteConnectAckAck()
+    {
+        try {
+            DAL::beginTransaction();
+
+
+            DAL::commit();
+            self::_sendHeader(200);
+        } catch (Exception $e) {
+            self::_logErrorMessage($e->getMessage());
+            DAL::rollback();
+            self::_sendHeader(500);
+            exit;
+        }
+
+    }//end suiteConnectAckAck()
+
+
     // Process the incoming SquizSuite message.
     public static function processMessage()
     {
@@ -486,7 +626,7 @@ class SquizSuiteActions
 
                 // Add the system and set the status as 'pending'.
 
-                // TODO: What if pub key is not gived?
+                // TODO: What if pub key is not given?
                 // Anyway to validate the integrity of Public Key????
                 $pubKeyEl = $doc->getElementsByTagName('cert')->item(0);
                 $pubKey   = $pubKeyEl->nodeValue;
@@ -682,6 +822,9 @@ class SquizSuiteActions
 
     // TODO: Replace this with openssl_decrypt once PHP installation
     // is upgrade to > 5.3.0
+    /**
+     *
+     */
     private static function _opensslDecrypt($data, $algorithm, $password)
     {
         $filename = uniqid().'.txt';
@@ -700,7 +843,7 @@ class SquizSuiteActions
 
         return FALSE;
 
-    }//end _opensslEncrypt()
+    }//end _opensslDecrypt()
 
 
 }//end class
