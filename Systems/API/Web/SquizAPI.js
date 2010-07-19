@@ -35,6 +35,12 @@ sfapi.scriptTagid = '__sfapi';
 sfapi._getCallback = null;
 
 /**
+ * Session token that being submitted in every request.
+ * @type String
+ */
+sfapi._api_token = null;
+
+/**
  * For each related video in the JSON feed, add an thumbnail representing
  * that video to the div specified by a constant.
  * @param {String} Name of System to make action call.
@@ -61,7 +67,8 @@ sfapi.get = function(system, action, params, callback) {
     // Form URL to send the request.
     var src = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix + '/' + sfapi.outputDataFormat;
     src    += '/' + system + '/' + action;;
-    src    += '?_callback=sfapi._getCallback';
+    src    += '?_callback=sfapi._getCallback&_api_token=' + sfapi._api_token;
+
     if (params) {
         for (var id in params) {
             if (params.hasOwnProperty(id) === true) {
@@ -70,15 +77,24 @@ sfapi.get = function(system, action, params, callback) {
         }
     }
 
-    // Any callback function?
-    if (callback) {
-        sfapi._getCallback = callback;
-    } else {
-        sfapi._getCallback = function(data) {
-            // Nothing will happen.
-        };
-    }
+    sfapi._getCallback = function(data) {
+        if (data.new_token) {
+            // NULL token must been submitted.
+            sfapi._api_token = data.new_token;
+            sfapi.get(system, action, params, callback);
+        } else {
+            if (data.next_token) {
+                // A new token for the next request came.
+                sfapi._api_token = data.next_token;
+            }
+
+            if (callback) {
+                callback.call(data);
+            }
+        }
+    };
 
     // Do it!
     scriptTag.src = src;
+
 };
