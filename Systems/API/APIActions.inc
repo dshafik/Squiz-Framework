@@ -77,6 +77,7 @@ class APIActions
         */
         Channels::includeSystem('User');
         $userid = User::getCurrentUserid();
+
         if ($userid === NULL) {
             // Run as a public user. No need to verify the token.
         } else if ($userid !== NULL) {
@@ -273,7 +274,6 @@ class APIActions
 
         $result  = array();
         $currUrl = substr($url, 0, $serviceStartPos);
-
         if ($requestMethod === 'get') {
             // Get the URL without service request part so that we can get
             // the assetid from Lookup system.
@@ -315,9 +315,9 @@ class APIActions
 
             $default    = NULL;
             $jsonDecode = FALSE;
-            $system     = Security::getReuqestData('_system', $default, $jsonDecode, $requestMethod);
-            $action     = Security::getReuqestData('_action', $default, $jsonDecode, $requestMethod);
-            $format     = Security::getReuqestData('_format', self::$_outputFormat, $jsonDecode, $requestMethod);
+            $system     = Security::getRequestData('_system', $default, $jsonDecode, $requestMethod);
+            $action     = Security::getRequestData('_action', $default, $jsonDecode, $requestMethod);
+            $format     = Security::getRequestData('_format', self::$_outputFormat, $jsonDecode, $requestMethod);
         }
 
         $result['system']       = strtolower($system);
@@ -710,7 +710,7 @@ class APIActions
     public static function isAPIRequest()
     {
         include_once 'Libs/Web/Web.inc';
-        $url = Web::getCurrentURL(FALSE);
+        $url = Web::getCurrentURL();
         if (strpos($url, '/'.self::$_serviceWebPath.'/') !== FALSE) {
             return TRUE;
         }
