@@ -1,7 +1,4 @@
 <schema system="SquizSuite">
-    <udts>
-        <udt type="INTEGER">PRODUCTID</udt>
-    </udts>
     <tables>
         <table name="suite_product">
             <columns>
