@@ -453,7 +453,7 @@ class APIActions
     /**
      * Sends XML response data for the request.
      *
-     * @param array $responseContent Array contains the requied data to 
+     * @param array $responseContent Array contains the requied data to
      *                               send reponse. It includes 'system', 'action',
      *                               'assetid', 'result' and optional 'exception'
      *                               in case for error case.
@@ -501,7 +501,7 @@ class APIActions
      * Optionally if '_callback' function is specified in the request,
      * the result JSON string will be a function call to callback function.
      *
-     * @param array $responseContent Array contains the requied data to 
+     * @param array $responseContent Array contains the requied data to
      *                               send reponse. It includes 'system', 'action',
      *                               'assetid', 'result' and optional 'exception'
      *                               in case for error case.
@@ -673,7 +673,7 @@ class APIActions
 
                 case 'struct':
                     foreach ($content as $key => $val) {
-                        $arr[] = $key.':'.API::buildResponseJSONString($val);
+                        $arr[] = json_encode((string) $key).':'.API::buildResponseJSONString($val);
                     }
 
                     $result = '{'.implode(',', $arr).'}';

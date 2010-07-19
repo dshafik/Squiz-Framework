@@ -89,7 +89,7 @@ sfapi.get = function(system, action, params, callback) {
             }
 
             if (callback) {
-                callback.call(data);
+                callback.call(null, data);
             }
         }
     };
