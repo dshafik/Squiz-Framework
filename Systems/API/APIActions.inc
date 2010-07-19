@@ -72,6 +72,46 @@ class APIActions
         $responseContent['system'] = '';
         $responseContent['action'] = '';
 
+        /*
+            Token validation for every request.
+        */
+        Channels::includeSystem('User');
+        $userid = User::getCurrentUserid();
+        if ($userid === NULL) {
+            // Run as a public user. No need to verify the token.
+        } else if ($userid !== NULL) {
+            Channels::includeSystem('Session');
+            include_once 'Libs/Security/Security.inc';
+            $apiToken    = Security::getRequestData('_api_token', NULL, TRUE);
+            $returnToken = FALSE;
+            if ($apiToken === NULL) {
+                // Token is not submitted with the API call.
+                // Just return the new token.
+                $returnToken = TRUE;
+            } else {
+                $currToken = Session::getSessionData('API', 'user:'.$userid);
+                if ($apiToken !== $currToken) {
+                    // Token mis-matched. Let's return a new token.
+                    $returnToken = TRUE;
+                } else {
+                    // The current token is good. Now generate the new one
+                    // for the next request.
+                    $newToken = API::getUniqueToken();
+                    Session::setSessionData('API', 'user:'.$userid, $newToken);
+                    $responseContent['next_token'] = $newToken;
+                }
+            }
+
+            if ($returnToken === TRUE) {
+                $newToken = API::getUniqueToken();
+                Session::setSessionData('API', 'user:'.$userid, $newToken);
+
+                self::_sendHeader(200);
+                self::_sendResponse(array('new_token' => $newToken));
+                exit;
+            }
+        }//end if
+
         // Only support GET and POST method.
         $requestMethod = strtolower($_SERVER['REQUEST_METHOD']);
         if ($requestMethod !== 'get' && $requestMethod !== 'post') {
@@ -429,21 +469,18 @@ class APIActions
         $dom->appendChild($rspElem);
 
         // System and Action requested.
-        $systemElem  = $dom->createElement('system');
-        $actionElem  = $dom->createElement('action');
-        $assetidElem = $dom->createElement('assetid');
-        self::_addTextToNode($systemElem, $responseContent['system']);
-        self::_addTextToNode($actionElem, $responseContent['action']);
-        self::_addTextToNode($assetidElem, $responseContent['assetid'].'');
-        $rspElem->appendChild($systemElem);
-        $rspElem->appendChild($actionElem);
-        $rspElem->appendChild($assetidElem);
-
-        // Any exception?
-        if (isset($responseContent['exception']) === TRUE) {
-            $excepElem = $dom->createElement('exception');
-            $rspElem->appendChild($excepElem);
-            self::_addTextToNode($excepElem, $responseContent['exception']);
+        $fields = array(
+                   'system',
+                   'action',
+                   'assetid',
+                   'new_token',
+                   'next_token',
+                   'exception',
+                  );
+        foreach ($fields as $field) {
+            $fieldElem  = $dom->createElement($field);
+            self::_addTextToNode($fieldElem, $responseContent[$field]);
+            $rspElem->appendChild($fieldElem);
         }
 
         if (isset($responseContent['result']) === TRUE) {
@@ -476,14 +513,19 @@ class APIActions
     {
         header('Content-type: application/json');
 
-        $attrs   = array();
-        $attrs[] = 'system: '.json_encode($responseContent['system']);
-        $attrs[] = 'action: '.json_encode($responseContent['action']);
-        $attrs[] = 'assetid: '.json_encode($responseContent['assetid']);
-
-        // Any exception?
-        if (isset($responseContent['exception']) === TRUE) {
-            $attrs[] = 'exception: '.json_encode($responseContent['exception']);
+        $attrs  = array();
+        $fields = array(
+                   'system',
+                   'action',
+                   'assetid',
+                   'new_token',
+                   'next_token',
+                   'exception',
+                  );
+        foreach ($fields as $field) {
+            if (isset($responseContent[$field]) === TRUE) {
+                $attrs[] = $field.': '.json_encode($responseContent[$field]);
+            }
         }
 
         if (isset($responseContent['result']) === TRUE) {
@@ -809,6 +851,20 @@ class APIActions
         DAL::executeQuery($query);
 
     }//end updateAPI()
+
+
+    /**
+     * Get a new unique token for API call.
+     *
+     * @since  4.0.0
+     * @return vaoid
+     */
+    public static function getUniqueToken()
+    {
+        $token = sha1(microtime(TRUE));
+        return $token;
+
+    }//end getUniqueToken()
 
 
 }//end class
