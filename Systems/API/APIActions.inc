@@ -22,7 +22,6 @@
 class APIActions
 {
 
-
     /**
      * Special web path to handle API request.
      *
@@ -61,6 +60,54 @@ class APIActions
 
 
     /**
+     * Send POST API request to the destinated system.
+     *
+     * It sends API request via POST to the destined system.
+     *
+     * @param string $url       URL of the system to send the request.
+     * @param array  $msg       Array of messages to send.
+     * @param string $userAgent Optional User Agent string to send.
+     *
+     * @since  4.0.0
+     * @return array
+     * @throws ChannelException Error occurred.
+     */
+    public static function sendCURLAPIRequest($url, array $msg, $userAgent='')
+    {
+        $requiredFields = array(
+                           '_system',
+                           '_action',
+                           '_format',
+                          );
+        foreach ($requiredFields as $field) {
+            if (isset($msg[$field]) === FALSE) {
+                $errMsg = '';
+                throw new ChannelException($errMsg);
+            }
+        }
+
+        $url = rtrim($url, '/');
+        $ch  = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url.'/'.self::$_serviceWebPath.'/');
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+
+        if (empty($userAgent) === FALSE) {
+            curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+        }
+
+        $result   = curl_exec($ch);
+        $curlinfo = curl_getinfo($ch);
+        curl_close($ch);
+
+        return $curlinfo;
+
+    }//end sendCURLAPIRequest()
+
+
+    /**
      * Central point to handle all API request.
      *
      * @since  4.0.0
@@ -72,15 +119,10 @@ class APIActions
         $responseContent['system'] = '';
         $responseContent['action'] = '';
 
-        /*
-            Token validation for every request.
-        */
+        // Token validation for every request.
         Channels::includeSystem('User');
         $userid = User::getCurrentUserid();
-
-        if ($userid === NULL) {
-            // Run as a public user. No need to verify the token.
-        } else if ($userid !== NULL) {
+        if ($userid !== NULL) {
             Channels::includeSystem('Session');
             include_once 'Libs/Security/Security.inc';
             $apiToken    = Security::getRequestData('_api_token', NULL, TRUE);
@@ -206,7 +248,7 @@ class APIActions
      * @since  4.0.0
      * @return boolean
      */
-    public static function checkPermission($assetid, $options)
+    public static function checkPermission($assetid, array $options)
     {
         return TRUE;
 
@@ -278,10 +320,10 @@ class APIActions
             // Get the URL without service request part so that we can get
             // the assetid from Lookup system.
             $queryStrPos   = strpos($url, '?');
-            $serviceEndPos = strlen($url) - 1;
+            $serviceEndPos = (strlen($url) - 1);
             if ($queryStrPos !== FALSE) {
-                $currUrl      .= substr($url, $queryStrPos, strlen($url) - $queryStrPos);
-                $serviceEndPos = $queryStrPos - 1;
+                $currUrl      .= substr($url, $queryStrPos, (strlen($url) - $queryStrPos));
+                $serviceEndPos = ($queryStrPos - 1);
             }
 
             // Now, find the system and action names for the requested service.
@@ -289,7 +331,11 @@ class APIActions
             // Optionally, output format can be included prior to SYSTEM_NAME like following.
             // '_serviceWebPath/(xml|json)/SYSTEM_NAME/ACTION_NAME/'.
             $matches        = array();
-            $serviceUrlPart = substr($url, $serviceStartPos, ($serviceEndPos - $serviceStartPos) + 1);
+            $serviceUrlPart = substr(
+                $url,
+                $serviceStartPos,
+                (($serviceEndPos - $serviceStartPos) + 1)
+            );
 
             $serviceUrlPattern           = '/\/'.self::$_serviceWebPath.'\/([^\/]+)\/([^\/]+)/';
             $serviceUrlPatternWithFormat = '/\/'.self::$_serviceWebPath.'\/(xml|json)\/([^\/]+)\/([^\/]+)/';
@@ -299,7 +345,7 @@ class APIActions
                 $system = $matches[1];
                 $action = $matches[2];
                 $format = self::$_outputFormat;
-            } else  {
+            } else {
                 $res = preg_match($serviceUrlPatternWithFormat, $serviceUrlPart, $matches);
                 if ($res === 1) {
                     $format = $matches[1];
@@ -318,7 +364,7 @@ class APIActions
             $system     = Security::getRequestData('_system', $default, $jsonDecode, $requestMethod);
             $action     = Security::getRequestData('_action', $default, $jsonDecode, $requestMethod);
             $format     = Security::getRequestData('_format', self::$_outputFormat, $jsonDecode, $requestMethod);
-        }
+        }//end if
 
         $result['system']       = strtolower($system);
         $result['action']       = strtolower($action);
@@ -386,7 +432,7 @@ class APIActions
             } else {
                 $params[] = json_decode($value);
             }
-        }
+        }//end foreach
 
         return $params;
 
@@ -406,7 +452,7 @@ class APIActions
      * @since  4.0.0
      * @return mixed
      */
-    public static function getActionResult($system, $action, $args)
+    public static function getActionResult($system, $action, array $args)
     {
         $callback = array(
                      $system,
@@ -432,10 +478,16 @@ class APIActions
     /**
      * Private wrapper function to send different types of response.
      *
+     * @param array  $responseContent Array contains the requied data to
+     *                                send reponse. It includes 'system', 'action',
+     *                                'assetid', 'result' and optional 'exception'
+     *                                in case for error case.
+     * @param string $format          Response format type.
+     *
      * @since  4.0.0
      * @return void
      */
-    private static function _sendResponse($responseContent, $format='json')
+    private static function _sendResponse(array $responseContent, $format='json')
     {
         switch ($format) {
             case 'json':
@@ -444,6 +496,10 @@ class APIActions
 
             case 'xml':
                 self::_sendXMLResponse($responseContent);
+            break;
+
+            default:
+                // No default behaviour.
             break;
         }
 
@@ -461,7 +517,7 @@ class APIActions
      * @since  4.0.0
      * @return void
      */
-    public static function _sendXMLResponse($responseContent)
+    private static function _sendXMLResponse(array $responseContent)
     {
         header('Content-Type: text/xml; charset=utf-8');
         $dom     = new DomDocument('1.0', 'utf-8');
@@ -478,7 +534,7 @@ class APIActions
                    'exception',
                   );
         foreach ($fields as $field) {
-            $fieldElem  = $dom->createElement($field);
+            $fieldElem = $dom->createElement($field);
             self::_addTextToNode($fieldElem, $responseContent[$field]);
             $rspElem->appendChild($fieldElem);
         }
@@ -509,7 +565,7 @@ class APIActions
      * @since  4.0.0
      * @return void
      */
-    public static function _sendJSONResponse($responseContent)
+    private static function _sendJSONResponse(array $responseContent)
     {
         header('Content-type: application/json');
 
@@ -551,8 +607,8 @@ class APIActions
      * The passed content will be converted to DOM tree structure
      * and appended to the parent node.
      *
-     * @param DomNode $parentNode Parent DOM node to have the content tree.
-     * @param mixed   $content    Content to create.
+     * @param object &$parentNode Parent DOM node to have the content tree.
+     * @param mixed  $content     Content to create.
      *
      * @since  4.0.0
      * @return void
@@ -607,6 +663,10 @@ class APIActions
                         API::buildResponseXMLDom($keyElem, $val);
                     }
                 break;
+
+                default:
+                    // No default behaviour.
+                break;
             }//end switch
         }//end if
 
@@ -619,8 +679,8 @@ class APIActions
      * If the text contains invalid XML characters, CDATA section
      * is appended instead.
      *
-     * @param DomNode $node Parent DOM node to have the content tree.
-     * @param string  $text Content to create.
+     * @param object &$node Parent DOM node to have the content tree.
+     * @param string $text  Content to create.
      *
      * @since  4.0.0
      * @return void
@@ -645,7 +705,7 @@ class APIActions
      * @param mixed $content Content to create.
      *
      * @since  4.0.0
-     * @return void
+     * @return string
      */
     public static function buildResponseJSONString($content)
     {
@@ -678,6 +738,10 @@ class APIActions
 
                     $result = '{'.implode(',', $arr).'}';
                 break;
+
+                default:
+                    // No default behaviour.
+                break;
             }//end switch
         }//end if
 
@@ -688,6 +752,8 @@ class APIActions
 
     /**
      * Help function to send HTTP header.
+     *
+     * @param integer $response HTTP reponse code.
      *
      * @since  4.0.0
      * @return void
@@ -754,7 +820,7 @@ class APIActions
             if ($option === '' && ($value === 'read' || $value === 'write')) {
                 $options['type'] = $value;
             } else if ($option[0] === '-' && empty($value) === FALSE) {
-                $options[substr($option, 1, strlen($option) - 1)] = $value;
+                $options[substr($option, 1, (strlen($option) - 1))] = $value;
             }
         }
 
@@ -773,7 +839,7 @@ class APIActions
      * @param string $action Name of the action to request.
      *
      * @since  4.0.0
-     * @return void
+     * @return array
      */
     public static function getAPI($system, $action)
     {
@@ -802,7 +868,7 @@ class APIActions
      * @since  4.0.0
      * @return void
      */
-    public static function addAPI($system, $action, $type, $options)
+    public static function addAPI($system, $action, $type, array $options)
     {
         if (is_array($options) === TRUE) {
             Channels::modifyBasket('options', serialize($options));
@@ -841,7 +907,7 @@ class APIActions
      * @since  4.0.0
      * @return void
      */
-    public static function updateAPI($system, $action, $options)
+    public static function updateAPI($system, $action, array $options)
     {
         if (is_array($options) === TRUE) {
             Channels::modifyBasket('options', serialize($options));
