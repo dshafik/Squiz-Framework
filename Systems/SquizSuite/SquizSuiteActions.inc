@@ -441,6 +441,11 @@ class SquizSuiteActions
     }//end _getSuiteMessageDOMTemplate()
 
 
+    public static function preProcessSuiteRequest($system, $action, $args)
+    {
+    }//end preProcessSuiteRequest()
+
+
     /**
      *
      * @since  4.0.0
@@ -461,6 +466,7 @@ class SquizSuiteActions
             $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
             $password   = Security::getRequestData('password', NULL, FALSE, 'post');
             $conRequest = Security::getRequestData('con_request', NULL, FALSE, 'post');
+            $xml        = html_entity_decode($xml);
 
             $doc = new DomDocument();
             $doc->loadXML($xml);
