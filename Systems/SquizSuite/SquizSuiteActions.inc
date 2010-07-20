@@ -20,13 +20,29 @@ require_once 'Systems/BaseSystem.inc';
 class SquizSuiteActions
 {
 
-    // User Agent string prefix.
+    /**
+     * User Agent String prefix.
+     *
+     * @var   string
+     * @since 4.0.0
+     */
     private static $_userAgentPrefix = 'SquizSuite-';
 
+    /**
+     * Encryption algorithm.
+     *
+     * @var   string
+     * @since 4.0.0
+     */
     private static $_opensslEncryptionAlgorithm = 'blowfish';
 
-    // Product information cache.
-    private static $_productCache    = array();
+    /**
+     * Local cache variable for product information.
+     *
+     * @var   string
+     * @since 4.0.0
+     */
+    private static $_productCache = array();
 
 
     /**
@@ -73,7 +89,7 @@ class SquizSuiteActions
     public static function getProduct($systemid=NULL)
     {
         if (isset(self::$_productCache[$systemid]) === TRUE) {
-            return self::$_productCache[$systemid]; 
+            return self::$_productCache[$systemid];
         }
 
         $query  = DAL::getDALQuery('SquizSuite', 'getProduct');
@@ -104,7 +120,7 @@ class SquizSuiteActions
      */
     public static function updateProduct($systemid, $attrName, $attrValue)
     {
-        if ($attrName === 'connection' && is_array($attrValue)) {
+        if ($attrName === 'connection' && is_array($attrValue) === TRUE) {
             $attrValue = serialize($attrValue);
             Channels::modifyBasket('attrValue', $attrValue);
         }
@@ -159,94 +175,6 @@ class SquizSuiteActions
 
 
     /**
-     * Encrypt the passed data with the public key of the given system.
-     *
-     * It encrypts the data with the password based encryption algorithm.
-     * Then the password will be encrypted with the public key of the
-     * given system. The returned array includes both of the password and
-     * encrypted data.
-     *
-     * @param string $systemid Unique ID of the product.
-     * @param mixed  $data     Data to encrypt.
-     *
-     * @since  4.0.0
-     * @return array
-     */
-    public static function encryptMessage($systemid, $data)
-    {
-        $encrypted = NULL;
-        $product   = SquizSuite::getProduct($systemid);
-        if (isset($product['connection']['cert']) === TRUE) {
-            $certStr = $product['connection']['cert'];
-            $pubKey  = openssl_pkey_get_public($certStr);
-
-            $password     = sha1(microtime(true));
-            $encryptedMsg = self::_opensslEncrypt($data, self::$_opensslEncryptionAlgorithm, $password);
-            if ($encryptedMsg === FALSE) {
-                return FALSE;
-            }
-
-            $success       = openssl_public_encrypt($password, $encryptedPass, $pubKey);
-            $encryptedPass = base64_encode($encryptedPass);
-            if ($success === FALSE) {
-                return FALSE;
-            }
-
-            $result = array(
-                       'encrypted' => $encryptedMsg,
-                       'password'  => $encryptedPass,
-                      );
-            return $result;
-        }
-
-        return FALSE;
-
-    }//end encryptMessage()
-
-
-    /**
-     * Decrypt the passed data with the given password.
-     *
-     * It decrypts the given password with the current product's private
-     * key. Then it uses the decrypted password to decrypt the data.
-     * It returns the decrypted string or FALSE on error.
-     *
-     * @param string $data     Data to decrypt.
-     * @param string $password Key encrypted password.
-     *
-     * @since  4.0.0
-     * @return mixed
-     */
-    public static function decryptMessage($data, $password)
-    {
-        // Get the current product information.
-        $currProduct = SquizSuite::getProduct();
-        $priKeyPath  = BaseSystem::getDataDir('SquizSuite').'/privatekey.pem';
-        $priKey      = openssl_pkey_get_private('file://'.$priKeyPath);
-        $password    = base64_decode($password);
-
-        $decrypted = '';
-        $result    = openssl_private_decrypt(
-            $password,
-            $passdec,
-            $priKey
-        );
-
-        if ($result === FALSE) {
-            return FALSE;
-        }
-
-        $decrypted = self::_opensslDecrypt($data, self::$_opensslEncryptionAlgorithm, $passdec);
-        if ($decrypted === FALSE) {
-            return FALSE;
-        }
-
-        return $decrypted;
-
-    }//end decryptMessage()
-
-
-    /**
      * Generates private/public RSA keypairs for the current product.
      *
      * It also creates a self signed certificate and stores it in DB.
@@ -284,7 +212,7 @@ class SquizSuiteActions
                  'commonName'             => $currProduct['systemid'],
                  'emailAddress'           => $currProduct['systemid'].'@squizsuite.com',
                 );
-        $csr = openssl_csr_new($info, $keyGenerated);
+        $csr  = openssl_csr_new($info, $keyGenerated);
         openssl_csr_export_to_file($csr, $suiteDir.'/system.csr');
 
         $cert = openssl_csr_sign($csr, NULL, $keyGenerated, (365 * 10));
@@ -297,91 +225,74 @@ class SquizSuiteActions
         $currProduct['connection']['cert'] = $certStr;
         SquizSuite::updateProduct($currProduct['systemid'], 'connection', $currProduct['connection']);
 
-    }//end generateKeyPair()
+    }//end generateSystemKeyPair()
 
 
-    // Send SquizSuite message to the target system.
-    // TODO: $data?
-    public static function sendMessage($systemid, $msgType, $data=NULL)
+    /**
+     * Send suite specific message to other system.
+     *
+     * @param string $systemid ID of the destined system.
+     * @param string $msgType  Type of message to send.
+     *
+     * @since  4.0.0
+     * @return void
+     * @throws ChannelException Error occurred.
+     */
+    public static function sendMessage($systemid, $msgType)
     {
-        try {
-            DAL::beginTransaction();
-            $productInfo = SquizSuite::getProduct($systemid);
-            if (empty($productInfo) === TRUE) {
-                $errMsg = $systemid.' is not known. Cannot send '.$msgType.' to it.';
-                throw new ChannelException($errMsg);
-            }
+        $productInfo = SquizSuite::getProduct($systemid);
+        if (empty($productInfo) === TRUE) {
+            $errMsg = $systemid.' is not known. Cannot send '.$msgType.' to it.';
+            throw new ChannelException($errMsg);
+        }
 
-            $dom = self::_createSuiteMessageDOMTemplate();
-            self::_createSuiteMessageDOM($dom, $systemid, $productInfo, $msgType);
-            $xml = $dom->saveXML();
-            $msg = array();
+        $dom = self::_createSuiteMessageDOMTemplate();
+        self::_createSuiteMessageDOM($dom, $msgType);
+        $xml = $dom->saveXML();
 
-            $msg['_format'] = 'xml';
-            $msg['_system'] = 'SquizSuite';
-            switch ($msgType) {
-                case 'CON_REQUEST':
-                    $msg['_action'] = 'suiteConnect';
-                break;
+        $msg            = array();
+        $msg['_format'] = 'xml';
+        $msg['_system'] = 'SquizSuite';
+        $msg['_action'] = $msgType;
 
-                case 'CON_REQUEST_ACK':
-                    $msg['_action'] = 'suiteConnectAck';
-                break;
- 
-                case 'CON_REQUEST_ACK_ACK':
-                    $msg['_action'] = 'suiteConnectAckAck';
-                break;
-            }
+        // Do not encrypt suiteConnect message. In fact, it can not encrypt as
+        // the current system does not know the public key of the destined system.
+        if ($msgType === 'suiteConnect') {
+            $msg['xml']         = $xml;
+            $msg['con_request'] = 1;
+        } else {
+            $msg['_enc']            = $xml;
+            $msg['_pubKeySystemid'] = $systemid;
+        }
 
-            if ($msgType === 'CON_REQUEST') {
-                $msg['con_request'] = 1;
-                $msg['xml']         = $xml;
-            } else {
-                $enc = SquizSuite::encryptMessage($systemid, $xml);
-                if ($enc === FALSE) {
-                    // TODO: Encrytion Failed!
-                    $errMsg = 'Encryting data to '.$systemid.' has failed.';
-                    throw new ChannelException($errMsg);
-                }
+        $currProductInfo = SquizSuite::getProduct();
+        $userAgentStr    = self::$_userAgentPrefix.$currProductInfo['type'].'/4.0';
+        Channels::includeSystem('API');
+        self::_logSentMessage($systemid, $msgType);
+        $curlinfo = API::sendCURLAPIRequest(
+            $productInfo['connection']['url'],
+            $msg,
+            $userAgentStr
+        );
 
-                $msg['xml']      = $enc['encrypted'];
-                $msg['password'] = $enc['password'];
-
-            }
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $productInfo['connection']['url'].'/__api/');
-            curl_setopt($ch, CURLOPT_POST, TRUE);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
-            curl_setopt($ch, CURLOPT_USERAGENT, self::_getSystemUserAgent());
-
-            self::_logSentMessage($systemid, $msgType);
-            $result   = curl_exec($ch);
-            $curlinfo = curl_getinfo($ch);
-            curl_close($ch);
-
-            if ($curlinfo['http_code'] === 200) {
-                //self::_logSentMessage($systemid, $msgType);
-            } else {
-                $errMsg = 'Sending '.$msgType.' to '.$systemid.' '.$curlinfo['http_code'].' returned.';
-                throw new ChannelException($errMsg);
-            }
-
-            DAL::commit();
-            return TRUE;
-        } catch (Exception $e) {
-            DAL::rollback();
-            self::_logErrorMessage($e->getMessage());
-            return FALSE;
+        if ($curlinfo['http_code'] !== 200) {
+            $errMsg  = 'HTTP Response '.$curlinfo['http_code']."\n";
+            $errMsg .= var_export($curlinfo, 1)."\n";
+            self::_logErrorMessage($errMsg);
         }
 
     }//end sendMessage()
 
 
-    // Create DOM template for the message to send with the current
-    // system's information.
+    /**
+     * Return the template message XML in DOM document format.
+     *
+     * Every suite messages are based on this template. It includes
+     * systemid, system type and the URL of the system.
+     *
+     * @since  4.0.0
+     * @return object
+     */
     private static function _createSuiteMessageDOMTemplate()
     {
         Channels::includeSystem('API');
@@ -406,11 +317,19 @@ class SquizSuiteActions
 
         return $dom;
 
-    }//end _getSuiteMessageDOMTemplate()
+    }//end _createSuiteMessageDOMTemplate()
 
 
-    // Create SquizSuite message DOM.
-    private static function _createSuiteMessageDOM(&$dom, $systemid, $productInfo, $msgType)
+    /**
+     * Add message specific element to the passed DOM object.
+     *
+     * @param object &$dom    DOM object to work with.
+     * @param string $msgType Type of the message to send.
+     *
+     * @since  4.0.0
+     * @return object
+     */
+    private static function _createSuiteMessageDOM(&$dom, $msgType)
     {
         Channels::includeSystem('API');
         $msgEl     = $dom->getElementsByTagName('message')->item(0);
@@ -421,8 +340,9 @@ class SquizSuiteActions
         $msgEl->appendChild($msgTypeEl);
 
         switch ($msgType) {
-            case 'CON_REQUEST':
-            case 'CON_REQUEST_ACK':
+            case 'suiteConnect':
+            case 'suiteConnectAck':
+            case 'suiteConnectAckAck':
                 // Both of CON_REQUEST and CON_REQUEST_ACK will send
                 // the system's public key together.
                 $currProduct = SquizSuite::getProduct();
@@ -433,274 +353,281 @@ class SquizSuiteActions
             break;
 
             default:
+                // No default behaviour.
             break;
         }//end switch
 
         return $dom;
 
-    }//end _getSuiteMessageDOMTemplate()
-
-
-    public static function preProcessSuiteRequest($system, $action, $args)
-    {
-    }//end preProcessSuiteRequest()
+    }//end _createSuiteMessageDOM()
 
 
     /**
+     * Suite system connection request handler.
+     *
+     * Other suite system will make a request to connect by sharing
+     * the security certificate that includes public key information.
+     * The submitter's key certificate will be registered together and
+     * it will send suiteConnectAck message back as a response.
      *
      * @since  4.0.0
      * @return void
+     * @throws ChannelException Error occurred.
      * @api    read
      */
     public static function suiteConnect()
     {
         try {
-            DAL::beginTransaction();
-            $systemType = self::_getsystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
+            // Verify the User Agent string. Can we get the system type out of it?
+            $systemType = self::_getSystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
             if ($systemType === FALSE) {
                 $errMsg = 'User-agent string can not be parsed.';
                 throw new ChannelException($errMsg);
             }
 
+            // Parse the posted XML file. Exception will be thrown in case error occurs.
             include_once 'Libs/Security/Security.inc';
-            $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
-            $password   = Security::getRequestData('password', NULL, FALSE, 'post');
-            $conRequest = Security::getRequestData('con_request', NULL, FALSE, 'post');
-            $xml        = html_entity_decode($xml);
+            $xml     = Security::getRequestData('xml', NULL, FALSE, 'post');
+            $xml     = html_entity_decode($xml);
+            $message = self::_parseSuiteXML($xml);
 
-            $doc = new DomDocument();
-            $doc->loadXML($xml);
-
-            $sysidEl   = $doc->getElementsByTagName('systemid')->item(0);
-            $sysurlEl  = $doc->getElementsByTagName('system_url')->item(0);
-            $systemid  = $sysidEl->nodeValue;
-            $systemUrl = $sysurlEl->nodeValue;
-
-            $msgTypeEl = $doc->getElementsByTagName('message_type')->item(0);
-            $msgType   = $msgTypeEl->nodeValue;
-            self::_logReceivedMessage($systemid, $msgType);
+            // All the required fields exist?
+            $required = array(
+                         'system_id',
+                         'system_url',
+                         'cert',
+                        );
+            foreach ($required as $field) {
+                if ($message[$field] === NULL) {
+                    $errMsg = $field.' has not been specified.';
+                    throw new ChannelException($errMsg);
+                }
+            }
 
             // TODO: Maximum daily request exceeded?
-            // TODO: System already exists?
+            $systemid    = $message['system_id'];
+            $systemUrl   = $message['system_url'];
+            $certificate = $message['cert'];
 
-            // Add the system and set the status as 'pending'.
+            // The systemid already exists?
+            $product = SquizSuite::getProduct($systemid);
+            if (empty($product) === FALSE) {
+                $errMsg = 'The requested system already exists.';
+                throw new ChannelException($errMsg);
+            }
 
-            // TODO: What if pub key is not given?
-            // Anyway to validate the integrity of Public Key????
-            $pubKeyEl = $doc->getElementsByTagName('cert')->item(0);
-            $pubKey   = $pubKeyEl->nodeValue;
+            self::_logReceivedMessage($systemid, 'suiteConnect');
 
+            DAL::beginTransaction();
+            // Now we are all good. Register the system and set the status
+            // as pending. Then send acknowlegement message back.
             $connection         = array();
             $connection['url']  = $systemUrl;
-            $connection['cert'] = $pubKey;
+            $connection['cert'] = $certificate;
             SquizSuite::registerProduct($systemid, $systemType, $connection);
             SquizSuite::updateProduct($systemid, 'status', 'pending');
-            $success = SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
-
             DAL::commit();
-            self::_sendHeader(200);
+
+            $success = SquizSuite::sendMessage($systemid, 'suiteConnectAck');
         } catch (Exception $e) {
-            self::_logErrorMessage($e->getMessage());
+            $errMsg  = 'suiteConnect failed'."\n";
+            $errMsg .= $e->getMessage()."\n";
+            self::_logErrorMessage($errMsg);
             DAL::rollback();
-            self::_sendHeader(500);
-            exit;
-        }
+
+            // Re-throw exception here so that API system can send
+            // the proper error HTTP header.
+            throw $e;
+        }//end try
 
     }//end suiteConnect()
 
 
     /**
+     * Suite system connection acknowlegement request handler.
+     *
+     * Once the initial connect message has been accepted by the
+     * other system and the returning acknowlegement will be handled
+     * here. The incoming message is encrypted with the current system's
+     * public key.
      *
      * @since  4.0.0
      * @return void
+     * @throws ChannelException Error occurred.
      * @api    read
      */
     public static function suiteConnectAck()
     {
         try {
-            DAL::beginTransaction();
-
-
-            DAL::commit();
-            self::_sendHeader(200);
-        } catch (Exception $e) {
-            self::_logErrorMessage($e->getMessage());
-            DAL::rollback();
-            self::_sendHeader(500);
-            exit;
-        }
-
-    }//end suiteConnectAck()
-
-
-    /**
-     *
-     * @since  4.0.0
-     * @return void
-     * @api    read
-     */
-    public static function suiteConnectAckAck()
-    {
-        try {
-            DAL::beginTransaction();
-
-
-            DAL::commit();
-            self::_sendHeader(200);
-        } catch (Exception $e) {
-            self::_logErrorMessage($e->getMessage());
-            DAL::rollback();
-            self::_sendHeader(500);
-            exit;
-        }
-
-    }//end suiteConnectAckAck()
-
-
-    // Process the incoming SquizSuite message.
-    public static function processMessage()
-    {
-        try {
-            DAL::beginTransaction();
-            $systemType = self::_getsystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
+            // Verify the User Agent string. Can we get the system type out of it?
+            $systemType = self::_getSystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
             if ($systemType === FALSE) {
                 $errMsg = 'User-agent string can not be parsed.';
                 throw new ChannelException($errMsg);
             }
 
+            // Parse the posted XML file. Exception will be thrown in case error occurs.
             include_once 'Libs/Security/Security.inc';
-            $xml        = Security::getRequestData('xml', NULL, FALSE, 'post');
-            $password   = Security::getRequestData('password', NULL, FALSE, 'post');
-            $conRequest = Security::getRequestData('con_request', NULL, FALSE, 'post');
-            if ($conRequest === NULL) {
-                // Only the connection request comes unencrypted.
-                $xml = SquizSuite::decryptMessage($xml, $password);
-                if ($xml === FALSE) {
-                    $errMsg = 'Squiz Suite message can not be decrypted.';
+            $xml     = Security::getRequestData('_enc', NULL, FALSE, 'post');
+            $xml     = html_entity_decode($xml);
+            $message = self::_parseSuiteXML($xml);
+
+            // All the required fields exist?
+            $required = array(
+                         'system_id',
+                         'system_url',
+                         'cert',
+                        );
+            foreach ($required as $field) {
+                if ($message[$field] === NULL) {
+                    $errMsg = $field.' has not been specified.';
                     throw new ChannelException($errMsg);
                 }
-            } else {
-                // It comes as non-encrypted, HTML entity encoded format.
-                $xml = html_entity_decode($xml);
             }
 
-            self::_processMessage($systemType, $xml);
+            $systemid    = $message['system_id'];
+            $systemUrl   = $message['system_url'];
+            $certificate = $message['cert'];
+
+            $productInfo = SquizSuite::getProduct($systemid);
+            if (empty($productInfo) === TRUE) {
+                $errMsg = 'Unknown system has been requested.';
+                throw new ChannelException($errMsg);
+            }
+
+            self::_logReceivedMessage($systemid, 'suiteConnectAck');
+
+            DAL::beginTransaction();
+            // Connection Request accepted by the other system.
+            // Set the system live and send the final acknowledgement.
+            $productInfo['connection']['cert'] = $certificate;
+            SquizSuite::updateProduct($systemid, 'connection', $productInfo['connection']);
+            SquizSuite::updateProduct($systemid, 'status', 'live');
             DAL::commit();
-            self::_sendHeader(200);
+
+            $success = SquizSuite::sendMessage($systemid, 'suiteConnectAckAck');
         } catch (Exception $e) {
-            self::_logErrorMessage($e->getMessage());
+            $errMsg  = 'suiteConnectAck failed.'."\n";
+            $errMsg .= $e->getMessage()."\n";
+            self::_logErrorMessage($errMsg);
             DAL::rollback();
-            self::_sendHeader(500);
-            exit;
+
+            // Re-throw exception here so that API system can send
+            // the proper error HTTP header.
+            throw $e;
+        }//end try
+
+    }//end suiteConnectAck()
+
+
+    /**
+     * Suite system connection acknowlegement acknowlegement request handler.
+     *
+     * The final acknowlegement for suite connection request.
+     *
+     * @since  4.0.0
+     * @return void
+     * @throws ChannelException Error occurred.
+     * @api    read
+     */
+    public static function suiteConnectAckAck()
+    {
+        try {
+            // Verify the User Agent string. Can we get the system type out of it?
+            $systemType = self::_getSystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
+            if ($systemType === FALSE) {
+                $errMsg = 'User-agent string can not be parsed.';
+                throw new ChannelException($errMsg);
+            }
+
+            // Parse the posted XML file. Exception will be thrown in case error occurs.
+            include_once 'Libs/Security/Security.inc';
+            $xml     = Security::getRequestData('_enc', NULL, FALSE, 'post');
+            $xml     = html_entity_decode($xml);
+            $message = self::_parseSuiteXML($xml);
+
+            // All the required fields exist?
+            $required = array(
+                         'system_id',
+                         'system_url',
+                        );
+            foreach ($required as $field) {
+                if ($message[$field] === NULL) {
+                    $errMsg = $field.' has not been specified.';
+                    throw new ChannelException($errMsg);
+                }
+            }
+
+            $systemid  = $message['system_id'];
+            $systemUrl = $message['system_url'];
+
+            // The final acknowledgment has been arrived.
+            // Now two systems are connected.
+            $productInfo = SquizSuite::getProduct($systemid);
+            if (empty($productInfo) === TRUE) {
+                $errMsg = 'Unknown system has been requested.';
+                throw new ChannelException($errMsg);
+            }
+
+            self::_logReceivedMessage($systemid, 'suiteConnectAckAck');
+
+            SquizSuite::updateProduct($systemid, 'status', 'live');
+        } catch (Exception $e) {
+            $errMsg  = 'suiteConnectAckAck failed.'."\n";
+            $errMsg .= $e->getMessage()."\n";
+            self::_logErrorMessage($errMsg);
+        }//end try
+
+    }//end suiteConnectAckAck()
+
+
+    /**
+     * Parse the passed XML file and return.
+     *
+     * @param string $xml SquizSuite specific XML message string.
+     *
+     * @since  4.0.0
+     * @return array
+     * @throws ChannelException Invalid XML caused DomDocument() error.
+     */
+    private static function _parseSuiteXML($xml)
+    {
+        $doc    = new DomDocument();
+        $result = $doc->loadXML($xml);
+        if ($result === FALSE) {
+            $errMsg = 'Failed to load the message XML.';
+            throw new ChannelException($errMsg);
         }
 
-    }//end processSuiteMessage()
-
-
-    private static function _processMessage($systemType, $xml)
-    {
-        $doc = new DomDocument();
-        $doc->loadXML($xml);
-
-        $sysidEl   = $doc->getElementsByTagName('systemid')->item(0);
-        $sysurlEl  = $doc->getElementsByTagName('system_url')->item(0);
-        $systemid  = $sysidEl->nodeValue;
-        $systemUrl = $sysurlEl->nodeValue;
-
-        $msgTypeEl = $doc->getElementsByTagName('message_type')->item(0);
-        $msgType   = $msgTypeEl->nodeValue;
-        self::_logReceivedMessage($systemid, $msgType);
-        switch ($msgType) {
-            case 'CON_REQUEST':
-                // TODO: Maximum daily request exceeded?
-                // TODO: System already exists?
-
-                // Add the system and set the status as 'pending'.
-
-                // TODO: What if pub key is not given?
-                // Anyway to validate the integrity of Public Key????
-                $pubKeyEl = $doc->getElementsByTagName('cert')->item(0);
-                $pubKey   = $pubKeyEl->nodeValue;
-
-                $connection              = array();
-                $connection['url']       = $systemUrl;
-                $connection['cert'] = $pubKey;
-                SquizSuite::registerProduct($systemid, $systemType, $connection);
-                SquizSuite::updateProduct($systemid, 'status', 'pending');
-                $success = SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK');
-            break;
-
-            case 'CON_REQUEST_ACK':
-                $productInfo = SquizSuite::getProduct($systemid);
-                if (empty($productInfo) === TRUE) {
-                    // Who r u ? and y you sending this to me?
-                }
-
-                $pubKeyEl = $doc->getElementsByTagName('cert')->item(0);
-                $pubKey   = $pubKeyEl->nodeValue;
-
-                // TODO: What if pub key is not gived?
-                $productInfo['connection']['cert'] = $pubKey;
-
-                // Connection Request accepted.
-                SquizSuite::updateProduct($systemid, 'connection', $productInfo['connection']);
-                SquizSuite::updateProduct($systemid, 'status', 'live');
-                $success = SquizSuite::sendMessage($systemid, 'CON_REQUEST_ACK_ACK');
-            break;
-
-            case 'CON_REQUEST_ACK_ACK':
-                $productInfo = SquizSuite::getProduct($systemid);
-                if (empty($productInfo) === TRUE) {
-                    // Who r u ? and y you sending this to me?
-                    // TODO: Do i have pending system waiting for the response from 
-                    // this system?
-                }
-
-                SquizSuite::updateProduct($systemid, 'status', 'live');
-            break;
-
-            default:
-            break;
-        }//end switch
-
-    }//end _processMessage()
-
-
-    // Send HTTP header.
-    private static function _sendHeader($responseCode)
-    {
-        switch ($responseCode) {
-            case 200:
-                header('HTTP/1.1 200 OK', FALSE, 200);
-                /*
-                    Content-Type: text/xml; charset=utf-8
-                    Content-Length: length
-                */
-            break;
-
-            case 500:
-                header('HTTP/1.1 500 Internal Server Error', FALSE, 500);
-            break;
-
-            default:
-            break;
+        $result = array();
+        $fields = array(
+                   'system_id',
+                   'system_url',
+                   'cert',
+                  );
+        foreach ($fields as $field) {
+            $fieldEl = $doc->getElementsByTagName($field)->item(0);
+            if ($fieldEl === NULL) {
+                $result[$field] = NULL;
+            } else {
+                $result[$field] = $fieldEl->nodeValue;
+            }
         }
 
-    }//end _sendHeader()
+        return $result;
+
+    }//end _parseSuiteXML()
 
 
-    // Returns the current system's User Agent string.
-    private static function _getSystemUserAgent()
-    {
-        $productInfo  = SquizSuite::getProduct();
-        $userAgentStr = self::$_userAgentPrefix.$productInfo['type'].'/4.0';
-        return $userAgentStr;
-
-    }//end _getSystemUserAgent()
-
-
-    // Parse the incoming SquizSuite User Agent string.
-    private static function _getsystemTypeFromUserAgent($userAgentStr)
+    /**
+     * Parse the passed user agent string and return the system type.
+     *
+     * @param string $userAgentStr User agent string to parse.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _getSystemTypeFromUserAgent($userAgentStr)
     {
         $matches = array();
         $pattern = '/'.self::$_userAgentPrefix.'([^\/]+)\/4\.0/';
@@ -711,13 +638,22 @@ class SquizSuiteActions
 
         return $matches[1][0];
 
-    }//end _parseSystemUserAgent()
+    }//end _getSystemTypeFromUserAgent()
 
 
+    /**
+     * Log the received message to file.
+     *
+     * @param string $systemid Source systemid where the message is from.
+     * @param string $msgType  Type of message received.
+     *
+     * @since  4.0.0
+     * @return void
+     */
     private static function _logReceivedMessage($systemid, $msgType)
     {
         /*
-            e.g)
+            E.g)
             [RECEIVED 02:23:18] CON_REQUEST from search (http://squiz-search.net) (172.293.283.281)
             [SENT 02:23:18] CON_REQUEST to search (http://squiz-search.net) (172.293.283.281)
         */
@@ -738,20 +674,29 @@ class SquizSuiteActions
 
         file_put_contents(self::_getLogFilePath(), $log, FILE_APPEND);
 
-    }//end _logMessage()
+    }//end _logReceivedMessage()
 
 
+    /**
+     * Log the sent message to file.
+     *
+     * @param string $systemid Destined systemid.
+     * @param string $msgType  Type of message sent.
+     *
+     * @since  4.0.0
+     * @return void
+     */
     private static function _logSentMessage($systemid, $msgType)
     {
         /*
-            e.g)
+            E.g)
             [RECEIVED 02:23:18] CON_REQUEST from search (http://squiz-search.net) (172.293.283.281)
             [SENT 02:23:18] CON_REQUEST to search (http://squiz-search.net) (172.293.283.281)
         */
 
         include_once 'Libs/String/String.inc';
-        $log  = '[SENT '.String::easyDatetime(time()).'] '.$msgType;
-        $log .= ' to '.$systemid;
+        $log         = '[SENT '.String::easyDatetime(time()).'] '.$msgType;
+        $log        .= ' to '.$systemid;
         $productInfo = SquizSuite::getProduct($systemid);
         if (empty($productInfo) === FALSE) {
             $log .= ' ('.$productInfo['connection']['url'].')';
@@ -761,35 +706,214 @@ class SquizSuiteActions
 
         file_put_contents(self::_getLogFilePath(), $log, FILE_APPEND);
 
-    }//end _logMessage()
+    }//end _logSentMessage()
 
 
+    /**
+     * Log the passed error message to file.
+     *
+     * @param string $errorMessage Error message to log.
+     *
+     * @since  4.0.0
+     * @return void
+     */
     private static function _logErrorMessage($errorMessage='')
     {
         /*
-            e.g)
+            E.g)
             [RECEIVED 02:23:18] CON_REQUEST from search (http://squiz-search.net) (172.293.283.281)
             [SENT 02:23:18] CON_REQUEST to search (http://squiz-search.net) (172.293.283.281)
         */
+
         include_once 'Libs/String/String.inc';
         $log  = '[ERROR '.String::easyDatetime(time()).'] '.$errorMessage;
         $log .= "\n";
 
         file_put_contents(self::_getLogFilePath(), $log, FILE_APPEND);
 
-    }//end _logMessage()
+    }//end _logErrorMessage()
 
 
+    /**
+     * Return the file path to the SquizSuite system log file.
+     *
+     * @since  4.0.0
+     * @return string
+     */
     private static function _getLogFilePath()
     {
         $logFilePath  = BaseSystem::getDataDir('SquizSuite');
         $logFilePath .= '/message_log.txt';
         return $logFilePath;
 
-    }
+    }//end _getLogFilePath()
 
-    // TODO: Replace this with openssl_encrypt once PHP installation
-    // is upgrade to > 5.3.0
+
+    /**
+     * Encrypt the outgoing API message with the destined system's public key.
+     *
+     * This runs as a modifier on API::sendCURLAPIRequest() action and checks
+     * $msg array. If _enc and _pubKeySystemid fields are included, then it
+     * encrypts the data with the destined system's public key.
+     *
+     * @param string $url       URL of the system to send the request.
+     * @param array  $msg       Array of messages to send.
+     * @param string $userAgent Optional User Agent string to send.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function encryptAPIData($url, array $msg, $userAgent)
+    {
+        if (isset($msg['_enc']) === TRUE && isset($msg['_pubKeySystemid']) === TRUE) {
+            $destProduct = SquizSuite::getProduct($msg['_pubKeySystemid']);
+            if (empty($destProduct) === TRUE) {
+                return $msg;
+            }
+
+            $enc = SquizSuite::encryptData($msg['_pubKeySystemid'], $msg['_enc']);
+            $msg['_enc']      = $enc['encrypted'];
+            $msg['_password'] = $enc['password'];
+        }
+
+        return $msg;
+
+    }//end encryptAPIData()
+
+
+    /**
+     * Decrypt the posted data with the current system's private key.
+     *
+     * This runs as an after runner on API::getActionResult() action and
+     * checks _enc and _password fields exist in POST var. If they are
+     * provided, decrypt the value of _enc with the current system's
+     * private key and put it back to POST var.
+     *
+     * @param string $system System name where action resides.
+     * @param string $action Action name to call.
+     * @param array  $args   Parameters to pass to the action.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function decryptAPIData($system, $action, array $args)
+    {
+        include_once 'Libs/Security/Security.inc';
+        $encrypted = Security::getRequestData('_enc', NULL, FALSE, 'post');
+        $password  = Security::getRequestData('_password', NULL, FALSE, 'post');
+        if ($encrypted === NULL || $password === NULL) {
+            return;
+        }
+
+        $encrypted     = SquizSuite::decryptData($encrypted, $password);
+        $_POST['_enc'] = $encrypted;
+
+    }//end decryptAPIData()
+
+
+    /**
+     * Encrypt the passed data with the public key of the given system.
+     *
+     * It encrypts the data with the password based encryption algorithm.
+     * Then the password will be encrypted with the public key of the
+     * given system. The returned array includes both of the password and
+     * encrypted data.
+     *
+     * @param string $systemid Unique ID of the product.
+     * @param mixed  $data     Data to encrypt.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function encryptData($systemid, $data)
+    {
+        $encrypted = NULL;
+        $product   = SquizSuite::getProduct($systemid);
+        if (isset($product['connection']['cert']) === TRUE) {
+            $certStr      = $product['connection']['cert'];
+            $pubKey       = openssl_pkey_get_public($certStr);
+            $password     = sha1(microtime(TRUE));
+            $encryptedMsg = self::_opensslEncrypt($data, self::$_opensslEncryptionAlgorithm, $password);
+            if ($encryptedMsg === FALSE) {
+                return FALSE;
+            }
+
+            $success       = openssl_public_encrypt($password, $encryptedPass, $pubKey);
+            $encryptedPass = base64_encode($encryptedPass);
+            if ($success === FALSE) {
+                return FALSE;
+            }
+
+            $result = array(
+                       'encrypted' => $encryptedMsg,
+                       'password'  => $encryptedPass,
+                      );
+            return $result;
+        }//end if
+
+        return FALSE;
+
+    }//end encryptData()
+
+
+    /**
+     * Decrypt the passed data with the given password.
+     *
+     * It decrypts the given password with the current product's private
+     * key. Then it uses the decrypted password to decrypt the data.
+     * It returns the decrypted string or FALSE on error.
+     *
+     * @param string $data     Data to decrypt.
+     * @param string $password Key encrypted password.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function decryptData($data, $password)
+    {
+        // Get the current product information.
+        $currProduct = SquizSuite::getProduct();
+        $priKeyPath  = BaseSystem::getDataDir('SquizSuite').'/privatekey.pem';
+        $priKey      = openssl_pkey_get_private('file://'.$priKeyPath);
+        $password    = base64_decode($password);
+
+        $decrypted = '';
+        $result    = openssl_private_decrypt(
+            $password,
+            $passdec,
+            $priKey
+        );
+
+        if ($result === FALSE) {
+            return FALSE;
+        }
+
+        $decrypted = self::_opensslDecrypt($data, self::$_opensslEncryptionAlgorithm, $passdec);
+        if ($decrypted === FALSE) {
+            return FALSE;
+        }
+
+        return $decrypted;
+
+    }//end decryptData()
+
+
+    /**
+     * Encrypt the data with the given algorithm.
+     *
+     * It uses the command line openssl to perform the encryption and works
+     * the same as openssl_encrypt() function, which is only available in
+     * PHP > 5.3.0.
+     *
+     * Note: Replace it with openssl_encrypt() once PHP installation is upgraded.
+     *
+     * @param string $data      Data to decrypt.
+     * @param string $algorithm Algorithm to use for encryption.
+     * @param string $password  Password to use for encryption.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
     private static function _opensslEncrypt($data, $algorithm, $password)
     {
         $filename = uniqid().'.txt';
@@ -811,10 +935,21 @@ class SquizSuiteActions
     }//end _opensslEncrypt()
 
 
-    // TODO: Replace this with openssl_decrypt once PHP installation
-    // is upgrade to > 5.3.0
     /**
+     * Decrypt the data with the given algorithm.
      *
+     * It uses the command line openssl to perform the decryption and works
+     * the same as openssl_decrypt() function, which is only available in
+     * PHP > 5.3.0.
+     *
+     * Note: Replace it with openssl_decrypt() once PHP installation is upgraded.
+     *
+     * @param string $data      Data to decrypt.
+     * @param string $algorithm Algorithm to use for decryption.
+     * @param string $password  Password to use for decryption.
+     *
+     * @since  4.0.0
+     * @return mixed
      */
     private static function _opensslDecrypt($data, $algorithm, $password)
     {

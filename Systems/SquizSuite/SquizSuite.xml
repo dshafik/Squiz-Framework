@@ -3,7 +3,7 @@
   <plugs>
     <runner>
       <required>no</required>
-      <method>preProcessSuiteRequest</method>
+      <method>decryptAPIData</method>
       <action listen="before">API::getActionResult</action>
       <fatal>no</fatal>
       <parameters>
@@ -12,5 +12,19 @@
         <parameter>args</parameter>
       </parameters>
     </runner>
+    <modifier>
+      <required>yes</required>
+      <method>encryptAPIData</method>
+      <action>API::sendCURLAPIRequest</action>
+      <fatal>yes</fatal>
+      <modify-parameters>
+        <parameter>msg</parameter>
+      </modify-parameters>
+      <parameters>
+        <parameter>url</parameter>
+        <parameter>msg</parameter>
+        <parameter>userAgent</parameter>
+      </parameters>
+    </modifier>
   </plugs>
 </system>
