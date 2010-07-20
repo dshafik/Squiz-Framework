@@ -300,21 +300,6 @@ class SquizSuiteActions
     }//end generateKeyPair()
 
 
-    // Returns true if the request is for SquizSuite system messages.
-    public static function isSuiteRequest()
-    {
-        //'SquizSuite-Analytics/4.0 (http://squiz-analytics.net; systemidcomeshere)';
-        if (isset($_SERVER['HTTP_USER_AGENT']) === TRUE) {
-            if (strpos($_SERVER['HTTP_USER_AGENT'], self::$_userAgentPrefix) === 0) {
-                return TRUE;
-            }
-        }
-
-        return FALSE;
-
-    }//end 
-
-
     // Send SquizSuite message to the target system.
     // TODO: $data?
     public static function sendMessage($systemid, $msgType, $data=NULL)

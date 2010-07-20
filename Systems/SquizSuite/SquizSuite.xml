@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
 <system>
   <plugs>
-    <switcher>
+    <runner>
       <required>no</required>
-      <method>isSuiteRequest</method>
-      <parameters/>
-      <switch_event>SquizSuite::processMessage</switch_event>
-      <action>MySource::main</action>
+      <method>preProcessSuiteRequest</method>
+      <action listen="before">API::getActionResult</action>
       <fatal>no</fatal>
-    </switcher>
+      <parameters>
+        <parameter>system</parameter>
+        <parameter>action</parameter>
+        <parameter>args</parameter>
+      </parameters>
+    </runner>
   </plugs>
 </system>
