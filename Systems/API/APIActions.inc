@@ -81,13 +81,14 @@ class APIActions
                           );
         foreach ($requiredFields as $field) {
             if (isset($msg[$field]) === FALSE) {
-                $errMsg = '';
+                $errMsg = 'The required field '.$field.' is missing.';
                 throw new ChannelException($errMsg);
             }
         }
 
         $url = rtrim($url, '/');
         $ch  = curl_init();
+
         curl_setopt($ch, CURLOPT_URL, $url.'/'.self::$_serviceWebPath.'/');
         curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
@@ -98,11 +99,21 @@ class APIActions
             curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
         }
 
-        $result   = curl_exec($ch);
-        $curlinfo = curl_getinfo($ch);
-        curl_close($ch);
+        $success = curl_exec($ch);
+        if ($success === FALSE) {
+            $errMsg = 'cURL failed.';
+            throw new ChannelException($errMsg);
+        }
 
-        return $curlinfo;
+        // As CURLOPT_RETURNTRANSFER is set on, $success will have
+        // the result of the request.
+        $curlinfo = curl_getinfo($ch);
+        $result   = array(
+                     'result'   => $success,
+                     'curlInfo' => $curlinfo,
+                    );
+        curl_close($ch);
+        return $result;
 
     }//end sendCURLAPIRequest()
 
@@ -201,6 +212,7 @@ class APIActions
             $api['action'],
             $request['assetid']
         );
+
         if ($params === FALSE) {
             // Insufficient parameters are provided.
             self::_sendHeader(400);
@@ -534,12 +546,16 @@ class APIActions
                    'exception',
                   );
         foreach ($fields as $field) {
-            $fieldElem = $dom->createElement($field);
-            self::_addTextToNode($fieldElem, $responseContent[$field]);
-            $rspElem->appendChild($fieldElem);
+            if (array_key_exists($field, $responseContent) === TRUE) {
+                $fieldElem = $dom->createElement($field);
+                self::_addTextToNode($fieldElem, $responseContent[$field]);
+                $rspElem->appendChild($fieldElem);
+            }
         }
 
-        if (isset($responseContent['result']) === TRUE) {
+
+
+        if (array_key_exists('result', $responseContent) === TRUE) {
             $resultElem = $dom->createElement('result');
             API::buildResponseXMLDom($resultElem, $responseContent['result']);
             $rspElem->appendChild($resultElem);
@@ -579,12 +595,12 @@ class APIActions
                    'exception',
                   );
         foreach ($fields as $field) {
-            if (isset($responseContent[$field]) === TRUE) {
+            if (array_key_exists($field, $responseContent) === TRUE) {
                 $attrs[] = $field.': '.json_encode($responseContent[$field]);
             }
         }
 
-        if (isset($responseContent['result']) === TRUE) {
+        if (array_key_exists('result', $responseContent) === TRUE) {
             $attrs[] = 'result: '.API::buildResponseJSONString($responseContent['result']);
         }
 
@@ -845,7 +861,6 @@ class APIActions
     {
         $query  = DAL::getDALQuery('API', 'getAPI', 'getAssoc');
         $result = DAL::getAssoc($query);
-
         if (empty($result) === TRUE) {
             return FALSE;
         }
