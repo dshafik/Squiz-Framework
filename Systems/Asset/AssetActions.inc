@@ -110,6 +110,10 @@ class AssetActions
      */
     public static function exists($assetid)
     {
+        if ($assetid === NULL) {
+            return FALSE;
+        }
+
         $id = (int) DAL::executeOne('Asset', 'assetExists');
         if ($id === (int) $assetid) {
             return TRUE;
