@@ -269,15 +269,15 @@ class SquizSuiteActions
         $userAgentStr    = self::$_userAgentPrefix.$currProductInfo['type'].'/4.0';
         Channels::includeSystem('API');
         self::_logSentMessage($systemid, $msgType);
-        $curlinfo = API::sendCURLAPIRequest(
+        $result = API::sendCURLAPIRequest(
             $productInfo['connection']['url'],
             $msg,
             $userAgentStr
         );
 
-        if ($curlinfo['http_code'] !== 200) {
-            $errMsg  = 'HTTP Response '.$curlinfo['http_code']."\n";
-            $errMsg .= var_export($curlinfo, 1)."\n";
+        if ($result['curlInfo']['http_code'] !== 200) {
+            $errMsg  = 'HTTP Response '.$result['curlInfo']['http_code']."\n";
+            $errMsg .= var_export($result, 1)."\n";
             self::_logErrorMessage($errMsg);
         }
 
