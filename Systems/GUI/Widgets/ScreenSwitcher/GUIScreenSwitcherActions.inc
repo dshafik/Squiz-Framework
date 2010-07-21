@@ -128,13 +128,47 @@ class GUIScreenSwitcherActions
     {
         Channels::includeSystem('GUI');
 
-        $contents = '';
+        $contents    = '';
+        $cssIncludes = array();
+        $jsIncludes  = array();
+
         ob_start();
             GUI::printTemplate($systemName, $screenId.'.tpl');
             $contents = ob_get_contents();
         ob_end_clean();
 
-        return $contents;
+        // Get the list of dependent files we need.
+        $depFiles = GUI::getTemplateDependentFiles($systemName, $screenId.'.tpl');
+
+        // Add the web prefix to the dependent files.
+        foreach ($depFiles['css'] as &$typeFiles) {
+            foreach ($typeFiles as &$depFile) {
+                $depFile = '/__web/'.$depFile;
+            }
+
+            unset($depFile);
+        }
+
+        unset($typeFiles);
+
+        foreach ($depFiles['js'] as &$typeFiles) {
+            foreach ($typeFiles as &$depFile) {
+                $depFile = '/__web/'.$depFile;
+            }
+
+            unset($depFile);
+        }
+
+        unset($typeFiles);
+
+        $retval = array(
+                   'contents'    => $contents,
+                   'cssIncludes' => $depFiles['css'],
+                   'jsIncludes'  => $depFiles['js'],
+                   'widgets'     => $depFiles['widgets'],
+                  );
+
+        return $retval;
 
     }//end getScreenContents()
 
