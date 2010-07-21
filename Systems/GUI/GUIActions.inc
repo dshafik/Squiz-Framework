@@ -34,7 +34,15 @@ class GUIActions
      * @var   array
      * @since 4.0.0
      */
-    private static $_js = array();
+    private static $_requiredWidgets = array();
+
+    /**
+     * Array of what templates require which other templates (notably, widgets).
+     *
+     * @var   array
+     * @since 4.0.0
+     */
+    private static $_dependants = array();
 
     /**
      * The JS files to include.
@@ -81,6 +89,33 @@ class GUIActions
 
 
     /**
+     * Includes the PHP file containing the dependencies of the template.
+     *
+     * The template dependencies file contains:
+     * - the JavaScript and CSS files that are loaded in this template,
+     * - the widgets that exist in this template.
+     *
+     * The intention is to provide enough information for such files and widgets to
+     * be dynamically loaded if necessary, instead of just being hard-coded into a
+     * template.
+     *
+     * @param string $systemName Name of the system.
+     * @param string $template   The template to load.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function getTemplateDependentFiles($systemName, $template)
+    {
+        $dataPath = BaseSystem::getDataDir($systemName);
+        include $dataPath.'/Templates/'.$template.'.deps.php';
+
+        return $dependentFiles;
+
+    }//end getTemplateDependentFiles()
+
+
+    /**
      * Loads the specified template file and returns it as DOMDocument.
      *
      * @param string $filePath The template file path.
@@ -120,9 +155,25 @@ class GUIActions
      * @since  4.0.0
      * @return DOMNode
      */
-    public static function getTemplateContent($systemName, array $settings=array(), $tplFile=NULL)
-    {
+    public static function getTemplateContent(
+        $systemName,
+        array $settings=array(),
+        $tplFile=NULL
+    ) {
         Channels::includeSystem('GUI');
+
+        // Build required template key, something like 'systemName:templateName'.
+        // Default templateName's (tplFile === NULL) have the same name as the
+        // system name.
+        $templateKey = self::_getTemplateKey($systemName, $tplFile);
+
+        // JavaScript object namespace will be based on the template name, or system
+        // name if template name is not provided.
+        if ($tplFile === NULL) {
+            $jsObjName = $systemName;
+        } else {
+            $jsObjName = basename($tplFile, '.tpl');
+        }
 
         // Get the template content from the system as a string.
         if ($systemName === 'GUI') {
@@ -137,16 +188,15 @@ class GUIActions
         }
 
         // Add any JS and CSS files that this widget has.
-        $jsPath = GUI::getWidgetJSFilePath($systemName);
+        $jsPath = GUI::getTemplateJSFilePath($systemName, $tplFile);
         if ($jsPath !== NULL) {
-            GUI::addJSInclude($systemName, array($jsPath));
-            GUI::addJSInitCode($systemName, $settings['id'], $settings);
+            GUI::addJSInclude($templateKey, array($jsPath));
         }
 
         // Get the CSS path.
-        $cssPath = GUI::getWidgetCSSFilePath($systemName);
+        $cssPath = GUI::getTemplateCSSFilePath($systemName, $tplFile);
         if ($cssPath !== NULL) {
-            GUI::addCSSInclude($systemName, array($cssPath));
+            GUI::addCSSInclude($templateKey, array($cssPath));
         }
 
         $content = self::_replaceKeywords($content, $systemName, $settings);
@@ -155,8 +205,55 @@ class GUIActions
         $doc = new DOMDocument('1.0');
         $doc->loadXML($content);
 
+        // Find what widgets we have, and store them by widget type.
+        $includedWidgets = array();
+        $widgetNodes     = $doc->documentElement->getElementsByTagName('widget');
+
+        foreach ($widgetNodes as $widgetNode) {
+            $widgetId       = (string) $widgetNode->getAttribute('id');
+            $widgetName     = (string) $widgetNode->getAttribute('type');
+            $widgetName     = str_replace('/', '', $widgetName);
+            $widgetSettings = self::_getSettingsForWidget($widgetNode);
+
+            // Widgets always use the default template.
+            $widgetTemplateKey = self::_getTemplateKey($widgetName, NULL);
+
+            $thisWidget = array(
+                           'id'       => $widgetId,
+                           'type'     => $widgetName,
+                           'settings' => $widgetSettings,
+                          );
+
+            $includedWidgets[$widgetTemplateKey][] = $thisWidget;
+        }
+
+        self::$_requiredWidgets[$templateKey] = $includedWidgets;
+
         // Convert all widget tags.
         GUI::convertWidgetTags($doc->documentElement);
+
+        // Work out which templates require which.
+        self::$_dependants[$templateKey] = array();
+
+        foreach ($includedWidgets as $widgetTemplateKey => $typeWidgets) {
+            foreach ($typeWidgets as $includedWidget) {
+                $widgetId = $includedWidget['id'];
+
+                self::$_dependants[$templateKey] = array_merge(
+                    self::$_dependants[$templateKey],
+                    Util::getArrayIndex(
+                        self::$_dependants,
+                        $widgetTemplateKey,
+                        array()
+                    ),
+                    array($widgetTemplateKey)
+                );
+            }//end foreach
+        }//end foreach
+
+        self::$_dependants[$templateKey] = array_unique(
+            self::$_dependants[$templateKey]
+        );
 
         // Call prepareBake.
         call_user_func(array($systemName, 'prepareBake'), $doc->documentElement, $settings);
@@ -288,28 +385,83 @@ class GUIActions
     {
         Channels::includeSystem('GUI');
 
-        // Before converting to HTML we need to add the JS and CSS files.
-        // But first lets check if we can add them to HEAD tag.
-        $head = $html->getElementsByTagName('head');
-        if ($head->length !== 0) {
-            $head = $head->item(0);
+        // Now get the set of includes we have so far.
+        $allJsIncludes  = self::_getJSIncludes();
+        $allCssIncludes = self::_getCSSIncludes();
 
+        // Now work out exactly which ones we need for this template.
+        $templateKey = self::_getTemplateKey($systemName, $tplName);
+
+        $jsIncludes  = array(
+                        $templateKey => Util::getArrayIndex($allJsIncludes, $templateKey, array()),
+                       );
+        $cssIncludes = array(
+                        $templateKey => Util::getArrayIndex($allCssIncludes, $templateKey, array()),
+                       );
+        $widgets     = Util::getArrayIndex(self::$_requiredWidgets, $templateKey, array());
+
+        foreach (self::$_dependants[$templateKey] as $depTemplateKey) {
+            $jsIncludes[$depTemplateKey]  = array_unique(
+                Util::getArrayIndex(
+                    $allJsIncludes,
+                    $depTemplateKey,
+                    array()
+                )
+            );
+            $cssIncludes[$depTemplateKey] = array_unique(
+                Util::getArrayIndex(
+                    $allCssIncludes,
+                    $depTemplateKey,
+                    array()
+                )
+            );
+        }//end foreach
+
+        // Write out the list of dependents.
+        $saveArray = array(
+                      'js'      => $jsIncludes,
+                      'css'     => $cssIncludes,
+                      'widgets' => self::$_requiredWidgets[$templateKey],
+                     );
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
+        if (file_exists($syDataPath) === FALSE) {
+            FileSystem::mkdir($syDataPath, 0755, TRUE);
+        }
+
+        $dest = $syDataPath.'/'.$tplName.'.deps.php';
+        FileSystem::arrayToFile($saveArray, 'dependentFiles', $dest);
+
+        // Now add the dependent files to the HEAD tag, if it exists.
+        $head = $html->getElementsByTagName('head');
+
+        if ($head->length !== 0) {
             // Add the GUI systems JS files. These are required.
             $path = GUI::getSystemWebPath('GUI');
-            GUI::addJSInclude('GUI', array($path.'/GUI.js', $path.'/DfxJSLib/mysource.js'));
+            $jsIncludes['GUI'][] = $path.'/GUI.js';
+            $jsIncludes['GUI'][] = $path.'/DfxJSLib/mysource.js';
+
+            $head = $head->item(0);
 
             // Add required JS files.
-            $jsIncludes = self::_getJSIncludes();
-            foreach ($jsIncludes as $jsSysName => $sysJsIncs) {
-                $sysJsIncs = array_unique($sysJsIncs);
-                foreach ($sysJsIncs as $jsInclude) {
-                    GUI::addJS($jsSysName, $jsInclude, $head);
+            foreach ($jsIncludes as $typeIncludes) {
+                foreach ($typeIncludes as $jsInclude) {
+                    GUI::addJS(NULL, $jsInclude, $head);
+                }
+            }
+
+            $js = array();
+
+            foreach (self::$_requiredWidgets[$templateKey] as $typeWidgets) {
+                foreach ($typeWidgets as $widget) {
+                    $js[] = GUI::getJSInitCode($widget['type'], $widget['id'], $widget['settings']);
                 }
             }
 
             // Create the script tag that contains JS init codes.
             $jsElem = $head->ownerDocument->createElement('script');
-            $js     = implode("\n", self::$_js);
+            $js     = implode("\n", $js);
 
             // All these needs to be wrapped with onLoad.
             $js = "dfx.addLoadEvent(function() {\n\t".$js."\n});";
@@ -318,11 +470,9 @@ class GUIActions
             $head->appendChild($jsElem);
 
             // Now get the CSS.
-            $cssIncludes = self::_getCSSIncludes();
-            foreach ($cssIncludes as $cssSysName => $sysCssIncs) {
-                $sysCssIncs = array_unique($sysCssIncs);
-                foreach ($sysCssIncs as $cssInclude) {
-                    GUI::addCSS($cssSysName, $cssInclude, $head);
+            foreach ($cssIncludes as $typeIncludes) {
+                foreach ($typeIncludes as $cssInclude) {
+                    GUI::addCSS(NULL, $cssInclude, $head);
                 }
             }
         }//end if
@@ -340,12 +490,6 @@ class GUIActions
         $htmlCont = str_replace('?&gt;', '?'.'>', $htmlCont);
 
         // Write to data file.
-        include_once 'Libs/FileSystem/FileSystem.inc';
-        $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
-        if (file_exists($syDataPath) === FALSE) {
-            FileSystem::mkdir($syDataPath, 0755, TRUE);
-        }
-
         $dest = $syDataPath.'/'.$tplName.'.php';
         file_put_contents($dest, $htmlCont);
 
@@ -528,17 +672,27 @@ class GUIActions
 
 
     /**
-     * Returns the widget's JS file path.
+     * Returns a template's associated JS file path.
      *
-     * @param string $widgetType Type of the widget.
+     * For compiling widgets, the template file will be NULL. In that case, we will
+     * use the same name as the system.
+     *
+     * @param string $systemName System name from which the template is drawn.
+     * @param string $tplFile    Name of the template file.
      *
      * @since  4.0.0
      * @return string
      */
-    public static function getWidgetJSFilePath($widgetType)
+    public static function getTemplateJSFilePath($systemName, $tplFile=NULL)
     {
-        $path  = GUI::getSystemWebPath($widgetType);
-        $path .= '/'.$widgetType.'.js';
+        if ($tplFile === NULL) {
+            $tplFile = $systemName;
+        } else {
+            $tplFile = basename($tplFile, '.tpl');
+        }
+
+        $path  = GUI::getSystemWebPath($systemName);
+        $path .= '/'.$tplFile.'.js';
 
         $fullPath = dirname(Channels::getSystemsPath()).'/'.$path;
 
@@ -548,21 +702,31 @@ class GUIActions
 
         return NULL;
 
-    }//end getWidgetJSFilePath()
+    }//end getTemplateJSFilePath()
 
 
     /**
-     * Returns the widget's CSS file path.
+     * Returns a template's associated CSS file path.
      *
-     * @param string $widgetType Type of the widget.
+     * For compiling widgets, the template file will be NULL. In that case, we will
+     * use the same name as the system.
+     *
+     * @param string $systemName System name from which the template is drawn.
+     * @param string $tplFile    Name of the template file.
      *
      * @since  4.0.0
      * @return string
      */
-    public static function getWidgetCSSFilePath($widgetType)
+    public static function getTemplateCSSFilePath($systemName, $tplFile=NULL)
     {
-        $path  = GUI::getSystemWebPath($widgetType);
-        $path .= '/'.$widgetType.'.css';
+        if ($tplFile === NULL) {
+            $tplFile = $systemName;
+        } else {
+            $tplFile = basename($tplFile, '.tpl');
+        }
+
+        $path  = GUI::getSystemWebPath($systemName);
+        $path .= '/'.$tplFile.'.css';
 
         $fullPath = dirname(Channels::getSystemsPath()).'/'.$path;
 
@@ -572,28 +736,29 @@ class GUIActions
 
         return NULL;
 
-    }//end getWidgetCSSFilePath()
+    }//end getTemplateCSSFilePath()
 
 
     /**
-     * Adds JS initialisation code.
+     * Returns JS initialisation code to be included into a template.
      *
      * This is used to initialiase the JS Widget objects. These objects can be
      * retrieved by calling GUI.getWidget(id).
      *
      * @param string $systemName Name of the system.
      * @param string $id         Unique ID of the widget object.
+     * @param string $settings   Settings array of the widget object.
      *
      * @since  4.0.0
-     * @return void
+     * @return string
      */
-    public static function addJSInitCode($systemName, $id, array $settings=array())
+    public static function getJSInitCode($systemName, $id, array $settings=array())
     {
         $code = 'GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'));';
 
-        self::$_js[$id] = $code;
+        return $code;
 
-    }//end addJSInitCode()
+    }//end getJSInitCode()
 
 
     /**
@@ -820,6 +985,28 @@ class GUIActions
         exit;
 
     }//end serveWebFile()
+
+
+    /**
+     * Build a template key from the system name and template file.
+     *
+     * @param string $systemName The name of the system.
+     * @param string $tplFile    Filename of the template.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _getTemplateKey($systemName, $tplFile=NULL)
+    {
+        if ($tplFile === NULL) {
+            $tplFile = $systemName;
+        } else {
+            $tplFile = basename($tplFile, '.tpl');
+        }
+
+        return $systemName.':'.$tplFile;
+
+    }//end _getTemplateKey()
 
 
 }//end class
