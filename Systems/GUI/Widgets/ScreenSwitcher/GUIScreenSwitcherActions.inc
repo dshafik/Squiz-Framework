@@ -37,19 +37,12 @@ class GUIScreenSwitcherActions
         $content .= '<div class="%class%-left">';
         $content .= '</div>';
 
-        $firstScreen = TRUE;
         foreach ($settings['screens'] as $screen) {
             $screenid = $settings['id'].'-'.$screen['id'];
             if (strtolower($screen['disabled']) === 'true') {
                 $content .= '<div id="'.$screenid.'" class="%class%-button disabled">';
             } else {
-                // Enable the first screen by default.
-                if ($firstScreen === TRUE) {
-                    $content .= '<div id="'.$screenid.'" class="%class%-button selected">';
-                    $firstScreen === FALSE;
-                } else {
-                    $content .= '<div id="'.$screenid.'" class="%class%-button inactive">';
-                }//end if first screen
+                $content .= '<div id="'.$screenid.'" class="%class%-button inactive">';
             }//end if screen disabled
 
             // Work out the name of the template and web icon we expect from the

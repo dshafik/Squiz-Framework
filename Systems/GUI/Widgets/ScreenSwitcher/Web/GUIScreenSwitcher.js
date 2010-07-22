@@ -30,19 +30,45 @@ GUIScreenSwitcher.prototype = {
     init: function()
     {
         var self = this;
+
         dfx.foreach(this.settings.screens, function(idx) {
             var screenid = self.id + '-' + self.settings.screens[idx].id;
             dfx.addEvent(dfx.getId(screenid), 'click', function(evt) {
                 if (self.currScreen.id !== self.settings.screens[idx].id) {
                     if (self.settings.screens[idx].disabled !== 'true') {
+                        var oldScreenid = self.id + '-' + self.currScreen.id;
+
                         self.currScreen = {
                             system: self.settings.screens[idx].system,
                             id: self.settings.screens[idx].id,
                         },
+
+                        dfx.addClass(dfx.getId(oldScreenid), 'inactive');
+                        dfx.removeClass(dfx.getId(oldScreenid), 'selected');
+
+                        dfx.addClass(dfx.getId(screenid), 'selected');
+                        dfx.removeClass(dfx.getId(screenid), 'inactive');
+
                         self.loadScreen(
                             self.settings.screens[idx].system,
                             self.settings.screens[idx].id
                         );
+                    }
+                }
+            });
+
+            dfx.addEvent(dfx.getId(screenid), 'mouseover', function(evt) {
+                if (self.currScreen.id !== self.settings.screens[idx].id) {
+                    if (self.settings.screens[idx].disabled !== 'true') {
+                        dfx.addClass(this, 'hover');
+                    }
+                }
+            });
+
+            dfx.addEvent(dfx.getId(screenid), 'mouseout', function(evt) {
+                if (self.currScreen.id !== self.settings.screens[idx].id) {
+                    if (self.settings.screens[idx].disabled !== 'true') {
+                        dfx.removeClass(this, 'hover');
                     }
                 }
             });

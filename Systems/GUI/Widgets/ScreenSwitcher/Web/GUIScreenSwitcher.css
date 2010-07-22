@@ -71,8 +71,7 @@
     text-align: center;
 }
 
-.GUIScreenSwitcher-button.selected .GUIScreenSwitcher-text,
-.GUIScreenSwitcher-button.inactive.hover .GUIScreenSwitcher-text {
+.GUIScreenSwitcher-button.selected .GUIScreenSwitcher-text {
     font-weight: bold;
 }
 
