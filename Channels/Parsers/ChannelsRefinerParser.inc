@@ -131,7 +131,7 @@ class ChannelsRefinerParser extends ChannelsPlugParser
                  'required' => TRUE,
                  'method'   => TRUE,
                  'action'   => TRUE,
-                 'fatal'    => TRUE,
+                 'fatal'    => FALSE,
                  'gatherer' => FALSE,
                 );
 

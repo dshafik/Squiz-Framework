@@ -221,7 +221,7 @@ class ChannelsSwitcherParser extends ChannelsPlugParser
                  'method'       => TRUE,
                  'switch_event' => TRUE,
                  'action'       => TRUE,
-                 'fatal'        => TRUE,
+                 'fatal'        => FALSE,
                  'gatherer'     => FALSE,
                 );
 

@@ -118,7 +118,7 @@ class ChannelsGathererParser extends ChannelsPlugParser
                  'required' => TRUE,
                  'method'   => TRUE,
                  'field'    => TRUE,
-                 'fatal'    => TRUE,
+                 'fatal'    => FALSE,
                 );
 
         return $elms;

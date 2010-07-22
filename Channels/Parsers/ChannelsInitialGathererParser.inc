@@ -151,7 +151,7 @@ class ChannelsInitialGathererParser extends ChannelsPlugParser
                  'required' => TRUE,
                  'default'  => TRUE,
                  'field'    => TRUE,
-                 'fatal'    => TRUE,
+                 'fatal'    => FALSE,
                  'action'   => TRUE,
                 );
 

@@ -772,10 +772,14 @@ class ChannelsPlugParser
     {
         $fatalValue = NULL;
         $fatalTags  = $plug->getElementsByTagName('fatal');
-        $fatalValue = $fatalTags->item(0)->nodeValue;
-        if ($fatalValue !== 'no' && $fatalValue !== 'yes') {
-            $msg = 'Invalid value for "fatal" tag. Found: '.$fatalValue;
-            throw new Exception($msg);
+        if ($fatalTags->length > 0) {
+            $fatalValue = $fatalTags->item(0)->nodeValue;
+            if ($fatalValue !== 'no' && $fatalValue !== 'yes') {
+                $msg = 'Invalid value for "fatal" tag. Found: '.$fatalValue;
+                throw new Exception($msg);
+            }
+        } else {
+            $fatalValue = 'no';
         }
 
         return $fatalValue;
