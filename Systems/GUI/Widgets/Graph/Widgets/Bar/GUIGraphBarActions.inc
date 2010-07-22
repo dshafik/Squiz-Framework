@@ -52,15 +52,7 @@ class GUIGraphBarActions
      * @var   integer
      * @since 4.0.0
      */
-    private static $_xAxisHeight = 18;
-
-    /**
-     * Height of an empty X-axis.
-     *
-     * @var   integer
-     * @since 4.0.0
-     */
-    private static $_xAxisEmptyHeight = 3;
+    private static $_xAxisHeight = 15;
 
     /**
      * Height of spacing between flags.
@@ -260,6 +252,30 @@ class GUIGraphBarActions
         $class
     ) {
         /*
+            Calculate the total amount of space we need below (and including)
+            the X-axis:
+            - Certain number of pixels for the X-axis legend, if one is required.
+            - Certain number of pixels for each flag - either whatever was specified
+              in the settings, or the default.
+            - 2 pixels above each flag.
+
+            Note that the X-axis line, being a border, is not counted as part of the
+            box model and therefore doesn't count.
+        */
+
+        $belowAxisHeight = 0;
+
+        foreach ($flags as $flagIndex => $flag) {
+            $flags[$flagIndex]['height'] = (int) Util::getArrayIndex(
+                $flag,
+                'height',
+                self::$_defaultFlagHeight
+            );
+
+            $belowAxisHeight += ($flags[$flagIndex]['height'] + self::$_flagSpacing);
+        }//end foreach
+
+        /*
             Calculate the maximum bar total overall, and the maximum bar total
             that contains a label.
             This is so we can adjust the size of the bars to fit labels on tall
@@ -296,33 +312,26 @@ class GUIGraphBarActions
             }
         }//end foreach
 
-        // Allow room for the flags at the bottom of the screen.
-        $flagHeight = 0;
-
-        foreach ($flags as $flagIndex => $flag) {
-            $flags[$flagIndex]['height'] = (int) Util::getArrayIndex(
-                $flag,
-                'height',
-                self::$_defaultFlagHeight
-            );
-
-            $flagHeight += ($flags[$flagIndex]['height'] + self::$_flagSpacing);
+        if ($hasXAxis === TRUE) {
+            $belowAxisHeight += (self::$_xAxisHeight + 1);
         }
 
-        $heightDiff = 0;
+        $maxBarHeight = ($height - $belowAxisHeight);
 
         // If we could not have a label on our tallest stacks without stretching the
         // graph, shrink the stacks until we can.
         if (($maxValueWithLabel !== NULL) && ($maxValue > 0)) {
             $labelPct   = ($maxValueWithLabel / $maxValue);
-            $maxHeight  = ($labelPct * ($height - $flagHeight));
-            $maxHeight += self::$_topLabelHeight;
-            $maxHeight  = ceil($maxHeight);
+            $barHeight  = ($labelPct * $maxBarHeight);
+            $barHeight += self::$_topLabelHeight;
+            $barHeight  = ceil($barHeight);
 
-            if ($maxHeight > ($height - $flagHeight)) {
-                $heightDiff = ($maxHeight - ($height - $flagHeight));
+            // If the projected bar height is too high, shrink the maximum so it
+            // will fit.
+            if ($barHeight > $maxBarHeight) {
+                $maxBarHeight -= ($barHeight - $maxBarHeight);
             }
-        }
+        }//end if
 
         // Now paint it.
         $rowNumber = 0;
@@ -330,17 +339,9 @@ class GUIGraphBarActions
             $rowNumber++;
 
             // Calculate how high our bar is allowed to be in total.
-            $rowTotal     = array_sum($dataRow['data']);
-            $maxBarHeight = ($height - $flagHeight - $heightDiff);
-            $totalHeight  = floor(($rowTotal / $maxValue * $maxBarHeight));
-
-            if ($hasXAxis === TRUE) {
-                $totalHeight -= self::$_xAxisHeight;
-            } else {
-                $totalHeight -= self::$_xAxisEmptyHeight;
-            }
-
-            $barHeight = $totalHeight;
+            $rowTotal    = array_sum($dataRow['data']);
+            $barHeight   = round(($rowTotal / $maxValue * $maxBarHeight));
+            $totalHeight = ($barHeight + $belowAxisHeight);
 
             // Make room for a label.
             if (array_key_exists('label', $dataRow) === TRUE) {
@@ -365,7 +366,7 @@ class GUIGraphBarActions
             echo '" style="width: ';
             echo number_format((100 / count($data)), 3);
             echo '%; height: ';
-            echo $barHeight;
+            echo $totalHeight;
             echo 'px">';
 
             // Do we have a label for this data row?
@@ -390,7 +391,7 @@ class GUIGraphBarActions
             echo 'Data';
             echo '</li>';
 
-            echo '<ul style="display: block">';
+            echo '<ul style="display: block;">';
 
             // Start stacking the graph up.
             foreach ($dataRow['data'] as $groupIndex => $dataPoint) {
@@ -399,8 +400,27 @@ class GUIGraphBarActions
                 $pointTitle  = $groups[$groupIndex]['name'];
                 $pointTitle .= ': '.$dataPoint.$groupUnits;
 
-                $oldHeight  = $cumHeight;
-                $cumHeight += ($dataPoint / $rowTotal * $totalHeight);
+                $oldHeight = $cumHeight;
+                if ($rowTotal > 0) {
+                    $cumHeight += ($dataPoint / $rowTotal * $barHeight);
+                }
+
+                $dataPointHeight = (round($cumHeight) - round($oldHeight));
+
+                // If the first point, one pixel is taken up by the border, which
+                // isn't counted as part of the height in the box model.
+                if ($oldHeight === 0) {
+                    if ($dataPointHeight > 0) {
+                        $dataPointHeight--;
+                    }
+                }
+
+                // But if this made the height negative, offset the cumulative
+                // height by this amount and make the data point zero pixels high.
+                if ($dataPointHeight < 0) {
+                    $cumHeight      += $dataPointHeight;
+                    $dataPointHeight = 0;
+                }
 
                 ob_start();
                     echo '<li class="'.$class.'-data-point';
@@ -408,7 +428,7 @@ class GUIGraphBarActions
                     echo ' '.$class.'-bar-style-'.$groups[$groupIndex]['style'];
                     echo '" title="'.$pointTitle.'"';
                     echo ' style="height: ';
-                    echo (round($cumHeight) - round($oldHeight)).'px">';
+                    echo $dataPointHeight.'px">';
                     echo '<span class="'.$class.'-data-point-alt-text">';
                     echo $pointTitle;
                     echo '</span>';
