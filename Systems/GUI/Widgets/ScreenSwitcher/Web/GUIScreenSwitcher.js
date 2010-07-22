@@ -43,11 +43,13 @@ GUIScreenSwitcher.prototype = {
                             id: self.settings.screens[idx].id,
                         },
 
+                        dfx.removeClass(dfx.getId(oldScreenid), 'hover');
                         dfx.addClass(dfx.getId(oldScreenid), 'inactive');
                         dfx.removeClass(dfx.getId(oldScreenid), 'selected');
 
-                        dfx.addClass(dfx.getId(screenid), 'selected');
-                        dfx.removeClass(dfx.getId(screenid), 'inactive');
+                        dfx.addClass(this, 'selected');
+                        dfx.removeClass(this, 'inactive');
+                        dfx.removeClass(this, 'hover');
 
                         self.loadScreen(
                             self.settings.screens[idx].system,
