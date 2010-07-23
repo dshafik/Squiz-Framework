@@ -44,7 +44,7 @@ class GUITableActions
                 $colClass = 'last';
             }
 
-            $content .= '<th align="'.$column['align'].'" class="%class%-'.$colClass.'col">&lt;?php echo _(\''.$column['name'].'\'); ?&gt;</th>';
+            $content .= '<th align="'.$column['align'].'" class="%class%-'.$colClass.'col">&lt;?php echo _('.var_export($column['name'], TRUE).'); ?&gt;</th>';
         }
 
         $content .= '</tr>';
