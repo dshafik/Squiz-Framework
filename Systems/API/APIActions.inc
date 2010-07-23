@@ -134,36 +134,27 @@ class APIActions
         Channels::includeSystem('User');
         $userid = User::getCurrentUserid();
         if ($userid !== NULL) {
-            Channels::includeSystem('Session');
             include_once 'Libs/Security/Security.inc';
-            $apiToken    = Security::getRequestData('_api_token', NULL, TRUE);
-            $returnToken = FALSE;
+            $apiToken = Security::getRequestData('_api_token', NULL, TRUE);
             if ($apiToken === NULL) {
-                // Token is not submitted with the API call.
-                // Just return the new token.
-                $returnToken = TRUE;
-            } else {
-                $currToken = Session::getSessionData('API', 'user:'.$userid);
-                if ($apiToken !== $currToken) {
-                    // Token mis-matched. Let's return a new token.
-                    $returnToken = TRUE;
-                } else {
-                    // The current token is good. Now generate the new one
-                    // for the next request.
-                    $newToken = API::getUniqueToken();
-                    Session::setSessionData('API', 'user:'.$userid, $newToken);
-                    $responseContent['next_token'] = $newToken;
-                }
-            }
-
-            if ($returnToken === TRUE) {
-                $newToken = API::getUniqueToken();
-                Session::setSessionData('API', 'user:'.$userid, $newToken);
-
-                self::_sendHeader(200);
-                self::_sendResponse(array('new_token' => $newToken));
+                // Logged in user didn't submit the API token.
+                // Invalid.
+                self::_sendHeader(503);
+                self::_sendResponse(array('error' => 'Invalid token'));
                 exit;
             }
+
+            $userTokens = Session::getSessionData('API', 'userToken:'.$userid);
+            if ($userTokens === NULL) {
+                // What is this token?
+                self::_sendHeader(503);
+                self::_sendResponse(array('error' => 'Invalid token'));
+                exit;
+            } else if ($userTokens !== $apiToken) {
+                self::_sendHeader(503);
+                self::_sendResponse(array('error' => 'Invalid token'));
+                exit;
+            }//end if
         }//end if
 
         // Only support GET and POST method.
@@ -942,7 +933,9 @@ class APIActions
      */
     public static function getUniqueToken()
     {
-        $token = sha1(microtime(TRUE));
+        $prefix      = '';
+        $moreEntropy = TRUE;
+        $token = sha1(uniqid($prefix, $moreEntropy));
         return $token;
 
     }//end getUniqueToken()
