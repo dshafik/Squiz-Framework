@@ -119,14 +119,21 @@ class GUIGraphBarActions
 
         $groups = $settings['groups'];
         foreach ($groups as $groupIndex => &$groupData) {
+            $groupData['units'] = (string) Util::getArrayIndex(
+                $groupData,
+                'units',
+                ''
+            );
+
             if (array_key_exists('colour', $groupData) === TRUE) {
-                $groupData['style'] = Util::getArrayIndex(
+                $groupData['style'] = (string) Util::getArrayIndex(
                     $groupData,
                     'style',
                     'diagonal'
                 );
 
-                $groupKey = $groupData['colour'].','.$groupData['style'];
+                $groupKey  = (string) $groupData['colour'];
+                $groupKey .= ','.$groupData['style'];
 
                 if (array_key_exists($groupKey, $usedStyles) === FALSE) {
                     $usedStyles[$groupKey] = 0;
@@ -165,8 +172,8 @@ class GUIGraphBarActions
                         count($fixedStyles));
                     $fixedIndex++;
 
-                    $thisColour = $fixedColours[$colourIndex];
-                    $thisStyle  = $fixedStyles[$styleIndex];
+                    $thisColour = (string) $fixedColours[$colourIndex];
+                    $thisStyle  = (string) $fixedStyles[$styleIndex];
                     $groupKey   = $thisColour.','.$thisStyle;
 
                     // Do we still have a manually-set combination to match?
@@ -193,9 +200,14 @@ class GUIGraphBarActions
         unset($groupData);
 
         $flags = Util::getArrayIndex($settings, 'flags', array());
+        $max   = Util::getArrayIndex($settings, 'max', NULL);
+        $tick  = array(
+                  'major' => Util::getArrayIndex($settings, 'majorTick', NULL),
+                  'minor' => Util::getArrayIndex($settings, 'minorTick', NULL),
+                 );
 
         $content  = '<div id="%id%" class="%class%">';
-        $content .= '<ul class="%class%-outer-list" style="height: ';
+        $content .= '<div class="%class%-outer-list" style="height: ';
         $content .= $graphHeight.'px;">';
         $content .= '<?php ';
         $content .= 'Channels::includeSystem(\'GUIGraphBar\');';
@@ -203,12 +215,15 @@ class GUIGraphBarActions
         $content .= '$groups = '.var_export($groups, TRUE).'; ';
         $content .= '$flags  = '.var_export($flags, TRUE).'; ';
         $content .= '$data   = '.$settings['dataProvider'].'(); ';
+        $content .= '$max    = '.var_export($max, TRUE).'; ';
+        $content .= '$tick   = '.var_export($tick, TRUE).'; ';
         $content .= '$height = '.$graphHeight.'; ';
-        $content .= 'GUIGraphBar::paintGraph($data, $groups, $flags, $height,';
+        $content .= 'GUIGraphBar::paintGraph($data, $groups, $flags, $height, $max, $tick, ';
         $content .= ' \'%id%\', \'%class%\'); ';
         $content .= '?>';
-        $content .= '</ul>';
         $content .= '</div>';
+        $content .= '</div>';
+
         return $content;
 
     }//end getTemplateContent()
@@ -248,6 +263,8 @@ class GUIGraphBarActions
         array $groups,
         array $flags,
         $height,
+        $max,
+        $tick,
         $id,
         $class
     ) {
@@ -301,7 +318,7 @@ class GUIGraphBarActions
                 }
             }//end if
 
-            $maxValue = max($maxValue, $rowTotal);
+            $maxValue = max($maxValue, $max, $rowTotal);
             $data[$dataIndex] = $dataRow;
 
             // Do we need to print an x-axis?
@@ -311,6 +328,32 @@ class GUIGraphBarActions
                 }
             }
         }//end foreach
+
+        if ($tick['major'] !== NULL) {
+            if ($tick['major'] === 'auto') {
+                if ($tick['minor'] !== NULL) {
+                    $tickAmounts = ceil($maxValue / $tick['minor']);
+                    $tickAmounts = max(2, round($tickAmounts / 5));
+                    $tick['major'] = $tick['minor'] * $tickAmounts;
+                } else {
+                    // Auto tick!
+                    $tickExp = pow(10, floor(log($maxValue, 10)));
+                    $maxExp = $maxValue / $tickExp;
+                    if ($maxExp > 6) {
+                        $tickExp *= 2;
+                    } else if ($maxExp <= 3) {
+                        $tickExp *= 0.5;
+                    }
+                    $tick['major'] = $tickExp;
+
+                    if ($tick['minor'] === NULL) {
+                        $tick['minor'] = $tick['major'] / 2;
+                    }
+                }
+            }
+
+            $maxValue = ceil($maxValue / $tick['major']) * $tick['major'];
+        }
 
         if ($hasXAxis === TRUE) {
             $belowAxisHeight += (self::$_xAxisHeight + 1);
@@ -334,6 +377,17 @@ class GUIGraphBarActions
         }//end if
 
         // Now paint it.
+        if ($tick['minor'] !== NULL) {
+            $listRight = '2.5%';
+            $listWidth = '95%';
+        } else {
+            $listRight = 0;
+            $listWidth = '100%';
+        }
+        echo '<ul class="'.$class.'-inner-list" style="position: absolute; ';
+        echo 'display: block; width: '.$listWidth.'; top: 0; right: '.$listRight.';';
+        echo ' height: '.$graphHeight.'px; vertical-align: bottom; z-index: 2">';
+
         $rowNumber = 0;
         foreach ($data as $dataRow) {
             $rowNumber++;
@@ -365,7 +419,11 @@ class GUIGraphBarActions
 
             echo '" style="width: ';
             echo number_format((100 / count($data)), 3);
-            echo '%; height: ';
+            echo '%; left: ';
+            echo number_format((100 / count($data) * ($rowNumber - 1)), 3);
+            echo '%; top: ';
+            echo ($height - $totalHeight);
+            echo 'px; height: ';
             echo $totalHeight;
             echo 'px">';
 
@@ -395,7 +453,11 @@ class GUIGraphBarActions
 
             // Start stacking the graph up.
             foreach ($dataRow['data'] as $groupIndex => $dataPoint) {
-                $groupUnits = Util::getArrayIndex($groups[$groupIndex], 'units', '');
+                $groupUnits = (string) Util::getArrayIndex(
+                    $groups[$groupIndex],
+                    'units',
+                    ''
+                );
 
                 $pointTitle  = $groups[$groupIndex]['name'];
                 $pointTitle .= ': '.$dataPoint.$groupUnits;
@@ -558,6 +620,41 @@ class GUIGraphBarActions
 
             echo '</ul>';
         }//end foreach
+
+        echo '</ul>';
+
+        // Draw the ticks.
+        if ($tick['major'] !== NULL) {
+            echo '<div style="z-index: 1; display: block; position: absolute; top: 0;';
+            echo 'right: 0; width: 100%; height: 100%;">';
+
+            if ($tick['minor'] !== NULL) {
+                for ($i = $maxValue; $i > 0; $i -= $tick['minor']) {
+                    echo '<div style="border-top: 1px solid #ddd; height: 0; top: ';
+                    echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
+                    echo 'px; width: 100%; position: absolute;"></div>';
+                }
+            }
+
+            for ($i = $maxValue; $i > 0; $i -= $tick['major']) {
+                echo '<div style="border-top: 1px solid #bbb; height: 0; top: ';
+                echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
+                echo 'px; width: 100%; position: absolute;"></div>';
+
+                echo '<div style="color: #bbb; left: 0; top: ';
+                echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
+                echo 'px; position: absolute;">'.$i.'</div>';
+
+                echo '<div style="color: #bbb; right: 0; top: ';
+                echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
+                echo 'px; position: absolute;">'.$i.'</div>';
+            }
+
+            echo '<div style="border-top: 1px solid #bbb; height: 0; top: ';
+            echo $maxBarHeight.'px; width: 100%; position: absolute;"></div>';
+
+            echo '</div>';
+        }
 
     }//end paintGraph()
 
