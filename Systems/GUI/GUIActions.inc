@@ -482,6 +482,28 @@ class GUIActions
         $htmlCont = $html->ownerDocument->saveXML();
         $htmlCont = XML::xmlToXHTML($htmlCont);
 
+        // If <head> element exists, insert API token hidden input field
+        // for the interface to work.
+        if ($head->length !== 0) {
+            $replacement  = '<?php '."\n";
+            $replacement .= 'Channels::includeSystem(\'User\');'."\n";
+            $replacement .= 'Channels::includeSystem(\'API\');'."\n";
+            $replacement .= '$currUserid = User::getCurrentUserid();'."\n";
+            $replacement .= 'if ($currUserid !== NULL) {'."\n";
+            $replacement .= '   Channels::includeSystem(\'Session\');'."\n";
+            $replacement .= '   $currToken = Session::getSessionData(\'API\', \'userToken:\'.$currUserid);'."\n";
+            $replacement .= '   if ($currToken === NULL) {'."\n";
+            $replacement .= '       $currToken = API::getUniqueToken();'."\n";
+            $replacement .= '       Session::setSessionData(\'API\', \'userToken:\'.$currUserid, $currToken);'."\n";
+            $replacement .= '   }'."\n";
+            $replacement .= '   echo \'<input id="__api_token" type="hidden" value="\'.$currToken.\'" />\';'."\n";
+            $replacement .= '}'."\n";
+            $replacement .= '?'.'>'."\n";
+            $replacement .= '</body>'."\n";
+
+            $htmlCont = str_replace('</body>', $replacement, $htmlCont);
+        }//end if
+
         // Do some cleanup.
         $htmlCont = str_replace(self::$_docType, '', $htmlCont);
         $htmlCont = trim(str_replace('<?xml version="1.0"?>', '', $htmlCont));
