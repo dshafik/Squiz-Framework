@@ -66,8 +66,13 @@ sfapi.get = function(system, action, params, callback) {
 
     // Form URL to send the request.
     var src = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix + '/' + sfapi.outputDataFormat;
-    src    += '/' + system + '/' + action;;
-    src    += '?_callback=sfapi._getCallback&_api_token=' + sfapi._api_token;
+    src    += '/' + system + '/' + action;
+    src    += '?_callback=sfapi._getCallback';
+
+    var token = document.getElementById('__api_token');
+    if (token) {
+        src += '&_api_token=' + token.value;
+    }
 
     if (params) {
         for (var id in params) {
@@ -78,16 +83,9 @@ sfapi.get = function(system, action, params, callback) {
     }
 
     sfapi._getCallback = function(data) {
-        if (data.new_token) {
-            // NULL token must been submitted.
-            sfapi._api_token = data.new_token;
-            sfapi.get(system, action, params, callback);
+        if (data.error) {
+            alert('Invalid token');
         } else {
-            if (data.next_token) {
-                // A new token for the next request came.
-                sfapi._api_token = data.next_token;
-            }
-
             if (callback) {
                 callback.call(null, data);
             }
