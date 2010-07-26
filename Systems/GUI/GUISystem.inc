@@ -39,19 +39,56 @@ class GUISystem extends BaseSystem
     /**
      * Bakes all the templates in the Systems dir.
      *
+     * @param boolean $minified If TRUE then JS and CSS will be minified.
+     *
      * @since  4.0.0
      * @return void
      */
-    public function bakeTemplates()
+    public function bakeTemplates($minified=FALSE)
     {
+        Channels::includeSystem('GUI');
         include_once 'Libs/FileSystem/FileSystem.inc';
-        $path = BaseSystem::getSystemRootPath().'/Systems';
+        $root = BaseSystem::getSystemRootPath();
+        $path = $root.'/Systems';
 
         // Get the tpl files.
         $templateDirs = FileSystem::findDirectories($path, 'Templates');
 
         if (empty($templateDirs) === TRUE) {
             return;
+        }
+
+        // Get All JS and CSS files in the system.
+        $jsFiles  = FileSystem::listDirectory($path, array('.js'));
+        $cssFiles = FileSystem::listDirectory($path, array('.css'));
+
+        $ignoreJSFiles = array('SquizAPI_demo.js');
+
+        // Convert them to URLs.
+        foreach ($jsFiles as $index => $file) {
+            if (strpos($file, 'DfxJSLib') !== FALSE
+                || in_array(basename($file), $ignoreJSFiles) === TRUE
+            ) {
+                unset($jsFiles[$index]);
+            } else {
+                $url = str_replace($root, '', $file);
+                $jsFiles[$index] = $url;
+            }
+        }
+
+        $guiPath = GUI::getSystemWebPath('GUI');
+        array_unshift($jsFiles, $guiPath.'/DfxJSLib/mysource.js');
+        $url        = str_replace($root, '', $guiPath.'/DfxJSLib/mysource.js');
+        $jsFiles[0] = '/'.$url;
+
+        foreach ($cssFiles as $index => $file) {
+            $url = str_replace($root, '', $file);
+            $cssFiles[$index] = $url;
+        }
+
+        if ($minified === FALSE) {
+            GUI::setJSIncludes($jsFiles);
+            GUI::setCSSIncludes($cssFiles);
         }
 
         foreach ($templateDirs as $tplDir) {
@@ -61,7 +98,6 @@ class GUISystem extends BaseSystem
             $syOvenPath = NULL;
             $bakeDest   = NULL;
 
-            Channels::includeSystem('GUI');
             foreach ($tplFiles as $file) {
                 // Get the system name for the template.
                 if ($systemName === NULL) {
@@ -75,8 +111,6 @@ class GUISystem extends BaseSystem
                 }
             }
         }//end foreach
-
-        GUI::copyWebFiles();
 
     }//end bakeTemplates()
 

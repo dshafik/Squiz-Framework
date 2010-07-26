@@ -68,6 +68,22 @@ class GUIActions
      */
     private static $_publicDirName = 'Web';
 
+    /**
+     * List if systems and their settings that needs to do post bake processing.
+     *
+     * @var   array
+     * @since 4.0.0
+     */
+    private static $_postBakeProcessors = array();
+
+    /**
+     * List of widgets to initialise in main template.
+     *
+     * @var   array
+     * @since 4.0.0
+     */
+    private static $_tmpWidgetList = array();
+
 
     /**
      * Includes the template PHP file.
@@ -82,6 +98,22 @@ class GUIActions
     {
         $dataPath = BaseSystem::getDataDir($systemName);
         $dest     = $dataPath.'/Templates/'.$template.'.php';
+
+        if (file_exists($dest) === FALSE) {
+            echo 'ERROR: Template ('.$template.') file not found. ('.$dest.')';
+            return;
+        }
+
+        $deps = GUI::getTemplateDependentFiles($systemName, $template);
+
+        foreach ($deps['widgets'] as $widgets) {
+            foreach ($widgets as $widget) {
+                self::$_tmpWidgetList[$widget['id']] = array(
+                                                        'type'     => $widget['type'],
+                                                        'settings' => $widget['settings'],
+                                                       );
+            }
+        }
 
         include_once $dest;
 
@@ -108,7 +140,12 @@ class GUIActions
     public static function getTemplateDependentFiles($systemName, $template)
     {
         $dataPath = BaseSystem::getDataDir($systemName);
-        include $dataPath.'/Templates/'.$template.'.deps.php';
+        $depFile  = $dataPath.'/Templates/'.$template.'.deps.php';
+        if (file_exists($depFile) === FALSE) {
+            return array();
+        }
+
+        include $depFile;
 
         return $dependentFiles;
 
@@ -167,14 +204,6 @@ class GUIActions
         // system name.
         $templateKey = self::_getTemplateKey($systemName, $tplFile);
 
-        // JavaScript object namespace will be based on the template name, or system
-        // name if template name is not provided.
-        if ($tplFile === NULL) {
-            $jsObjName = $systemName;
-        } else {
-            $jsObjName = basename($tplFile, '.tpl');
-        }
-
         // Get the template content from the system as a string.
         if ($systemName === 'GUI') {
             return NULL;
@@ -187,23 +216,17 @@ class GUIActions
             $content = '<div>(ERROR) Empty Template file in '.$systemName.': '.$tplFile.'</div>';
         }
 
-        // Add any JS and CSS files that this widget has.
-        $jsPath = GUI::getTemplateJSFilePath($systemName, $tplFile);
-        if ($jsPath !== NULL) {
-            GUI::addJSInclude($templateKey, array($jsPath));
-        }
-
-        // Get the CSS path.
-        $cssPath = GUI::getTemplateCSSFilePath($systemName, $tplFile);
-        if ($cssPath !== NULL) {
-            GUI::addCSSInclude($templateKey, array($cssPath));
-        }
-
         $content = self::_replaceKeywords($content, $systemName, $settings);
 
         // Add it to dom object.
         $doc = new DOMDocument('1.0');
         $doc->loadXML($content);
+
+        // If this a top level template then reset vars.
+        $head = $doc->getElementsByTagName('head');
+        if ($head->length === 1) {
+            self::$_tmpWidgetList = array();
+        }
 
         // Find what widgets we have, and store them by widget type.
         $includedWidgets = array();
@@ -224,8 +247,13 @@ class GUIActions
                            'settings' => $widgetSettings,
                           );
 
+            self::$_tmpWidgetList[$widgetId] = array(
+                                                'type'     => $widgetName,
+                                                'settings' => $widgetSettings,
+                                               );
+
             $includedWidgets[$widgetTemplateKey][] = $thisWidget;
-        }
+        }//end foreach
 
         self::$_requiredWidgets[$templateKey] = $includedWidgets;
 
@@ -255,7 +283,7 @@ class GUIActions
             self::$_dependants[$templateKey]
         );
 
-        // Call prepareBake.
+        // Call prepareBake
         call_user_func(array($systemName, 'prepareBake'), $doc->documentElement, $settings);
 
         return $doc->documentElement;
@@ -281,7 +309,7 @@ class GUIActions
 
         Channels::includeSystem('GUI');
         foreach ($warray as $widget) {
-            GUI::getWidgetHTML($widget);
+            GUI::convertWidgetToHTML($widget);
         }
 
     }//end convertWidgetTags()
@@ -295,7 +323,7 @@ class GUIActions
      * @since  4.0.0
      * @return void
      */
-    public static function getWidgetHTML(DOMNode $widget)
+    public static function convertWidgetToHTML(DOMNode $widget)
     {
         Channels::includeSystem('GUI');
         $type     = $widget->getAttribute('type');
@@ -313,6 +341,33 @@ class GUIActions
         $node = $widget->ownerDocument->importNode($content, TRUE);
         $widget->parentNode->insertBefore($node, $widget);
         $widget->parentNode->removeChild($widget);
+
+    }//end convertWidgetToHTML()
+
+
+    /**
+     * Returns the HTML content of the specified widget.
+     *
+     * @param DOMNode $widget The widget tag to replace.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getWidgetHTML(DOMNode $widget)
+    {
+        Channels::includeSystem('GUI');
+        $type     = $widget->getAttribute('type');
+        $system   = GUI::getSystemNameFromWidgetType($type);
+        $settings = self::_getSettingsForWidget($widget);
+
+        // Get the widget contents as DOMNode.
+        $content = GUI::getTemplateContent($system, $settings);
+
+        if (is_string($content) === TRUE) {
+            $content = DOMDocument::loadXML($content);
+        }
+
+        return $content->ownerDocument->saveHTML();
 
     }//end getWidgetHTML()
 
@@ -349,14 +404,29 @@ class GUIActions
 
             if ($node->childNodes->length !== 0) {
                 include_once 'Libs/XML/XML.inc';
-                $xml   = simplexml_import_dom($node);
-                $value = array();
-                foreach ($xml->value as $val) {
-                    $value[] = (array) $val;
-                }
+
+                foreach ($node->childNodes as $childNode) {
+                    if ($childNode->nodeType !== XML_ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    switch ($childNode->tagName) {
+                        case 'widget':
+                            $value = GUI::getWidgetHTML($childNode);
+                        break;
+
+                        default:
+                            $xml   = simplexml_import_dom($node);
+                            $value = array();
+                            foreach ($xml->value as $val) {
+                                $value[] = (array) $val;
+                            }
+                        break;
+                    }
+                }//end foreach
             } else {
                 $value = $node->getAttribute('value');
-            }
+            }//end if
 
             // TODO: Make this work with array setting values.
             if (strpos($value, '#') === 0) {
@@ -385,42 +455,18 @@ class GUIActions
     {
         Channels::includeSystem('GUI');
 
-        // Now get the set of includes we have so far.
-        $allJsIncludes  = self::_getJSIncludes();
-        $allCssIncludes = self::_getCSSIncludes();
+        // Run post bake processes.
+        self::_runPostbakeFunctions($html->ownerDocument);
+
+        // Reset post bake processors.
+        self::$_postBakeProcessors = array();
 
         // Now work out exactly which ones we need for this template.
         $templateKey = self::_getTemplateKey($systemName, $tplName);
-
-        $jsIncludes  = array(
-                        $templateKey => Util::getArrayIndex($allJsIncludes, $templateKey, array()),
-                       );
-        $cssIncludes = array(
-                        $templateKey => Util::getArrayIndex($allCssIncludes, $templateKey, array()),
-                       );
         $widgets     = Util::getArrayIndex(self::$_requiredWidgets, $templateKey, array());
-
-        foreach (self::$_dependants[$templateKey] as $depTemplateKey) {
-            $jsIncludes[$depTemplateKey]  = array_unique(
-                Util::getArrayIndex(
-                    $allJsIncludes,
-                    $depTemplateKey,
-                    array()
-                )
-            );
-            $cssIncludes[$depTemplateKey] = array_unique(
-                Util::getArrayIndex(
-                    $allCssIncludes,
-                    $depTemplateKey,
-                    array()
-                )
-            );
-        }//end foreach
 
         // Write out the list of dependents.
         $saveArray = array(
-                      'js'      => $jsIncludes,
-                      'css'     => $cssIncludes,
                       'widgets' => self::$_requiredWidgets[$templateKey],
                      );
 
@@ -437,27 +483,24 @@ class GUIActions
         $head = $html->getElementsByTagName('head');
 
         if ($head->length !== 0) {
-            // Add the GUI systems JS files. These are required.
-            $path = GUI::getSystemWebPath('GUI');
-            $jsIncludes['GUI'][] = $path.'/GUI.js';
-            $jsIncludes['GUI'][] = $path.'/DfxJSLib/mysource.js';
-
             $head = $head->item(0);
 
-            // Add required JS files.
-            foreach ($jsIncludes as $typeIncludes) {
-                foreach ($typeIncludes as $jsInclude) {
-                    GUI::addJS(NULL, $jsInclude, $head);
-                }
+            foreach (self::$_jsIncludes as $jsInclude) {
+                GUI::addJS(NULL, $jsInclude, $head);
+            }
+
+            foreach (self::$_cssIncludes as $cssInclude) {
+                GUI::addCSS(NULL, $cssInclude, $head);
             }
 
             $js = array();
 
-            foreach (self::$_requiredWidgets[$templateKey] as $typeWidgets) {
-                foreach ($typeWidgets as $widget) {
-                    $js[] = GUI::getJSInitCode($widget['type'], $widget['id'], $widget['settings']);
-                }
+            foreach (self::$_tmpWidgetList as $widgetid => $widget) {
+                $js[] = GUI::getJSInitCode($widget['type'], $widgetid, $widget['settings']);
             }
+
+            // Wrote out all the widgets in this template, clear widget list.
+            self::$_tmpWidgetList = array();
 
             // Create the script tag that contains JS init codes.
             $jsElem = $head->ownerDocument->createElement('script');
@@ -468,13 +511,6 @@ class GUIActions
 
             $jsElem->nodeValue = $js;
             $head->appendChild($jsElem);
-
-            // Now get the CSS.
-            foreach ($cssIncludes as $typeIncludes) {
-                foreach ($typeIncludes as $cssInclude) {
-                    GUI::addCSS(NULL, $cssInclude, $head);
-                }
-            }
         }//end if
 
         // Get the HTML string.
@@ -518,6 +554,42 @@ class GUIActions
         return $htmlCont;
 
     }//end bakeTemplate()
+
+
+    /**
+     * Adds a new post bake process.
+     *
+     * @param string $system   Name of the system that will processes the settings.
+     * @param array  $settings Settings for the post bake process or widget.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function addPostBakeProcess($system, $settings)
+    {
+        self::$_postBakeProcessors[] = array(
+                                        'system'   => $system,
+                                        'settings' => $settings,
+                                       );
+
+    }//end addPostBakeProcess()
+
+
+    /**
+     * Runs the post bake functions.
+     *
+     * @param DOMNode $html The whole HTML node.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    private static function _runPostbakeFunctions(DOMNode $html)
+    {
+        foreach (self::$_postBakeProcessors as $p) {
+            call_user_func(array($p['system'], 'postBake'), $html, $p['settings']);
+        }
+
+    }//end _runPostbakeFunctions()
 
 
     /**
@@ -611,6 +683,36 @@ class GUIActions
         $head->appendChild($link);
 
     }//end addCSS()
+
+
+    /**
+     * Set the JS files to be included by a main template.
+     *
+     * @param array $jsFiles List of JS files to include.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function setJSIncludes(array $jsFiles)
+    {
+        self::$_jsIncludes = $jsFiles;
+
+    }//end setJSIncludes()
+
+
+    /**
+     * Set the CSS files to be included by a main template.
+     *
+     * @param array $cssFiles List of CSS files to include.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function setCSSIncludes(array $cssFiles)
+    {
+        self::$_cssIncludes = $cssFiles;
+
+    }//end setCSSIncludes()
 
 
     /**
@@ -769,14 +871,14 @@ class GUIActions
      *
      * @param string $systemName Name of the system.
      * @param string $id         Unique ID of the widget object.
-     * @param string $settings   Settings array of the widget object.
+     * @param array  $settings   Settings array of the widget object.
      *
      * @since  4.0.0
      * @return string
      */
     public static function getJSInitCode($systemName, $id, array $settings=array())
     {
-        $code = 'GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'));';
+        $code = 'if (window["'.$systemName.'"]) {GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'));}';
 
         return $code;
 
