@@ -1,0 +1,25 @@
+.GUIToolbar {
+    height: 38px;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: url(background.png) repeat-x;
+    z-index: 5000;
+}
+
+.GUIToolbar-logo {
+    background: url(logo.png) no-repeat 0 0;
+    width: 117px;
+    height: 38px;
+    margin-left: 15px;
+    float: left;
+}
+
+.GUIToolbar-content {
+    float: left;
+    margin-left: 20px;
+    height: 38px;
+    line-height: 38px;
+}

@@ -132,34 +132,10 @@ class GUIScreenSwitcherActions
 
         // Get the list of dependent files we need.
         $depFiles = GUI::getTemplateDependentFiles($systemName, $screenId.'.tpl');
-
-        // Add the web prefix to the dependent files.
-        foreach ($depFiles['css'] as &$typeFiles) {
-            foreach ($typeFiles as &$depFile) {
-                $depFile = '/__web/'.$depFile;
-            }
-
-            unset($depFile);
-        }
-
-        unset($typeFiles);
-
-        foreach ($depFiles['js'] as &$typeFiles) {
-            foreach ($typeFiles as &$depFile) {
-                $depFile = '/__web/'.$depFile;
-            }
-
-            unset($depFile);
-        }
-
-        unset($typeFiles);
-
-        $retval = array(
-                   'contents'    => $contents,
-                   'cssIncludes' => $depFiles['css'],
-                   'jsIncludes'  => $depFiles['js'],
-                   'widgets'     => $depFiles['widgets'],
-                  );
+        $retval   = array(
+                     'contents' => $contents,
+                     'widgets'  => $depFiles['widgets'],
+                    );
 
         return $retval;
 

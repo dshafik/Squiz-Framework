@@ -31,15 +31,16 @@ class GUIToolbarActions
      */
     public static function getTemplateContent(array $settings=array())
     {
-        $content = '<div class="Toolbar">
-                        <div class="logo" />
-                        <div class="leftList">
-                            <widget type="GUI/Toolbar/List" id="ToolbarLeftList" />
-                        </div>
-                        <div class="rightList">
-                            <widget type="GUI/Toolbar/List" id="ToolbarRightList" />
-                        </div>
-                    </div>';
+        $content = '<div class="%class%">
+                        <div class="%class%-logo" style="background-url: ('.$settings['logo'].')" />
+                        <div class="%class%-content">';
+
+        if (isset($settings['content']) === TRUE) {
+            $content .= $settings['content'];
+        }
+
+        $content .= '</div></div>';
+
         return $content;
 
     }//end getTemplateContent()

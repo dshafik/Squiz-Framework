@@ -19,8 +19,6 @@ function GUIScreenSwitcher(id, settings) {
      */
     GUI.addWidgetEvent(this, 'screenLoadStarts');
     GUI.addWidgetEvent(this, 'screenLoadFinished');
-    //this.addScreenLoadStartsCallback(function() {alert('hi');});
-    //this.fireScreenLoadStartsCallbacks();
 
     this.init();
 }
@@ -97,67 +95,17 @@ GUIScreenSwitcher.prototype = {
             // Set the contents.
             dfx.setHtml(self.targetElem, data.result.contents);
 
-            // Load the CSS files.
-            var headTag = document.getElementsByTagName('head').item(0);
+            dfx.foreach(data.result.widgets, function(templateKey) {
+                var widgets = data.result.widgets[templateKey];
+                var wln     = widgets.length;
+                for (var i = 0; i < wln; i++) {
+                    var widget = widgets[i];
+                    self.loadedWidgets.push(widget.id);
 
-            for (var templateKey in data.result.cssIncludes) {
-                var templateCss = data.result.cssIncludes[templateKey];
-
-                for (var i = 0; i < templateCss.length; i++) {
-                    var cssFile = templateCss[i];
-
-                    if (!self.includedFiles[cssFile]) {
-                        self.includedFiles[cssFile] = true;
-                        var newLink = document.createElement('link');
-                        newLink.setAttribute('rel', 'stylesheet');
-                        newLink.setAttribute('type', 'text/css');
-                        newLink.setAttribute('href', cssFile);
-                        headTag.appendChild(newLink);
-                    }
-                }//end for
-            }//end for
-
-            // Create a callback function template for loading widgets.
-            var callbackFn = function(templateKey) {
-                this.execute = function() {
-                    if (data.result.widgets[templateKey]) {
-                        for (var j = 0; j < data.result.widgets[templateKey].length; j++) {
-                            var widget = data.result.widgets[templateKey][j];
-                            self.loadedWidgets.push(widget.id);
-
-                            var widgetObj = eval('new ' + widget.type
-                                + '(widget.id, widget.settings)');
-                            GUI.addWidget(widget.id, widgetObj);
-                        }
-                    }
-                };
-            };
-
-            // Load the JavaScript files, and run the callback for each widget type.
-            var scriptsToLoad = [];
-            for (var templateKey in data.result.jsIncludes) {
-                var templateJs = data.result.jsIncludes[templateKey];
-
-                for (var i = 0; i < templateJs.length; i++) {
-                    var jsFile = templateJs[i];
-
-                    if (!self.includedFiles[jsFile]) {
-                        self.includedFiles[jsFile] = true;
-
-                        scriptsToLoad.push({
-                            file: jsFile,
-                            callback: new callbackFn(templateKey)
-                        });
-                    }
-                }//end for
-            }//end for
-
-            for (var i = 0; i < scriptsToLoad.length; i++) {
-                jQuery.getScript(
-                    scriptsToLoad[i].file,
-                    scriptsToLoad[i].callback.execute
-                );
-            }
+                    var widgetObj = eval('new ' + widget.type + '(widget.id, widget.settings)');
+                    GUI.addWidget(widget.id, widgetObj);
+                }
+            });
         });
     }
 

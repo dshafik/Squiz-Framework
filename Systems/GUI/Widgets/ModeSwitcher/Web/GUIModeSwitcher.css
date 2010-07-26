@@ -1,0 +1,25 @@
+.GUIModeSwitcher-modeContent {
+    display: none;
+}
+
+.GUIModeSwitcher-modeContent.visible {
+    display: block;
+}
+
+.GUIModeSwitcher {
+    font-family: arial;
+    color: #FFF;
+    size: 12px;
+}
+
+.GUIModeSwitcher ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.GUIModeSwitcher li {
+    float: left;
+    margin-left: 15px;
+    cursor: pointer;
+}
