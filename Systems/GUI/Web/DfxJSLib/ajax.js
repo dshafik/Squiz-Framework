@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 dfx.get = function(url, data, callBack)
 {
     jQuery.get(url, data, callBack);

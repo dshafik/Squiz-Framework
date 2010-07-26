@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 /**
  * Sets a CSS style property on an element.
  *

@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 dfx.date = function(format, timestamp, tsIso8601)
 {
     if (timestamp === null && tsIso8601) {

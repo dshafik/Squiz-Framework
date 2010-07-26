@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 /**
  * General functions that must be included on every execution.
  */

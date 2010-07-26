@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 /**
  * Moves given elements.
  *

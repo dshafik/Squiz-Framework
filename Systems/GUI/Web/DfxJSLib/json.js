@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 // @codingStandardsIgnoreFile
 if(!this.JSON){JSON={};}
 (function(){function f(n){return n<10?'0'+n:n;}

@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 /**
  * General DOM operations that are used in javascript.
  */

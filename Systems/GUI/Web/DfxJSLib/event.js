@@ -1,3 +1,7 @@
+if (!window.dfx) {
+    function dfx() {}
+}
+
 dfx.DOM_VK_DELETE = 8;
 dfx.DOM_VK_LEFT   = 37;
 dfx.DOM_VK_UP     = 38;
