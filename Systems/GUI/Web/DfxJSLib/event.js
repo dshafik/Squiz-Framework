@@ -1,5 +1,5 @@
 if (!window.dfx) {
-    function dfx() {}
+    window.dfx = function() {};
 }
 
 dfx.DOM_VK_DELETE = 8;

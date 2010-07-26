@@ -1,5 +1,5 @@
 if (!window.dfx) {
-    function dfx() {}
+    window.dfx = function() {};
 }
 
 /**
