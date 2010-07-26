@@ -132,6 +132,7 @@ class APIActions
 
         // Token validation for every request.
         Channels::includeSystem('User');
+        Channels::includeSystem('Session');
         $userid = User::getCurrentUserid();
         if ($userid !== NULL) {
             include_once 'Libs/Security/Security.inc';
@@ -175,14 +176,16 @@ class APIActions
             exit;
         }
 
-        $assetid            = API::getAssetid($requestMethod);
-        $request['assetid'] = $assetid;
-
         // Is the requested service available?
-        $api = API::getAPI($request['system'], $request['action']);
-        $responseContent['system']  = $request['system'];
-        $responseContent['action']  = $request['action'];
-        $responseContent['assetid'] = $request['assetid'];
+        $request['assetid']        = API::getAssetid($requestMethod);
+        $api                       = API::getAPI($request['system'], $request['action']);
+        $responseContent['system'] = $request['system'];
+        $responseContent['action'] = $request['action'];
+        if ($request['assetid'] !== NULL) {
+            // Add in the assetid as it was found.
+            $responseContent['assetid'] = $request['assetid'];
+        }
+
         if ($api === FALSE) {
             // Requested service is not available. Not Found.
             $responseContent['exception'] = 'Requested service & is not found.';
@@ -414,10 +417,10 @@ class APIActions
         $params          = array();
         $parametersExist = TRUE;
         include_once 'Libs/Security/Security.inc';
+        $default    = NULL;
+        $jsonDecode = TRUE;
         foreach ($requiredParams as $param) {
-            $default    = NULL;
-            $jsonDecode = TRUE;
-            $value      = Security::getRequestData(
+            $value = Security::getRequestData(
                 $param['name'],
                 $default,
                 $jsonDecode,
@@ -433,7 +436,7 @@ class APIActions
             if ($value === NULL && $param['optional'] === FALSE) {
                 return FALSE;
             } else {
-                $params[] = json_decode($value);
+                $params[] = $value;
             }
         }//end foreach
 
@@ -543,8 +546,6 @@ class APIActions
                 $rspElem->appendChild($fieldElem);
             }
         }
-
-
 
         if (array_key_exists('result', $responseContent) === TRUE) {
             $resultElem = $dom->createElement('result');
@@ -935,10 +936,12 @@ class APIActions
     {
         $prefix      = '';
         $moreEntropy = TRUE;
-        $token = sha1(uniqid($prefix, $moreEntropy));
+        $token       = sha1(uniqid($prefix, $moreEntropy));
         return $token;
 
     }//end getUniqueToken()
 
 
 }//end class
+
+?>
