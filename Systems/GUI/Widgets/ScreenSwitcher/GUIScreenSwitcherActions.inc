@@ -37,6 +37,9 @@ class GUIScreenSwitcherActions
         $content .= '<div class="%class%-left">';
         $content .= '</div>';
 
+        $content .= '<div class="%class%-right">';
+        $content .= '</div>';
+
         foreach ($settings['screens'] as $screen) {
             $screenid = $settings['id'].'-'.$screen['id'];
             if (strtolower($screen['disabled']) === 'true') {
@@ -81,9 +84,6 @@ class GUIScreenSwitcherActions
 
             $firstScreen = FALSE;
         }//end foreach
-
-        $content .= '<div class="%class%-right">';
-        $content .= '</div>';
 
         $content .= '</div>';
 

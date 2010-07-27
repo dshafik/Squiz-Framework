@@ -1,6 +1,7 @@
 .GUIScreenSwitcher {
     background-image: url(menu_mid.png);
     background-repeat: repeat-x;
+    margin: 0 20px;
 }
 
 .GUIScreenSwitcher-left {
@@ -8,6 +9,7 @@
     vertical-align: top;
     width: 21px;
     height: 134px;
+    float: left;
     background-image: url(menu_left.png);
     background-repeat: none;
 }
@@ -15,9 +17,7 @@
 .GUIScreenSwitcher-right {
     display: inline-block;
     vertical-align: top;
-    position: absolute;
-    right: 0;
-    top: 0;
+    float: right;
     width: 21px;
     height: 134px;
     background-image: url(menu_right.png);
