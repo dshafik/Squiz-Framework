@@ -1246,6 +1246,34 @@ class GUIActions
     }//end _getTemplateKey()
 
 
+    /**
+     * Used to act like PHP 5.3 static:: call.
+     *
+     * When widgets are calling methods in their own class they should use this
+     * method so that child widgets can override those methods.
+     *
+     * @param string $widgetType Type of the widget.
+     * @param string $methodName Name of the method to call.
+     * @param array  $args       Array of arguments to pass to the method.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function callStatic($widgetType, $methodName, array $args=array())
+    {
+        $system = GUI::getSystemNameFromWidgetType($widgetType);
+
+        Channels::includeSystem($system);
+        $retVal = call_user_func_array(
+            array($system, $methodName),
+            $args
+        );
+
+        return $retVal;
+
+    }//end callStatic()
+
+
 }//end class
 
 ?>
