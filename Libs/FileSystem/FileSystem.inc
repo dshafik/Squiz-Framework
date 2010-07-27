@@ -141,6 +141,7 @@ class FileSystem
         'aif'  => array('friendlyName' => 'Audio Interchange File', 'mimeType' => 'audio/x-aiff',),
         'aiff' => array('friendlyName' => 'Audio Interchange File', 'mimeType' => 'audio/x-aiff',),
         'wav'  => array('friendlyName' => 'Waveform Audio', 'mimeType' => 'audio/x-wav',),
+        'svg'  => array('friendlyName' => 'Scalable Vector Graphics Image', 'mimeType' => 'image/svg+xml',),
        );
    // @codingStandardsIgnoreEnd
 
