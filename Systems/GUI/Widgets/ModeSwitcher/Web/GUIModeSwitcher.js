@@ -39,10 +39,6 @@ GUIModeSwitcher.prototype = {
     {
         var modeid = button.getAttribute('modeid');
         var system = button.getAttribute('system');
-        if (!modeid || !system) {
-            return;
-        }
-
         this.loadMode(system, modeid);
 
     },

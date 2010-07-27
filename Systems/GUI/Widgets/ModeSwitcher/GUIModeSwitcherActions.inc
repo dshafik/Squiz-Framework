@@ -102,8 +102,10 @@ class GUIModeSwitcherActions
 
         $elem = $elems->item(0);
 
-        $doc = new DomDocument();
-        $doc->loadHTML(GUIModeSwitcher::getAllModeContents($settings));
+        $content = GUIModeSwitcher::getAllModeContents($settings);
+
+        $doc = new DOMDocument('1.0');
+        $doc->loadXML($content);
         $newNode = $html->importNode($doc->getElementsByTagName('div')->item(0), TRUE);
         $elem->appendChild($newNode);
 
@@ -143,13 +145,18 @@ class GUIModeSwitcherActions
             $contents .= '"';
 
             $contents .= ' id="'.$settings['id'].'-modeContent-'.$mode['id'].'">';
-            ob_start();
-                GUI::printTemplate($mode['system'], ucfirst($mode['id']).'Mode.tpl');
-                $contents .= ob_get_contents();
-            ob_end_clean();
+
+            if (isset($mode['content']) === TRUE) {
+                $contents .= $mode['content'];
+            } else {
+                ob_start();
+                    GUI::printTemplate($mode['system'], ucfirst($mode['id']).'Mode.tpl');
+                    $contents .= ob_get_contents();
+                ob_end_clean();
+            }
 
             $contents .= '</div>';
-        }
+        }//end foreach
 
         $contents .= '</div>';
 
@@ -192,10 +199,10 @@ class GUIModeSwitcherActions
             $widgets = $depFiles['widgets'];
         }
 
-        $retval   = array(
-                     'contents' => $contents,
-                     'widgets'  => $widgets,
-                    );
+        $retval = array(
+                   'contents' => $contents,
+                   'widgets'  => $widgets,
+                  );
 
         return $retval;
 
