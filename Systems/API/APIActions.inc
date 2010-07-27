@@ -198,6 +198,9 @@ class APIActions
         // the values from API::getAPI() to set the correct case-sensitive names.
         $responseContent['system'] = $api['system'];
         $responseContent['action'] = $api['action'];
+        if (isset($api['contentType']) === TRUE) {
+            $responseContent['contentType'] = $api['contentType'];
+        }
 
         // What parameters are required for the action?
         $params = self::_getActionParameters(
@@ -343,11 +346,16 @@ class APIActions
                 (($serviceEndPos - $serviceStartPos) + 1)
             );
 
+            $formatTypes = array(
+                            'xml',
+                            'json',
+                            'raw',
+                           );
             $serviceUrlPattern           = '/\/'.self::$_serviceWebPath.'\/([^\/]+)\/([^\/]+)/';
-            $serviceUrlPatternWithFormat = '/\/'.self::$_serviceWebPath.'\/(xml|json)\/([^\/]+)\/([^\/]+)/';
+            $serviceUrlPatternWithFormat = '/\/'.self::$_serviceWebPath.'\/('.implode('|', $formatTypes).')\/([^\/]+)\/([^\/]+)/';
             $res = preg_match($serviceUrlPattern, $serviceUrlPart, $matches);
 
-            if ($res === 1 && $matches[1] !== 'xml' && $matches[1] !== 'json') {
+            if ($res === 1 && in_array($matches[1], $formatTypes) === FALSE) {
                 $system = $matches[1];
                 $action = $matches[2];
                 $format = self::$_outputFormat;
@@ -502,6 +510,14 @@ class APIActions
 
             case 'xml':
                 self::_sendXMLResponse($responseContent);
+            break;
+
+            case 'raw':
+                if (isset($responseContent['contentType']) === TRUE) {
+                    header('Content-Type: '.$responseContent['contentType']);
+                }
+
+                echo $responseContent['result'];
             break;
 
             default:
