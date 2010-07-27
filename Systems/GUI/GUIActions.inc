@@ -1194,6 +1194,37 @@ class GUIActions
 
 
     /**
+     * Serves any file on the file system, using X-Sendfile.
+     *
+     * @param string $filePath Path to the file.
+     * @param string $mimeType Content type of the file.
+     * @param array  $headers  Extra headers to send.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function serveFile(
+        $filePath,
+        $mimeType,
+        array $headers=array()
+    ) {
+        // Set the content type header, X-Sendfile headers.
+        $headers['Content-type']         = $mimeType;
+        $headers['X-Sendfile']           = $filePath;
+        $headers['x-lighttpd-send-file'] = $filePath;
+
+        if (headers_sent() === FALSE) {
+            foreach ($headers as $header => $value) {
+                header($header.': '.$value);
+            }
+        }
+
+        exit();
+
+    }//end serveFile()
+
+
+    /**
      * Build a template key from the system name and template file.
      *
      * @param string $systemName The name of the system.
