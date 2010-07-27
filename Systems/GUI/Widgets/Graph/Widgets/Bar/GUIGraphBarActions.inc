@@ -386,7 +386,7 @@ class GUIGraphBarActions
         }
         echo '<ul class="'.$class.'-inner-list" style="position: absolute; ';
         echo 'display: block; width: '.$listWidth.'; top: 0; right: '.$listRight.';';
-        echo ' height: '.$graphHeight.'px; vertical-align: bottom; z-index: 2">';
+        echo ' height: '.$height.'px; vertical-align: bottom; z-index: 2">';
 
         $rowNumber = 0;
         foreach ($data as $dataRow) {
