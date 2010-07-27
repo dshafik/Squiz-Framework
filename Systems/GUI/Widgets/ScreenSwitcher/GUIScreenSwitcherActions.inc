@@ -10,26 +10,26 @@
  * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
  */
 
-require_once 'Systems/BaseSystem.inc';
+require_once 'Systems/GUI/Widgets/ContentSwitcher/GUIContentSwitcherActions.inc';
 
 /**
  * GUI Screen Switcher Widget Actions Class.
  *
  * @since 4.0.0
  */
-class GUIScreenSwitcherActions
+class GUIScreenSwitcherActions extends GUIContentSwitcherActions
 {
 
 
     /**
-     * Returns this widgets content.
+     * Returns the contents of the switcher buttons.
      *
-     * @param array $settings The list of settings for this widget.
+     * @param array $settings The settings of the widget.
      *
      * @since  4.0.0
      * @return string
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function getButtonsContent(array $settings=array())
     {
         Channels::includeSystem('GUI');
 
@@ -89,57 +89,7 @@ class GUIScreenSwitcherActions
 
         return $content;
 
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @since  4.0.0
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
-
-
-    /**
-     * Get the requested template for a system's screen.
-     *
-     * @param string $systemName The name of the system providing the screen.
-     * @param string $screenId   The ID of the screen.
-     *
-     * @since  4.0.0
-     * @return string
-     * @api    read
-     */
-    public static function getScreenContents($systemName, $screenId)
-    {
-        Channels::includeSystem('GUI');
-
-        $contents    = '';
-        $cssIncludes = array();
-        $jsIncludes  = array();
-
-        ob_start();
-            GUI::printTemplate($systemName, $screenId.'.tpl');
-            $contents = ob_get_contents();
-        ob_end_clean();
-
-        // Get the list of dependent files we need.
-        $depFiles = GUI::getTemplateDependentFiles($systemName, $screenId.'.tpl');
-        $retval   = array(
-                     'contents' => $contents,
-                     'widgets'  => $depFiles['widgets'],
-                    );
-
-        return $retval;
-
-    }//end getScreenContents()
+    }//end getButtonsContent()
 
 
 }//end class

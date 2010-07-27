@@ -10,14 +10,14 @@
  * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
  */
 
-require_once 'Systems/BaseSystem.inc';
+require_once 'Systems/GUI/Widgets/ContentSwitcher/GUIContentSwitcherSystem.inc';
 
 /**
  * GUI Screen Switcher System Class.
  *
  * @since 4.0.0
  */
-class GUIScreenSwitcherSystem extends BaseSystem
+class GUIScreenSwitcherSystem extends GUIContentSwitcherSystem
 {
 
 

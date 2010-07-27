@@ -1,0 +1,25 @@
+.GUIContentSwitcher-itemContent {
+    display: none;
+}
+
+.GUIContentSwitcher-itemContent.visible {
+    display: block;
+}
+
+.GUIContentSwitcher {
+    font-family: arial;
+    color: #FFF;
+    size: 12px;
+}
+
+.GUIContentSwitcher ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.GUIContentSwitcher li {
+    float: left;
+    margin-left: 15px;
+    cursor: pointer;
+}
