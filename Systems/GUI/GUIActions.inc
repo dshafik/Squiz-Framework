@@ -84,6 +84,14 @@ class GUIActions
      */
     private static $_tmpWidgetList = array();
 
+    /**
+     * List of widget settings for a template.
+     *
+     * @var   array
+     * @since 4.0.0
+     */
+    private static $_tmpWidgetSettings = array();
+
 
     /**
      * Includes the template PHP file.
@@ -100,7 +108,7 @@ class GUIActions
         $dest     = $dataPath.'/Templates/'.$template.'.php';
 
         if (file_exists($dest) === FALSE) {
-            echo 'ERROR: Template ('.$template.') file not found. ('.$dest.')';
+            echo '<div>ERROR: Template ('.$template.') file not found. ('.$dest.')</div>';
             return;
         }
 
@@ -225,7 +233,8 @@ class GUIActions
         // If this a top level template then reset vars.
         $head = $doc->getElementsByTagName('head');
         if ($head->length === 1) {
-            self::$_tmpWidgetList = array();
+            self::$_tmpWidgetList     = array();
+            self::$_tmpWidgetSettings = array();
         }
 
         // Find what widgets we have, and store them by widget type.
@@ -283,7 +292,7 @@ class GUIActions
             self::$_dependants[$templateKey]
         );
 
-        // Call prepareBake
+        // Call prepareBake.
         call_user_func(array($systemName, 'prepareBake'), $doc->documentElement, $settings);
 
         return $doc->documentElement;
@@ -367,7 +376,9 @@ class GUIActions
             $content = DOMDocument::loadXML($content);
         }
 
-        return $content->ownerDocument->saveHTML();
+        $content = $content->ownerDocument->saveXML();
+        $content = trim(str_replace('<?xml version="1.0"?>', '', $content));
+        return $content;
 
     }//end getWidgetHTML()
 
@@ -385,6 +396,11 @@ class GUIActions
      */
     private static function _getSettingsForWidget(DOMNode $widget)
     {
+        $widgetid = $widget->getAttribute('id');
+        if (isset(self::$_tmpWidgetSettings[$widgetid]) === TRUE) {
+            return self::$_tmpWidgetSettings[$widgetid];
+        }
+
         $settings = array();
 
         // Get the widget attributes.
@@ -401,32 +417,7 @@ class GUIActions
 
             // Found a setting node.
             $setting = $node->getAttribute('name');
-
-            if ($node->childNodes->length !== 0) {
-                include_once 'Libs/XML/XML.inc';
-
-                foreach ($node->childNodes as $childNode) {
-                    if ($childNode->nodeType !== XML_ELEMENT_NODE) {
-                        continue;
-                    }
-
-                    switch ($childNode->tagName) {
-                        case 'widget':
-                            $value = GUI::getWidgetHTML($childNode);
-                        break;
-
-                        default:
-                            $xml   = simplexml_import_dom($node);
-                            $value = array();
-                            foreach ($xml->value as $val) {
-                                $value[] = (array) $val;
-                            }
-                        break;
-                    }
-                }//end foreach
-            } else {
-                $value = $node->getAttribute('value');
-            }//end if
+            $value   = self::_parseSettingValue($node);
 
             // TODO: Make this work with array setting values.
             if (strpos($value, '#') === 0) {
@@ -436,9 +427,73 @@ class GUIActions
             $settings[$setting] = $value;
         }//end foreach
 
+        self::$_tmpWidgetSettings[$widgetid] = $settings;
+
         return $settings;
 
     }//end _getSettingsForWidget()
+
+
+    /**
+     * Parses specified widget setting node.
+     *
+     * @param DOMNode $settingNode A single setting for a widget.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    private static function _parseSettingValue(DOMNode $settingNode)
+    {
+        if ($settingNode->hasAttribute('value') === TRUE) {
+            return $settingNode->getAttribute('value');
+        }
+
+        include_once 'Libs/XML/XML.inc';
+
+        if (XML::hasChildElements($settingNode) === FALSE) {
+            return $settingNode->nodeValue;
+        }
+
+        $value = array();
+
+        foreach ($settingNode->childNodes as $childNode) {
+            if ($childNode->nodeType !== XML_ELEMENT_NODE) {
+                continue;
+            }
+
+            switch ($childNode->tagName) {
+                case 'widget':
+                    $value = GUI::getWidgetHTML($childNode);
+                break;
+
+                case 'value':
+                    $value[] = self::_parseSettingValue($childNode);
+                break;
+
+                default:
+                    if (XML::hasChildElements($childNode) === FALSE) {
+                        $value[$childNode->tagName] = $childNode->nodeValue;
+                    } else {
+                        $value[$childNode->tagName] = array();
+                        foreach ($childNode->childNodes as $valueNode) {
+                            if ($valueNode->nodeType !== XML_ELEMENT_NODE) {
+                                continue;
+                            }
+
+                            if ($valueNode->tagName === 'widget') {
+                                $value[$childNode->tagName] = GUI::getWidgetHTML($valueNode);
+                            } else {
+                                $value[$childNode->tagName][$valueNode->tagName] = self::_parseSettingValue($valueNode);
+                            }
+                        }
+                    }
+                break;
+            }//end switch
+        }//end foreach
+
+        return $value;
+
+    }//end _parseSettingValue()
 
 
     /**
@@ -500,7 +555,8 @@ class GUIActions
             }
 
             // Wrote out all the widgets in this template, clear widget list.
-            self::$_tmpWidgetList = array();
+            self::$_tmpWidgetList     = array();
+            self::$_tmpWidgetSettings = array();
 
             // Create the script tag that contains JS init codes.
             $jsElem = $head->ownerDocument->createElement('script');
@@ -565,12 +621,12 @@ class GUIActions
      * @since  4.0.0
      * @return void
      */
-    public static function addPostBakeProcess($system, $settings)
+    public static function addPostBakeProcess($system, array $settings)
     {
-        self::$_postBakeProcessors[] = array(
-                                        'system'   => $system,
-                                        'settings' => $settings,
-                                       );
+        self::$_postBakeProcessors[$settings['id']] = array(
+                                                       'system'   => $system,
+                                                       'settings' => $settings,
+                                                      );
 
     }//end addPostBakeProcess()
 
@@ -878,11 +934,37 @@ class GUIActions
      */
     public static function getJSInitCode($systemName, $id, array $settings=array())
     {
+        // Need to remove all settings that have widget in them.
+        $settings = self::_removePHPSettings($settings);
+
         $code = 'if (window["'.$systemName.'"]) {GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'));}';
 
         return $code;
 
     }//end getJSInitCode()
+
+
+    /**
+     * Removes setting values that contain PHP tags.
+     *
+     * @param array $settings Settings array.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    private static function _removePHPSettings(array $settings)
+    {
+        foreach ($settings as $setting => $value) {
+            if (is_array($value) === TRUE) {
+                $settings[$setting] = self::_removePHPSettings($value);
+            } else if (strpos($value, '<?php') !== FALSE) {
+                unset($settings[$setting]);
+            }
+        }
+
+        return $settings;
+
+    }//end _removePHPSettings()
 
 
     /**
