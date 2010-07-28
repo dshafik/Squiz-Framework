@@ -96,6 +96,8 @@ class GUIActions
     /**
      * Template stack.
      *
+     * Only populated during getTemplateContent() calls.
+     *
      * @var   array
      * @since 4.0.0
      */
@@ -316,7 +318,11 @@ class GUIActions
 
 
     /**
-    * Get the details of the template including the current widget.
+    * Get the details of the template including the current widget during bake time.
+    *
+    * Only gives meaningful information when getTemplateContent() is being called,
+    * and we are getting the contents of a widget (more correctly, we are not working
+    * on a top-level template). Otherwise, returns NULL.
     *
     * We get the SECOND template on the stack, since the first one will be the
     * currently printed template.
@@ -324,7 +330,7 @@ class GUIActions
     * @since  4.0.0
     * @return array
     */
-    public static function getParentTemplate()
+    public static function getBakeTimeIncludingTemplate()
     {
         if (count(self::$_templateStack) > 1) {
             $retval = array(
