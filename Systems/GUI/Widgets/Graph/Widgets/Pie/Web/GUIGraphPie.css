@@ -1,0 +1,35 @@
+.GUIGraphPie .colour-black {
+    fill: #000;
+}
+
+.GUIGraphPie .colour-blue {
+    fill: #4480CF;
+}
+
+.GUIGraphPie .colour-gold {
+    fill: #EBE811;
+}
+
+.GUIGraphPie .colour-red {
+    fill: #C22;
+}
+
+.GUIGraphPie .colour-green {
+    fill: #292;
+}
+
+.GUIGraphPie .colour-navy {
+    fill: #103264;
+}
+
+.GUIGraphPie .colour-orange {
+    fill: #E09A2D;
+}
+
+.GUIGraphPie .colour-purple {
+    fill: #1F1F37;
+}
+
+.GUIGraphPie .colour-grass {
+    fill: #789312;
+}
