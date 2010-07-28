@@ -41,10 +41,9 @@ class GUIButtonActions
         // Handle click setting.
         $onClick = '';
         if (isset($settings['click']) === TRUE) {
-            $onClick .= ' onclick="';
-            if (isset($settings['click']['targetWidget']) === TRUE
-                && isset($settings['click']['function']) === TRUE
-            ) {
+            if (isset($settings['click']['function']) === TRUE) {
+                $onClick .= ' onclick="';
+
                 $args = '';
                 if (isset($settings['click']['arguments']) === TRUE
                     && empty($settings['click']['arguments']) === FALSE
@@ -52,7 +51,10 @@ class GUIButtonActions
                     $args .= '\''.implode('\', \'', $settings['click']['arguments']).'\'';
                 }
 
-                $onClick .= 'GUI.getWidget(\''.$settings['click']['targetWidget'].'\').';
+                if (isset($settings['click']['targetWidget']) === TRUE) {
+                    $onClick .= 'GUI.getWidget(\''.$settings['click']['targetWidget'].'\').';
+                }
+
                 $onClick .= $settings['click']['function'].'('.$args.');"';
             }
         }
