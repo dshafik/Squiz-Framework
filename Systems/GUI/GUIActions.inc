@@ -29,7 +29,7 @@ class GUIActions
     private static $_docType = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
 
     /**
-     * The JS content.
+     * The widget settings required by a template, organised by template key.
      *
      * @var   array
      * @since 4.0.0
@@ -91,6 +91,15 @@ class GUIActions
      * @since 4.0.0
      */
     private static $_tmpWidgetSettings = array();
+
+
+    /**
+     * Template stack.
+     *
+     * @var   array
+     * @since 4.0.0
+     */
+    private static $_templateStack = array();
 
 
     /**
@@ -212,6 +221,9 @@ class GUIActions
         // system name.
         $templateKey = self::_getTemplateKey($systemName, $tplFile);
 
+        // Add the template to the stack.
+        array_unshift(self::$_templateStack, explode(':', $templateKey, 2));
+
         // Get the template content from the system as a string.
         if ($systemName === 'GUI') {
             return NULL;
@@ -295,9 +307,37 @@ class GUIActions
         // Call prepareBake.
         call_user_func(array($systemName, 'prepareBake'), $doc->documentElement, $settings);
 
+        // Remove the template from the stack.
+        array_shift(self::$_templateStack);
+
         return $doc->documentElement;
 
     }//end getTemplateContent()
+
+
+    /**
+    * Get the details of the template including the current widget.
+    *
+    * We get the SECOND template on the stack, since the first one will be the
+    * currently printed template.
+    *
+    * @since  4.0.0
+    * @return array
+    */
+    public static function getParentTemplate()
+    {
+        if (count(self::$_templateStack) > 1) {
+            $retval = array(
+                       'system'   => self::$_templateStack[1][0],
+                       'template' => self::$_templateStack[1][1],
+                      );
+        } else {
+            $retval = NULL;
+        }
+
+        return $retval;
+
+    }//end getParentTemplate()
 
 
     /**
