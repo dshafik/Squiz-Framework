@@ -198,8 +198,8 @@ class APIActions
         // the values from API::getAPI() to set the correct case-sensitive names.
         $responseContent['system'] = $api['system'];
         $responseContent['action'] = $api['action'];
-        if (isset($api['contentType']) === TRUE) {
-            $responseContent['contentType'] = $api['contentType'];
+        if (isset($api['options']['contentType']) === TRUE) {
+            $responseContent['contentType'] = $api['options']['contentType'];
         }
 
         // What parameters are required for the action?
