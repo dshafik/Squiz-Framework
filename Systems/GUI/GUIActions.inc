@@ -471,22 +471,7 @@ class GUIActions
                 break;
 
                 default:
-                    if (XML::hasChildElements($childNode) === FALSE) {
-                        $value[$childNode->tagName] = $childNode->nodeValue;
-                    } else {
-                        $value[$childNode->tagName] = array();
-                        foreach ($childNode->childNodes as $valueNode) {
-                            if ($valueNode->nodeType !== XML_ELEMENT_NODE) {
-                                continue;
-                            }
-
-                            if ($valueNode->tagName === 'widget') {
-                                $value[$childNode->tagName] = GUI::getWidgetHTML($valueNode);
-                            } else {
-                                $value[$childNode->tagName][$valueNode->tagName] = self::_parseSettingValue($valueNode);
-                            }
-                        }
-                    }
+                    $value[$childNode->tagName] = self::_parseSettingValue($childNode);
                 break;
             }//end switch
         }//end foreach

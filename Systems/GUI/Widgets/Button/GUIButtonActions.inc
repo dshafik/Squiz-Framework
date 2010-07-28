@@ -31,13 +31,35 @@ class GUIButtonActions
      */
     public static function getTemplateContent(array $settings=array())
     {
-        $val = $settings['value'];
+        $value = $settings['value'];
+        $color = $settings['color'];
 
-        $content  = '<div class="%class%" id="%id%">';
-        $content .= '<div class="%class%-left"></div>';
-        $content .= '<input type="button" class="%class%-mid" value="&lt;?php echo _(\''.$val.'\'); ?&gt;" onclick="'.$settings['onclick'].'" />';
-        $content .= '<div class="%class%-right"></div>';
-        $content .= '</div>';
+        if (empty($color) === TRUE) {
+            $color = 'Default';
+        }
+
+        // Handle click setting.
+        $onClick = '';
+        if (isset($settings['click']) === TRUE) {
+            $onClick .= ' onclick="';
+            if (isset($settings['click']['targetWidget']) === TRUE
+                && isset($settings['click']['function']) === TRUE
+            ) {
+                $args = '';
+                if (isset($settings['click']['arguments']) === TRUE
+                    && empty($settings['click']['arguments']) === FALSE
+                ) {
+                    $args .= '\''.implode('\', \'', $settings['click']['arguments']).'\'';
+                }
+
+                $onClick .= 'GUI.getWidget(\''.$settings['click']['targetWidget'].'\').';
+                $onClick .= $settings['click']['function'].'('.$args.');"';
+            }
+        }
+
+        $content  = '<button class="%class% button'.$color.'" type="button"'.$onClick.'>';
+        $content .= '<span>'.$value.'</span>';
+        $content .= '</button>';
 
         return $content;
 

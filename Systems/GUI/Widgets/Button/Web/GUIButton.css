@@ -1,28 +1,54 @@
-.GUIButton {
-    overflow: hidden;
+button {
+    margin: 0;
+    cursor: pointer;
+    padding: 0 1.1em;
+    height: 2em;
+    font-family: Verdana;
+    font-size: 11px;
+    border: 1px solid;
+    border-radius: 14px;
+    -moz-border-radius: 25%;
+    *padding: 0 0em; /* IE 7 Target */
+    outline: none;
 }
 
-.GUIButton-left, .GUIButton-right, .GUIButton-mid {
-    height: 22px;
-    float: left;
+@-moz-document url-prefix() { /* Moz Target */
+    button span { margin-top: -4px;}
 }
 
-.GUIButton-left, .GUIButton-right {
-    width: 9px;
+button span {
+    display: block;
+    line-height: 20px;
+    *margin-top: -2px; /* IE 7 Target */
 }
 
-.GUIButton-left {
-    background: transparent url(black_left.png) no-repeat;
+button.buttonDefault {
+    border-color: #606060;
+    color: #fff;
+    text-shadow: 0px -1px 1px #555;
+    background-color: #848484;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#a9a9a9), to(#626161));
+    background-image: -moz-linear-gradient(#a9a9a9, #626161);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#a9a9a9, endColorstr=#626161);
+    position: relative;
 }
 
-.GUIButton-right {
-    background: transparent url(black_right.png) no-repeat;
+button.buttonLight {
+    border-color: #a3a3a3;
+    color: #444;
+    text-shadow: 0px 1px 1px #FFF;
+    background-color: #dbdbdb;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f8f8f8), to(#c0c0c0));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #f8f8f8, #c0c0c0);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#f8f8f8, endColorstr=#c0c0c0);
 }
 
-.GUIButton-mid {
-    font-family: arial;
-    font-size: 12px;
-    color: #EEE;
-    background: transparent url(black_mid.png) repeat-x;
-    border: none;
+button.buttonDark {
+    border-color: #1a1a1a #1a1a1a #555;
+    color: #fff;
+    text-shadow: 0px -1px 1px #000;
+    background-color: #282828;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#474747), to(#0c0c0c));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #474747, #0c0c0c);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#474747, endColorstr=#0c0c0c);
 }
