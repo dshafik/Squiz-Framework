@@ -70,13 +70,19 @@ class GUIGraphPieActions
     /**
      * Paint the graph data for the widget.
      *
+     * @param array  $data          The provided data.
+     * @param array  $ringConf      Ring configuration settings.
+     * @param array  $dataPointConf Data point configuration settings.
+     * @param string $id            ID of the widget.
+     * @param string $class         Class (prefix) of the widget.
+     *
      * @since  4.0.0
      * @return void
      */
     public static function paintData(
-        $data,
-        $ringConf,
-        $dataPointConf,
+        array $data,
+        array $ringConf,
+        array $dataPointConf,
         $id,
         $class
     ) {
@@ -86,31 +92,39 @@ class GUIGraphPieActions
         // proportions.
         $total = array_sum($data[0]);
 
+        if ($total <= 0) {
+            return;
+        }
+
         // Then normalise the data points to a [0..1] value.
         foreach ($data as $dataRingIndex => $dataRing) {
             $dataPct[$dataRingIndex] = array();
+
             foreach ($dataRing as $dataPointIndex => $dataPoint) {
                 if ($dataPoint > $data[0][$dataPointIndex]) {
                     $dataPoint = $data[0][$dataPointIndex];
                 }
-                $dataPct[$dataRingIndex][$dataPointIndex] = $dataPoint / $total;
-            }
-        }
 
-        $circleAngle = 2 * M_PI;
+                $dataPct[$dataRingIndex][$dataPointIndex] = ($dataPoint / $total);
+            }//end foreach
+        }//end foreach
+
+        // Total angle provided by a circle.
+        $circleAngle = (2 * M_PI);
 
         // Array of positions where the data points should start.
         $startAngles = array();
         $cumAngle    = $circleAngle;
         $outerRadius = 0;
 
+        // Work on a ring-by-ring basis.
         foreach ($dataPct as $dataRingIndex => $dataRing) {
             if ($dataRingIndex >= count($ringConf)) {
                 break;
             }
 
             $innerRadius = $outerRadius;
-            $outerRadius = $innerRadius + $ringConf[$dataRingIndex]['radius'];
+            $outerRadius = ($innerRadius + $ringConf[$dataRingIndex]['radius']);
 
             foreach ($dataRing as $dataPointIndex => $dataPoint) {
                 if ($dataPointIndex >= count($dataPointConf)) {
@@ -124,12 +138,12 @@ class GUIGraphPieActions
                     $oldAngle = $cumAngle;
                 }
 
-                $thisAngle = $dataPoint * $circleAngle;
+                $thisAngle = ($dataPoint * $circleAngle);
 
                 // Rationalise angle to a 0..2Pi range.
                 $thisAngle -= (floor(($thisAngle / $circleAngle)) * $circleAngle);
 
-                $cumAngle = $oldAngle - $thisAngle;
+                $cumAngle = ($oldAngle - $thisAngle);
 
                 if ($thisAngle > 0) {
                     // We need to negate the Y points... normally when converting
@@ -138,20 +152,20 @@ class GUIGraphPieActions
                     // DOWN on the graph, so we need to flip the values.
                     $points = array(
                                array(
-                                'x' => round($innerRadius * cos($oldAngle), 6),
-                                'y' => round($innerRadius * (-sin($oldAngle)), 6),
+                                'x' => round(($innerRadius * cos($oldAngle)), 6),
+                                'y' => round(($innerRadius * (-sin($oldAngle))), 6),
                                ),
                                array(
-                                'x' => round($innerRadius * cos($cumAngle), 6),
-                                'y' => round($innerRadius * (-sin($cumAngle)), 6),
+                                'x' => round(($innerRadius * cos($cumAngle)), 6),
+                                'y' => round(($innerRadius * (-sin($cumAngle))), 6),
                                ),
                                array(
-                                'x' => round($outerRadius * cos($cumAngle), 6),
-                                'y' => round($outerRadius * (-sin($cumAngle)), 6),
+                                'x' => round(($outerRadius * cos($cumAngle)), 6),
+                                'y' => round(($outerRadius * (-sin($cumAngle))), 6),
                                ),
                                array(
-                                'x' => round($outerRadius * cos($oldAngle), 6),
-                                'y' => round($outerRadius * (-sin($oldAngle)), 6),
+                                'x' => round(($outerRadius * cos($oldAngle)), 6),
+                                'y' => round(($outerRadius * (-sin($oldAngle))), 6),
                                ),
                               );
 
@@ -208,22 +222,25 @@ class GUIGraphPieActions
                     }
 
                     echo ' />'."\n";
-                }
-
-
+                }//end if
             }//end foreach
         }//end foreach
 
-    }//end paintGraph()
+    }//end paintData()
 
 
     /**
      * Get the contents of the SVG file.
      *
+     * @param string $system   The system that the template is a part of.
+     * @param string $template The template that contains the widget.
+     * @param string $widgetId The widget ID to draw the contents for.
+     *
+     * @since  4.0.0
+     * @return string
+     * @throws ChannelException If the widget settings are not well-formed.
      * @api             read
      * @api-contentType image/svg+xml
-     * @since           4.0.0
-     * @return          string
      */
     public static function getSVGContents($system, $template, $widgetId)
     {
@@ -231,7 +248,6 @@ class GUIGraphPieActions
             // Include the dependencies file of the template, and see if that widget
             // exists.
             $filename = BaseSystem::getDataDir().'/'.$system.'/Templates/'.$template.'.tpl.deps.php';
-            //Debug::bam($filename);
 
             if (file_exists($filename) === TRUE) {
                 include $filename;
@@ -239,16 +255,15 @@ class GUIGraphPieActions
                     $found = FALSE;
 
                     foreach ($dependentFiles['widgets']['GUIGraphPie:GUIGraphPie'] as $pieWidget) {
-
                         if ($pieWidget['id'] === $widgetId) {
-                            $found = TRUE;
+                            $found    = TRUE;
                             $settings = $pieWidget['settings'];
 
                             // Data provider channel.
                             $dataProvider = (string) Util::getArrayIndex($settings, 'dataProvider');
                             if ($dataProvider === NULL) {
                                 $msg = 'Widget parse error: No data provider for pie chart.';
-                                throw new Exception($msg);
+                                throw new ChannelException($msg);
                             } else {
                                 list($providerSystem, $method) = explode('::', $dataProvider);
                             }
@@ -264,25 +279,36 @@ class GUIGraphPieActions
 
                             $totalRadius = 0;
 
-                            // Ring definitions.
-                            // - radius: Radius of the ring, in logical units.
-                            // - colour: The colour of the background of the ring.
-                            //           If not specified, it's transparent.
+                            /*
+                                Ring definitions:
+                                - radius:  Radius of the ring, in logical units.
+                                - opacity: Opacity of data points on this ring.
+                            */
+
                             $rings = (array) Util::getArrayIndex($settings, 'rings', array());
                             foreach ($rings as $ringIndex => &$ring) {
                                 if (array_key_exists('radius', $ring) === FALSE) {
                                     $msg = 'Widget parse error: Pie chart ring '.($ringIndex + 1).' must have a radius set.';
-                                    throw new Exception($msg);
+                                    throw new ChannelException($msg);
                                 }
 
                                 $totalRadius += ($ring['radius']);
                             }
+
+                            // Unset by-ref foreach value.
                             unset($ring);
 
-                            // Data point definitions.
-                            // - label:  Label to show when mousing over the data point.
-                            // - colour: colour of the data point.
-                            // - style:  style of the data point (defaulting to 'none').
+                            /*
+                                Data point definitions:
+                                - label:   Label to show when mousing over the
+                                           data point.
+                                - colour:  Pre-defined colour of the data point.
+                                - opacity: Opacity of this data point (in all rings).
+
+                                Where an opacity is specified on both ring and
+                                data point, they will be multiplied together.
+                            */
+
                             $dpConf = (array) Util::getArrayIndex($settings, 'dataPoints', array());
 
                             echo '<svg:svg xmlns:svg="http://www.w3.org/2000/svg"';
@@ -297,16 +323,8 @@ class GUIGraphPieActions
                             break;
                         }//end if
                     }//end foreach
-
-                    if ($found === FALSE) {
-                        // No Pie widget named this
-                    }
-                } else {
-                    // No Pie widgets at all
-                }
-            } else {
-                // Fail.
-            }
+                }//end if
+            }//end if
 
             $contents = ob_get_contents();
         ob_end_clean();
