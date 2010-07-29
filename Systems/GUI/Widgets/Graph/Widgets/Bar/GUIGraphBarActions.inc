@@ -469,28 +469,24 @@ class GUIGraphBarActions
 
                 $dataPointHeight = (round($cumHeight) - round($oldHeight));
 
-                // If the first point, one pixel is taken up by the border, which
-                // isn't counted as part of the height in the box model.
+                // If this is the first point of at least 1 pixel height, take one
+                // pixel off it to add the top border (which is not considered part
+                // of the box model).
+                $firstPointStyle = '';
                 if ($oldHeight === 0) {
                     if ($dataPointHeight > 0) {
+                        $firstPointStyle = ' first-point';
                         $dataPointHeight--;
                     }
                 }
 
-                // But if this made the height negative, offset the cumulative
-                // height by this amount and make the data point zero pixels high.
-                if ($dataPointHeight < 0) {
-                    $cumHeight      += $dataPointHeight;
-                    $dataPointHeight = 0;
-                }
-
                 ob_start();
-                    echo '<li class="'.$class.'-data-point';
+                    echo '<li class="'.$class.'-data-point'.$firstPointStyle;
                     echo ' '.$class.'-bar-colour-'.$groups[$groupIndex]['colour'];
                     echo ' '.$class.'-bar-style-'.$groups[$groupIndex]['style'];
                     echo '" title="'.$pointTitle.'"';
                     echo ' style="height: ';
-                    echo $dataPointHeight.'px">';
+                    echo max($dataPointHeight, 0).'px">';
                     echo '<span class="'.$class.'-data-point-alt-text">';
                     echo $pointTitle;
                     echo '</span>';

@@ -54,7 +54,7 @@ ul.GUIGraphBar-data-row ul {
     border-bottom: none;
 }
 
-.GUIGraphBar-data-point:first-child {
+.GUIGraphBar-data-point.first-point {
     border-top: 1px solid #A0A0A0;
 }
 
