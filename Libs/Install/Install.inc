@@ -124,41 +124,27 @@ class Install
             const PROFILE_SUFFIX = '_profile';
             const MODE_SUFFIX    = '_mode';
 
+            private static \$_rootUrl = NULL;
+
             public static function getBaseURL(\$force=FALSE)
             {
+                if (self::\$_rootUrl !== NULL) { 	 
+                    return self::\$_rootUrl; 	 
+                }
+
                 include_once 'Libs/Web/Web.inc';
                 include_once 'Systems/BaseSystem.inc';
                 \$currentUrl = Web::getCurrentUrl(FALSE);
 
-                include BaseSystem::getDataDir().'/urls.inc';
-                \$matchUrls = Array();
-                foreach (\$mysourceUrls as \$url) {
-                    if (strpos(\$currentUrl, \$url) === 0) {
-                        \$matchUrls[] = \$url;
-                    }
+                Channels::includeSystem('Lookup');
+                \$rootUrl = DAL::getAssoc(Lookup::getClosestRootUrl(\$currentUrl));
+                if (empty(\$rootUrl) === FALSE) {
+                    self::\$_rootUrl = \$rootUrl[0]['url'];
+                    return \$rootUrl[0]['url'];
                 }
 
-                // If we have only one match, just return it
-                if (count(\$matchUrls) === 1) {
-                    return array_pop(\$matchUrls);
-                } else if (count(\$matchUrls) > 1) {
-                    // We are checking for overlapped system root urls
-                    \$finalMatchUrls = \$matchUrls;
-                    foreach (\$matchUrls as \$index => \$matchUrl) {
-                        foreach (\$matchUrls as \$indexLvlTwo => \$matchUrlLvlTwo) {
-                            if (\$matchUrl !== \$matchUrlLvlTwo && strpos(\$matchUrlLvlTwo, \$matchUrl) !== FALSE) {
-                                unset(\$finalMatchUrls[\$index]);
-                            }//end if
-                        }//end foreach
-                    }//end foreach
-
-                    if (!empty(\$finalMatchUrls) && count(\$finalMatchUrls) === 1) {
-                        return array_pop(\$finalMatchUrls);
-                    }//end if
-
-                }//end else
-
                 if (\$force === TRUE) {
+                    include BaseSystem::getDataDir().'/urls.inc';
                     return \$mysourceUrls[0];
                 }
 
