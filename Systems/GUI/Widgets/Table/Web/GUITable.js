@@ -9,12 +9,14 @@ GUITable.prototype = {
 
     init: function()
     {
-        $("#" + this.id + "").tablesorter();
+        if (this.settings.sortable === 'true') {
+            $("#" + this.id + "").tablesorter();
+        }
 
         var self      = this;
         var tableElem = dfx.getId(this.id);
 
-        if (this.settings['selectable'] === 'true') {
+        if (this.settings.selectable === 'true') {
             // Rows are selectable add the click event.
             dfx.addEvent(tableElem, 'click', function(e) {
                 var target = dfx.getMouseEventTarget(e);

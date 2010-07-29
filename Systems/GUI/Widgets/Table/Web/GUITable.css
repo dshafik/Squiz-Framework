@@ -11,10 +11,13 @@ table.GUITable {
 }
 
 .GUITable th {
-    background: url('table_header_bg.png') repeat-x;
-    color: #656464;
-    border-top: 1px solid #CECECE;
-    line-height: 33px;
+    background-color: #aaa;
+    color: #FFF;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 10px;
+    padding-bottom: 3px;
+    padding-top: 3px;
 }
 
 .GUITable-firstCol {
@@ -35,11 +38,13 @@ table.GUITable {
     line-height: 30px;
 }
 
-.GUITable.noBorders td {
+.GUITable.noBorders td,
+.GUITable.noBorders th {
     border-right: none;
 }
 
-.GUITable.noBorders td.GUITable-firstCol {
+.GUITable.noBorders td.GUITable-firstCol,
+.GUITable.noBorders th.GUITable-firstCol {
     border-left: none;
 }
 
