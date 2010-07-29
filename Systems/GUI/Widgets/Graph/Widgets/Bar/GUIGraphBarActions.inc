@@ -473,7 +473,7 @@ class GUIGraphBarActions
                 // pixel off it to add the top border (which is not considered part
                 // of the box model).
                 $firstPointStyle = '';
-                if ($oldHeight === 0) {
+                if (round($cumHeight) === $barHeight) {
                     if ($dataPointHeight > 0) {
                         $firstPointStyle = ' first-point';
                         $dataPointHeight--;
