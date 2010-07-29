@@ -4,7 +4,6 @@ function GUIContentSwitcher(id, settings)
     this.settings  = settings;
     this.className = 'GUIContentSwitcher';
 
-
     this.loadedWidgets = [];
 
     this.init();
@@ -22,7 +21,11 @@ GUIContentSwitcher.prototype = {
     addEvents: function()
     {
         var parentElem = dfx.getId(this.id);
-        var buttons    = dfx.getTag('li', parentElem);
+        if (!parentElem) {
+            return;
+        }
+
+        var buttons = dfx.getTag('li', parentElem);
 
         var self = this;
         dfx.addEvent(buttons, 'click', function(e) {
@@ -90,8 +93,10 @@ GUIContentSwitcher.prototype = {
                     var widget = widgets[i];
                     self.loadedWidgets.push(widget.id);
 
-                    var widgetObj = eval('new ' + widget.type + '(widget.id, widget.settings)');
-                    GUI.addWidget(widget.id, widgetObj);
+                    if (window[widget.type]) {
+                        var widgetObj = eval('new ' + widget.type + '(widget.id, widget.settings)');
+                        GUI.addWidget(widget.id, widgetObj);
+                    }
                 }
             });
         });

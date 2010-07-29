@@ -40,12 +40,15 @@ class GUIContentSwitcherActions
             }
         }
 
-
-        $content = GUI::callStatic(
-            $settings['type'],
-            'getButtonsContent',
-            array($settings)
-        );
+        if ($settings['showButtons'] !== 'false') {
+            $content = GUI::callStatic(
+                $settings['type'],
+                'getButtonsContent',
+                array($settings)
+            );
+        } else {
+            $content .= '<span />';
+        }
 
         if (empty($settings['initialItem']) === FALSE
             || ($settings['loadType'] === 'static'
@@ -84,7 +87,7 @@ class GUIContentSwitcherActions
         $count = 1;
         $extraClass = ' positionFirst';
         foreach ($settings['items'] as $mode) {
-            $content .= '<li id="%id%" class="%class%-modeButton'.$extraClass.'">';
+            $content .= '<li id="%id%-'.$mode['id'].'" class="%class%-modeButton'.$extraClass.'">';
             $content .= '<a href="#" modeid="'.$mode['id'].'" system="'.$mode['system'].'">'.$mode['label'].'</a></li>';
 
             if (($total - 1) === $count) {

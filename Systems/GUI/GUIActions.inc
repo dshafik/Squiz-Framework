@@ -119,9 +119,21 @@ class GUIActions
         $dest     = $dataPath.'/Templates/'.$template.'.php';
 
         if (file_exists($dest) === FALSE) {
-            echo '<div>ERROR: Template ('.$template.') file not found. ('.$dest.')</div>';
-            return;
-        }
+            // It might not have been baked yet, try it now..
+            $tplFilePath = Channels::getSystemsPath($systemName).'/Templates/'.$template;
+            if (file_exists($tplFilePath) === TRUE) {
+                ob_start();
+                    $tplDoc = GUI::getTemplateContent($systemName, array(), $tplFilePath);
+                    if ($tplDoc !== NULL) {
+                        GUI::bakeTemplate($systemName, $template, $tplDoc);
+                    }
+
+                ob_end_clean();
+            } else {
+                echo '<div>ERROR: Template ('.$template.') file not found. ('.$dest.')</div>';
+                return;
+            }
+        }//end if
 
         $deps = GUI::getTemplateDependentFiles($systemName, $template);
 

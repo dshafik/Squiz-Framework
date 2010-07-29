@@ -31,35 +31,63 @@ class GUITableActions
      */
     public static function getTemplateContent(array $settings=array())
     {
-        $content  = '<table class="%class%" id="%id%" cellspacing="0" cellpadding="0">';
-        $content .= '<thead>';
-        $content .= '<tr>';
+        $tableClass = '%class%';
 
-        $lastColid = (count($settings['columns']) - 1);
-        foreach ($settings['columns'] as $colid => $column) {
-            $colClass = 'middle';
-            if ($colid === 0) {
-                $colClass = 'first';
-            } else if ($colid === $lastColid) {
-                $colClass = 'last';
-            }
-
-            $content .= '<th align="'.$column['align'].'" class="%class%-'.$colClass.'col">&lt;?php echo _('.var_export($column['name'], TRUE).'); ?&gt;</th>';
+        include_once 'Libs/Util/Util.inc';
+        $showTableBorders = Util::getArrayIndex($settings, 'showBorders', 'false');
+        if ($showTableBorders === 'false') {
+            $tableClass .= ' noBorders';
         }
 
-        $content .= '</tr>';
-        $content .= '</thead>';
+        $alternateType = Util::getArrayIndex($settings, 'alternate', NULL);
+        if ($alternateType === 'rows') {
+            $tableClass .= ' alternateRows';
+        } else if ($alternateType === 'cols') {
+            $tableClass .= ' alternateCols';
+        }
+
+        $selectable = Util::getArrayIndex($settings, 'selectable', FALSE);
+        if ($selectable === 'true') {
+            $tableClass .= ' selectable';
+        }
+
+        $content = '<table class="'.$tableClass.'" id="%id%" cellspacing="0" cellpadding="0">';
+
+        $columns = $settings['columns'];
+        if (isset($settings['hideHeader']) === FALSE
+            || $settings['hideHeader'] !== 'true'
+        ) {
+            $content .= '<thead>';
+            $content .= '<tr>';
+
+            $lastColid = (count($columns) - 1);
+            foreach ($columns as $colid => $column) {
+                $colClass = 'middle';
+                if ($colid === 0) {
+                    $colClass = 'first';
+                } else if ($colid === $lastColid) {
+                    $colClass = 'last';
+                }
+
+                $content .= '<th align="'.$column['align'].'" class="%class%-'.$colClass.'Col">&lt;?php echo _('.var_export($column['name'], TRUE).'); ?&gt;</th>';
+            }
+
+            $content .= '</tr>';
+            $content .= '</thead>';
+        }//end if
+
         $content .= '<tbody>';
 
         // Load the table rows.
         list($providerSystem, $providerMethod) = explode('::', $settings['dataProvider']);
-        $content .= '<?php ';
+        $content .= '<?'.'php ';
         $content .= 'Channels::includeSystem(\'GUITable\');';
         $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-        $content .= '$columns = '.var_export($settings['columns'], TRUE).';';
+        $content .= '$columns = '.var_export($columns, TRUE).';';
         $content .= '$data = '.$settings['dataProvider'].'();';
-        $content .= 'GUITable::paintRows($data, $columns, \'%id%\', \'%class%\');';
-        $content .= ' ?>';
+        $content .= '$settings = '.var_export($settings, TRUE).';';
+        $content .= 'GUITable::paintRows($data, $columns, $settings);';
+        $content .= ' ?'.'>';
 
         $content .= '</tbody>';
         $content .= '</table>';
@@ -87,33 +115,62 @@ class GUITableActions
     /**
      * Paint the rows of the table.
      *
-     * @param array  $rows    An array of arrays that contain row data.
-     * @param array  $columns An array of column names and information.
-     * @param string $id      The ID used by the table.
-     * @param string $class   The class used by the table.
+     * @param array $rows     An array of arrays that contain row data.
+     * @param array $columns  An array of column names and information.
+     * @param array $settings Settings for the widget.
      *
      * @since  4.0.0
      * @return void
      */
-    public static function paintRows(array $rows, array $columns, $id, $class)
+    public static function paintRows(array $rows, array $columns, array $settings)
     {
-        $lastColid = (count($columns) - 1);
+        $id         = $settings['id'];
+        $class      = 'GUITable';
+        $colids     = array_keys($columns);
+        $lastColid  = $colids[(count($colids) - 1)];
+        $firstColid = $colids[0];
+        $rowCount   = count($rows);
+        $rowClass   = ' firstRow';
 
-        foreach ($rows as $row) {
-            echo '<tr>';
-            foreach ($row as $colid => $col) {
-                $colClass = 'middle';
-                if ($colid === 0) {
-                    $colClass = 'first';
-                } else if ($colid === $lastColid) {
-                    $colClass = 'last';
-                }
-
-                echo '<td align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.'col">'.$col.'</td>';
+        foreach ($rows as $idx => $row) {
+            if ($idx === ($rowCount - 1)) {
+                $rowClass = ' lastRow';
+            } else if ($idx !== 0) {
+                $rowClass = ' midRow';
             }
 
+            echo '<tr class="';
+
+            if ((($idx + 1) % 2) === 0) {
+                echo 'rowEven';
+            } else {
+                echo 'rowOdd';
+            }
+
+            echo '">';
+
+            $colIdx = 1;
+            foreach ($row as $colid => $col) {
+                $colClass = 'middleCol';
+                if ($colid === $firstColid) {
+                    $colClass = 'firstCol';
+                } else if ($colid === $lastColid) {
+                    $colClass = 'lastCol';
+                }
+
+                if ((($colIdx + 1) % 2) === 0) {
+                    $colClass .= ' colEven';
+                } else {
+                    $colClass .= ' colOdd';
+                }
+
+                echo '<td align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.'">'.$col.'</td>';
+
+                $colIdx++;
+            }//end foreach
+
             echo '</tr>';
-        }
+        }//end foreach
 
     }//end paintRows()
 

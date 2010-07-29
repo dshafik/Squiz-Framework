@@ -1,7 +1,11 @@
+table.GUITable {
+    width: 100%;
+}
+
 .GUITable th, .GUITable td {
     font-family: arial;
     font-weight: normal;
-    font-size: 12px;
+    font-size: 11px;
     padding-left: 15px;
     padding-right: 15px;
 }
@@ -13,7 +17,7 @@
     line-height: 33px;
 }
 
-.GUITable-firstcol {
+.GUITable-firstCol {
     border-left: 1px solid #CECECE;
 }
 
@@ -21,7 +25,7 @@
     border-right: 1px solid #CECECE;
 }
 
-.GUITable-firstcol, .GUITable th.GUITable-middlecol {
+.GUITable-firstCol, .GUITable th.GUITable-middlecol {
     border-right: 1px solid #FFF;
 }
 
@@ -29,4 +33,28 @@
     border-bottom: 1px solid #CECECE;
     border-right: 1px solid #CECECE;
     line-height: 30px;
+}
+
+.GUITable.noBorders td {
+    border-right: none;
+}
+
+.GUITable.noBorders td.GUITable-firstCol {
+    border-left: none;
+}
+
+.GUITable.alternateRows tr.rowOdd {
+    background-color: #DDD;
+}
+
+.GUITable.alternateCols td.colOdd {
+    background-color: #CCC;
+}
+
+.GUITable tr.selected {
+    background-color: #89F;
+}
+
+.GUITable.selectable tr {
+    cursor: pointer;
 }

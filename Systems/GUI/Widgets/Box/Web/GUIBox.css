@@ -1,0 +1,61 @@
+.GUIBox-header {
+    position: relative;
+    padding: 3px;
+    overflow: hidden;
+    border: 1px solid;
+    border-color: #DCDCDC #DCDCDC #BBB;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+    -moz-border-radius-topleft: 9px;
+    -moz-border-radius-topright: 9px;
+    background-color: #e4e4e4;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f6f6f6), to(#d8d8d8));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #f6f6f6, #d8d8d8);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#f6f6f6, endColorstr=#d8d8d8);
+}
+
+.GUIBox-title {
+    float: left;
+    line-height: 32px;
+    margin: 0 10px;
+    font-weight: bold;
+    font-size: 12px;
+    color: #69717a;
+}
+
+.GUIBox-headerContent {
+    float: left;
+    line-height: 32px;
+    font-size: 12px;
+    color: #69717a;
+}
+
+.GUIBox-content {
+    border: 1px solid #dcdcdc;
+    border-top: none;
+    border-bottom-left-radius: 9px;
+    border-bottom-right-radius: 9px;
+    -moz-border-radius-bottomleft: 9px;
+    -moz-border-radius-bottomright: 9px;
+    padding-bottom: 5px;
+}
+
+.GUIBox.noLeftBorder .GUIBox-header {
+    border-top-left-radius: 0;
+    -moz-border-radius-topleft: 0;
+}
+
+.GUIBox.noRightBorder .GUIBox-header {
+    border-top-right-radius: 0;
+    -moz-border-radius-topRight: 0;
+}
+
+.GUIBox.noLeftBorder .GUIBox-content {
+    border-bottom-left-radius: 0;
+    -moz-border-radius-bottomleft: 0;
+}
+
+.GUIBox.noRightBorder .GUIBox-content {
+    border-bottom-right-radius: 0;
+    -moz-border-radius-bottomright: 0;
+}

@@ -69,4 +69,35 @@ var GUI = new function()
         };
     };
 
+    /**
+     * Loads content in to the specified element or elementid.
+     *
+     * Result from the called method must have result.contents and result.widgets.
+     * All widgets that are contained in the content will be initialised.
+     */
+    this.loadContent = function(system, method, targetElement, params) {
+        if (dfx.isObj(targetElement) === false) {
+            targetElement = dfx.getId(targetElement);
+        }
+
+        sfapi.get(system, method, params, function(data) {
+            // Set the contents.
+            dfx.setHtml(targetElement, data.result.contents);
+
+            dfx.foreach(data.result.widgets, function(templateKey) {
+                var widgets = data.result.widgets[templateKey];
+                var wln     = widgets.length;
+                for (var i = 0; i < wln; i++) {
+                    var widget = widgets[i];
+
+                    if (window[widget.type]) {
+                        var widgetObj = eval('new ' + widget.type + '(widget.id, widget.settings)');
+                        GUI.addWidget(widget.id, widgetObj);
+                    }
+                }
+            });
+        });
+
+    };
+
 };
