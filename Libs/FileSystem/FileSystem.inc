@@ -809,7 +809,7 @@ class FileSystem
 
 
     /**
-     * Create a directory in the file system..
+     * Create a directory in the file system.
      *
      * @param string  $pathname  The directory path.
      * @param integer $mode      The mode is 0777 by default, which means the
@@ -817,7 +817,7 @@ class FileSystem
      * @param boolean $recursive Default to FALSE.
      *
      * @since  4.0.0
-     * @return integer
+     * @return boolean
      */
     public static function mkdir($pathname, $mode=0777, $recursive=FALSE)
     {
@@ -856,6 +856,7 @@ class FileSystem
             $mode,
             $recursive
         );
+
         return self::$changedFiles[$pathname]['result'];
 
     }//end mkdir()
