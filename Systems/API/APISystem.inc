@@ -47,6 +47,10 @@ class APISystem extends BaseSystem
 
         Channels::includeSystem('API');
         $ovenDir = Init::ROOT_DIR.'/Channels/Oven';
+        if (class_exists('Systems') === FALSE) {
+            include_once $ovenDir.'/systems.inc';
+        }
+
         foreach (Systems::$systems as $systemName => $enabled) {
             if ($enabled !== TRUE
                 || file_exists($ovenDir.'/'.$systemName.'/'.$systemName.'.inc') === FALSE
