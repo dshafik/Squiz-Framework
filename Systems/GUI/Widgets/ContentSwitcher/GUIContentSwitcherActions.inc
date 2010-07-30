@@ -229,7 +229,6 @@ class GUIContentSwitcherActions
             'getBodyContent',
             array($settings)
         );
-        //$content = self::getBodyContent($settings);
 
         $doc = new DOMDocument('1.0');
         $doc->loadXML($content);

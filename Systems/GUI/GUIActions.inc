@@ -92,7 +92,6 @@ class GUIActions
      */
     private static $_tmpWidgetSettings = array();
 
-
     /**
      * Template stack.
      *
@@ -102,6 +101,16 @@ class GUIActions
      * @since 4.0.0
      */
     private static $_templateStack = array();
+
+    /**
+     * Variable to keep track of baking process.
+     *
+     * If TRUE then templates are being baked.
+     *
+     * @var   boolean
+     * @since 4.0.0
+     */
+    private static $_isBaking = FALSE;
 
 
     /**
@@ -146,9 +155,95 @@ class GUIActions
             }
         }
 
-        include_once $dest;
+        if (self::$_isBaking === TRUE) {
+            echo '<?php include_once "'.$dest.'"; ?>';
+        } else {
+            include_once $dest;
+        }
 
     }//end printTemplate()
+
+
+    /**
+     * Bakes all the templates in the Systems dir.
+     *
+     * @param boolean $minified If TRUE then JS and CSS will be minified.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function bakeTemplates($minified=FALSE)
+    {
+        self::$_isBaking = TRUE;
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        $root = BaseSystem::getSystemRootPath();
+        $path = $root.'/Systems';
+
+        // Get the tpl files.
+        $templateDirs = FileSystem::findDirectories($path, 'Templates');
+
+        if (empty($templateDirs) === TRUE) {
+            return;
+        }
+
+        // Get All JS and CSS files in the system.
+        $jsFiles  = FileSystem::listDirectory($path, array('.js'));
+        $cssFiles = FileSystem::listDirectory($path, array('.css'));
+
+        $ignoreJSFiles = array('SquizAPI_demo.js');
+
+        // Convert them to URLs.
+        foreach ($jsFiles as $index => $file) {
+            if (strpos($file, 'DfxJSLib') !== FALSE
+                || in_array(basename($file), $ignoreJSFiles) === TRUE
+            ) {
+                unset($jsFiles[$index]);
+            } else {
+                $url = str_replace($root, '', $file);
+                $jsFiles[$index] = $url;
+            }
+        }
+
+        $guiPath = GUI::getSystemWebPath('GUI');
+        array_unshift($jsFiles, $guiPath.'/DfxJSLib/mysource.js');
+        $url        = str_replace($root, '', $guiPath.'/DfxJSLib/mysource.js');
+        $jsFiles[0] = '/'.$url;
+
+        foreach ($cssFiles as $index => $file) {
+            $url = str_replace($root, '', $file);
+            $cssFiles[$index] = $url;
+        }
+
+        if ($minified === FALSE) {
+            GUI::setJSIncludes($jsFiles);
+            GUI::setCSSIncludes($cssFiles);
+        }
+
+        foreach ($templateDirs as $tplDir) {
+            $tplFiles = FileSystem::listDirectory($tplDir, array('.tpl'));
+
+            $systemName = NULL;
+            $syOvenPath = NULL;
+            $bakeDest   = NULL;
+
+            foreach ($tplFiles as $file) {
+                // Get the system name for the template.
+                if ($systemName === NULL) {
+                    $systemName = GUI::getSystemNameFromTemplate($file);
+                    Channels::includeSystem($systemName);
+                }
+
+                $tplDoc = GUI::getTemplateContent($systemName, array(), $file);
+                if ($tplDoc !== NULL) {
+                    GUI::bakeTemplate($systemName, basename($file), $tplDoc);
+                }
+            }
+        }//end foreach
+
+        self::$_isBaking = FALSE;
+
+    }//end bakeTemplates()
 
 
     /**
@@ -330,18 +425,18 @@ class GUIActions
 
 
     /**
-    * Get the details of the template including the current widget during bake time.
-    *
-    * Only gives meaningful information when getTemplateContent() is being called,
-    * and we are getting the contents of a widget (more correctly, we are not working
-    * on a top-level template). Otherwise, returns NULL.
-    *
-    * We get the SECOND template on the stack, since the first one will be the
-    * currently printed template.
-    *
-    * @since  4.0.0
-    * @return array
-    */
+     * Get the details of the template including the current widget during bake time.
+     *
+     * Only gives meaningful information when getTemplateContent() is being called,
+     * and we are getting the contents of a widget (more correctly, we are not working
+     * on a top-level template). Otherwise, returns NULL.
+     *
+     * We get the SECOND template on the stack, since the first one will be the
+     * currently printed template.
+     *
+     * @since  4.0.0
+     * @return array
+     */
     public static function getBakeTimeIncludingTemplate()
     {
         if (count(self::$_templateStack) > 1) {
@@ -355,7 +450,7 @@ class GUIActions
 
         return $retval;
 
-    }//end getParentTemplate()
+    }//end getBakeTimeIncludingTemplate()
 
 
     /**
