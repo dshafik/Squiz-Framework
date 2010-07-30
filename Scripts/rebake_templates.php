@@ -28,8 +28,8 @@ foreach ($templateDirs as $templateDirPath) {
 }
 
 // Re-run GUI installation function.
-include_once $rootdir.'/Systems/GUI/GUISystem.inc';
-$guiSys = new GUISystem();
-$guiSys->bakeTemplates();
+include_once 'Channels/Channels.inc';
+Channels::includeSystem('GUI');
+GUI::bakeTemplates();
 
 ?>
