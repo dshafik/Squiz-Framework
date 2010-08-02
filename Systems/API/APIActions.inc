@@ -89,7 +89,7 @@ class APIActions
         $url = rtrim($url, '/');
         $ch  = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $url.'/'.self::$_serviceWebPath.'/');
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
