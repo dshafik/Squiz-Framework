@@ -338,7 +338,14 @@ class GUIGraphBarActions
                 } else {
                     // Auto tick!
                     $tickExp = pow(10, floor(log($maxValue, 10)));
-                    $maxExp = $maxValue / $tickExp;
+
+                    if ((int) $tickExp === 0) {
+                        $maxExp  = 1;
+                        $tickExp = 2;
+                    } else {
+                        $maxExp = $maxValue / $tickExp;
+                    }
+
                     if ($maxExp > 6) {
                         $tickExp *= 2;
                     } else if ($maxExp <= 3) {
@@ -349,11 +356,11 @@ class GUIGraphBarActions
                     if ($tick['minor'] === NULL) {
                         $tick['minor'] = $tick['major'] / 2;
                     }
-                }
-            }
+                }//end if
+            }//end if
 
             $maxValue = ceil($maxValue / $tick['major']) * $tick['major'];
-        }
+        }//end if
 
         if ($hasXAxis === TRUE) {
             $belowAxisHeight += (self::$_xAxisHeight + 1);
@@ -394,7 +401,11 @@ class GUIGraphBarActions
 
             // Calculate how high our bar is allowed to be in total.
             $rowTotal    = array_sum($dataRow['data']);
-            $barHeight   = round(($rowTotal / $maxValue * $maxBarHeight));
+            if ((int) $maxValue === 0) {
+                $barHeight = 0;
+            } else {
+                $barHeight   = round(($rowTotal / $maxValue * $maxBarHeight));
+            }
             $totalHeight = ($barHeight + $belowAxisHeight);
 
             // Make room for a label.
