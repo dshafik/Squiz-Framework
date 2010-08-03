@@ -271,7 +271,7 @@ dfx.ellipsize = function(value, length)
     }
 
     // If the string is not long enough, don't change it.
-    if (value.length < length) {
+    if (value.length <= length) {
         return value;
     }
 
