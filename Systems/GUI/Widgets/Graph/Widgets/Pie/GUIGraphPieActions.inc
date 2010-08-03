@@ -12,6 +12,7 @@
 
 require_once 'Systems/BaseSystem.inc';
 require_once 'Libs/Util/Util.inc';
+require_once 'Libs/Web/Web.inc';
 
 /**
  * Actions Class for the Pie Graph Widget (GUIGraphPie) System.
@@ -38,13 +39,27 @@ class GUIGraphPieActions
         // same size.
         $size = (int) Util::getArrayIndex($settings, 'size');
 
-        $content  = '<object data="/__api/raw/GUIGraphPie/getSVGContents?';
-        $content .= 'system='.$currentTemplate['system'];
-        $content .= '&amp;template='.$currentTemplate['template'];
-        $content .= '&amp;widgetId='.$settings['id'];
-        $content .= '" style="width: '.$size.'px; height: '.$size.'px;"';
+        $params = Web::getQueryStringParams();
+        unset($params['_callback']);
+
+        $url = '/__api/raw/GUIGraphPie/getSVGContents';
+
+        $content  = '<span>';
+        $content .= '&lt;?php'."\n";
+        $content .= 'include_once \'Libs/Web/Web.inc\';'."\n\n";
+        $content .= '$url    = \''.addslashes($url).'\';'."\n";
+        $content .= '$params = Web::getQueryStringParams();'."\n";
+        $content .= 'unset($params[\'_callback\']);'."\n\n";
+        $content .= '$params[\'system\']   = \''.addslashes($currentTemplate['system']).'\';'."\n";
+        $content .= '$params[\'template\'] = \''.addslashes($currentTemplate['template']).'\';'."\n";
+        $content .= '$params[\'widgetId\'] = \''.addslashes($settings['id']).'\';'."\n\n";
+        $content .= '$url = Web::appendQueryString($params, $url);';
+        $content .= '?&gt;'."\n";
+        $content .= '<object data="&lt;?php echo $url; ?&gt;"';
+        $content .= ' style="width: '.$size.'px; height: '.$size.'px;"';
         $content .= ' type="image/svg+xml">'."\n";
         $content .= '</object>'."\n";
+        $content .= '</span>';
 
         return $content;
 
@@ -72,6 +87,7 @@ class GUIGraphPieActions
      *
      * @param array  $data          The provided data.
      * @param array  $ringConf      Ring configuration settings.
+     * @param array  $borderConf    Border configuration settings.
      * @param array  $dataPointConf Data point configuration settings.
      * @param string $id            ID of the widget.
      * @param string $class         Class (prefix) of the widget.
@@ -82,6 +98,7 @@ class GUIGraphPieActions
     public static function paintData(
         array $data,
         array $ringConf,
+        array $borderConf,
         array $dataPointConf,
         $id,
         $class
@@ -94,6 +111,22 @@ class GUIGraphPieActions
 
         if ($total <= 0) {
             return;
+        }
+
+
+
+        if (empty($borderConf) === FALSE) {
+            $radius = (int) Util::getArrayIndex($borderConf, 'radius', 0);
+
+            foreach ($ringConf as $ring) {
+                $radius += (int) $ring['radius'];
+            }
+
+            if ($radius > 0) {
+                echo '<svg:circle cx="0" cy="0" ';
+                echo 'r="'.($radius).'" ';
+                echo ' class="colour-'.$borderConf['colour'].'" />';
+            }
         }
 
         // Then normalise the data points to a [0..1] value.
@@ -147,7 +180,7 @@ class GUIGraphPieActions
 
                 if ($thisAngle > 0) {
                     // We need to negate the Y points... normally when converting
-                    // points on a circle to an XY-graph co-ordinate, positive Y is
+                    // points on a circl to an XY-graph co-ordinate, positive Y is
                     // going UP on the graph. However in SVG, positive Y is going
                     // DOWN on the graph, so we need to flip the values.
                     $points = array(
@@ -299,6 +332,27 @@ class GUIGraphPieActions
                             unset($ring);
 
                             /*
+                                Border definitions:
+                                - radius:  Radius of the outer border.
+                                - colour:  Pre-defined colour.
+                            */
+
+                            $border = (array) Util::getArrayIndex($settings, 'border', array());
+
+                            if (count($border) > 0) {
+                                $border = $border[0];
+                            }
+
+                            if (array_key_exists('colour', $border) === FALSE) {
+                                $border = array();
+                            }
+
+                            $totalRadius += Util::getArrayIndex($border, 'radius', 0);
+
+                            // Unset by-ref foreach value.
+                            unset($ring);
+
+                            /*
                                 Data point definitions:
                                 - label:   Label to show when mousing over the
                                            data point.
@@ -316,7 +370,7 @@ class GUIGraphPieActions
                             echo ' viewBox="'.(-$totalRadius).' '.(-$totalRadius);
                             echo ' '.($totalRadius * 2).' '.($totalRadius * 2).'">'."\n";
 
-                            GUIGraphPie::paintData($data, $rings, $dpConf, $settings['id'], 'GUIGraphPie');
+                            GUIGraphPie::paintData($data, $rings, $border, $dpConf, $settings['id'], 'GUIGraphPie');
 
                             echo '</svg:svg>';
 

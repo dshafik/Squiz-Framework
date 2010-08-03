@@ -33,3 +33,7 @@
 .GUIGraphPie .colour-grass {
     fill: #789312;
 }
+
+.GUIGraphPie .colour-white {
+    fill: #FFF;
+}
