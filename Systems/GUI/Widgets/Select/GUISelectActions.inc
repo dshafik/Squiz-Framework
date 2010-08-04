@@ -39,10 +39,12 @@ class GUISelectActions
         }
 
         // Load the list items.
-        list($providerSystem, $providerMethod) = explode(
-            '::',
-            $settings['dataProvider']
-        );
+        if (isset($settings['dataProvider']) === TRUE) {
+            list($providerSystem, $providerMethod) = explode(
+                '::',
+                $settings['dataProvider']
+            );
+        }
 
         $content = '<select id="%id%" class="%class%"';
 
@@ -52,12 +54,20 @@ class GUISelectActions
 
         $content .= '>';
 
-        $content .= '<?php ';
-        $content .= 'Channels::includeSystem(\'GUISelect\');';
-        $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-        $content .= '$data = '.$settings['dataProvider'].'();';
-        $content .= 'GUISelect::paintItems($data, \'%id%\', \'%class%\');';
-        $content .= ' ?>';
+        if (isset($settings['dataProvider']) === TRUE) {
+            $content .= '<?php ';
+            $content .= 'Channels::includeSystem(\'GUISelect\');';
+            $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
+            $content .= '$data = '.$settings['dataProvider'].'();';
+            $content .= 'GUISelect::paintItems($data, \'%id%\', \'%class%\');';
+            $content .= ' ?>';
+        } else if (isset($settings['items']) === TRUE) {
+            $data     = $settings['items'];
+            ob_start();
+                GUISelect::paintItems($data, $settings['id'], 'GUISelect');
+                $content .= ob_get_contents();
+            ob_end_clean();
+        }
 
         $content .= '</select>';
 

@@ -28,12 +28,18 @@ class GUITableActions
      *
      * @since  4.0.0
      * @return string
+     * @throws ChannelException If settings are incorrect.
      */
     public static function getTemplateContent(array $settings=array())
     {
         $tableClass = '%class%';
 
         include_once 'Libs/Util/Util.inc';
+        $columns = Util::getArrayIndex($settings, 'columns', array());
+        if (empty($columns) === TRUE) {
+            throw new ChannelException(_('Table widget must have at least one column'));
+        }
+
         $showTableBorders = Util::getArrayIndex($settings, 'showBorders', 'false');
         if ($showTableBorders === 'false') {
             $tableClass .= ' noBorders';
@@ -53,20 +59,22 @@ class GUITableActions
 
         $content = '<table class="'.$tableClass.'" id="%id%" cellspacing="0" cellpadding="0">';
 
-        $columns = $settings['columns'];
         if (isset($settings['hideHeader']) === FALSE
             || $settings['hideHeader'] !== 'true'
         ) {
             $content .= '<thead>';
             $content .= '<tr>';
 
-            $lastColid = (count($columns) - 1);
+            $colids     = array_keys($columns);
+            $lastColid  = $colids[(count($colids) - 1)];
+            $firstColid = $colids[0];
             foreach ($columns as $colid => $column) {
-                $colClass = 'middle';
-                if ($colid === 0) {
+                if ($colid === $firstColid) {
                     $colClass = 'first';
                 } else if ($colid === $lastColid) {
                     $colClass = 'last';
+                } else {
+                    $colClass = 'middle';
                 }
 
                 $content .= '<th align="'.$column['align'].'" class="%class%-'.$colClass.'Col">&lt;?php echo _('.var_export($column['name'], TRUE).'); ?&gt;</th>';
@@ -83,9 +91,9 @@ class GUITableActions
         $content .= '<?'.'php ';
         $content .= 'Channels::includeSystem(\'GUITable\');';
         $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-        $content .= '$columns = '.var_export($columns, TRUE).';';
-        $content .= '$data = '.$settings['dataProvider'].'();';
         $content .= '$settings = '.var_export($settings, TRUE).';';
+        $content .= '$columns = '.var_export($columns, TRUE).';';
+        $content .= '$data = '.$settings['dataProvider'].'($settings);';
         $content .= 'GUITable::paintRows($data, $columns, $settings);';
         $content .= ' ?'.'>';
 
@@ -132,16 +140,17 @@ class GUITableActions
         $rowCount   = count($rows);
         $rowClass   = ' firstRow';
 
-        foreach ($rows as $idx => $row) {
-            if ($idx === ($rowCount - 1)) {
+        $idx = 1;
+        foreach ($rows as $rowid => $row) {
+            if ($idx === $rowCount) {
                 $rowClass = ' lastRow';
-            } else if ($idx !== 0) {
+            } else if ($idx !== 1) {
                 $rowClass = ' midRow';
             }
 
-            echo '<tr class="';
+            echo '<tr rowid="'.$rowid.'" class="';
 
-            if ((($idx + 1) % 2) === 0) {
+            if (($idx % 2) === 0) {
                 echo 'rowEven';
             } else {
                 echo 'rowOdd';
@@ -158,18 +167,20 @@ class GUITableActions
                     $colClass = 'lastCol';
                 }
 
-                if ((($colIdx + 1) % 2) === 0) {
+                if (($colIdx % 2) === 0) {
                     $colClass .= ' colEven';
                 } else {
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.'">'.$col.'</td>';
+                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.'">'.$col.'</td>';
 
                 $colIdx++;
             }//end foreach
 
             echo '</tr>';
+
+            $idx++;
         }//end foreach
 
     }//end paintRows()

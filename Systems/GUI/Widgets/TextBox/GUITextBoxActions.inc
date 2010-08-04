@@ -20,8 +20,21 @@ require_once 'Systems/BaseSystem.inc';
 class GUITextBoxActions
 {
 
-    private static $defaultValue = '';
-    private static $width = '30';
+    /**
+     * Default value of the field.
+     *
+     * @var   string
+     * @since 4.0.0
+     */
+    private static $_defaultValue = '';
+
+    /**
+     * Width of the field.
+     *
+     * @var   string
+     * @since 4.0.0
+     */
+    private static $_width = '30';
 
 
     /**
@@ -37,16 +50,25 @@ class GUITextBoxActions
         $content  = '<div class="%class% container" id="%id%">';
         $content .= '<?php ';
         if (isset($settings['dataProvider']) === TRUE) {
-            list($providerSystem, $providerMethod) = explode('::', $settings['dataProvider']);
+            list($providerSystem, $providerMethod) = explode(
+                '::',
+                $settings['dataProvider']
+            );
+
             $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
             $content .= '$value = '.$settings['dataProvider'].'();';
         } else {
-            $content .= '$value = '.Util::getArrayIndex($settings, 'default', self::$defaultValue).';';
+            $defaultValue = "'".self::$_defaultValue."'";
+            $content     .= '$value = '.Util::getArrayIndex(
+                $settings,
+                'default',
+                $defaultValue
+            ).';';
         }
 
         $content .= ' ?>';
 
-        $width         = Util::getArrayIndex($settings, 'width', self::$width);
+        $width         = Util::getArrayIndex($settings, 'width', self::$_width);
         $maxLengthProp = Util::getArrayIndex($settings, 'maxlength', 0);
         $nameProp      = Util::getArrayIndex($settings, 'name', '');
 

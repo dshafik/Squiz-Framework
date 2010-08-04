@@ -6,8 +6,7 @@ table.GUITable {
     font-family: arial;
     font-weight: normal;
     font-size: 11px;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 4px 15px;
 }
 
 .GUITable th {
@@ -16,8 +15,6 @@ table.GUITable {
     font-size: 10px;
     font-weight: bold;
     line-height: 10px;
-    padding-bottom: 3px;
-    padding-top: 3px;
 }
 
 .GUITable-firstCol {
@@ -35,7 +32,7 @@ table.GUITable {
 .GUITable td {
     border-bottom: 1px solid #CECECE;
     border-right: 1px solid #CECECE;
-    line-height: 30px;
+    line-height: 17px;
 }
 
 .GUITable.noBorders td,

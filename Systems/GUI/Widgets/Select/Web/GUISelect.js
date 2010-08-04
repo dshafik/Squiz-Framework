@@ -7,4 +7,10 @@ function GUISelect(id, settings)
 
 GUISelect.prototype = {
 
+    getValue: function()
+    {
+        return dfx.getId(this.id).selectedIndex;
+
+    }
+
 };

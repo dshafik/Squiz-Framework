@@ -10,16 +10,17 @@ function GUIToggleButton(id, settings) {
 
     GUI.addWidgetEvent(this, 'toggleOn');
     GUI.addWidgetEvent(this, 'toggleOff');
-    
+
+    this.currentValue = settings['default'];
+
     this.init();
 }
 
 GUIToggleButton.prototype = {
-    init: function() {
-
+    init: function()
+    {
         var self = this;
         dfx.addEvent(dfx.getId(self.id), 'click', function() {
-
                 if (self.currentValue === true) {
                     // move to false
                     self.setValue(false);
@@ -29,7 +30,7 @@ GUIToggleButton.prototype = {
                 }
         });
 
-    }, 
+    },
 
     getValue: function() {
         var self = this;
@@ -52,7 +53,7 @@ GUIToggleButton.prototype = {
     },
 
     switchOff: function() {
-        var sec = 300; 
+        var sec = 300;
         var self     = this;
         var widgetElement = dfx.getId(self.id);
         var glowMask = dfx.getClass('toggle', widgetElement)[0];
@@ -69,7 +70,7 @@ GUIToggleButton.prototype = {
     },
 
     switchOn: function() {
-        var sec = 300; 
+        var sec = 300;
         var self     = this;
         var widgetElement = dfx.getId(self.id);
         var glowMask = dfx.getClass('toggle', widgetElement)[0];

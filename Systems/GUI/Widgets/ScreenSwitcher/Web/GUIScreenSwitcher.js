@@ -1,4 +1,5 @@
-function GUIScreenSwitcher(id, settings) {
+function GUIScreenSwitcher(id, settings)
+{
     GUIContentSwitcher.call(this, id, settings);
     this.className = 'GUIScreenSwitcher';
 
@@ -14,14 +15,11 @@ function GUIScreenSwitcher(id, settings) {
     this.includedFiles = {};
     this.loadedWidgets = [];
 
-    /**
-     * screenLoadStarts event.
-     * screenLoadFinished event.
-     */
     GUI.addWidgetEvent(this, 'screenLoadStarts');
     GUI.addWidgetEvent(this, 'screenLoadFinished');
 
     this.init();
+
 }
 
 GUIScreenSwitcher.prototype = {
@@ -39,7 +37,7 @@ GUIScreenSwitcher.prototype = {
 
                         self.currScreen = {
                             system: self.settings.screens[idx].system,
-                            id: self.settings.screens[idx].id,
+                            id: self.settings.screens[idx].id
                         },
 
                         dfx.removeClass(dfx.getId(oldScreenid), 'hover');
@@ -54,8 +52,8 @@ GUIScreenSwitcher.prototype = {
                             self.settings.screens[idx].system,
                             self.settings.screens[idx].id + 'Screen'
                         );
-                    }
-                }
+                    }//end if
+                }//end if
             });
 
             dfx.addEvent(dfx.getId(screenid), 'mouseover', function(evt) {

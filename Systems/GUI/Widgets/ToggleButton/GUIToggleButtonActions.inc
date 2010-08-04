@@ -42,7 +42,12 @@ class GUIToggleButtonActions
             $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
             $content .= '$selected = '.$settings['dataProvider'].'();';
         } else {
-            $content .= '$selected = '.Util::getArrayIndex($settings, 'default', self::$defaultValue).';';
+            $strVal = 'FALSE';
+            if (Util::getArrayIndex($settings, 'default', self::$defaultValue) === TRUE) {
+                $strVal = 'TRUE';
+            }
+
+            $content .= '$selected = '.$strVal.';';
         }
 
         $content .= '$options = '.var_export(self::_getToggleOptions($settings), TRUE).';';

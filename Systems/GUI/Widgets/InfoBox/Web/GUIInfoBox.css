@@ -1,0 +1,38 @@
+.GUIInfoBox {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid;
+    border-color: #DCDCDC #DCDCDC #BBB;
+    border-radius: 9px;
+    -moz-border-radius: 9px;
+    background-color: #162C63;
+}
+
+.GUIInfoBox-top {
+    padding: 20px 10px 15px;
+    border-radius: 9px;
+    -moz-border-radius: 9px;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4473CE), to(#162C63));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #4473CE, #162C63);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#4473CE, endColorstr=#162C63);
+}
+
+.GUIInfoBox-title {
+    border: 1px solid #162C63;
+    font-size: 18px;
+    color: #FFF;
+    line-height: 25px;
+    padding: 5px;
+    border-radius: 9px;
+    -moz-border-radius: 9px;
+}
+
+.GUIInfoBox-mid {
+    background: url(infobox_thumb_stripes.png);
+    height: 140px;
+    padding: 10px;
+}
+
+.GUIInfoBox-bottom {
+    padding: 10px;
+}

@@ -40,7 +40,14 @@ class GUIScreenSwitcherActions extends GUIContentSwitcherActions
         $content .= '<div class="%class%-right">';
         $content .= '</div>';
 
-        foreach ($settings['screens'] as $screen) {
+        $screens = array();
+        if (isset($settings['items']) === TRUE) {
+            $screens = $settings['items'];
+        } else if (isset($settings['screens']) === TRUE) {
+            $screens = $settings['screens'];
+        }
+
+        foreach ($screens as $screen) {
             $screenid = $settings['id'].'-'.$screen['id'];
             if (strtolower($screen['disabled']) === 'true') {
                 $content .= '<div id="'.$screenid.'" class="%class%-button disabled">';
@@ -52,7 +59,7 @@ class GUIScreenSwitcherActions extends GUIContentSwitcherActions
             // system we are referencing.
             $screenBaseName = preg_replace('/[^A-Za-z0-9]/', ' ', $screen['id']);
             $screenBaseName = ucwords($screenBaseName);
-            $screenBaseName = str_replace(' ', '', $screenBaseName).'Screen';
+            $screenBaseName = str_replace(' ', '', $screenBaseName);
 
             $path  = '/__web/'.GUI::getSystemWebPath($screen['system']).'/';
             $path .= $screenBaseName.'.png';

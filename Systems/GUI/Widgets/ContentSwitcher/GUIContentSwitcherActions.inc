@@ -131,7 +131,6 @@ class GUIContentSwitcherActions
                 'getItemContent',
                 array($settings, $item)
             );
-            //$contents .= self::getItemContent($settings, $item);
         }//end foreach
 
         $contents .= '</div>';
@@ -155,7 +154,7 @@ class GUIContentSwitcherActions
         if ($settings['loadType'] === 'dynamic'
             && $settings['initialItem'] !== $item['id']
         ) {
-            // Load type is dynamic but we still need to load the initial ,
+            // Load type is dynamic but we still need to load the initial item,
             // so skip items until initial item is found.
             return;
         }

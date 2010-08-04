@@ -6,6 +6,8 @@ function GUIContentSwitcher(id, settings)
 
     this.loadedWidgets = [];
 
+    this.current = null;
+
     this.init();
 
 }
@@ -72,34 +74,39 @@ GUIContentSwitcher.prototype = {
 
         dfx.addClass(itemContentElem, 'visible');
 
+        if (this.current !== null) {
+            GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
+        }
+
+        GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
+
+        this.current = {
+            system: system,
+            modeid: modeid
+        };
+
     },
 
     loadDynamic: function(system, modeid)
     {
-        var self   = this;
         var params = {
             system: system,
             modeid: modeid
         };
 
-        sfapi.get(this.className, 'getDynamicItemContent', params, function(data) {
-            // Set the contents.
-            dfx.setHtml(dfx.getId(self.settings.target), data.result.contents);
+        GUI.loadContent(this.className, 'getDynamicItemContent', dfx.getId(this.settings.target), params);
 
-            dfx.foreach(data.result.widgets, function(templateKey) {
-                var widgets = data.result.widgets[templateKey];
-                var wln     = widgets.length;
-                for (var i = 0; i < wln; i++) {
-                    var widget = widgets[i];
-                    self.loadedWidgets.push(widget.id);
+        if (this.current !== null) {
+            GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
+        }
 
-                    if (window[widget.type]) {
-                        var widgetObj = eval('new ' + widget.type + '(widget.id, widget.settings)');
-                        GUI.addWidget(widget.id, widgetObj);
-                    }
-                }
-            });
-        });
+        GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
+
+        this.current = {
+            system: system,
+            modeid: modeid
+        };
+
     }
 
 }
