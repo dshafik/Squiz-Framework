@@ -771,7 +771,10 @@ class SquizSuiteActions
                 return $msg;
             }
 
-            $enc = SquizSuite::encryptData($msg['_pubKeySystemid'], $msg['_enc']);
+            // JSON encode the data to handle various types.
+            $msg['_enc'] = json_encode($msg['_enc']);
+            $enc         = SquizSuite::encryptData($msg['_pubKeySystemid'], $msg['_enc']);
+
             $msg['_enc']      = $enc['encrypted'];
             $msg['_password'] = $enc['password'];
         }
@@ -796,7 +799,7 @@ class SquizSuiteActions
      * @since  4.0.0
      * @return void
      */
-    public static function decryptAPIData($system, $action, array $args)
+    public static function decryptAPIData($system, $action)
     {
         include_once 'Libs/Security/Security.inc';
         $encrypted = Security::getRequestData('_enc', NULL, FALSE, 'post');
@@ -806,7 +809,7 @@ class SquizSuiteActions
         }
 
         $encrypted     = SquizSuite::decryptData($encrypted, $password);
-        $_POST['_enc'] = $encrypted;
+        $_POST['_enc'] = json_decode($encrypted, TRUE);
 
     }//end decryptAPIData()
 

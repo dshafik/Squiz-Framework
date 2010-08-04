@@ -203,7 +203,7 @@ class APIActions
         }
 
         // What parameters are required for the action?
-        $params = self::_getActionParameters(
+        $params = API::getActionParameters(
             $requestMethod,
             $api['system'],
             $api['action'],
@@ -235,7 +235,7 @@ class APIActions
 
         Channels::includeSystem($system);
         try {
-            $responseContent['result'] = API::getActionResult($system, $action, $params);
+            $responseContent['result'] = self::_getActionResult($system, $action, $params);
             $response = 200;
         } catch (Exception $e) {
             $responseContent['exception'] = $e->getMessage();
@@ -411,7 +411,7 @@ class APIActions
      * @since  4.0.0
      * @return array|boolean
      */
-    private static function _getActionParameters($requestMethod, $system, $action, $assetid=NULL)
+    public static function getActionParameters($requestMethod, $system, $action, $assetid=NULL)
     {
         $requiredParams = array();
 
@@ -430,6 +430,9 @@ class APIActions
         include_once 'Libs/Security/Security.inc';
         $default    = NULL;
         $jsonDecode = TRUE;
+
+        // Action parameters can come from '_enc' field if system key ecryption is being used.
+        $encrypted = Security::getRequestData('_enc', $default, FALSE, 'post');
         foreach ($requiredParams as $param) {
             $value = Security::getRequestData(
                 $param['name'],
@@ -444,6 +447,13 @@ class APIActions
                 $value = $assetid;
             }
 
+            if ($value === NULL
+                && $encrypted !== NULL
+                && array_key_exists($param['name'], $encrypted) === TRUE
+            ) {
+                $value = $encrypted[$param['name']];
+            }
+
             if ($value === NULL && $param['optional'] === FALSE) {
                 return FALSE;
             } else {
@@ -453,7 +463,7 @@ class APIActions
 
         return $params;
 
-    }//end _getActionParameters()
+    }//end getActionParameters()
 
 
     /**
@@ -469,7 +479,7 @@ class APIActions
      * @since  4.0.0
      * @return mixed
      */
-    public static function getActionResult($system, $action, array $args)
+    private static function _getActionResult($system, $action, array $args)
     {
         $callback = array(
                      $system,
@@ -489,7 +499,7 @@ class APIActions
 
         return $result;
 
-    }//end getActionResult()
+    }//end _getActionResult()
 
 
     /**

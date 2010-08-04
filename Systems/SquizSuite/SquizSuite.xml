@@ -4,12 +4,11 @@
     <runner>
       <required>no</required>
       <method>decryptAPIData</method>
-      <action listen="before">API::getActionResult</action>
+      <action listen="before">API::getActionParameters</action>
       <fatal>no</fatal>
       <parameters>
         <parameter>system</parameter>
         <parameter>action</parameter>
-        <parameter>args</parameter>
       </parameters>
     </runner>
     <modifier>
