@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<schema system="Cron">
+  <tables>
+    <table name="cron">
+      <columns>
+        <column type="VARCHAR" size="50" allow-null="false">system</column>
+        <column type="VARCHAR" size="50" allow-null="false">script</column>
+        <column type="VARCHAR" size="50" allow-null="false">name</column>
+        <column type="VARCHAR" size="255" allow-null="false">description</column>
+        <column type="TIMESTAMP WITH TIME ZONE" allow-null="true">last_run</column>
+        <column type="INTEGER" allow-null="true">last_duration</column>
+        <column type="VARCHAR" size="20" allow-null="true" default="'daily'">interval</column>
+        <column type="BOOLEAN" allow-null="false" default="'0'">running</column>
+        <column type="BOOLEAN" allow-null="false" default="'0'">enabled</column>
+        <column type="TEXT" allow-null="true" default="null">config</column>
+      </columns>
+      <constraints>
+        <primary-key name="cron_pk">
+          <column>system</column>
+          <column>script</column>
+        </primary-key>
+      </constraints>
+    </table>
+    <table name="cron_types">
+      <columns>
+        <column type="VARCHAR" size="50" allow-null="false">typeid</column>
+        <column type="VARCHAR" size="50" allow-null="false">type_title</column>
+        <column type="VARCHAR" size="50" allow-null="false">condition</column>
+        <column type="BOOLEAN" allow-null="false" default="'0'">running</column>
+        <column type="INTEGER" allow-null="true" default="'0'">run_check</column>
+        <column type="TIMESTAMP WITH TIME ZONE" allow-null="true">started</column>
+        <column type="TIMESTAMP WITH TIME ZONE" allow-null="true">updated</column>
+        <column type="INTEGER" allow-null="true">run_time</column>
+      </columns>
+      <constraints>
+        <primary-key name="cron_types_pk">
+          <column>typeid</column>
+        </primary-key>
+      </constraints>
+    </table>
+  </tables>
+</schema>

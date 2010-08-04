@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<queries system="Cron">
+  <query id="addCronScript">
+    <primary>
+      <insert>
+        <fields table="cron">
+          <field>system</field>
+          <field>script</field>
+          <field>name</field>
+          <field>description</field>
+        </fields>
+        <values>
+          <value column="system">:system</value>
+          <value column="script">:script</value>
+          <value column="name">:name</value>
+          <value column="description">:description</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+  <query id="getCron">
+    <primary>
+      <select>
+        <fields>
+          <field table="cron" column="system"/>
+          <field table="cron" column="script"/>
+          <field table="cron" column="name"/>
+          <field table="cron" column="description"/>
+          <field table="cron" column="last_run"/>
+          <field table="cron" column="last_duration"/>
+          <field table="cron" column="interval"/>
+          <field table="cron" column="running"/>
+          <field table="cron" column="enabled"/>
+        </fields>
+        <from>
+          <table>cron</table>
+        </from>
+        <where>
+          <and>
+            <equal table="cron" column="system">:system</equal>
+            <equal table="cron" column="script">:scriptName</equal>
+          </and>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getCrons">
+    <primary>
+      <select>
+        <fields>
+          <field table="cron" column="system"/>
+          <field table="cron" column="script"/>
+          <field table="cron" column="name"/>
+          <field table="cron" column="description"/>
+          <field table="cron" column="last_run"/>
+          <field table="cron" column="last_duration"/>
+          <field table="cron" column="interval"/>
+          <field table="cron" column="running"/>
+          <field table="cron" column="enabled"/>
+        </fields>
+        <from>
+          <table>cron</table>
+        </from>
+      </select>
+    </primary>
+  </query>
+  <query id="updateCron">
+    <primary>
+      <update>
+        <fields table="cron">
+          <field>last_run</field>
+          <field>last_duration</field>
+          <field>interval</field>
+          <field>running</field>
+          <field>enabled</field>
+        </fields>
+        <values>
+          <value column="last_run">:lastRun</value>
+          <value column="last_duration">:lastDuration</value>
+          <value column="interval">:interval</value>
+          <value column="running">:running</value>
+          <value column="enabled">:enabled</value>
+        </values>
+        <where>
+          <equal table="cron" column="system">:system</equal>
+          <equal table="cron" column="script">:scriptName</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="addCronType">
+    <primary>
+      <insert>
+        <fields table="cron_types">
+          <field>typeid</field>
+          <field>type_title</field>
+          <field>condition</field>
+        </fields>
+        <values>
+          <value column="typeid">:typeid</value>
+          <value column="type_title">:typeTitle</value>
+          <value column="condition">:condition</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+  <query id="getCronType">
+    <primary>
+      <select>
+        <fields>
+          <field table="cron_types" column="typeid"/>
+          <field table="cron_types" column="type_title"/>
+          <field table="cron_types" column="condition"/>
+          <field table="cron_types" column="running"/>
+          <field table="cron_types" column="run_check"/>
+          <field table="cron_types" column="started"/>
+          <field table="cron_types" column="updated"/>
+          <field table="cron_types" column="run_time"/>
+        </fields>
+        <from>
+          <table>cron_types</table>
+        </from>
+        <where>
+          <equal table="cron_types" column="typeid">:typeid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getCronTypes">
+    <primary>
+      <select>
+        <fields>
+          <field table="cron_types" column="typeid"/>
+          <field table="cron_types" column="type_title"/>
+          <field table="cron_types" column="condition"/>
+          <field table="cron_types" column="running"/>
+          <field table="cron_types" column="run_check"/>
+          <field table="cron_types" column="started"/>
+          <field table="cron_types" column="updated"/>
+          <field table="cron_types" column="run_time"/>
+        </fields>
+        <from>
+          <table>cron_types</table>
+        </from>
+      </select>
+    </primary>
+  </query>
+  <query id="updateCronType">
+    <primary>
+      <update>
+        <fields table="cron_types">
+          <field>typeid</field>
+          <field>type_title</field>
+          <field>condition</field>
+          <field>running</field>
+          <field>run_check</field>
+          <field>updated</field>
+        </fields>
+        <values>
+          <value column="typeid">:typeid</value>
+          <value column="type_title">:typeTitle</value>
+          <value column="condition">:condition</value>
+          <value column="running">:running</value>
+          <value column="run_check">:runCheck</value>
+          <value column="started">:started</value>
+          <value column="updated">:updated</value>
+          <value column="run_time">:runTime</value>
+        </values>
+        <where>
+          <equal table="cron_types" column="typeid">:typeid</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="getCronConfig">
+    <primary>
+      <select>
+        <fields table="cron">
+          <field table="cron" column="config"/>
+        </fields>
+        <from>
+          <table>cron</table>
+        </from>
+        <where>
+          <equal table="cron" column="system">:system</equal>
+          <equal table="cron" column="script">:script</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="setCronConfig">
+    <primary>
+      <update>
+        <fields table="cron">
+          <field>config</field>
+        </fields>
+        <values>
+          <value column="config">:config</value>
+        </values>
+        <where>
+          <equal table="cron" column="system">:system</equal>
+          <equal table="cron" column="script">:script</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+</queries>

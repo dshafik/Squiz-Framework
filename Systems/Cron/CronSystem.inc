@@ -30,6 +30,33 @@ class CronSystem extends BaseSystem
     public function install()
     {
         parent::install();
+        Channels::includeSystem('Cron');
+
+        if (Channels::systemExists('SystemConfig') === TRUE) {
+            Channels::includeSystem('SystemConfig');
+            $defaultConfigs = array(
+                               'frequent_running'      => FALSE,
+                               'frequent_last_updated' => NULL,
+                               'frequent_run_check'    => 0,
+                               'hourly_running'        => FALSE,
+                               'hourly_last_updated'   => NULL,
+                               'hourly_run_check'      => 0,
+                               'daily_running'         => FALSE,
+                               'daily_last_updated'    => NULL,
+                               'daily_run_check'       => 0,
+                              );
+            SystemConfig::setConfig('Cron', $defaultConfigs);
+        }
+
+        Cron::addCronType('frequent', 'Frequent', '*/5 *');
+        Cron::addCronType('hourly', 'Hourly', '20 *');
+        Cron::addCronType('daily', 'Daily', '30 0');
+
+        // Install cron jobs.
+        $systems = Channels::getSystemList(TRUE, FALSE, FALSE);
+        foreach ($systems as $system => $path) {
+            Cron::installCronScripts($system, $path);
+        }
 
     }//end install()
 
