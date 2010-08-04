@@ -146,15 +146,7 @@ class GUIActions
 
         $deps = GUI::getTemplateDependentFiles($systemName, $template);
 
-        foreach ($deps['widgets'] as $widgets) {
-            foreach ($widgets as $widget) {
-                self::$_tmpWidgetList[$widget['id']] = array(
-                                                        'type'     => $widget['type'],
-                                                        'settings' => $widget['settings'],
-                                                       );
-            }
-        }
-
+        // Start template output.
         if (self::$_isBaking === TRUE) {
             echo '<?php include_once "'.$dest.'"; ?>';
         } else {
@@ -220,8 +212,11 @@ class GUIActions
             GUI::setCSSIncludes($cssFiles);
         }
 
+        sort($templateDirs);
+
         foreach ($templateDirs as $tplDir) {
             $tplFiles = FileSystem::listDirectory($tplDir, array('.tpl'));
+            sort($tplFiles);
 
             $systemName = NULL;
             $syOvenPath = NULL;
@@ -250,7 +245,6 @@ class GUIActions
      * Includes the PHP file containing the dependencies of the template.
      *
      * The template dependencies file contains:
-     * - the JavaScript and CSS files that are loaded in this template,
      * - the widgets that exist in this template.
      *
      * The intention is to provide enough information for such files and widgets to
@@ -351,13 +345,6 @@ class GUIActions
         $doc = new DOMDocument('1.0');
         $doc->loadXML($content);
 
-        // If this a top level template then reset vars.
-        $head = $doc->getElementsByTagName('head');
-        if ($head->length === 1) {
-            self::$_tmpWidgetList     = array();
-            self::$_tmpWidgetSettings = array();
-        }
-
         // Find what widgets we have, and store them by widget type.
         $includedWidgets = array();
         $widgetNodes     = $doc->documentElement->getElementsByTagName('widget');
@@ -376,11 +363,6 @@ class GUIActions
                            'type'     => $widgetName,
                            'settings' => $widgetSettings,
                           );
-
-            self::$_tmpWidgetList[$widgetId] = array(
-                                                'type'     => $widgetName,
-                                                'settings' => $widgetSettings,
-                                               );
 
             $includedWidgets[$widgetTemplateKey][] = $thisWidget;
         }//end foreach
@@ -422,6 +404,40 @@ class GUIActions
         return $doc->documentElement;
 
     }//end getTemplateContent()
+
+
+    /**
+     * Creates a new widget and returns its contents as string.
+     *
+     * This method should be used to create widgets at run time (e.g. by data provider).
+     *
+     * @param string $id       The id to use for the widget.
+     * @param string $type     The type of the widget.
+     * @param array  $settings Settings for the widget.
+     * @param string $tplFile  Template file to use.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function createWidget($id, $type, array $settings=array(), $tplFile=NULL)
+    {
+        ob_start();
+            $settings['id'] = $id;
+
+            Channels::includeSystem($type);
+            $templateCode = call_user_func(array($type, 'getTemplateContent'), $settings, $tplFile);
+            $templateCode = '?>'.$templateCode.'<?';
+            eval($templateCode);
+            $templateCode = ob_get_contents();
+        ob_end_clean();
+
+        $templateCode  = self::_replaceKeywords($templateCode, $type, $settings);
+        $templateCode .= '<script>'.GUI::getJSInitCode($type, $id, $settings);
+        $templateCode .= '</script>';
+
+        return $templateCode;
+
+    }//end createWidget()
 
 
     /**
@@ -623,6 +639,24 @@ class GUIActions
                     $value[] = self::_parseSettingValue($childNode);
                 break;
 
+                case 'content':
+                    // Content tags can contain multiple widgets.
+                    $widgetContent = array();
+                    foreach ($childNode->childNodes as $contentNode) {
+                        if ($contentNode->nodeType === XML_ELEMENT_NODE
+                            && $contentNode->tagName === 'widget'
+                        ) {
+                            $widgetContent[] = GUI::getWidgetHTML($contentNode);
+                        }
+                    }
+
+                    if (count($widgetContent) <= 1) {
+                        $value[$childNode->tagName] = self::_parseSettingValue($childNode);
+                    } else {
+                        $value = implode('', $widgetContent);
+                    }
+                break;
+
                 default:
                     $value[$childNode->tagName] = self::_parseSettingValue($childNode);
                 break;
@@ -658,10 +692,16 @@ class GUIActions
         $templateKey = self::_getTemplateKey($systemName, $tplName);
         $widgets     = Util::getArrayIndex(self::$_requiredWidgets, $templateKey, array());
 
+        self::$_tmpWidgetList[$templateKey] = array();
+        foreach ($widgets as $k => $tplWidgets) {
+            foreach ($tplWidgets as $j => $widget) {
+                $widgets[$k][$j]['parentTemplateKey'] = $templateKey;
+                self::$_tmpWidgetList[$templateKey][] = $widgets[$k][$j];
+            }
+        }
+
         // Write out the list of dependents.
-        $saveArray = array(
-                      'widgets' => self::$_requiredWidgets[$templateKey],
-                     );
+        $saveArray = array('widgets' => $widgets);
 
         include_once 'Libs/FileSystem/FileSystem.inc';
         $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
@@ -688,9 +728,17 @@ class GUIActions
 
             $js = array();
 
-            foreach (self::$_tmpWidgetList as $widgetid => $widget) {
-                $js[] = GUI::getJSInitCode($widget['type'], $widgetid, $widget['settings']);
-            }
+           //foreach (self::$_tmpWidgetList as $tplkey => $widgets) {
+           //    foreach ($widgets as $widgetid => $widget) {
+           //        $js[] = GUI::getJSInitCode($widget['type'], $widget['id'], $widget['settings'], $widget['parentTemplateKey']);
+           //    }
+           //}
+
+           foreach ($widgets as $key => $tplWidgets) {
+               foreach ($tplWidgets as $widget) {
+                   $js[] = GUI::getJSInitCode($widget['type'], $widget['id'], $widget['settings'], $widget['parentTemplateKey']);
+               }
+           }
 
             // Wrote out all the widgets in this template, clear widget list.
             self::$_tmpWidgetList     = array();
@@ -1066,17 +1114,17 @@ class GUIActions
      * @param string $systemName Name of the system.
      * @param string $id         Unique ID of the widget object.
      * @param array  $settings   Settings array of the widget object.
+     * @param string $template   The template that this widget belongs to.
      *
      * @since  4.0.0
      * @return string
      */
-    public static function getJSInitCode($systemName, $id, array $settings=array())
+    public static function getJSInitCode($systemName, $id, array $settings=array(), $template=NULL)
     {
         // Need to remove all settings that have widget in them.
         $settings = self::_removePHPSettings($settings);
 
-        $code = 'if (window["'.$systemName.'"]) {GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'));}';
-
+        $code = 'if (window["'.$systemName.'"]) {GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'), "'.$template.'");}';
         return $code;
 
     }//end getJSInitCode()
@@ -1173,6 +1221,61 @@ class GUIActions
         return $str;
 
     }//end _replaceWidgetIds()
+
+
+    /**
+     * Build a template key from the system name and template file.
+     *
+     * @param string $systemName The name of the system.
+     * @param string $tplFile    Filename of the template.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _getTemplateKey($systemName, $tplFile=NULL)
+    {
+        if ($tplFile === NULL) {
+            $tplFile = $systemName;
+        } else {
+            $tplFile = basename($tplFile, '.tpl');
+        }
+
+        return $systemName.':'.$tplFile;
+
+    }//end _getTemplateKey()
+
+
+    /**
+     * Used to act like PHP 5.3 static:: call.
+     *
+     * When widgets are calling methods in their own class they should use this
+     * method so that child widgets can override those methods.
+     *
+     * @param string $widgetType Type of the widget.
+     * @param string $methodName Name of the method to call.
+     * @param array  $args       Array of arguments to pass to the method.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function callStatic($widgetType, $methodName, array $args=array())
+    {
+        $system = GUI::getSystemNameFromWidgetType($widgetType);
+
+        $callback = array(
+                     $system,
+                     $methodName,
+                    );
+
+        Channels::includeSystem($system);
+        $retVal = call_user_func_array(
+            $callback,
+            $args
+        );
+
+        return $retVal;
+
+    }//end callStatic()
 
 
     /**
@@ -1360,56 +1463,6 @@ class GUIActions
         exit();
 
     }//end serveFile()
-
-
-    /**
-     * Build a template key from the system name and template file.
-     *
-     * @param string $systemName The name of the system.
-     * @param string $tplFile    Filename of the template.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    private static function _getTemplateKey($systemName, $tplFile=NULL)
-    {
-        if ($tplFile === NULL) {
-            $tplFile = $systemName;
-        } else {
-            $tplFile = basename($tplFile, '.tpl');
-        }
-
-        return $systemName.':'.$tplFile;
-
-    }//end _getTemplateKey()
-
-
-    /**
-     * Used to act like PHP 5.3 static:: call.
-     *
-     * When widgets are calling methods in their own class they should use this
-     * method so that child widgets can override those methods.
-     *
-     * @param string $widgetType Type of the widget.
-     * @param string $methodName Name of the method to call.
-     * @param array  $args       Array of arguments to pass to the method.
-     *
-     * @since  4.0.0
-     * @return mixed
-     */
-    public static function callStatic($widgetType, $methodName, array $args=array())
-    {
-        $system = GUI::getSystemNameFromWidgetType($widgetType);
-
-        Channels::includeSystem($system);
-        $retVal = call_user_func_array(
-            array($system, $methodName),
-            $args
-        );
-
-        return $retVal;
-
-    }//end callStatic()
 
 
 }//end class

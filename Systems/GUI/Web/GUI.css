@@ -8,5 +8,29 @@
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     -moz-border-radius: 5px;
-
 }
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: arial;
+    font-size: 12px;
+    color: #000;
+}
+
+* {
+    margin:0;
+    padding:0;
+}
+
+.GUI-screen-left {
+    float: left;
+    width: 250px;
+    margin-left: 30px;
+}
+
+.GUI-screen-right {
+    margin-left: 280px;
+    margin-right: 25px;
+}
+

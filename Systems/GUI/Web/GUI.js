@@ -1,14 +1,40 @@
 var GUI = new function()
 {
-    this.widgetStore   = {};
-    var _publicDirName = 'Web';
+    this.widgetStore     = {};
+    var _publicDirName   = 'Web';
+    this.widgetTemplates = {};
+    this.templateLineage = [];
 
     this.getWidget = function(id) {
         return this.widgetStore[id];
     };
 
-    this.addWidget = function(id, obj) {
+    this.addWidget = function(id, obj, parent) {
         this.widgetStore[id] = obj;
+
+        if (!parent) {
+            return;
+        }
+
+        if (!this.widgetTemplates[parent]) {
+            this.widgetTemplates[parent] = {};
+        }
+
+        this.widgetTemplates[parent][id] = obj;
+    };
+
+    this.removeWidget = function(id) {
+        if (this.widgetStore[id]) {
+            if (this.widgetStore[id].removeWidget) {
+                this.widgetStore[id].removeWidget();
+            }
+
+            this.widgetStore[id] = null;
+            delete this.widgetStore[id];
+            return true;
+        }
+
+        return false;
     };
 
     this.getWidgetWebPath = function(widgetPath) {
@@ -21,6 +47,28 @@ var GUI = new function()
         var url = window.location.href.replace(/\/+$/, '');
         url    += '/__web/Systems/' + GUI.getWidgetWebPath(widgetPath);
         return url;
+    };
+
+    this.unloadTemplate = function(parent) {
+        var self = this;
+        var ln   = this.templateLineage.length;
+        for (var i = (ln - 1); i >= 0; i--) {
+            var p = this.templateLineage[i];
+            dfx.foreach(this.widgetTemplates[p], function(idx) {
+                self.removeWidget(idx);
+            });
+
+            delete self.widgetTemplates[p];
+            this.templateLineage.pop();
+
+            if (p === parent) {
+                break;
+            }
+        }
+    };
+
+    this.addTemplate = function(template) {
+        this.templateLineage.push(template);
     };
 
     /**
@@ -92,12 +140,43 @@ var GUI = new function()
 
                     if (window[widget.type]) {
                         var widgetObj = eval('new ' + widget.type + '(widget.id, widget.settings)');
-                        GUI.addWidget(widget.id, widgetObj);
+                        GUI.addWidget(widget.id, widgetObj, widget.parentTemplateKey);
                     }
                 }
             });
         });
+    };
 
+    this.save = function() {
+        var self   = this;
+        var values = {};
+        var ln     = this.templateLineage.length;
+
+        // Retrieve the save values in reverse order.
+        for (var i = (ln - 1); i >= 0; i--) {
+            var template     = this.templateLineage[i];
+            var isEmpty      = true;
+            values[template] = {};
+            dfx.foreach(self.widgetTemplates[template], function(widgetid) {
+                var widget = self.getWidget(widgetid);
+                if (!widget || !widget.getValue) {
+                    // Invalid object ref. or widget has no getValue function.
+                    return;
+                }
+
+                isEmpty = false;
+                values[template][widgetid] = widget.getValue();
+            });
+
+            if (isEmpty === true) {
+                // Nothing to save for this template.
+                delete values[template];
+            }
+        }//end for
+
+        console.info(values);
+
+        return values;
     };
 
 };
