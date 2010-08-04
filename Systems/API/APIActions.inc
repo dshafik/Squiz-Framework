@@ -526,7 +526,7 @@ class APIActions
             default:
                 // No default behaviour.
             break;
-        }
+        }//end switch
 
     }//end _sendResponse()
 
@@ -668,36 +668,210 @@ class APIActions
                 $type = 'struct';
             }
 
+            if (isset($content['_base64']) === TRUE) {
+                $type = 'base64';
+            }
+
             $parentNode->setAttribute('type', $type);
-            switch ($type) {
-                case 'array':
-                    foreach ($content as $val) {
-                        $valueElem = $parentNode->ownerDocument->createElement('value');
-                        $parentNode->appendChild($valueElem);
-                        API::buildResponseXMLDom($valueElem, $val);
-                    }
-                break;
-
-                case 'struct':
-                    foreach ($content as $key => $val) {
-                        $keyElemTag = $key;
-                        if (is_numeric($key) === TRUE) {
-                            $keyElemTag = '_'.$key;
-                        }
-
-                        $keyElem = $parentNode->ownerDocument->createElement($keyElemTag);
-                        $parentNode->appendChild($keyElem);
-                        API::buildResponseXMLDom($keyElem, $val);
-                    }
-                break;
-
-                default:
-                    // No default behaviour.
-                break;
-            }//end switch
+            $class = 'APIActions';
+            $func  = '_build'.ucwords($type).'Response';
+            if (method_exists($class, $func) === TRUE) {
+                $callback = array(
+                             $class,
+                             $func,
+                            );
+                $params   = array(
+                             $parentNode,
+                             $content,
+                            );
+                $response = call_user_func_array($callback, $params);
+            }
         }//end if
 
     }//end buildResponseXMLDom()
+
+
+    /**
+     * Build the array response from the XML DOM structure.
+     *
+     * @param object $parentNode Parent DOM node to have the content tree.
+     * @param array  $content    Content to create. 
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    private static function _buildArrayResponse($parentNode, array $content)
+    {
+        foreach ($content as $val) {
+            $valueElem = $parentNode->ownerDocument->createElement('value');
+            $parentNode->appendChild($valueElem);
+            API::buildResponseXMLDom($valueElem, $val);
+        }
+
+    }//end _buildArrayResponse()
+
+
+    /**
+     * Build the struct response from the XML DOM structure.
+     *
+     * @param object $parentNode Parent DOM node to have the content tree.
+     * @param array  $content    Content to create. 
+     *
+     * @since  4.0.0
+     * @return void 
+     */
+    private static function _buildStructResponse($parentNode, array $content)
+    {
+        foreach ($content as $key => $val) {
+            $keyElemTag = $key;
+            if (is_numeric($key) === TRUE) {
+                $keyElemTag = '_'.$key;
+            }
+
+            $keyElem = $parentNode->ownerDocument->createElement($keyElemTag);
+            $parentNode->appendChild($keyElem);
+            API::buildResponseXMLDom($keyElem, $val);
+        }
+
+    }//end _buildStructResponse()
+
+
+    /**
+     * Build the base64 response from the XML DOM structure.
+     *
+     * @param object $parentNode Parent DOM node to have the content tree.
+     * @param array  $content    Content to create. 
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    private static function _buildBase64Response($parentNode, array $content)
+    {
+        foreach ($content as $key => $val) {
+            if ($key === '_base64') {
+                continue;
+            }
+
+            $parentNode->setAttribute($key, $val);
+        }
+
+        self::_addTextToNode($parentNode, $content['_base64'], TRUE);
+
+    }//end _buildBase64Response()
+
+
+    /**
+     * Get the response type from the XML DOM structure.
+     *
+     * @param object $parentNode Parent DOM node to have the content tree.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function getResponseFromXMLDom($parentNode)
+    {
+        $response = '';
+        if ($parentNode->hasAttribute('type') === TRUE) {
+            $type  = $parentNode->getAttribute('type');
+            $class = 'APIActions';
+            $func  = '_get'.ucwords($type).'Response';
+            if (method_exists($class, $func) === TRUE) {
+                $callback = array(
+                             $class,
+                             $func,
+                            );
+                $params   = array($parentNode);
+                $response = call_user_func_array($callback, $params);
+            } else {
+                $response = $parentNode->nodeValue;
+                settype($response, $type);
+            }
+        }//end if
+
+        return $response;
+
+    }//end getResponseFromXMLDom()
+
+
+    /**
+     * Get the array response from the XML DOM structure.
+     *
+     * @param object $parentNode Parent DOM node to have the content tree.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    private static function _getArrayResponse($parentNode)
+    {
+        $response = array();
+        if ($parentNode->hasChildNodes() === TRUE) {
+            foreach ($parentNode->childNodes as $child) {
+                if ($child->nodeType === XML_ELEMENT_NODE) {
+                    $response[] = API::getResponseFromXMLDom($child);
+                }
+            }
+        }
+
+        return $response;
+
+    }//end _getArrayResponse()
+
+
+    /**
+     * Get the struct response from the XML DOM structure.
+     *
+     * @param object $parentNode Parent DOM node to have the content tree.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    private static function _getStructResponse($parentNode)
+    {
+        $response = array();
+        if ($parentNode->hasChildNodes() === TRUE) {
+            foreach ($parentNode->childNodes as $child) {
+                $key = $child->nodeName;
+                if ($child->nodeType === XML_ELEMENT_NODE) {
+                    $response[$key] = API::getResponseFromXMLDOM($child);
+                }
+            }
+        }
+
+        ksort($response);
+
+        return $response;
+
+    }//end _getStructResponse()
+
+
+    /**
+     * Get the base64 response from the XML DOM structure.
+     *
+     * @param object $parentNode Parent DOM node to have the content tree.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    private static function _getBase64Response($parentNode)
+    {
+        $response = array();
+        if ($parentNode->hasAttributes() === TRUE) {
+            foreach ($parentNode->attributes as $attribute) {
+                $name  = $attribute->name;
+                $value = $attribute->value;
+                if ($name !== 'type') {
+                    $response[$name] = $value;
+                }
+            }
+        }
+
+        // Finally, add in the base64 content.
+        $response['_base64'] = $parentNode->nodeValue;
+        ksort($response);
+
+        return $response;
+
+    }//end _getBase64Response()
 
 
     /**
@@ -706,19 +880,24 @@ class APIActions
      * If the text contains invalid XML characters, CDATA section
      * is appended instead.
      *
-     * @param object &$node Parent DOM node to have the content tree.
-     * @param string $text  Content to create.
+     * @param object  &$node Parent DOM node to have the content tree.
+     * @param string  $text  Content to create.
+     * @param boolean $force Force to append a CDATA section.
      *
      * @since  4.0.0
      * @return void
      */
-    private static function _addTextToNode(&$node, $text)
+    private static function _addTextToNode(&$node, $text, $force=FALSE)
     {
-        $invalidXMLChars = preg_match('/[&<>"\']/', $text);
-        if ($invalidXMLChars === 1) {
+        if ($force === TRUE) {
             $node->appendChild($node->ownerDocument->createCDATASection($text));
         } else {
-            $node->appendChild($node->ownerDocument->createTextNode($text));
+            $invalidXMLChars = preg_match('/[&<>"\']/', $text);
+            if ($invalidXMLChars === 1) {
+                $node->appendChild($node->ownerDocument->createCDATASection($text));
+            } else {
+                $node->appendChild($node->ownerDocument->createTextNode($text));
+            }
         }
 
     }//end _addTextToNode()
