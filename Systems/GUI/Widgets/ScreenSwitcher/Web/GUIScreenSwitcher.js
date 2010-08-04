@@ -50,7 +50,7 @@ GUIScreenSwitcher.prototype = {
 
                         self.loadDynamic(
                             self.settings.screens[idx].system,
-                            self.settings.screens[idx].id + 'Screen'
+                            self.settings.screens[idx].id
                         );
                     }//end if
                 }//end if
