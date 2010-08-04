@@ -318,9 +318,12 @@ class APIActions
         $url = Web::getCurrentURL();
 
         // Confirm the URL includes the service suffix.
-        $serviceStartPos = strpos($url, '/'.self::$_serviceWebPath.'/');
-        if ($serviceStartPos === FALSE) {
+        $pattern = '(\/'.self::$_serviceWebPath.'$|\/'.self::$_serviceWebPath.'\/)';
+        $result  = preg_match($pattern, $url, $matches, PREG_OFFSET_CAPTURE);
+        if ($result === 0) {
             return FALSE;
+        } else {
+            $serviceStartPos = $matches[0][1];
         }
 
         $result  = array();
@@ -800,8 +803,10 @@ class APIActions
     public static function isAPIRequest()
     {
         include_once 'Libs/Web/Web.inc';
-        $url = Web::getCurrentURL();
-        if (strpos($url, '/'.self::$_serviceWebPath.'/') !== FALSE) {
+        $url     = Web::getCurrentURL();
+        $pattern = '(\/'.self::$_serviceWebPath.'$|\/'.self::$_serviceWebPath.'\/)';
+        $result  = preg_match($pattern, $url, $matches);
+        if ($result === 1) {
             return TRUE;
         }
 

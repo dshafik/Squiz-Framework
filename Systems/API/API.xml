@@ -7,7 +7,6 @@
             <parameters/>
             <switch_event>API::processRequest</switch_event>
             <action>MySource::init</action>
-            <fatal>no</fatal>
         </switcher>
     </plugs>
 </system>
