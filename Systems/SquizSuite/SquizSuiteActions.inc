@@ -409,22 +409,42 @@ class SquizSuiteActions
             $systemUrl   = $message['system_url'];
             $certificate = $message['cert'];
 
-            // The systemid already exists?
-            $product = SquizSuite::getProduct($systemid);
-            if (empty($product) === FALSE) {
-                $errMsg = 'The requested system already exists.';
-                throw new ChannelException($errMsg);
-            }
-
             self::_logReceivedMessage($systemid, 'suiteConnect');
 
             DAL::beginTransaction();
+
+            // The systemid already exists?
+            $product = SquizSuite::getProduct($systemid);
+            if (empty($product) === FALSE) {
+                // Is the status Live already?
+                if ($product['status'] === 'live') {
+                    $errMsg = 'The requested system is already registered.';
+                    throw new ChannelException($errMsg);
+                }
+
+                // The systemid exists and it's not live yet. But make sure
+                // it doesn't have URL or certificate yet before we accept the
+                // connection request. Or not, anyone can re-write the existing
+                // system's URL or certificate with their own!
+                if (array_key_exists('url', $product['connection']) === FALSE
+                    && array_key_exists('cert', $product['connection']) === FALSE
+                ) {
+                    $product['connection']['url']  = $systemUrl;
+                    $product['connection']['cert'] = $certificate;
+                    SquizSuite::updateProduct($systemid, 'connection', $product['connection']);
+                } else {
+                    $errMsg = 'The requested system can not be accepted.';
+                    throw new ChannelException($errMsg);
+                }
+            } else {
+                $connection         = array();
+                $connection['url']  = $systemUrl;
+                $connection['cert'] = $certificate;
+                SquizSuite::registerProduct($systemid, $systemType, $connection);
+            }
+
             // Now we are all good. Register the system and set the status
             // as pending. Then send acknowlegement message back.
-            $connection         = array();
-            $connection['url']  = $systemUrl;
-            $connection['cert'] = $certificate;
-            SquizSuite::registerProduct($systemid, $systemType, $connection);
             SquizSuite::updateProduct($systemid, 'status', 'pending');
             DAL::commit();
 
