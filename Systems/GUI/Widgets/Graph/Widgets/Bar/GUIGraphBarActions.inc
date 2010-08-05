@@ -304,9 +304,8 @@ class GUIGraphBarActions
         $hasXAxis          = FALSE;
 
         foreach ($data as $dataIndex => $dataRow) {
-            $dataRow['data'] = array_slice($dataRow['data'], 0, count($groups));
-            $rowTotal        = array_sum($dataRow['data']);
-            $maxValue        = max($maxValue, $rowTotal);
+            $rowTotal = array_sum($dataRow['data']);
+            $maxValue = max($maxValue, $rowTotal);
 
             if (array_key_exists('label', $dataRow) === TRUE) {
                 if ($dataRow['label'] !== '') {
@@ -463,7 +462,10 @@ class GUIGraphBarActions
             echo '<ul style="display: block;">';
 
             // Start stacking the graph up.
-            foreach ($dataRow['data'] as $groupIndex => $dataPoint) {
+            foreach (array_reverse($groups) as $groupIndex => $groupInfo) {
+                $dataPoint = Util::getArrayIndex($dataRow['data'], $groupIndex, 0);
+                if ($dataPoint === 0) continue;
+
                 $groupUnits = (string) Util::getArrayIndex(
                     $groups[$groupIndex],
                     'units',
