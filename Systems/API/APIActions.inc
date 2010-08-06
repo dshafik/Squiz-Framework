@@ -617,12 +617,12 @@ class APIActions
                   );
         foreach ($fields as $field) {
             if (array_key_exists($field, $responseContent) === TRUE) {
-                $attrs[] = $field.': '.json_encode($responseContent[$field]);
+                $attrs[] = '"'.$field.'": '.json_encode($responseContent[$field]);
             }
         }
 
         if (array_key_exists('result', $responseContent) === TRUE) {
-            $attrs[] = 'result: '.API::buildResponseJSONString($responseContent['result']);
+            $attrs[] = '"result": '.API::buildResponseJSONString($responseContent['result']);
         }
 
         $jsonString = '{'.implode(','."\n", $attrs).'}';
@@ -929,6 +929,8 @@ class APIActions
         $result = '';
         if (is_scalar($content) === TRUE) {
             $result = json_encode($content);
+        } else if (is_null($content) === TRUE) {
+            $result = 'null';
         } else if (is_array($content) === TRUE) {
             $type = 'array';
 
