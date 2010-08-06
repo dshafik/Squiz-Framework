@@ -80,6 +80,25 @@
         </assert-null>
     </alternate>
   </query>
+  <query id="getProductsByType">
+    <primary>
+       <select>
+        <fields>
+           <field table="p1" column="systemid"/>
+           <field table="p1" column="type"/>
+           <field table="p1" column="status"/>
+           <field table="p1" column="current"/>
+           <field table="p1" column="connection"/>
+        </fields>
+        <from>
+          <table alias="p1">suite_product</table>
+        </from>
+        <where>
+          <in table="p1" column="type">:type</in>
+        </where>
+      </select>
+    </primary>
+  </query>
   <query id="getAllProducts">
     <primary>
       <select>

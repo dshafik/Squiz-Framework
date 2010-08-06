@@ -109,6 +109,23 @@ class SquizSuiteActions
 
 
     /**
+     * Get the product list of the given type.
+     *
+     * @param string $type Type of product to get.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    public static function getProductsByType($type)
+    {
+        $query  = DAL::getDALQuery('SquizSuite', 'getProductsByType');
+        $result = DAL::getAssoc($query);
+        return $result;
+
+    }//end getProductsByType()
+
+
+    /**
      * Update the product information for the given systemid.
      *
      * @param string $systemid  Unique ID of the product.
