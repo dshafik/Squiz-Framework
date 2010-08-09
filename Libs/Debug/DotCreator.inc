@@ -2,18 +2,29 @@
 /**
  * DotCreator Library.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Library for creating DOT files.
  *
- * @since 4.0.0
  */
 class DotCreator
 {
@@ -22,7 +33,6 @@ class DotCreator
      * List of nodes.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_nodes = array();
 
@@ -30,7 +40,6 @@ class DotCreator
      * List of node connections.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_nodeConnections = array();
 
@@ -38,7 +47,6 @@ class DotCreator
      * Path of the DOT template file.
      *
      * @var   string
-     * @since 4.0.0
      */
     private $_templateFile = '';
 
@@ -46,7 +54,6 @@ class DotCreator
      * If true then any dupe connections will be shown on 1 line.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     private $_singleConnections = TRUE;
 
@@ -54,7 +61,6 @@ class DotCreator
     /**
      * Constructor.
      *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -69,7 +75,6 @@ class DotCreator
      * @param string $nodeid Id of the new node.
      * @param string $label  Label of the node.
      *
-     * @since  4.0.0
      * @return void
      */
     public function addNode($nodeid, $label)
@@ -99,7 +104,6 @@ class DotCreator
      * @param string $colour The colour for the connection.
      * @param string $url    Url for the connection.
      *
-     * @since  4.0.0
      * @return void
      */
     public function addConnection($from, $to, $label=NULL, $style=NULL, $colour=NULL, $url=NULL)
@@ -140,7 +144,6 @@ class DotCreator
      * @param string $nodeid   Id of the node.
      * @param array  $nodeInfo Node information.
      *
-     * @since  4.0.0
      * @return string
      */
     private function _nodeToStr($nodeid, array $nodeInfo)
@@ -156,7 +159,6 @@ class DotCreator
      *
      * @param array $con Node connection info.
      *
-     * @since  4.0.0
      * @return string
      */
     private function _connectionToStr(array $con)
@@ -209,7 +211,6 @@ class DotCreator
      *
      * @param string $dotFile Path of the result file.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception When DOT template file cannot be found.
      */
@@ -245,7 +246,6 @@ class DotCreator
      * @param string $dotFile  Path to the DOT file to convert.
      * @param string $destFile Path to the result file.
      *
-     * @since  4.0.0
      * @return string
      * @throws Exception When DOT file cannot be found or fails to convert.
      */

@@ -2,12 +2,24 @@
 /**
  * Datastructure Lib.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Libs/Datastructure/AbstractNode.inc';
@@ -15,7 +27,6 @@ require_once 'Libs/Datastructure/AbstractNode.inc';
 /**
  * SystemNode class.
  *
- * @since 4.0.0
  */
 class SystemNode extends AbstractNode
 {
@@ -24,7 +35,6 @@ class SystemNode extends AbstractNode
      * The reference to the graph that this node is conntected to.
      *
      * @var   object
-     * @since 4.0.0
      */
     private $_graph = NULL;
 
@@ -32,7 +42,6 @@ class SystemNode extends AbstractNode
      * The list of nodes which have outgoing link to this node.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_ins = array();
 
@@ -40,7 +49,6 @@ class SystemNode extends AbstractNode
      * The list of nodes which this node has outgoing link.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_outs = array();
 
@@ -52,7 +60,6 @@ class SystemNode extends AbstractNode
      * @param DirectedAcyclicGraph &$graph The graph which the node is
      *                                     connected to.
      *
-     * @since  4.0.0
      * @throws Exception No id specified.
      */
     public function __construct($id='', DirectedAcyclicGraph &$graph=NULL)
@@ -74,7 +81,6 @@ class SystemNode extends AbstractNode
      *
      * @param string $key The key for the value.
      *
-     * @since  4.0.0
      * @return mixed
      * @throws Exception Unknown key specified.
      */
@@ -96,7 +102,6 @@ class SystemNode extends AbstractNode
      * @param string $key The key for the data.
      * @param mixed  $val The value associated with the key.
      *
-     * @since  4.0.0
      * @return void
      */
     public function setData($key, $val)
@@ -111,7 +116,6 @@ class SystemNode extends AbstractNode
      *
      * @param string $key The key for the data.
      *
-     * @since  4.0.0
      * @return void
      */
     public function unsetData($key)
@@ -124,7 +128,6 @@ class SystemNode extends AbstractNode
     /**
      * Return the id of the node.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public function getId()
@@ -139,7 +142,6 @@ class SystemNode extends AbstractNode
      *
      * @param SystemNode &$node The node which this node is connecting to.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception Error occurred during the node connection.
      */
@@ -175,7 +177,6 @@ class SystemNode extends AbstractNode
      *
      * @param SystemNode &$node The node which is connected to this node.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception Error occurred during the node connection.
      */
@@ -196,7 +197,6 @@ class SystemNode extends AbstractNode
     /**
      * Return the graph this node is connected to.
      *
-     * @since  4.0.0
      * @return object
      */
     public function &getGraph()
@@ -211,7 +211,6 @@ class SystemNode extends AbstractNode
      *
      * @param DirectedAcyclicGraph &$graph The graph this noded is connected to.
      *
-     * @since  4.0.0
      * @return void
      */
     public function setGraph(DirectedAcyclicGraph &$graph)
@@ -224,7 +223,6 @@ class SystemNode extends AbstractNode
     /**
      * Returns TRUE if the node is connected to the graph.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public function isGraphSet()
@@ -241,7 +239,6 @@ class SystemNode extends AbstractNode
     /**
      * Returns the list of nodeids connected to this node.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getInIds()
@@ -255,7 +252,6 @@ class SystemNode extends AbstractNode
     /**
      * Returns the list of nodeids connected from this node.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getOutIds()
@@ -269,7 +265,6 @@ class SystemNode extends AbstractNode
     /**
      * Returns the number of incoming links.
      *
-     * @since  4.0.0
      * @return integer
      */
     public function inDegree()
@@ -283,7 +278,6 @@ class SystemNode extends AbstractNode
     /**
      * Returns the number of outgoing links.
      *
-     * @since  4.0.0
      * @return integer
      */
     public function outDegree()
@@ -299,7 +293,6 @@ class SystemNode extends AbstractNode
      *
      * Note: acyclic test helper function.
      *
-     * @since  4.0.0
      * @return void
      */
     public function acyclicTestSetData()
@@ -316,7 +309,6 @@ class SystemNode extends AbstractNode
      *
      * Note: acyclic test helper function.
      *
-     * @since  4.0.0
      * @return void
      */
     public function acyclicTestCleanup()
@@ -332,7 +324,6 @@ class SystemNode extends AbstractNode
      *
      * Note: acyclic test helper function.
      *
-     * @since  4.0.0
      * @return integer
      */
     public function acyclicTestGetInData()
@@ -348,7 +339,6 @@ class SystemNode extends AbstractNode
      *
      * Note: acyclic test helper function.
      *
-     * @since  4.0.0
      * @return integer
      */
     public function acyclicTestGetOutData()
@@ -364,7 +354,6 @@ class SystemNode extends AbstractNode
      *
      * Note: acyclic test helper function.
      *
-     * @since  4.0.0
      * @return integer
      */
     public function acyclicTestIsSinkNode()
@@ -383,7 +372,6 @@ class SystemNode extends AbstractNode
      *
      * Note: acyclic test helper function.
      *
-     * @since  4.0.0
      * @return integer
      */
     public function acyclicTestIsSourceNode()
@@ -404,7 +392,6 @@ class SystemNode extends AbstractNode
      *
      * @param string $nodeid The id of the node to unlink.
      *
-     * @since  4.0.0
      * @return void
      */
     public function acyclicTestDelOutNode($nodeid)
@@ -421,7 +408,6 @@ class SystemNode extends AbstractNode
      *
      * @param string $nodeid The id of the node to unlink.
      *
-     * @since  4.0.0
      * @return void
      */
     public function acyclicTestDelInNode($nodeid)

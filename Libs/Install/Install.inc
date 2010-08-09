@@ -2,12 +2,24 @@
 /**
  * Install Lib.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'DAL/DALBaker.inc';
@@ -22,7 +34,6 @@ require_once 'Systems/BaseSystem.inc';
  * This class contains methods that are useful during installation but nowhere
  * else.
  *
- * @since 4.0.0
  */
 class Install
 {
@@ -36,7 +47,6 @@ class Install
      *
      * @param string $path The path of the directory to list.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function listNestedDirectories($path)
@@ -74,7 +84,6 @@ class Install
      * @param string $rootDir The root path.
      * @param string $id      Unique id of data directory.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getDataDirPath($rootDir, $id='')
@@ -99,7 +108,6 @@ class Install
      * @param string $url     The root URL.
      * @param string $id      Unique id of data directory.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function prepareDataDir($rootDir, $url, $id='')
@@ -128,8 +136,8 @@ class Install
 
             public static function getBaseURL(\$force=FALSE)
             {
-                if (self::\$_rootUrl !== NULL) { 	 
-                    return self::\$_rootUrl; 	 
+                if (self::\$_rootUrl !== NULL) {
+                    return self::\$_rootUrl;
                 }
 
                 include_once 'Libs/Web/Web.inc';
@@ -204,7 +212,6 @@ class Install
      * @param string $oven    Allows you to optionally spec a different
      *                        oven from the default.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function rebakeOven($rootDir, $url, $oven='')
@@ -234,7 +241,6 @@ class Install
      *
      * @param array $systemNames List of systems to install.
      *
-     * @since  4.0.0
      * @return array
      * @throws Exception If the inheritance validation fails.
      */
@@ -266,7 +272,6 @@ class Install
      * @param array $systemNames List of systems whose queries need to be
      *                           installed.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function installQueries(array $systemNames)
@@ -289,7 +294,6 @@ class Install
      * @param string $systemName Name of system whose queries need to be
      *                           installed.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function installQuery($systemName)
@@ -314,7 +318,6 @@ class Install
      *
      * @param array $systems List of system paths.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the functions were unable to be installed for the
      *                   database.
@@ -386,7 +389,6 @@ class Install
      * @param string $url The root URL for this project.
      * @param string $dir The root path of this project.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception Error occurred during sample project creation.
      */
@@ -417,7 +419,6 @@ class Install
      *
      * @param string $systemPath Inspect this path for systems.
      *
-     * @since  4.0.0
      * @return array
      * @throws Exception If the actions.xml file is invalid.
      */
@@ -459,7 +460,6 @@ class Install
      * @param boolean $clearChannels Whether to clear the Channels oven or not.
      * @param boolean $clearDAL      Whether to clear the DAL oven or not.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getInstallOptions(
@@ -502,7 +502,6 @@ class Install
      * @param string $path       Path of the system.
      * @param string $tables     List of system tables.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getSystemDependencies($systemName, $path, $tables)
@@ -539,7 +538,6 @@ class Install
      * @param array $systemNames The array('system_name' => 'path') containing
      *                           the systems to be ordered.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getInstallOrder(array $systemNames)
@@ -593,7 +591,6 @@ class Install
      * @param array $list         List of elements to sort.
      * @param array $dependencies List of dependencies for the first argument.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function orderDependencyList(array $list, array $dependencies)
@@ -636,7 +633,6 @@ class Install
      * @param string $typeCode The type of the new asset.
      * @param string $path     The path of its' definition.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function addAssetPath($typeCode, $path)
@@ -669,7 +665,6 @@ class Install
      * @param array $systemNames The array('path') containing the systems to be
      *                           installed.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception If the system file cannot be found for one of the
      *                   passed systems.
@@ -737,7 +732,6 @@ class Install
      *                          present in the resulting array, but is not
      *                          necessary for ordering.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function orderAssets(array $assetTypes)
@@ -776,7 +770,6 @@ class Install
      *
      * @param string $classname The name of the class you want to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isInstanciableClass($classname)
@@ -796,7 +789,6 @@ class Install
      *
      * @param array $paths List of paths.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function copyWebFiles(array $paths=array())
@@ -839,7 +831,6 @@ class Install
      *
      * This function will create 3 files for different browser types.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function minifyCSSFiles()
@@ -962,7 +953,6 @@ class Install
      *
      * @param string $content Content to replace.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function replaceURLforCSSminification($content)
@@ -999,7 +989,6 @@ class Install
      * @param boolean $minify TRUE minify the javascript.
      * @param boolean $gzip   TRUE gzip the javascript file.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function minifyGzipJSFiles($minify=TRUE, $gzip=TRUE)
@@ -1130,7 +1119,6 @@ class Install
     /**
      * Remove minified JS file from web directory.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeMinifiedJSFile()
@@ -1146,7 +1134,6 @@ class Install
     /**
      * Remove minified gzipped JS file from web directory.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeGzippedJSFile()
@@ -1162,7 +1149,6 @@ class Install
     /**
      * Remove minified gzipped JS file from web directory.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeMinifiedCSSFiles()
@@ -1186,7 +1172,6 @@ class Install
     /**
      * Returns the list of all javascrpt files in the system.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAllJSFiles()

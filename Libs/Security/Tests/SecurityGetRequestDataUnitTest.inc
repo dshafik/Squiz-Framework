@@ -2,18 +2,29 @@
 /**
  * Unit Tests for the getRequestData() action.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Unit Tests for the getRequestData() action.
  *
- * @since 4.0.0
  */
 class SecurityGetRequestDataUnitTest extends AbstractMySourceUnitTest
 {
@@ -25,7 +36,6 @@ class SecurityGetRequestDataUnitTest extends AbstractMySourceUnitTest
      * This bakes out a working system that contains the systems that this
      * unit test requires to be able to run.
      *
-     * @since  4.0.0
      * @return void
      */
     protected function setUp()
@@ -42,7 +52,6 @@ class SecurityGetRequestDataUnitTest extends AbstractMySourceUnitTest
      * Tests that the correct results are returned for the POST, GET,
      * REQUEST and user array.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testDataTypes()
@@ -88,7 +97,6 @@ class SecurityGetRequestDataUnitTest extends AbstractMySourceUnitTest
      * Tests that the HtmlEntities is performed on the result before
      * it is returned.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHtmlEntities()
@@ -115,7 +123,6 @@ class SecurityGetRequestDataUnitTest extends AbstractMySourceUnitTest
      * Tests to ensure that Json decoding is only performed on the result
      * when it is required.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testJsonDecode()

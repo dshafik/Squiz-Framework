@@ -2,18 +2,29 @@
 /**
  * Email related methods.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Web
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Email related methods.
  *
- * @since 4.0.0
  */
 class Email
 {
@@ -24,7 +35,6 @@ class Email
      *
      * Private to prevent instantiation.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -37,7 +47,6 @@ class Email
      *
      * @param string $email The email address to validate.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function validate($email)
@@ -82,7 +91,6 @@ class Email
      * @param string $headers Additional email headers.
      * @param string $params  Additional email parameters.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function send(

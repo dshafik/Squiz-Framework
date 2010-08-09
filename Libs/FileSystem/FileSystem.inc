@@ -2,12 +2,24 @@
 /**
  * FileSystem Lib.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
@@ -16,7 +28,6 @@
  * Methods for adding, deleting and modifying directories and files should
  * reside here.
  *
- * @since 4.0.0
  */
 class FileSystem
 {
@@ -43,7 +54,6 @@ class FileSystem
      * The number of files within a hash directory.
      *
      * @var   array
-     * @since 4.0.0
      */
     public static $changedFiles = array();
 
@@ -52,7 +62,6 @@ class FileSystem
      * The number of files within a hash directory.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $fileTypesInfo = array(
         // CSS Document Asset Type.
@@ -153,7 +162,6 @@ class FileSystem
      * @param string $mimeType Content type of the file.
      * @param array  $headers  Extra headers to send.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function serveFile(
@@ -212,7 +220,6 @@ class FileSystem
      *                            the $deleteRoot param should be false if this
      *                            is not empty.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws RuntimeException When the environment prevents the directory from
      *                          being succesfully deleted.
@@ -302,7 +309,6 @@ class FileSystem
      * @param boolean $fullPath   Include the full path, or just the filename.
      * @param string  $postfix    The pattern at the end of a file name.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function listDirectory(
@@ -413,7 +419,6 @@ class FileSystem
      * @param string $path The path of the directory to start at.
      * @param string $name The name of the directories to find.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function findDirectories($path, $name)
@@ -444,7 +449,6 @@ class FileSystem
      *
      * @param string $path Path to look at.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function listDirectories($path)
@@ -472,7 +476,6 @@ class FileSystem
      * @param integer $id    The integer to return the hash dir for.
      * @param integer $count Group by how many.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getHashDir($id, $count=0)
@@ -514,7 +517,6 @@ class FileSystem
      *                      display the file size.
      * @param integer $size If specified then $path argument will not be used.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function readableSize($path, $unit=NULL, $size=FALSE)
@@ -539,7 +541,6 @@ class FileSystem
      * @param integer $size If specified then $path argument will not be used.
      * @param string  $unit The maximum unit that can be used to display the file size.
      *
-     * @since  4.0.0
      * @return string
      * @access public
      */
@@ -577,7 +578,6 @@ class FileSystem
      *
      * @param string $path Path for a file.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getBaseName($path)
@@ -599,7 +599,6 @@ class FileSystem
      * @param string $perm     Permission for the files.
      * @param array  $callback Callback method.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function copyDirectory(
@@ -669,7 +668,6 @@ class FileSystem
      * @param string $varName  The name of the variable when included.
      * @param string $filename The filename to write to.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function arrayToFile(array $value, $varName, $filename)
@@ -691,7 +689,6 @@ class FileSystem
      *
      * @param string $fileName The filename to write to.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getExtension($fileName)
@@ -709,7 +706,6 @@ class FileSystem
     /**
      * Returns all file type info.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAllFileTypeInfo()
@@ -724,7 +720,6 @@ class FileSystem
      *
      * @param string $fileName The filename to get mime type.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getMimeType($fileName)
@@ -745,7 +740,6 @@ class FileSystem
      *
      * @param string $fileName The filename to get mime type.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getFriendlyName($fileName)
@@ -767,7 +761,6 @@ class FileSystem
      *                          the following flags (with some restrictions),
      *                          joined with the binary OR (|) operator.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function filePutContents($fileName, $content, $flag=0)
@@ -816,7 +809,6 @@ class FileSystem
      *                           widest possible access.
      * @param boolean $recursive Default to FALSE.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function mkdir($pathname, $mode=0777, $recursive=FALSE)
@@ -872,7 +864,6 @@ class FileSystem
      *                          filename is set to the value of atime.
      *                          Otherwise, it is set to time .
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function touch($filename, $time=0, $atime=0)
@@ -908,7 +899,6 @@ class FileSystem
      *
      * @param string $string String to remove comment lines.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function removeShellCommentLines($string)

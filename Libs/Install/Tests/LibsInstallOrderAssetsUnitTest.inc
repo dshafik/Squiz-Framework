@@ -2,12 +2,24 @@
 /**
  * Install Lib Tests.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage UnitTest
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Libs/Install/Install.inc';
@@ -17,7 +29,6 @@ require_once 'Libs/Install/Install.inc';
  *
  * NB: These tests check addAssetTree() but not directly.
  *
- * @since 4.0.0
  */
 class LibsInstallOrderAssetsUnitTest extends AbstractMySourceUnitTest
 {
@@ -26,7 +37,6 @@ class LibsInstallOrderAssetsUnitTest extends AbstractMySourceUnitTest
      * Test types for the ordering of assets.
      *
      * @var   $_simpleTest The test types.
-     * @since 4.0.0
      */
     private $_simpleTest = array(
                             array(
@@ -67,7 +77,6 @@ class LibsInstallOrderAssetsUnitTest extends AbstractMySourceUnitTest
      * A more complex array of test types to order.
      *
      * @var   $_complexTest The test types.
-     * @since 4.0.0
      */
     private $_complexTest = array(
                              array(
@@ -119,7 +128,6 @@ class LibsInstallOrderAssetsUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests a set of assets that have a straight line dependency.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testOrderSystemsSimple()
@@ -170,7 +178,6 @@ class LibsInstallOrderAssetsUnitTest extends AbstractMySourceUnitTest
      * Also checks that any extra information in the assets array is retained
      * in the result.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testOrderSystemsComplex()

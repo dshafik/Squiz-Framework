@@ -2,12 +2,24 @@
 /**
  * DebugChannels Library.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Libs/Debug/Debug.inc';
@@ -16,7 +28,6 @@ require_once 'Libs/Debug/DotCreator.inc';
 /**
  * Library for development and debugging.
  *
- * @since 4.0.0
  */
 class DebugChannels
 {
@@ -25,7 +36,6 @@ class DebugChannels
      * If TRUE then debugging is ON.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     private static $_debugging = TRUE;
 
@@ -33,7 +43,6 @@ class DebugChannels
      * List of classes that are ignored by debugger.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_ignoredClasses = array(
                                        'Channels',
@@ -48,7 +57,6 @@ class DebugChannels
      * This var will change to FALSE after first valid tick.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     private static $_firstTick = TRUE;
 
@@ -56,7 +64,6 @@ class DebugChannels
      * Tracks the backtrace level.
      *
      * @var   integer
-     * @since 4.0.0
      */
     private static $_prevCount = 0;
 
@@ -64,7 +71,6 @@ class DebugChannels
      * Tracks the previous method call.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_prevMethodCalled = NULL;
 
@@ -72,7 +78,6 @@ class DebugChannels
      * DotCreator object.
      *
      * @var   object
-     * @since 4.0.0
      */
     public static $dotCreator = NULL;
 
@@ -80,7 +85,6 @@ class DebugChannels
      * List of called methods.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_called = array();
 
@@ -88,7 +92,6 @@ class DebugChannels
      * Function call stack.
      *
      * @var   array
-     * @since 4.0.0
      */
      private static $_stack = array();
 
@@ -99,7 +102,6 @@ class DebugChannels
      * This may be required for things like array_walk_recursive() which causes
      * segfault when debug_backtrace() is called.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function ignoreStart()
@@ -112,7 +114,6 @@ class DebugChannels
     /**
      * End the debug ignore block.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function ignoreEnd()
@@ -125,7 +126,6 @@ class DebugChannels
     /**
      * The tick function.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function tick()
@@ -187,7 +187,6 @@ class DebugChannels
      * @param array   $bt            The backtrace.
      * @param integer $offset        The backtrace offset (used for recursion).
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _startCall($currentMethod, $caller, $startTime, array $bt, $offset=1)
@@ -224,7 +223,6 @@ class DebugChannels
      *
      * @param float $endTime The time.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _endCall($endTime)
@@ -260,7 +258,6 @@ class DebugChannels
      *
      * @param string $method The method string to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isIgnoredClass($method)
@@ -292,7 +289,6 @@ class DebugChannels
      * @param array   $bt     The backtrace.
      * @param integer $offset The start index.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getCallInfo(array $bt, $offset=1)

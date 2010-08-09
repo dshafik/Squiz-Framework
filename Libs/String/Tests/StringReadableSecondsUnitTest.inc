@@ -2,18 +2,29 @@
 /**
  * Unit Tests for the readableSeconds function.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Unit tests for the readableSeconds function.
  *
- * @since 4.0.0
  */
 class StringReadableSecondsUnitTest extends AbstractMySourceUnitTest
 {
@@ -25,7 +36,6 @@ class StringReadableSecondsUnitTest extends AbstractMySourceUnitTest
      * This bakes out a working system that contains the systems that this
      * unit test requires to be able to run.
      *
-     * @since  4.0.0
      * @return void
      */
     protected function setUp()
@@ -39,7 +49,6 @@ class StringReadableSecondsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the singular and plural versions of all time units.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testPlurals()
@@ -106,7 +115,6 @@ class StringReadableSecondsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test boundary cases where strings roll over.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testBoundaries()
@@ -145,7 +153,6 @@ class StringReadableSecondsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test negative second values.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNegativeValues()

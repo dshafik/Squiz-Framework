@@ -2,12 +2,24 @@
 /**
  * FileSystem library unit test.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage UnitTest
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Libs/FileSystem/FileSystem.inc';
@@ -15,7 +27,6 @@ require_once 'Libs/FileSystem/FileSystem.inc';
 /**
  * Unit test for FileSystem::getHashDir().
  *
- * @since 4.0.0
  */
 class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
 {
@@ -24,7 +35,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hash directory for id 1 is correct.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHashDir1()
@@ -39,7 +49,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hash directory for id 2 is correct.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHashDir2()
@@ -54,7 +63,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hash directory for id 10001 is correct.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHashDir10001()
@@ -69,7 +77,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hash directory for id 20001 is correct.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHashDir20001()
@@ -84,7 +91,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hash directory for id 10001 is correct.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHashDir1000450()
@@ -99,7 +105,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hash directory for id 0 is correct.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHashDir0()
@@ -114,7 +119,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hash directory for negative id (shadow asset) is correct.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHashDirNegative()
@@ -147,7 +151,6 @@ class LibsFileSystemGetHashDirUnitTest extends AbstractMySourceUnitTest
      *
      * Note: If this test fail, double check client system's dir structure.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetAssetDataDir()

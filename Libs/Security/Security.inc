@@ -2,18 +2,29 @@
 /**
  * Security Library.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Library for security.
  *
- * @since 4.0.0
  */
 class Security
 {
@@ -25,7 +36,6 @@ class Security
      * The challenge string is used for
      * the user authentication.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function createChallengeString()
@@ -43,7 +53,6 @@ class Security
      * @param string $password       The stored passowrd.
      * @param string $challenge      The challenge string to compare with.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function validateUserPassword(
@@ -68,7 +77,6 @@ class Security
      *
      * @param string $password The stored passowrd.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function hashUserPassword($password)
@@ -82,7 +90,6 @@ class Security
     /**
      * Creates a unique ID that can be used to identify a resource.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function createUID()
@@ -109,7 +116,6 @@ class Security
      * @param mixed   $dataType   Specifies $_REQUEST, $_POST, $_GET or
      *                            user's own array.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getRequestData(
@@ -177,7 +183,6 @@ class Security
      *
      * @param integer $length Password length.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function generatePassword($length=8)

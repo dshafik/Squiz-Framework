@@ -2,18 +2,29 @@
 /**
  * XML Lib.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Library for handling data in XML form.
  *
- * @since 4.0.0
  */
 class XML
 {
@@ -24,7 +35,6 @@ class XML
      *
      * @param DomNodeList $nodeList List of nodes to convert.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function nodeListToArray(DomNodeList $nodeList)
@@ -45,7 +55,6 @@ class XML
      * @param array   $tagNames An array of tag names to search for.
      * @param DomNode $elem     The element to search under.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getElementsByTagNames(array $tagNames, DomNode $elem)
@@ -71,7 +80,6 @@ class XML
      * @param DomNode $elem     The element to search under.
      * @param integer $max      Maximum number of elements to return.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getChildrenByTagNames(
@@ -111,7 +119,6 @@ class XML
      * @param string      $value     Attribute value.
      * @param boolean     $recursive Recurse the dom tree.
      *
-     * @since  4.0.0
      * @return DOMNodeList
      */
     public static function getElementsByAttributeValue(
@@ -149,7 +156,6 @@ class XML
      *
      * @param DomNode $node Dom node.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function hasChildElements(DomNode $node)
@@ -175,7 +181,6 @@ class XML
      *
      * @param DomNode $node Dom node.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getFirstChildElement(DomNode $node)
@@ -197,7 +202,6 @@ class XML
      * @param DomNode $node     Dom node.
      * @param integer $position Position.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getChildAt(DomNode $node, $position)
@@ -223,7 +227,6 @@ class XML
      *
      * @param DomNode $node Dom node.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function childCount(DomNode $node)
@@ -248,7 +251,6 @@ class XML
      *
      * @param DomElement $element Node to start from.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function traverseDom(DomElement $element)
@@ -289,7 +291,6 @@ class XML
      *                                  ...,
      *                                 ).
      *
-     * @since  4.0.0
      * @return DomElement
      */
     public static function setAttributes(DomElement $element, array $attributes)
@@ -308,7 +309,6 @@ class XML
      *
      * @param DomNode $node The element test.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isElementNode(DomNode $node)
@@ -328,7 +328,6 @@ class XML
      * @param DomNode $node             XML node to convert.
      * @param boolean $includeTextNodes Include text nodes.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function nodeToArray(DomNode $node, $includeTextNodes=FALSE)
@@ -404,7 +403,6 @@ class XML
      *
      * @param object $root SimpleXML object to convert.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function simplexml2array($root)
@@ -448,7 +446,6 @@ class XML
      *
      * @param string $xml The XML string to convert.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function xmlToXHTML($xml)
@@ -470,7 +467,6 @@ class XML
      *
      * @param array $matches Regex matches.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _xmlToXHTMLCallback(array $matches)
@@ -498,7 +494,6 @@ class XML
      * @param boolean $embedToDoc If true, the content is wrapped with
      *                            in XHTML structure.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getFlatValueListFromHTMLDom($html, $embedToDoc=TRUE)
@@ -530,7 +525,6 @@ class XML
      * @param DomNode $node      DomNode to process.
      * @param array   &$flatList The result array.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _getFlatValueListFromHTMLDom(DomNode $node, array &$flatList)

@@ -2,18 +2,29 @@
 /**
  * DebugExecutionPath Library.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Library for development and debugging.
  *
- * @since 4.0.0
  */
 class DebugExecutionPath
 {
@@ -22,7 +33,6 @@ class DebugExecutionPath
      * Channel call stack.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_stack = array();
 
@@ -30,7 +40,6 @@ class DebugExecutionPath
      * Stack element counter.
      *
      * @var   integer
-     * @since 4.0.0
      */
     private static $_stackCounter = 0;
 
@@ -38,7 +47,6 @@ class DebugExecutionPath
      * Completed array.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_completed = array();
 
@@ -50,7 +58,6 @@ class DebugExecutionPath
      * random exec path.
      *
      * @var   array $_toEnd
-     * @since 4.0.0
      */
     private static $_toEnd = array();
 
@@ -58,7 +65,6 @@ class DebugExecutionPath
      * Path to the report directory.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_reportDir = '';
 
@@ -66,7 +72,6 @@ class DebugExecutionPath
      * Channel type.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_channelType = '';
 
@@ -76,7 +81,6 @@ class DebugExecutionPath
      *
      * @param string $action The action name.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function start($action)
@@ -108,7 +112,6 @@ class DebugExecutionPath
     /**
      * Stores the time taken for the current channel.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception If file cannot be found or stack is empty.
      */
@@ -162,7 +165,6 @@ class DebugExecutionPath
     /**
      * Returns id for the request.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getId()
@@ -178,7 +180,6 @@ class DebugExecutionPath
      *
      * @param string $type Channel type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function setChannelType($type)
@@ -194,7 +195,6 @@ class DebugExecutionPath
      * @param string $id   ID.
      * @param string $file File.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception If file cannot be found or stack is empty.
      */
@@ -225,7 +225,6 @@ class DebugExecutionPath
      *
      * @param array $stack Channel call stack array.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getChannelCallInfo(array $stack)
@@ -288,7 +287,6 @@ class DebugExecutionPath
      * @param array  $stack Channel call stack array.
      * @param array  $data  Data array.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _createDotFile($id, array $stack, array $data)
@@ -417,7 +415,6 @@ class DebugExecutionPath
      * @param string  $destFile The svg file to create.
      * @param boolean $onlySVG  If FALSE then a wrapper HTML file is created.
      *
-     * @since  4.0.0
      * @return string
      * @throws Exception If source dot file is not found.
      */
@@ -471,7 +468,6 @@ class DebugExecutionPath
      * @param string $svgFile  The svg file to wrap.
      * @param string $destFile The destination HTML file.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _createSVGHTML($svgFile, $destFile)

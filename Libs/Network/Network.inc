@@ -2,18 +2,29 @@
 /**
  * Network methods.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Network
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Network methods.
  *
- * @since 4.0.0
  */
 class Network
 {
@@ -22,7 +33,6 @@ class Network
      * Network interface definition file path.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_interfaceFilePath = '/etc/network/interfaces';
 
@@ -30,7 +40,6 @@ class Network
      * Directory path where PEM files locate.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_pemFileDirectoryPath = '/etc/lighttpd/ssl';
 
@@ -38,7 +47,6 @@ class Network
      * Directory path where Lighttpd configuration files locate.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_lighttpdConfDirectoryPath = '/etc/lighttpd/conf-enabled';
 
@@ -46,7 +54,6 @@ class Network
      * SSL lighttpd configuration file suffix.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_lighttpdConfFilePrefix = '99-ssl-';
 
@@ -54,7 +61,6 @@ class Network
      * OpenSSL command line tool path.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_openSSLCommandPath = '/usr/bin/openssl';
 
@@ -62,7 +68,6 @@ class Network
      * Lighttpd Web Server command line tool path.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_lighttpdCommandPath = '/usr/sbin/lighttpd';
 
@@ -70,7 +75,6 @@ class Network
      * Invoke RC command line tool path.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_invokeRCCommandPath = '/usr/sbin/invoke-rc.d';
 
@@ -78,7 +82,6 @@ class Network
      * Command line tool path of ifup.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_ifconfigCommandPath = '/sbin/ifconfig';
 
@@ -86,7 +89,6 @@ class Network
      * Command line tool path of ifup.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_ifupCommandPath = '/sbin/ifup';
 
@@ -94,7 +96,6 @@ class Network
      * Command line tool path of ifdown.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_ifdownCommandPath = '/sbin/ifdown';
 
@@ -105,7 +106,6 @@ class Network
      * @param string $fileName       PEM File name to create.
      * @param string $pemFileContent PEM File content to create.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function createPemFile($fileName, $pemFileContent)
@@ -153,7 +153,6 @@ class Network
      *
      * @param string $fileName PEM file name to remove.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getPemFilePath($fileName)
@@ -169,7 +168,6 @@ class Network
      *
      * @param string $fileName PEM file name to remove.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function removePemFile($fileName)
@@ -192,7 +190,6 @@ class Network
      *
      * @param string $fileName PEM file name to test.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function testPemFileIntegrity($fileName)
@@ -224,7 +221,6 @@ class Network
      *
      * @param string $filePath PEM file path to test.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getPrivateKeyFromPEMFile($filePath)
@@ -266,7 +262,6 @@ class Network
      *
      * @param string $filePath PEM file path.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function testPemFilePrivateKeyPassword($filePath)
@@ -350,7 +345,6 @@ class Network
      * @param string $fileName            Configuration file name to create.
      * @param string $lighttpdConfContent Configuration file content.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function createLighttpdSSLConfFile($fileName, $lighttpdConfContent)
@@ -392,7 +386,6 @@ class Network
      *
      * @param string $fileName Configuration file name to remove.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function removeLighttpdSSLConfFile($fileName)
@@ -416,7 +409,6 @@ class Network
      * @param string $identifier  Domain name or IP address to bind.
      * @param string $pemFileName PEM file name.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getLighttpdSSLConfString($identifier, $pemFileName)
@@ -438,7 +430,6 @@ class Network
     /**
      * Test Lighttpd configuration file.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function testLighttpdConf()
@@ -458,7 +449,6 @@ class Network
     /**
      * Restart Lighttpd Web server.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function restartLighttpd()
@@ -478,7 +468,6 @@ class Network
     /**
      * Returns the existing network interfaces.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getNetworkInterfaces()
@@ -515,7 +504,6 @@ class Network
      * @param string $ipAddress IP address to bind.
      * @param string $netmask   Netmask address to use.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function createNewNetworkInterface($ipAddress, $netmask)
@@ -544,7 +532,6 @@ class Network
      *
      * @param string $interfaceStr Interface string to add.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function addNetworkInterface($interfaceStr)
@@ -573,7 +560,6 @@ class Network
      *
      * @param string $interfaceStr Interface string to remove.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function removeNetworkInterface($interfaceStr)
@@ -606,7 +592,6 @@ class Network
      *
      * @param string $interName Name of the interface like eth0.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getNetworkInterfaceAddresses($interName)
@@ -643,7 +628,6 @@ class Network
      *
      * @param string $alias Alias for eth0 network interface.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function startNetworkInterface($alias)
@@ -676,7 +660,6 @@ class Network
      *
      * @param string $alias Alias for eth0 network interface.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function stopNetworkInterface($alias)
@@ -708,7 +691,6 @@ class Network
      *
      * @param string $ipStr IP address to validate.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isValidIPAddress($ipStr)
@@ -726,7 +708,6 @@ class Network
     /**
      * Output file path for checking the command execution.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getCommandOutputFilePath()

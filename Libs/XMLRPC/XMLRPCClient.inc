@@ -2,12 +2,24 @@
 /**
  * XMLRPC client.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Web
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Libs/Web/HTTPRequest.inc';
@@ -15,7 +27,6 @@ require_once 'Libs/Web/HTTPRequest.inc';
 /**
  * XMLRPC client.
  *
- * @since 4.0.0
  */
 class XMLRPCClient
 {
@@ -24,7 +35,6 @@ class XMLRPCClient
      * List of glossary term ids.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_uri = '';
 
@@ -32,7 +42,6 @@ class XMLRPCClient
      * List of glossary term ids.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_options = array();
 
@@ -40,7 +49,6 @@ class XMLRPCClient
      * List of glossary term ids.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_reqObj = NULL;
 
@@ -51,7 +59,6 @@ class XMLRPCClient
      * @param string $uri     URI to connect.
      * @param array  $options Options to pass to HTTPRequest obj.
      *
-     * @since 4.0.0
      */
     public function __construct($uri, array $options=array())
     {
@@ -67,7 +74,6 @@ class XMLRPCClient
      * @param string $methodName Name of the method to call.
      * @param array  $params     Parameters.
      *
-     * @since  4.0.0
      * @return string
      */
     public function makeCall($methodName, array $params=array())
@@ -88,7 +94,6 @@ class XMLRPCClient
     /**
      * Returns HTTPRequest object.
      *
-     * @since  4.0.0
      * @return object
      */
     public function getHttpRequest()

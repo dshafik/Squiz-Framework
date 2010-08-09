@@ -2,18 +2,29 @@
 /**
  * HTTP Request class.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Web
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * HTTP Request class using cUrl.
  *
- * @since 4.0.0
  */
 class HTTPRequest
 {
@@ -22,7 +33,6 @@ class HTTPRequest
      * URI to send the request.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_uri = '';
 
@@ -30,7 +40,6 @@ class HTTPRequest
      * Curl object.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_ch = NULL;
 
@@ -38,7 +47,6 @@ class HTTPRequest
      * Request data string.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_requestData;
 
@@ -46,7 +54,6 @@ class HTTPRequest
      * Response data string.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_responseData;
 
@@ -54,7 +61,6 @@ class HTTPRequest
      * Proxy URI.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_proxy = NULL;
 
@@ -62,7 +68,6 @@ class HTTPRequest
      * Proxy Auth information.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_proxyAuth = NULL;
 
@@ -70,7 +75,6 @@ class HTTPRequest
      * SSL infomation.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_sslverify = TRUE;
 
@@ -78,7 +82,6 @@ class HTTPRequest
      * Encoding type.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_encoding = 'iso-8859-1';
 
@@ -86,7 +89,6 @@ class HTTPRequest
      * Cookie file path.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_cookiefile = NULL;
 
@@ -94,7 +96,6 @@ class HTTPRequest
      * When it's TRUE, it sends HTTP_GET request instead.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_httpGet = FALSE;
 
@@ -105,7 +106,6 @@ class HTTPRequest
      * @param string $uri    URI to connect.
      * @param array  $params Options to pass to HTTPRequest obj.
      *
-     * @since  4.0.0
      * @throws Exception If init failed.
      */
     public function __construct($uri='', array $params=array())
@@ -192,7 +192,6 @@ class HTTPRequest
     /**
      * Response getter.
      *
-     * @since  4.0.0
      * @return string
      */
     public function getData()
@@ -207,7 +206,6 @@ class HTTPRequest
      *
      * This only can be used when raw response is a XML format string.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getXMLToArray()
@@ -229,7 +227,6 @@ class HTTPRequest
      *
      * @param string $data Data to send.
      *
-     * @since  4.0.0
      * @return void
      */
     public function setData($data)
@@ -242,7 +239,6 @@ class HTTPRequest
     /**
      * Set the request option to GET.
      *
-     * @since  4.0.0
      * @return void
      */
     public function sendGetRequest()
@@ -257,7 +253,6 @@ class HTTPRequest
      *
      * @param string $uri URI to send the request.
      *
-     * @since  4.0.0
      * @return void
      */
     public function setUri($uri)
@@ -273,7 +268,6 @@ class HTTPRequest
      *
      * @param string $encoding Encoding type.
      *
-     * @since  4.0.0
      * @return void
      */
     public function setEncoding($encoding)
@@ -286,7 +280,6 @@ class HTTPRequest
     /**
      * Send request.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If curl request fails.
      */

@@ -2,18 +2,29 @@
 /**
  * Util methods.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Util
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Util methods.
  *
- * @since 4.0.0
  */
 class Util
 {
@@ -32,7 +43,6 @@ class Util
      * @param mixed $index   The array index.
      * @param mixed $default Default value to return.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getArrayIndex($var, $index, $default=NULL)
@@ -53,7 +63,6 @@ class Util
      * @param string $cssContents CSS to replace.
      * @param string $prefixId    ID prefix to replace (Optional).
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function replaceCSSPrefix($cssContents, $prefixId='EditingAsset')
@@ -150,7 +159,6 @@ class Util
      *
      * @param string $jsContents JS to minify.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function minifyJavascript($jsContents)
@@ -174,7 +182,6 @@ class Util
      * @param string  $cssContents  CSS to minify.
      * @param integer $linebreakpos Line wrapping point.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function minifyCSS($cssContents, $linebreakpos=0)
@@ -198,7 +205,6 @@ class Util
      * @param string $tag      Tag to get the content.
      * @param string $contents HTML content.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getTagContent($tag, $contents)
@@ -248,7 +254,6 @@ class Util
      *
      * @param string $html HTML content.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getScripts($html)
@@ -305,7 +310,6 @@ class Util
      *
      * @param string $html HTML content of <head> section.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getExternalCSSContents($html)
@@ -397,7 +401,6 @@ class Util
      *
      * @param string $value The HTML content to save.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getHTML($value)
@@ -475,7 +478,6 @@ class Util
      *
      * @param array $array Array to determine.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isAssoc(array $array)

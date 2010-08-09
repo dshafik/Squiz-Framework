@@ -2,12 +2,24 @@
 /**
  * XML Lib Tests.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage UnitTest
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/XML.inc';
@@ -17,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/XML.inc';
  *
  * Unlike fisrChild, getFirstChildElement returns the first XML_ELEMENT_NODE.
  *
- * @since 4.0.0
  */
 class LibsXMLGetFirstChildElementUnitTest extends AbstractMySourceUnitTest
 {
@@ -29,7 +40,6 @@ class LibsXMLGetFirstChildElementUnitTest extends AbstractMySourceUnitTest
      * Test the getFirstChildElement() returns null for a node that has text
      * and no node elements.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testTextNode()
@@ -49,7 +59,6 @@ class LibsXMLGetFirstChildElementUnitTest extends AbstractMySourceUnitTest
      * Test the hasChildElements() returns child for a node that has text
      * and node elements.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testTextNodeWithNodeElement()
@@ -69,7 +78,6 @@ class LibsXMLGetFirstChildElementUnitTest extends AbstractMySourceUnitTest
      * Test the hasChildElements() returns child for a node that has text
      * and empty node elements.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testTextNodeWithEmptyNodeElement()
@@ -89,7 +97,6 @@ class LibsXMLGetFirstChildElementUnitTest extends AbstractMySourceUnitTest
      * Test that hasChildElements() returns child for a node that has
      * node element.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNodeElement()
@@ -109,7 +116,6 @@ class LibsXMLGetFirstChildElementUnitTest extends AbstractMySourceUnitTest
      * Test the hasChildElements() returns child for a node that has
      * empty node element.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testEmptyNodeElement()
@@ -129,7 +135,6 @@ class LibsXMLGetFirstChildElementUnitTest extends AbstractMySourceUnitTest
      * Test the hasChildElements() returns child2 for a node that has
      * empty node element.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testEmptyNodeElements()

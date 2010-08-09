@@ -2,12 +2,24 @@
 /**
  * Datastructure Lib.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Libs
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Libs/Datastructure/AbstractNode.inc';
@@ -17,7 +29,6 @@ require_once 'Libs/Datastructure/Graph/AbstractGraph.inc';
 /**
  * DirectedAcyclicGraph class.
  *
- * @since 4.0.0
  */
 class DirectedAcyclicGraph extends AbstractGraph
 {
@@ -26,7 +37,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      * The list of cycle strings found in the graph.
      *
      * @var   array
-     * @since 4.0.0
      */
     protected $cycles = array();
 
@@ -34,7 +44,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      * The list of nodes containing cycle(s).
      *
      * @var   array
-     * @since 4.0.0
      */
     protected $cycleNodes = array();
 
@@ -42,7 +51,6 @@ class DirectedAcyclicGraph extends AbstractGraph
     /**
      * Constructor.
      *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -55,7 +63,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      *
      * @param string $nodeid The id of the node.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public function nodeExists($nodeid)
@@ -74,7 +81,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      *
      * @param AbstractNode &$node The reference to the node object.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception The given node already exists.
      */
@@ -96,7 +102,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      *
      * @param string $nodeid Node id.
      *
-     * @since  4.0.0
      * @return void
      */
     public function addNode($nodeid)
@@ -113,7 +118,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      * @param object $fromNodeid The node obj connects from.
      * @param object $toNodeid   The node obj connects to.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception Error occurred during the connection.
      */
@@ -147,7 +151,6 @@ class DirectedAcyclicGraph extends AbstractGraph
     /**
      * Gets the reverse order of the nodes in the graph.
      *
-     * @since  4.0.0
      * @return array The array of nodes in reverse order.
      * @throws Exception Cycle exists in the graph.
      */
@@ -202,7 +205,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      *
      * It returns TRUE if no loop cycle exists in the graph.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public function isAcyclic()
@@ -268,7 +270,6 @@ class DirectedAcyclicGraph extends AbstractGraph
     /**
      * Returns the list of cycles string.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getCycles()
@@ -283,7 +284,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      *
      * @param array $nodeList The list of nodes which the cycle exists.
      *
-     * @since  4.0.0
      * @return void
      */
     private function _setCycles(array $nodeList)
@@ -328,7 +328,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      * @param string $nodeid The current nodeid.
      * @param array  $list   The list of nodes have been processed.
      *
-     * @since  4.0.0
      * @return void
      */
     private function _setCycle($nodeid, array $list=array())
@@ -355,7 +354,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      *
      * Sourcenode is the node with outgoing link but with no incoming link.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getSourceNodes()
@@ -377,7 +375,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      *
      * Sourcenode is the node with ingoing link but with no outgoing link.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getSinkNodes()
@@ -397,7 +394,6 @@ class DirectedAcyclicGraph extends AbstractGraph
     /**
      * Return the list of nodes in the graph.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getNodes()
@@ -413,7 +409,6 @@ class DirectedAcyclicGraph extends AbstractGraph
      * @param string $fromid The nodeid to check the link from.
      * @param string $toid   The nodeid to check the link to.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception The given nodes don't exist.
      */

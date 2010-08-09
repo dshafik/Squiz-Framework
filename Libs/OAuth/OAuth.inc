@@ -2,12 +2,24 @@
 /**
  * Library functions.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Network
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Libs/Web/Web.inc';
@@ -60,7 +72,6 @@ require_once 'Libs/Web/Web.inc';
  * its AuthSub "revoke token" endpoint to accept OAuth token requests). These can
  * likely be called as normal doRequest() calls using the token to revoke.
  *
- * @since 4.0.0
  */
 class OAuth
 {
@@ -83,7 +94,6 @@ class OAuth
      * @param array  $extraAuthItems Extra header items to go into the Authorization
      *                               header.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getTemporaryCredentials(
@@ -127,7 +137,6 @@ class OAuth
      * @param string $endpointUrl The URL to redirect to authorise the token.
      * @param string $tempToken   The identifier part of the temporary credentials.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function getResourceOwnerAuth($endpointUrl, $tempToken)
@@ -154,7 +163,6 @@ class OAuth
      * @param string $verifier     The verifier provided from the auth redirect.
      * @param string $signMethod   The method used to sign the OAuth request.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getToken(
@@ -218,7 +226,6 @@ class OAuth
      * @param array  $postFields     If method is POST, fields to be posted to the
      *                               request, otherwise ignored.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function doRequest(
@@ -354,7 +361,6 @@ class OAuth
      * @param string $method  HTTP request method.
      * @param array  $params  Full parameter list (to be normalised).
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getBaseString(
@@ -399,7 +405,6 @@ class OAuth
      *
      * @param array $params Parameters of the request.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function normaliseParams(array $params)
@@ -451,7 +456,6 @@ class OAuth
      * @param array $a First parameter to compare.
      * @param array $b Second parameter to compare.
      *
-     * @since  4.0.0
      * @return integer
      */
     private static function _normaliseParamsFn(array $a, array $b)
@@ -497,7 +501,6 @@ class OAuth
      * @param string $tokenSecret  The shared secret part of the current credentials.
      * @param string $signMethod   The signature method.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getSignature(
@@ -546,7 +549,6 @@ class OAuth
      *
      * @param string $value The value to encode.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function encodeValue($value)
@@ -569,7 +571,6 @@ class OAuth
      * older implementations may still require them, and otherwise, including them
      * does not hurt.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function generateNonce()

@@ -2,18 +2,29 @@
 /**
  * Web related methods.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Web
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Libs
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * Web related methods.
  *
- * @since 4.0.0
  */
 class Web
 {
@@ -22,7 +33,6 @@ class Web
      * List of HTTP headers being sent out.
      *
      * @var   array
-     * @since 4.0.0
      */
     public static $headersSent = array();
 
@@ -30,7 +40,6 @@ class Web
      * The current URL.
      *
      * @var   string
-     * @since 4.0.0
      * @see   getCurrentUrl()
      */
     private static $_currentUrl = '';
@@ -39,7 +48,6 @@ class Web
      * The current URL with query string.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_currentUrlWithQueryStr = '';
 
@@ -49,7 +57,6 @@ class Web
      *
      * Private to prevent instantiation.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -63,7 +70,6 @@ class Web
      * @param string $includeQueryString If TRUE the query string will be
      *                                   included with the url.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getCurrentUrl($includeQueryString=TRUE)
@@ -110,7 +116,6 @@ class Web
     /**
      * Returns the protocol string of the current URL.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getCurrentWebProtocol()
@@ -130,7 +135,6 @@ class Web
     /**
      * Clears the URL cache, mainly for unit test.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function clearCurrentUrl()
@@ -144,7 +148,6 @@ class Web
     /**
      * Resets the current url cache.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function resetCurrentUrl()
@@ -159,7 +162,6 @@ class Web
      *
      * @param string $url The url to strip the suffix from.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function stripUrlSuffix($url)
@@ -178,7 +180,6 @@ class Web
      *
      * @param string $url The url to test the suffix from.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getUrlSuffix($url)
@@ -205,7 +206,6 @@ class Web
      *
      * @param string $url The url to strip the suffix from.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function stripUrlQueryString($url)
@@ -229,7 +229,6 @@ class Web
      * @param string $url The URL to get query string for.
      *                    Use current URL if this is not provided.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getQueryString($url='')
@@ -252,7 +251,6 @@ class Web
      * @param string $var The specific param to look for.
      *                    If not provided, will return the full param array.
      *
-     * @since  4.0.0
      * @return mixed string|array
      */
     public static function getQueryStringParams($url='', $var='')
@@ -283,7 +281,6 @@ class Web
      *
      * @param array $vars Array index by var name.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function addToQueryString(array $vars)
@@ -304,7 +301,6 @@ class Web
      * @param string $url  The URL to add query string to.
      *                     Use current URL if this is not provided.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function appendQueryString(array $vars, $url)
@@ -335,7 +331,6 @@ class Web
      * @param string $url  The URL to remove query string from.
      *                     Use current URL if this is not provided.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function removeFromQueryString(array $vars, $url='')
@@ -361,7 +356,6 @@ class Web
      *
      * @param array $headers List of key and value pairs.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function headers(array $headers)
@@ -393,7 +387,6 @@ class Web
      *                      as a header.
      * @param string $value Value to send.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function header($key, $value)
