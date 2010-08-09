@@ -2,12 +2,24 @@
 /**
  * Actions for the Attribute System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Attribute
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'DAL/DAL.inc';
@@ -15,7 +27,6 @@ require_once 'DAL/DAL.inc';
 /**
  * Attribute Actions Class.
  *
- * @since 4.0.0
  */
 class AttributeActions
 {
@@ -24,7 +35,6 @@ class AttributeActions
      * Cache for the attribute values.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_attrVals = array();
 
@@ -34,7 +44,6 @@ class AttributeActions
      *
      * Private to prevent instantiation.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -54,7 +63,6 @@ class AttributeActions
      * @param integer      $assetid     The asset to find the value for.
      * @param string|array $attributeid The attribute(s) to find.
      *
-     * @since         4.0.0
      * @return        mixed
      * @api           read
      * @api-privilege asset.read.content
@@ -86,7 +94,6 @@ class AttributeActions
      * @param integer $assetid     The asset to find the value for.
      * @param string  $attributeid The attribute to find.
      *
-     * @since         4.0.0
      * @return        mixed
      * @api           read
      * @api-privilege asset.read.content
@@ -149,7 +156,6 @@ class AttributeActions
      *
      * @param integer $assetid Id of an asset.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAttributeValues($assetid)
@@ -185,7 +191,6 @@ class AttributeActions
      * @param string  $attributeid The id of the attribute to set.
      * @param string  $value       The new value to set for the attribute.
      *
-     * @since         4.0.0
      * @see           DataSource::attributeValueExists()
      * @see           DataSource::setAttributeValue()
      * @see           DataSource::isUniqueAttributeValue()
@@ -337,7 +342,6 @@ class AttributeActions
      * @param boolean $systemOnly   If TRUE then only the system attributes
      *                              are returned.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAttributes(
@@ -389,7 +393,6 @@ class AttributeActions
      * @param integer $assetid     Asset's id.
      * @param string  $attributeid Attribute id.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException If there is an error retrieving the
      *                                attribute info.
@@ -419,7 +422,6 @@ class AttributeActions
      * @param string $assetType   Asset's type.
      * @param string $attributeid Attribute id.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException If there is an error retrieving the
      *                                attribute.
@@ -447,7 +449,6 @@ class AttributeActions
      * @param boolean $decendants  If TRUE assets of a type that is a
      *                             descendant of $assetType will be included.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAssetsByAttributeValue(
@@ -521,7 +522,6 @@ class AttributeActions
      *                               string of system name, then it is treated
      *                               as system attribute.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If the data source doesn't exist, or if
      *                                there is an error adding the attribute.
@@ -596,7 +596,6 @@ class AttributeActions
      * If this method is used in a loop then make sure you call modifyBasket to
      * update the attribute information.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _addAttribute()
@@ -615,7 +614,6 @@ class AttributeActions
      * @param string $assetType   The type of the attribute to remove.
      * @param string $attributeid The id of the attribute to remove.
      *
-     * @since  4.0.0
      * @return integer
      * @throws ChannelException If the attribute is not successfully
      *                                removed.
@@ -655,7 +653,6 @@ class AttributeActions
      * @param string $assetType   Asset type specified attribute belongs to.
      * @param string $attributeid Attribute's id.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function attributeExists($assetType, $attributeid)
@@ -675,7 +672,6 @@ class AttributeActions
      *
      * @param string $dataSource Name of the data source.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function getDataSourcePath($dataSource)
@@ -696,7 +692,6 @@ class AttributeActions
      * @param string $attributeid Id of the attribute.
      * @param string $ruleid      Rule's id.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function addAttributeRule($assetType, $attributeid, $ruleid)
@@ -717,7 +712,6 @@ class AttributeActions
      * @param string $attributeid Id of the attribute.
      * @param string $ruleid      Rule's id.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function removeAttributeRule(
@@ -738,7 +732,6 @@ class AttributeActions
      * @param object $inList The query object to restrict search within a
      *                       parent.
      *
-     * @since  4.0.0
      * @return Query
      */
     public static function findAssetsWithValue($value, $inList=NULL)

@@ -2,12 +2,24 @@
 /**
  * Actions for the FileSession System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage FileSession
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/Session/SessionActions.inc';
@@ -15,7 +27,6 @@ require_once 'Systems/Session/SessionActions.inc';
 /**
  * FileSessionActions.
  *
- * @since 4.0.0
  */
 class FileSessionActions implements SessionActions
 {
@@ -24,7 +35,6 @@ class FileSessionActions implements SessionActions
      * If TRUE, the sesssion has already been started.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     private static $_sessionStarted = FALSE;
 
@@ -32,7 +42,6 @@ class FileSessionActions implements SessionActions
     /**
      * Starts a new session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function startSession()
@@ -94,7 +103,6 @@ class FileSessionActions implements SessionActions
     /**
      * Destroys the current session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function destroySession()
@@ -113,7 +121,6 @@ class FileSessionActions implements SessionActions
     /**
      * Custom handler for the opening of a new session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionOpenHandler()
@@ -126,7 +133,6 @@ class FileSessionActions implements SessionActions
     /**
      * Custom handler for the closing of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionCloseHandler()
@@ -139,7 +145,6 @@ class FileSessionActions implements SessionActions
     /**
      * Custom handler for the reading of an existing session.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function sessionReadHandler()
@@ -152,7 +157,6 @@ class FileSessionActions implements SessionActions
     /**
      * Custom handler for the writing of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionWriteHandler()
@@ -165,7 +169,6 @@ class FileSessionActions implements SessionActions
     /**
      * Custom handler for the destruction of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionDestroyHandler()
@@ -178,7 +181,6 @@ class FileSessionActions implements SessionActions
     /**
      * Custom handler for the garbage collection of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionCleanHandler()
@@ -191,7 +193,6 @@ class FileSessionActions implements SessionActions
     /**
      * Returns the id of the current session.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getSessionid()
@@ -205,7 +206,6 @@ class FileSessionActions implements SessionActions
     /**
      * Regenerates and returns the current session id.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function regenerateSessionid()
@@ -222,7 +222,6 @@ class FileSessionActions implements SessionActions
      * If this returns TRUE, the default PHP session handling operations
      * will be overridden with the session handler channels in this system.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function usesCustomHandler()
@@ -240,7 +239,6 @@ class FileSessionActions implements SessionActions
      *                              identifier as in php.ini.
      * @param string $value         Value to set.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function setSessionConfig($sessionConfig, $value)
@@ -262,7 +260,6 @@ class FileSessionActions implements SessionActions
      *                           be identified/referenced.
      * @param mixed  $data       The data to set.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function setSessionData($systemName, $dataKey, $data)
@@ -291,7 +288,6 @@ class FileSessionActions implements SessionActions
      *                           set the value.
      * @param string $dataKey    Identifier/reference of value to get.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getSessionData($systemName, $dataKey)
@@ -318,7 +314,6 @@ class FileSessionActions implements SessionActions
      * @param string $systemName The name of the system which
      *                           set the value.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function removeSystemSession($systemName)
@@ -343,7 +338,6 @@ class FileSessionActions implements SessionActions
      *                           set the value.
      * @param string $dataKey    Identifier/reference of value to get.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function removeSystemDataSession($systemName, $dataKey)

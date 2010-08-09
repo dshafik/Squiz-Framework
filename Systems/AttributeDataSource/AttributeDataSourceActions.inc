@@ -2,12 +2,24 @@
 /**
  * Actions for the AttributeDataSource System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage AttributeDataSource
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/DataSource/DataSourceActions.inc';
@@ -18,7 +30,6 @@ require_once 'Systems/DataSource/DataSourceActions.inc';
  * Implementation of the abstract DataSource System. Uses
  * the local database for storage of attribute values.
  *
- * @since 4.0.0
  */
 class AttributeDataSourceActions implements DataSourceActions
 {
@@ -31,7 +42,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string  $attributeid Id of the attribute.
      * @param string  $attrType    Type of the attribute.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getAttributeValue($assetid, $attributeid, $attrType)
@@ -54,7 +64,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param array       $attributes List of attribute ids.
      * @param array       $attrTypes  All attribute types being retrieved.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function batchGetAttributeValue(
@@ -97,7 +106,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string  $attrType    Type of the attribute.
      * @param mixed   $value       Value of the attribute for the specified asset.
      *
-     * @since  4.0.0
      * @see    DataSourceActions::addAttributeValue()
      * @return boolean
      */
@@ -123,7 +131,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param array        $attrVals Array of attribute ids with their values.
      *                               array(attributeid => value).
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If there is an error retrieving the type
      *                          of an attribute, or an error retrieving
@@ -195,7 +202,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param mixed   $value       Value of the attribute for the specified asset.
      * @param boolean $isDefault   TRUE if it is the default value.
      *
-     * @since  4.0.0
      * @see    DataSourceActions::setAttributeValue()
      * @see    DataSourceActions::attributeValueExists()
      * @return boolean
@@ -233,7 +239,6 @@ class AttributeDataSourceActions implements DataSourceActions
      *
      * @param string $attributeType Attribute type to validate.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isValidAttributeType($attributeType)
@@ -264,7 +269,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid The ID of the attribute.
      * @param string $attrType    The attribute type.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException If there is an error retrieving the
      *                          attribute values.
@@ -290,7 +294,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $assetType     Asset type the attribute is set for.
      * @param string $attributeType The attribute type.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function removeAttributeValues($attributeid, $assetType, $attributeType)
@@ -309,7 +312,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string  $attrType    The type of attribute.
      * @param string  $value       The value of the attribute.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function attributeValueExists($assetid, $attributeid, $attrType, $value=NULL)
@@ -332,7 +334,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attrType    The attribute type.
      * @param mixed  $value       Value of attribute used to match assets.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException If there is an error retrieving
      *                          the assets.
@@ -364,7 +365,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attrType    The type of attribute.
      * @param mixed  $value       The attribute value to check.
      *
-     * @since  4.0.0
      * @see    AttributeDataSource::getAssetsByAttributeValue()
      * @return (boolean|array)
      */
@@ -392,7 +392,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid Id of the new attribute.
      * @param string $assetType   Asset type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAttributeText($attributeid, $assetType)
@@ -407,7 +406,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid Id of the new attribute.
      * @param string $assetType   Asset type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAttributeLongtext($attributeid, $assetType)
@@ -422,7 +420,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid Id of the new attribute.
      * @param string $assetType   Asset type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAttributeInteger($attributeid, $assetType)
@@ -437,7 +434,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid Id of the new attribute.
      * @param string $assetType   Asset type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAttributeFloat($attributeid, $assetType)
@@ -452,7 +448,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid Id of the new attribute.
      * @param string $assetType   Asset type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAttributeDatetime($attributeid, $assetType)
@@ -467,7 +462,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid Id of the new attribute.
      * @param string $assetType   Asset type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAttributeSelection($attributeid, $assetType)
@@ -483,7 +477,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $assetType   Type of the asset.
      * @param string $attrType    Type of the attribute.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function attributeValsUnique($attributeid, $assetType, $attrType)
@@ -503,7 +496,6 @@ class AttributeDataSourceActions implements DataSourceActions
      *
      * @param string $attrType Type of the attribute.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getAttributeTypeClassName($attrType)
@@ -521,7 +513,6 @@ class AttributeDataSourceActions implements DataSourceActions
      *
      * @param string $className Class name of an attribute type.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getAttributeTypePath($className)
@@ -541,7 +532,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeType Attribute's type.
      * @param string $newId         New id for the attribute.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function updateAttributeid($attributeid, $assetType, $attributeType, $newId)
@@ -560,7 +550,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeType Attribute's type.
      * @param string $newDataType   New data type for the attribute.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException The the attribute type is invalid.
      */
@@ -589,7 +578,6 @@ class AttributeDataSourceActions implements DataSourceActions
      *                               asset.
      * @param boolean $isDefault     True if the value is default.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAssetTypeAttributeValue($attributeid, $assetType, $attributeType, $value, $isDefault)
@@ -617,7 +605,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeid Attribute id.
      * @param string $assetType   Type of asset.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAttributeTextRule($attributeid, $assetType)
@@ -637,7 +624,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $attributeids List of attributes.
      * @param string $attrType     List of attribute types.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function batchGetAttributeValueQc($assetids, $attributeids, $attrType)
@@ -656,7 +642,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $newContext The context to override.
      * @param string $assetid    Asset id to use.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context cannot be replaced.
      */
@@ -701,7 +686,6 @@ class AttributeDataSourceActions implements DataSourceActions
      * @param string $context Context string that could be used in LIKE queries.
      *                        E.g. _____01__ .
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context data cannot be removed.
      */

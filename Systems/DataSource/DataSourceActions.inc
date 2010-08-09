@@ -2,12 +2,24 @@
 /**
  * Actions for the DataSource System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DataSource
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
@@ -19,7 +31,6 @@
  * values. All other data source systems must implement these
  * actions.
  *
- * @since 4.0.0
  */
 interface DataSourceActions
 {
@@ -32,7 +43,6 @@ interface DataSourceActions
      * @param string  $attributeid Id of the attribute.
      * @param string  $attrType    Type of the attribute.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getAttributeValue($assetid, $attributeid, $attrType);
@@ -45,7 +55,6 @@ interface DataSourceActions
      * @param array       $attributes List of attribute ids.
      * @param array       $attrTypes  An array of all attribute types being retrieved.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function batchGetAttributeValue($assetids, array $attributes, array $attrTypes);
@@ -62,7 +71,6 @@ interface DataSourceActions
      * @param string  $attrType    Type of the attribute.
      * @param mixed   $value       Value of the attribute for the specified asset.
      *
-     * @since  4.0.0
      * @see    DataSourceActions::addAttributeValue()
      * @return boolean
      */
@@ -79,7 +87,6 @@ interface DataSourceActions
      * @param array       $attrVals Array of attribute ids with their values.
      *                              array(attributeid => value).
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function batchSetAttributeValue($assetids, array $attrVals);
@@ -98,7 +105,6 @@ interface DataSourceActions
      * @param mixed   $value       Value of the attribute for the specified asset.
      * @param boolean $isDefault   TRUE if it is the default value.
      *
-     * @since  4.0.0
      * @see    DataSourceActions::setAttributeValue()
      * @see    DataSourceActions::attributeValueExists()
      * @return boolean
@@ -111,7 +117,6 @@ interface DataSourceActions
      *
      * @param string $attributeType Attribute type to validate.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isValidAttributeType($attributeType);
@@ -124,7 +129,6 @@ interface DataSourceActions
      * @param string $attributeid The ID of the attribute.
      * @param string $attrType    The attribute type.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAllAttributeValues($assetType, $attributeid, $attrType);
@@ -137,7 +141,6 @@ interface DataSourceActions
      * @param string $assetType     Asset type the attribute is set for.
      * @param string $attributeType The attribute type.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function removeAttributeValues($attributeid, $assetType, $attributeType);
@@ -151,7 +154,6 @@ interface DataSourceActions
      * @param string  $attrType    The type of attribute.
      * @param string  $value       The value of the attribute.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function attributeValueExists($assetid, $attributeid, $attrType, $value=NULL);
@@ -165,7 +167,6 @@ interface DataSourceActions
      * @param string $attrType    The attribute type.
      * @param mixed  $value       Value of attribute used to match assets.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAssetsByAttributeValue($assetType, $attributeid, $attrType, $value);
@@ -183,7 +184,6 @@ interface DataSourceActions
      * @param string $attrType    The type of attribute.
      * @param mixed  $value       The attribute value to check.
      *
-     * @since  4.0.0
      * @return (boolean|array)
      */
     public static function isUniqueAttributeValue($assetType, $attributeid, $attrType, $value);

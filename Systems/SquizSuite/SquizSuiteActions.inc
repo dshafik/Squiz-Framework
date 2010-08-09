@@ -2,12 +2,24 @@
 /**
  * Actions for the SquizSuite System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage SquizSuite
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/BaseSystem.inc';
@@ -15,7 +27,6 @@ require_once 'Systems/BaseSystem.inc';
 /**
  * SquizSuite Actions Class.
  *
- * @since 4.0.0
  */
 class SquizSuiteActions
 {
@@ -24,7 +35,6 @@ class SquizSuiteActions
      * User Agent String prefix.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_userAgentPrefix = 'SquizSuite-';
 
@@ -32,7 +42,6 @@ class SquizSuiteActions
      * Encryption algorithm.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_opensslEncryptionAlgorithm = 'blowfish';
 
@@ -40,7 +49,6 @@ class SquizSuiteActions
      * Local cache variable for product information.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_productCache = array();
 
@@ -50,7 +58,6 @@ class SquizSuiteActions
      *
      * @param DOMNode $htmlTpl The HTML content of the widget.
      *
-     * @since  4.0.0
      * @return DOMNode
      */
     public static function prepareBake(DOMNode $htmlTpl)
@@ -63,7 +70,6 @@ class SquizSuiteActions
     /**
      * Get the list of all suite products.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAllProducts()
@@ -83,7 +89,6 @@ class SquizSuiteActions
      *
      * @param mixed $systemid Unique ID of the product.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getProduct($systemid=NULL)
@@ -113,7 +118,6 @@ class SquizSuiteActions
      *
      * @param string $type Type of product to get.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getProductsByType($type)
@@ -132,7 +136,6 @@ class SquizSuiteActions
      * @param string $attrName  Attribute name to update.
      * @param mixed  $attrValue Attribute value to update.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function updateProduct($systemid, $attrName, $attrValue)
@@ -159,7 +162,6 @@ class SquizSuiteActions
      * @param string $type       The type of the product to invite.
      * @param string $connection The connection details of the product.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function registerProduct($systemid, $type, $connection)
@@ -180,7 +182,6 @@ class SquizSuiteActions
      *
      * @param string $systemid Unique ID of the product.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function removeProduct($systemid)
@@ -198,7 +199,6 @@ class SquizSuiteActions
      * This certificate will be sent to other product as a part of sign-in
      * process.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function generateSystemKeyPair()
@@ -251,7 +251,6 @@ class SquizSuiteActions
      * @param string $systemid ID of the destined system.
      * @param string $msgType  Type of message to send.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred.
      */
@@ -307,7 +306,6 @@ class SquizSuiteActions
      * Every suite messages are based on this template. It includes
      * systemid, system type and the URL of the system.
      *
-     * @since  4.0.0
      * @return object
      */
     private static function _createSuiteMessageDOMTemplate()
@@ -343,7 +341,6 @@ class SquizSuiteActions
      * @param object &$dom    DOM object to work with.
      * @param string $msgType Type of the message to send.
      *
-     * @since  4.0.0
      * @return object
      */
     private static function _createSuiteMessageDOM(&$dom, $msgType)
@@ -387,7 +384,6 @@ class SquizSuiteActions
      * The submitter's key certificate will be registered together and
      * it will send suiteConnectAck message back as a response.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred.
      * @api    read
@@ -481,14 +477,13 @@ class SquizSuiteActions
 
 
     /**
-     * Suite system connection acknowlegement request handler.
+     * Suite system connection acknowledgment request handler.
      *
      * Once the initial connect message has been accepted by the
-     * other system and the returning acknowlegement will be handled
+     * other system and the returning acknowledgment will be handled
      * here. The incoming message is encrypted with the current system's
      * public key.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred.
      * @api    read
@@ -562,7 +557,6 @@ class SquizSuiteActions
      *
      * The final acknowlegement for suite connection request.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred.
      * @api    read
@@ -623,7 +617,6 @@ class SquizSuiteActions
      *
      * @param string $xml SquizSuite specific XML message string.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException Invalid XML caused DomDocument() error.
      */
@@ -661,7 +654,6 @@ class SquizSuiteActions
      *
      * @param string $userAgentStr User agent string to parse.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getSystemTypeFromUserAgent($userAgentStr)
@@ -684,7 +676,6 @@ class SquizSuiteActions
      * @param string $systemid Source systemid where the message is from.
      * @param string $msgType  Type of message received.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _logReceivedMessage($systemid, $msgType)
@@ -720,7 +711,6 @@ class SquizSuiteActions
      * @param string $systemid Destined systemid.
      * @param string $msgType  Type of message sent.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _logSentMessage($systemid, $msgType)
@@ -751,7 +741,6 @@ class SquizSuiteActions
      *
      * @param string $errorMessage Error message to log.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _logErrorMessage($errorMessage='')
@@ -774,7 +763,6 @@ class SquizSuiteActions
     /**
      * Return the file path to the SquizSuite system log file.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getLogFilePath()
@@ -797,7 +785,6 @@ class SquizSuiteActions
      * @param array  $msg       Array of messages to send.
      * @param string $userAgent Optional User Agent string to send.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function encryptAPIData($url, array $msg, $userAgent)
@@ -833,7 +820,6 @@ class SquizSuiteActions
      * @param string $action Action name to call.
      * @param array  $args   Parameters to pass to the action.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function decryptAPIData($system, $action)
@@ -862,7 +848,6 @@ class SquizSuiteActions
      * @param string $systemid Unique ID of the product.
      * @param mixed  $data     Data to encrypt.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function encryptData($systemid, $data)
@@ -906,7 +891,6 @@ class SquizSuiteActions
      * @param string $data     Data to decrypt.
      * @param string $password Key encrypted password.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function decryptData($data, $password)
@@ -951,7 +935,6 @@ class SquizSuiteActions
      * @param string $algorithm Algorithm to use for encryption.
      * @param string $password  Password to use for encryption.
      *
-     * @since  4.0.0
      * @return mixed
      */
     private static function _opensslEncrypt($data, $algorithm, $password)
@@ -988,7 +971,6 @@ class SquizSuiteActions
      * @param string $algorithm Algorithm to use for decryption.
      * @param string $password  Password to use for decryption.
      *
-     * @since  4.0.0
      * @return mixed
      */
     private static function _opensslDecrypt($data, $algorithm, $password)

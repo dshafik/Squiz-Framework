@@ -2,12 +2,24 @@
 /**
  * File Attribute.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage FileDataSource
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/DataSource/AttributeTypes/DataSourceText.inc';
@@ -15,7 +27,6 @@ require_once 'Systems/DataSource/AttributeTypes/DataSourceText.inc';
 /**
  * FileDataSourceFile.
  *
- * @since 4.0.0
  */
 class FileDataSourceFile extends DataSourceText
 {
@@ -27,7 +38,6 @@ class FileDataSourceFile extends DataSourceText
      * @param integer $assetid     Id of the asset.
      * @param string  $attributeid Id of the attribute.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getValue($assetid, $attributeid)
@@ -51,7 +61,6 @@ class FileDataSourceFile extends DataSourceText
      *                                This should be TRUE when path is going to be
      *                                used for writing.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getAttributeFilePath($assetid, $attributeid, $currentContext=FALSE)
@@ -87,7 +96,6 @@ class FileDataSourceFile extends DataSourceText
      *
      * @param integer $assetid The asset to create the hash directory for.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _createHashDir($assetid)
@@ -109,7 +117,6 @@ class FileDataSourceFile extends DataSourceText
      * @param string  $attributeid Id of the attribute.
      * @param mixed   $value       Value of the attribute.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws InvalidArgumentException If the file doesn't exist.
      */

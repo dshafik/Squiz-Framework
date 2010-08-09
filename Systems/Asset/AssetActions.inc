@@ -2,12 +2,24 @@
 /**
  * Actions for the Asset System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Asset
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
@@ -15,8 +27,6 @@
  *
  * Actions for the Asset system. This system stores all standard assets.
  * It contains actions for deleting, creating.
- *
- * @since 4.0.0
  */
 class AssetActions
 {
@@ -27,8 +37,6 @@ class AssetActions
      *
      * All methods should be called statically, and therefore this class should
      * never need to be instantiated.
-     *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -47,7 +55,6 @@ class AssetActions
      *
      * @param string $typeid The typeid of the new asset.
      *
-     * @since  4.0.0
      * @return integer
      * @throws ChannelException If there is a DB error.
      */
@@ -88,7 +95,6 @@ class AssetActions
      *
      * @param integer $assetid The identifier of the asset to delete.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException If there is a DB error.
      */
@@ -105,7 +111,6 @@ class AssetActions
      *
      * @param integer $assetid The identifier of the asset to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function exists($assetid)
@@ -135,7 +140,6 @@ class AssetActions
      *
      * @param string|array $typeid The type of assets to count.
      *
-     * @since  4.0.0
      * @return integer|array
      */
     public static function count($typeid=NULL)
@@ -167,7 +171,6 @@ class AssetActions
      *
      * @param float|array $assetid Assetid to get the type of.
      *
-     * @since  4.0.0
      * @return string|array
      */
     public static function getTypeOfAsset($assetid)
@@ -194,7 +197,6 @@ class AssetActions
      *
      * @param float|array $assetid Assetid to get the type of.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getTypeOfAssetQuery($assetid)
@@ -215,7 +217,6 @@ class AssetActions
      *
      * @param string|array $typeid The type of assets to get.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAssetsByType($typeid)
@@ -231,7 +232,6 @@ class AssetActions
      *
      * @param string|array $typeid The type of assets to get.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getAssetsByTypeQuery($typeid)
@@ -247,7 +247,6 @@ class AssetActions
      *
      * @param integer $assetid ID of an asset.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getDataPath($assetid)
@@ -272,7 +271,6 @@ class AssetActions
      * @param string $parentType The type the new asset inherits from.
      * @param string $isCustom   Set to TRUE if this is a custom asset type.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If there was a DB error.
      */
@@ -358,7 +356,6 @@ class AssetActions
      *
      * @param string $typeid Installed asset type.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If there was an installation error.
      */
@@ -420,7 +417,6 @@ class AssetActions
      *
      * @param string $assetType Type of the asset.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException If the attribute file doesn't exist.
      */
@@ -479,7 +475,6 @@ class AssetActions
      * @param integer $lvl          Number of levels between new type and
      *                              this parent.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelActionException If there is a database error.
      */
@@ -505,7 +500,6 @@ class AssetActions
      * @param integer $assetid The id of the asset to check.
      * @param string  $typeid  The type id.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isTypeOf($assetid, $typeid)
@@ -532,7 +526,6 @@ class AssetActions
      *
      * @param string $typeid Asset type code.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function includeAsset($typeid)
@@ -556,7 +549,6 @@ class AssetActions
      *
      * @param string $typeid Typeid to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function typeExists($typeid)
@@ -578,7 +570,6 @@ class AssetActions
      *
      * @param string $typeid The type of assets to get.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getTypeInfo($typeid)
@@ -599,7 +590,6 @@ class AssetActions
      *
      * @param string $typeid The type of assets to get.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getParentTypes($typeid)
@@ -616,7 +606,6 @@ class AssetActions
      * @param string  $typeid The type of assets to get.
      * @param integer $lvl    Level restriction to filter.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getChildTypes($typeid, $lvl=NULL)
@@ -632,7 +621,6 @@ class AssetActions
      *
      * @param string $typeid Id of the asset type.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getTypeDirPath($typeid)
@@ -655,7 +643,6 @@ class AssetActions
      *                                 icon then first parent that has an icon
      *                                 is returned.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getTypeIconPath(

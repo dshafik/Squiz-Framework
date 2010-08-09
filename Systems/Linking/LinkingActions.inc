@@ -2,12 +2,24 @@
 /**
  * Actions for the Linking System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Linking
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/Linking/LinkingActions.inc';
@@ -15,7 +27,6 @@ require_once 'Systems/Linking/LinkingActions.inc';
 /**
  * Linking Actions Class.
  *
- * @since 4.0.0
  */
 class LinkingActions
 {
@@ -26,7 +37,6 @@ class LinkingActions
      * TODO: Should use gatherer.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_oldContextParents = array();
 
@@ -38,7 +48,6 @@ class LinkingActions
      * @param integer $childid   The id of the child to link.
      * @param integer $sortOrder The sort order at which to add the child.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function batchCreateLink(
@@ -63,7 +72,6 @@ class LinkingActions
      * @param integer $sortOrder The sort order at which to add the child.
      * @param boolean $showMenu  Option to show the link in menu/lineage.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function activateLink(
@@ -87,7 +95,6 @@ class LinkingActions
      * @param boolean $activate  Actvates specified link if it was deleted, if
      *                           link does not exist then it will be created.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception        If you try to link an asset to the same parent.
      * @throws ChannelException If create link fails.
@@ -120,7 +127,6 @@ class LinkingActions
      * @param boolean $activate  Activates specified link if it was deleted, if
      *                           link does not exist then it will be created.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException If you try to link an asset to the same parent.
      * @throws ChannelException If create link fails.
@@ -230,7 +236,6 @@ class LinkingActions
     /**
      * Retrieves current userid and also current timestamp.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getUserData()
@@ -258,7 +263,6 @@ class LinkingActions
      * @param integer $parentid Asset id of the parent.
      * @param integer $childid  Asset id of the child.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _setCreateLinkLogMessage($parentid, $childid)
@@ -289,7 +293,6 @@ class LinkingActions
      * @param integer $sortOrder The sort order at which to add the child.
      * @param boolean $showMenu  Option to show the link in menu/lineage.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function createLinkOnly(
@@ -315,7 +318,6 @@ class LinkingActions
      * @param integer $parentid The parentid to create the link under.
      * @param integer $childid  The id of the child to link.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function createLinkOnlyPlug($parentid, $childid)
@@ -338,7 +340,6 @@ class LinkingActions
      * @param integer $sortOrder The sort order at which to add the child.
      * @param boolean $showMenu  Option to show the link in menu/lineage.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function updateLink(
@@ -368,7 +369,6 @@ class LinkingActions
      * @param integer $newParentid The id of the new parent asset.
      * @param integer $sortOrder   The sort order at which to add the child.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function updateSortOrders(
@@ -401,7 +401,6 @@ class LinkingActions
      *
      * @param integer $assetid The asset ID to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isLastLink($assetid)
@@ -427,7 +426,6 @@ class LinkingActions
      * @param integer $parentid ID of the parent.
      * @param integer $childid  ID of the child.
      *
-     * @since  4.0.0
      * @return object
      * @throws ChannelException If you try to delete a link that doesn't exist.
      */
@@ -501,7 +499,6 @@ class LinkingActions
      *
      * @param integer $childid ID of the asset to move to trash.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function trashAsset($childid)
@@ -557,7 +554,6 @@ class LinkingActions
      * @param integer $childid  Child assetid.
      * @param boolean $showMenu True link is displayed on the menu and lineage.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function updateLinkShowMenu($parentid, $childid, $showMenu)
@@ -595,7 +591,6 @@ class LinkingActions
      * @param boolean      $showMenu True link is displayed on the menu and
      *                               lineage.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getShowMenuLinksOnly(
@@ -623,7 +618,6 @@ class LinkingActions
      * @param integer $parentid Parent assetid.
      * @param integer $childid  Child assetid.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function getLinkShowMenu($parentid, $childid)
@@ -652,7 +646,6 @@ class LinkingActions
      *                             except the specified parent will be
      *                             returned.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getImmediateParents($childid, $notParentid=NULL)
@@ -679,7 +672,6 @@ class LinkingActions
      *                                    sort_order column together.
      * @param array|object $types         Optional list of asset types to get.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getImmediateChildren(
@@ -718,7 +710,6 @@ class LinkingActions
      * @param boolean      $withSortOrder If TRUE, the result query returns
      *                                    sort_order column together.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getLevelImmediateChildren(
@@ -742,7 +733,6 @@ class LinkingActions
      *                         asset underneath.
      * @param string $childid  The asset ID of the asset to link to.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getSortOrder($parentid, $childid)
@@ -766,7 +756,6 @@ class LinkingActions
      *
      * @param string $parentid The ID of the parent assets.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getChildSortOrders($parentid)
@@ -791,7 +780,6 @@ class LinkingActions
      * @param string $parentid The Asset Id of the parent asset.
      * @param string $childid  The Asset id of the child asset.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException When query failed.
      * @access public
@@ -824,7 +812,6 @@ class LinkingActions
      *
      * @param string $assetids The list of assetids to filter.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException When query failed.
      * @access public
@@ -845,7 +832,6 @@ class LinkingActions
      * @param string $newContext The context to override.
      * @param string $assetid    Asset id to use.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context cannot be replaced.
      */
@@ -903,7 +889,6 @@ class LinkingActions
      * @param string $newContext The context to override.
      * @param string $assetid    Asset id to use.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context cannot be replaced.
      */
@@ -976,7 +961,6 @@ class LinkingActions
      * @param string $context The context to remove.
      * @param string $assetid Asset id to use.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context data cannot be removed.
      */
@@ -1009,7 +993,6 @@ class LinkingActions
      * @param string $context Context string that could be used in LIKE queries.
      *                        E.g. _____01__ .
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context data cannot be removed.
      */
@@ -1040,7 +1023,6 @@ class LinkingActions
      * @param string $minLevel The minimum level to get parent for.
      * @param string $maxLevel The maximum level to get parent for.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getParents($childid, $minLevel, $maxLevel)
@@ -1077,7 +1059,6 @@ class LinkingActions
      *
      * @param string $assetids The assetids to get Query object for.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getAssetids($assetids)
@@ -1095,7 +1076,6 @@ class LinkingActions
      * @param string $minLevel The minimum level to get the children.
      * @param string $maxLevel The maximum level to get the children.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getChildren($parentid, $minLevel=0, $maxLevel=0)
@@ -1116,7 +1096,6 @@ class LinkingActions
      * @param integer $parentid The asset ID of the asset to link the new asset
      *                          underneath.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function batchGetChildren($parentid)
@@ -1132,7 +1111,6 @@ class LinkingActions
      *
      * @param string $childid The asset ID of the asset to link to.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getAssetChildPath($childid)
@@ -1149,7 +1127,6 @@ class LinkingActions
      * @param string $path  The path to child asset.
      * @param string $level The level to get children.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getChildrenByLevel($path, $level)
@@ -1171,7 +1148,6 @@ class LinkingActions
      *
      * @param integer $assetid The asset to get information underneath.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getChildLevelInfo($assetid)
@@ -1199,7 +1175,6 @@ class LinkingActions
      *
      * @param string $assetid The assetid.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAssetLineages($assetid)
@@ -1258,7 +1233,6 @@ class LinkingActions
      *
      * @param integer $assetid Asset id.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeAssetFromLinkTree($assetid)
@@ -1276,7 +1250,6 @@ class LinkingActions
      * @param integer $assetid Asset id.
      * @param integer $limit   The limit of number of result rows.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getAssetPath($assetid, $limit=1)
@@ -1299,7 +1272,6 @@ class LinkingActions
      *                          getAssetPath() query.
      * @param mixed $assetids   List of assetids to filter.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function filterChildOf($parentPath, $assetids)
@@ -1321,7 +1293,6 @@ class LinkingActions
      * @param mixed $assetid  Assetid of the asset to determine.
      * @param mixed $parentid Assetid of the asset belongs under.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function isChildOf($assetid, $parentid)

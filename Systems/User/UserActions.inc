@@ -2,12 +2,24 @@
 /**
  * Actions for the User System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage User
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
@@ -17,7 +29,6 @@
  * It contains actions for deleting, creating, cloning and morphing local
  * assets.
  *
- * @since 4.0.0
  */
 class UserActions
 {
@@ -29,7 +40,6 @@ class UserActions
      * All methods should be called statically, and therefore this class should
      * never need to be instantiated.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -48,7 +58,6 @@ class UserActions
      * @param string $email     Email of the user.
      * @param string $password  Plain text password of the user.
      *
-     * @since  4.0.0
      * @return integer
      * @throws ChannelException If the user fails to create.
      */
@@ -93,7 +102,6 @@ class UserActions
      *
      * @param string $name Name of user group.
      *
-     * @since  4.0.0
      * @return integer
      * @throws ChannelException If the group fails to create.
      */
@@ -127,7 +135,6 @@ class UserActions
      *
      * @param integer $userid ID of the user.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function getUserById($userid)
@@ -154,7 +161,6 @@ class UserActions
      *
      * @param integer $username Username of the user.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function getUserByUsername($username)
@@ -183,7 +189,6 @@ class UserActions
      *
      * @param string $username Username to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function usernameExists($username)
@@ -210,7 +215,6 @@ class UserActions
      * @param float $userid  Userid to check.
      * @param float $groupid Groupid to check against the userid.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isMemberOf($userid, $groupid)
@@ -232,7 +236,6 @@ class UserActions
      *
      * @param float $userid Userid to check.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getUserGroups($userid)
@@ -255,7 +258,6 @@ class UserActions
      * @param string $username Username of the user to log in.
      * @param string $password Password of the user to log in.
      *
-     * @since  4.0.0
      * @return boolean
      * @api    read
      */
@@ -291,7 +293,6 @@ class UserActions
     /**
      * Log out the currently logged in user.
      *
-     * @since  4.0.0
      * @return boolean
      * @api    read
      */
@@ -313,7 +314,6 @@ class UserActions
     /**
      * Return the userid of the currently logged in user.
      *
-     * @since  4.0.0
      * @return float
      * @api    read
      */

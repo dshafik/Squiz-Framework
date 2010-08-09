@@ -2,12 +2,24 @@
 /**
  * Actions for the Role System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Role
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
@@ -17,7 +29,6 @@
  * It contains actions for deleting, creating, cloning and morphing local
  * assets.
  *
- * @since 4.0.0
  */
 class RoleActions
 {
@@ -29,7 +40,6 @@ class RoleActions
      * All methods should be called statically, and therefore this class should
      * never need to be instantiated.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -43,9 +53,8 @@ class RoleActions
      * Returns the roleid created.
      *
      * @param string $name        Name of a new role.
-     * @param string $description Descript of a new role.
+     * @param string $description Description of a new role.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function createRole($name, $description)
@@ -68,7 +77,6 @@ class RoleActions
      *
      * @param integer $roleid ID of the role to be deleted.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function deleteRole($roleid)
@@ -89,7 +97,6 @@ class RoleActions
      * @param string  $attrName  Attribute name to update.
      * @param string  $attrValue New value for the attribute.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function updateRole($roleid, $attrName, $attrValue)
@@ -109,7 +116,6 @@ class RoleActions
      * @param integer $roleid    ID of the role to grant a privilege.
      * @param string  $privilege Privilege to grant.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function grantPrivilegeToRole($roleid, $privilege)
@@ -129,7 +135,6 @@ class RoleActions
      * @param integer $roleid    ID of the role to remove a privilege from.
      * @param string  $privilege Privilege to remove.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function removePrivilegeFromRole($roleid, $privilege)
@@ -146,7 +151,6 @@ class RoleActions
      *
      * @param integer $roleid ID of role.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getPrivilegesByRole($roleid)
@@ -163,7 +167,6 @@ class RoleActions
      *
      * @param string $privilege Privilege that role owns.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getRolesByPrivilege($privilege)
@@ -182,7 +185,6 @@ class RoleActions
      *
      * @param string $privilege Privilege to remove.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function deletePrivilege($privilege)

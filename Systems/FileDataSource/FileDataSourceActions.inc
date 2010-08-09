@@ -2,12 +2,24 @@
 /**
  * Actions for the FileDataSource System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage FileDataSource
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/DataSource/DataSourceActions.inc';
@@ -17,7 +29,6 @@ require_once 'Systems/FileDataSource/AttributeTypes/FileDataSourceFile.inc';
 /**
  * FileDataSourceActions.
  *
- * @since 4.0.0
  */
 class FileDataSourceActions implements DataSourceActions
 {
@@ -30,7 +41,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string  $attributeid Id of the attribute.
      * @param string  $attrType    Type of the attribute.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getAttributeValue($assetid, $attributeid, $attrType)
@@ -51,7 +61,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param array       $attributeids List of attribute ids.
      * @param array       $attrTypes    An array of all attribute types being retrieved.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function batchGetAttributeValue($assetids, array $attributeids, array $attrTypes)
@@ -81,7 +90,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string  $attrType    Type of the attribute.
      * @param mixed   $value       Value of the attribute for the specified asset.
      *
-     * @since  4.0.0
      * @see    DataSourceActions::addAttributeValue()
      * @return void
      */
@@ -102,7 +110,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param array       $attrVals Array of attribute ids with their values.
      *                              array(attributeid => value).
      *
-     * @since  4.0.0
      * @return void
      */
     public static function batchSetAttributeValue($assetids, array $attrVals)
@@ -129,7 +136,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param mixed   $value       Value of the attribute for the specified asset.
      * @param boolean $isDefault   TRUE if it is the default value.
      *
-     * @since  4.0.0
      * @see    DataSourceActions::setAttributeValue()
      * @see    DataSourceActions::attributeValueExists()
      * @return void
@@ -147,7 +153,6 @@ class FileDataSourceActions implements DataSourceActions
      *
      * @param string $attrType Attribute type to validate.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isValidAttributeType($attrType)
@@ -164,7 +169,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $attributeid The ID of the attribute.
      * @param string $attrType    The attribute type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function getAllAttributeValues($assetType, $attributeid, $attrType)
@@ -180,7 +184,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $assetType     Asset type the attribute is set for.
      * @param string $attributeType The attribute type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeAttributeValues($attributeid, $assetType, $attributeType)
@@ -197,7 +200,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string  $attrType    The type of attribute.
      * @param string  $value       The value of the attribute.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function attributeValueExists($assetid, $attributeid, $attrType, $value=NULL)
@@ -216,7 +218,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $attrType    The attribute type.
      * @param mixed  $value       Value of attribute used to match assets.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAssetsByAttributeValue($assetType, $attributeid, $attrType, $value)
@@ -238,7 +239,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $attrType    The type of attribute.
      * @param mixed  $value       The attribute value to check.
      *
-     * @since  4.0.0
      * @return (boolean|array)
      */
     public static function isUniqueAttributeValue($assetType, $attributeid, $attrType, $value)
@@ -253,7 +253,6 @@ class FileDataSourceActions implements DataSourceActions
      *
      * @param string $attrType Type of the attribute.
      *
-     * @since  4.0.0
      * @return string
      * @throws ChannelException If the attribute type is invalid.
      */
@@ -273,7 +272,6 @@ class FileDataSourceActions implements DataSourceActions
      *
      * @param string $className Class name of an attribute type.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _getAttributeTypePath($className)
@@ -292,7 +290,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $attributeType Attribute's type.
      * @param string $newId         New id for the attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function updateAttributeid($attributeid, $assetType, $attributeType, $newId)
@@ -311,7 +308,6 @@ class FileDataSourceActions implements DataSourceActions
      *                               asset.
      * @param boolean $isDefault     True if the value is default.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAssetTypeAttributeValue($attributeid, $assetType, $attributeType, $value, $isDefault)
@@ -327,7 +323,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $newContext The context to override.
      * @param string $assetid    Asset id to use.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context cannot be replaced.
      */
@@ -364,7 +359,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $context The context to remove.
      * @param string $assetid Asset id to use.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context data cannot be removed.
      */
@@ -399,7 +393,6 @@ class FileDataSourceActions implements DataSourceActions
      * @param string $context Context string that could be used in LIKE queries.
      *                        E.g. _____01__ .
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException If context data cannot be removed.
      */

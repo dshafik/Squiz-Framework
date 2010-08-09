@@ -2,12 +2,24 @@
 /**
  * Actions for the Cron System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Cron
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/BaseSystem.inc';
@@ -15,7 +27,6 @@ require_once 'Systems/BaseSystem.inc';
 /**
  * Cron System Actions Class.
  *
- * @since 4.0.0
  */
 class CronActions
 {
@@ -27,7 +38,6 @@ class CronActions
      * @param array  $settings The list of settings for this widget.
      * @param string $tplFile  The template file to use.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getTemplateContent(array $settings=array(), $tplFile=NULL)
@@ -47,7 +57,6 @@ class CronActions
      *
      * @param DOMNode $htmlTpl The HTML content of the widget.
      *
-     * @since  4.0.0
      * @return DOMNode
      */
     public static function prepareBake(DOMNode $htmlTpl)
@@ -62,7 +71,6 @@ class CronActions
      *
      * @param string $typeid ID of cron job type.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function runCronJobs($typeid)
@@ -342,7 +350,6 @@ class CronActions
     /**
      * Disable all the cron jobs.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function disableAllCronJobs()
@@ -372,7 +379,6 @@ class CronActions
      * This actions is used when the administrator is restoring the system from
      * backup.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function killAllCronProcesses()
@@ -414,7 +420,6 @@ class CronActions
      *
      * Set running flag to FALSE, last run time to now and run check to zero.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function resetCron()
@@ -457,7 +462,6 @@ class CronActions
      * @param string $system     Name of the system cron job belongs to.
      * @param string $scriptName Name of the script to run.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getCronJob($system, $scriptName)
@@ -483,7 +487,6 @@ class CronActions
      * @param mixed  $running If TRUE only returns running cron jobs.
      * @param string $type    Type of cron jobs.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getCronJobs($enabled=NULL, $running=NULL, $type='')
@@ -533,7 +536,6 @@ class CronActions
      * @param boolean $running      TRUE if the cron job is running.
      * @param boolean $enabled      TRUE if the cron job is enabled.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred during query execution.
      */
@@ -588,7 +590,6 @@ class CronActions
      * @param string $system The name of the system we are installing jobs for.
      * @param string $path   The file system location of the system.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Occurs when script has no description.
      */
@@ -658,7 +659,6 @@ class CronActions
      * @param string $name        Friendly name of the cron job.
      * @param string $description Short description of what the job does.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred during query execution.
      */
@@ -683,7 +683,6 @@ class CronActions
      * @param string $typeTitle Display name for cron type.
      * @param string $condition Crontab style definition of frequency.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred during query execution.
      */
@@ -706,7 +705,6 @@ class CronActions
      *
      * @param string $typeid Unique ID for the cron type.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException Error occurred during query execution.
      */
@@ -727,7 +725,6 @@ class CronActions
     /**
      * Return the list of cron types.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getCronTypes()
@@ -752,7 +749,6 @@ class CronActions
      * @param integer $updated   Timestamp when the cron type last updated.
      * @param integer $runTime   Timestamp of the length of the job type ran.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException Error occurred during query execution.
      */
@@ -816,7 +812,6 @@ class CronActions
      *
      * @param string $cond Frequency string.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function getCronTypeInterval($cond)
@@ -852,7 +847,6 @@ class CronActions
      *
      * @param string $cond Frequency string.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getCronTypeString($cond)
@@ -888,7 +882,6 @@ class CronActions
      *
      * @param object|string $timestamp The timestamp to format.
      *
-     * @since  4.0.0
      * @return object|string
      */
     public static function formatTime($timestamp)
@@ -910,7 +903,6 @@ class CronActions
      * @param string $system The name of the system cron belongs to.
      * @param string $script The name of the script.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getCronConfig($system, $script)
@@ -929,7 +921,6 @@ class CronActions
      * @param string $script The name of the script.
      * @param string $config The config data to save.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function setCronConfig($system, $script, $config)
@@ -945,7 +936,6 @@ class CronActions
      *
      * @param array $settings Settings for the widget.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getCronScreenJobsList(array $settings)
@@ -968,7 +958,6 @@ class CronActions
      * @param array $script   Cron Job script info.
      * @param array $settings Settings for the widget.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getCronScreenJobInfo(array $script, array $settings)
