@@ -17,7 +17,7 @@
  *
  * @package    Framework
  * @subpackage API
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
+ * @author     Squiz Pty Ltd <products@squiz.net>
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
@@ -704,7 +704,7 @@ class APIActions
      * Build the array response from the XML DOM structure.
      *
      * @param object $parentNode Parent DOM node to have the content tree.
-     * @param array  $content    Content to create. 
+     * @param array  $content    Content to create.
      *
      * @return void
      */
@@ -723,7 +723,7 @@ class APIActions
      * Build the struct response from the XML DOM structure.
      *
      * @param object $parentNode Parent DOM node to have the content tree.
-     * @param array  $content    Content to create. 
+     * @param array  $content    Content to create.
      *
      * @return void
      */
@@ -747,7 +747,7 @@ class APIActions
      * Build the base64 response from the XML DOM structure.
      *
      * @param object $parentNode Parent DOM node to have the content tree.
-     * @param array  $content    Content to create. 
+     * @param array  $content    Content to create.
      *
      * @return void
      */

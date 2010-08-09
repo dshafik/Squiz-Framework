@@ -17,7 +17,7 @@
  *
  * @package    Framework
  * @subpackage API
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
+ * @author     Squiz Pty Ltd <products@squiz.net>
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
