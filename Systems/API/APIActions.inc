@@ -2,22 +2,30 @@
 /**
  * Actions for the API System.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage Asset
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage API
  * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 /**
  * API Actions.
  *
- * Actions for the Asset system. This system stores all standard assets.
- * It contains actions for deleting, creating, cloning and morphing local
- * assets.
- *
- * @since 4.0.0
+ * This system provides an API to Squiz Suite products.
  */
 class APIActions
 {
@@ -25,24 +33,21 @@ class APIActions
     /**
      * Special web path to handle API request.
      *
-     * @var   string
-     * @since 4.0.0
+     * @var string
      */
     private static $_serviceWebPath = '__api';
 
     /**
      * Output data format. Either XML or JSON.
      *
-     * @var   string
-     * @since 4.0.0
+     * @var string
      */
     private static $_outputFormat = 'json';
 
     /**
      * HTTP response codes and messages.
      *
-     * @var   array
-     * @since 4.0.0
+     * @var array
      */
     private static $_responseCode = array(
                                      200 => 'OK',
@@ -68,7 +73,6 @@ class APIActions
      * @param array  $msg       Array of messages to send.
      * @param string $userAgent Optional User Agent string to send.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException Error occurred.
      */
@@ -121,7 +125,6 @@ class APIActions
     /**
      * Central point to handle all API request.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function processRequest()
@@ -254,7 +257,6 @@ class APIActions
      * @param float $assetid Assetid to check the permission.
      * @param array $options Request Method, GET or POST.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function checkPermission($assetid, array $options)
@@ -269,7 +271,6 @@ class APIActions
      *
      * @param string $requestMethod GET or POST request.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getAssetid($requestMethod)
@@ -284,7 +285,6 @@ class APIActions
      *
      * @param string $url URL to process.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getRealURL($url)
@@ -309,7 +309,6 @@ class APIActions
      *
      * @param string $requestMethod Request Method, GET or POST.
      *
-     * @since  4.0.0
      * @return array|boolean
      */
     private static function _getRequestedAction($requestMethod)
@@ -339,8 +338,9 @@ class APIActions
             }
 
             // Now, find the system and action names for the requested service.
-            // By default it checks '_serviceWebPath/SYSTEM_NAME/ACTION_NAME/' format.
-            // Optionally, output format can be included prior to SYSTEM_NAME like following.
+            // By default it checks '_serviceWebPath/SYSTEM_NAME/ACTION_NAME/'
+            // format. Optionally, output format can be included prior to
+            // SYSTEM_NAME like following:
             // '_serviceWebPath/(xml|json)/SYSTEM_NAME/ACTION_NAME/'.
             $matches        = array();
             $serviceUrlPart = substr(
@@ -405,10 +405,10 @@ class APIActions
      * @param string $system        System name where action resides.
      * @param string $action        Action name to call.
      * @param float  $assetid       Optional assetid to use. If the action requires
-     *                              a parameter called 'assetid' and it's not passed in
-     *                              POST or GET, this value will be used if specified.
+     *                              a parameter called 'assetid' and it's not passed
+     *                              in POST or GET, this value will be used
+     *                              if specified.
      *
-     * @since  4.0.0
      * @return array|boolean
      */
     public static function getActionParameters($requestMethod, $system, $action, $assetid=NULL)
@@ -431,7 +431,8 @@ class APIActions
         $default    = NULL;
         $jsonDecode = TRUE;
 
-        // Action parameters can come from '_enc' field if system key ecryption is being used.
+        // Action parameters can come from '_enc' field if
+        // system key ecryption is being used.
         $encrypted = Security::getRequestData('_enc', $default, FALSE, 'post');
         foreach ($requiredParams as $param) {
             $value = Security::getRequestData(
@@ -443,7 +444,10 @@ class APIActions
 
             // Special case for assetid parameter binding. If the assetid is not
             // specified, then use the one from URL.
-            if ($value === NULL && $assetid !== NULL && $param['name'] === 'assetid') {
+            if ($value === NULL
+                && $assetid !== NULL
+                && $param['name'] === 'assetid'
+            ) {
                 $value = $assetid;
             }
 
@@ -476,7 +480,6 @@ class APIActions
      * @param string $action Action name to call.
      * @param array  $args   Parameters to pass to the action.
      *
-     * @since  4.0.0
      * @return mixed
      */
     private static function _getActionResult($system, $action, array $args)
@@ -511,7 +514,6 @@ class APIActions
      *                                in case for error case.
      * @param string $format          Response format type.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _sendResponse(array $responseContent, $format='json')
@@ -549,7 +551,6 @@ class APIActions
      *                               'assetid', 'result' and optional 'exception'
      *                               in case for error case.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _sendXMLResponse(array $responseContent)
@@ -599,7 +600,6 @@ class APIActions
      *                               'assetid', 'result' and optional 'exception'
      *                               in case for error case.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _sendJSONResponse(array $responseContent)
@@ -647,7 +647,6 @@ class APIActions
      * @param object &$parentNode Parent DOM node to have the content tree.
      * @param mixed  $content     Content to create.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function buildResponseXMLDom(&$parentNode, $content)
@@ -707,7 +706,6 @@ class APIActions
      * @param object $parentNode Parent DOM node to have the content tree.
      * @param array  $content    Content to create. 
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _buildArrayResponse($parentNode, array $content)
@@ -727,8 +725,7 @@ class APIActions
      * @param object $parentNode Parent DOM node to have the content tree.
      * @param array  $content    Content to create. 
      *
-     * @since  4.0.0
-     * @return void 
+     * @return void
      */
     private static function _buildStructResponse($parentNode, array $content)
     {
@@ -752,7 +749,6 @@ class APIActions
      * @param object $parentNode Parent DOM node to have the content tree.
      * @param array  $content    Content to create. 
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _buildBase64Response($parentNode, array $content)
@@ -775,7 +771,6 @@ class APIActions
      *
      * @param object $parentNode Parent DOM node to have the content tree.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getResponseFromXMLDom($parentNode)
@@ -808,7 +803,6 @@ class APIActions
      *
      * @param object $parentNode Parent DOM node to have the content tree.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getArrayResponse($parentNode)
@@ -832,7 +826,6 @@ class APIActions
      *
      * @param object $parentNode Parent DOM node to have the content tree.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getStructResponse($parentNode)
@@ -859,7 +852,6 @@ class APIActions
      *
      * @param object $parentNode Parent DOM node to have the content tree.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getBase64Response($parentNode)
@@ -894,7 +886,6 @@ class APIActions
      * @param string  $text  Content to create.
      * @param boolean $force Force to append a CDATA section.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _addTextToNode(&$node, $text, $force=FALSE)
@@ -920,7 +911,6 @@ class APIActions
      *
      * @param mixed $content Content to create.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function buildResponseJSONString($content)
@@ -973,7 +963,6 @@ class APIActions
      *
      * @param integer $response HTTP reponse code.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _sendHeader($response)
@@ -988,7 +977,6 @@ class APIActions
     /**
      * Returns TRUE if it is API request.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isAPIRequest()
@@ -1011,7 +999,6 @@ class APIActions
      *
      * @param string $docComment Function comment.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAPIOptionsFromComment($docComment)
@@ -1058,7 +1045,6 @@ class APIActions
      * @param string $system Name of the system to request.
      * @param string $action Name of the action to request.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAPI($system, $action)
@@ -1084,7 +1070,6 @@ class APIActions
      * @param string $type    Type of API call. Either 'read' or 'write'.
      * @param array  $options Options for API call.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addAPI($system, $action, $type, array $options)
@@ -1105,7 +1090,6 @@ class APIActions
      * @param string $system Name of the system for action.
      * @param string $action Name of the action.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeAPI($system, $action)
@@ -1123,7 +1107,6 @@ class APIActions
      * @param string $action  Name of the action.
      * @param array  $options Options to upadte.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function updateAPI($system, $action, array $options)
@@ -1141,8 +1124,7 @@ class APIActions
     /**
      * Get a new unique token for API call.
      *
-     * @since  4.0.0
-     * @return vaoid
+     * @return void
      */
     public static function getUniqueToken()
     {

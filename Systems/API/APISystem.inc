@@ -2,20 +2,30 @@
 /**
  * API System Class.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage API
  * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/BaseSystem.inc';
 
 /**
  * AuthenticationSystem.
- *
- * @since 4.0.0
  */
 class APISystem extends BaseSystem
 {
@@ -23,8 +33,6 @@ class APISystem extends BaseSystem
 
     /**
      * Constructor.
-     *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -38,7 +46,6 @@ class APISystem extends BaseSystem
      * If the global project doesn't exist (this is a clean system) then it is
      * created.
      *
-     * @since  4.0.0
      * @return void
      */
     public function install()
@@ -61,7 +68,6 @@ class APISystem extends BaseSystem
             Channels::includeSystem($systemName);
             $refl    = new ReflectionClass($systemName);
             $methods = $refl->getMethods();
-            $result  = array();
             foreach ($methods as $method) {
                 if ($method->isPublic() === TRUE) {
                     $docComment = $method->getDocComment();
