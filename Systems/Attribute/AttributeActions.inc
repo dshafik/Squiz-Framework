@@ -34,7 +34,7 @@ class AttributeActions
     /**
      * Cache for the attribute values.
      *
-     * @var   array
+     * @var array
      */
     private static $_attrVals = array();
 
@@ -63,7 +63,8 @@ class AttributeActions
      * @param integer      $assetid     The asset to find the value for.
      * @param string|array $attributeid The attribute(s) to find.
      *
-     * @return        mixed
+     * @return mixed
+     *
      * @api           read
      * @api-privilege asset.read.content
      * @api-mustlock  false
@@ -94,7 +95,8 @@ class AttributeActions
      * @param integer $assetid     The asset to find the value for.
      * @param string  $attributeid The attribute to find.
      *
-     * @return        mixed
+     * @return mixed
+     *
      * @api           read
      * @api-privilege asset.read.content
      * @api-mustlock  false
@@ -191,14 +193,13 @@ class AttributeActions
      * @param string  $attributeid The id of the attribute to set.
      * @param string  $value       The new value to set for the attribute.
      *
-     * @see           DataSource::attributeValueExists()
-     * @see           DataSource::setAttributeValue()
-     * @see           DataSource::isUniqueAttributeValue()
-     * @return        boolean
-     * @throws        ChannelException If the attribute is not found for the
-     *                                 asset.
-     * @throws        ChannelException If there is a violation of the attribute's
-     *                                 constraints.
+     * @see    DataSource::attributeValueExists()
+     * @see    DataSource::setAttributeValue()
+     * @see    DataSource::isUniqueAttributeValue()
+     * @return boolean
+     * @throws ChannelException If the attribute is not found for the asset.
+     * @throws ChannelException If there is an attribute constraints violation.
+     *
      * @api           write
      * @api-privilege asset.edit.content
      * @api-mustlock  false
@@ -395,7 +396,7 @@ class AttributeActions
      *
      * @return array
      * @throws ChannelException If there is an error retrieving the
-     *                                attribute info.
+     *                          attribute info.
      */
     public static function getAttributeInfoByAsset($assetid, $attributeid)
     {
@@ -424,7 +425,7 @@ class AttributeActions
      *
      * @return array
      * @throws ChannelException If there is an error retrieving the
-     *                                attribute.
+     *                          attribute.
      */
     public static function getAttributeInfoByType($assetType, $attributeid)
     {
@@ -524,7 +525,7 @@ class AttributeActions
      *
      * @return void
      * @throws ChannelException If the data source doesn't exist, or if
-     *                                there is an error adding the attribute.
+     *                          there is an error adding the attribute.
      */
     public static function addAttribute(
         $assetType,
@@ -616,7 +617,7 @@ class AttributeActions
      *
      * @return integer
      * @throws ChannelException If the attribute is not successfully
-     *                                removed.
+     *                          removed.
      */
     public static function removeAttribute($assetType, $attributeid)
     {
