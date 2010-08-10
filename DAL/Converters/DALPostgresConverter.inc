@@ -2,12 +2,24 @@
 /**
  * Class for the conversion of Oracle specific SQL structures.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(__FILE__).'/DALConverter.inc';
@@ -20,7 +32,6 @@ require_once dirname(__FILE__).'/DALConverter.inc';
  * class "DALConverter", and if any conversions need to be altered for this
  * database the corresponding methods of DALConverter should be redefined here.
  *
- * @since 4.0.0
  */
 class DALPostgresConverter extends DALConverter
 {
@@ -29,7 +40,6 @@ class DALPostgresConverter extends DALConverter
      * The name of the database type that this converter uses.
      *
      * @var   $name Specifies that this converter is for 'Postgres'.
-     * @since 4.0.0
      */
     protected $name = 'Postgres';
 
@@ -37,7 +47,6 @@ class DALPostgresConverter extends DALConverter
     /**
      * Constructor.
      *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -52,7 +61,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param array $table CREATE array.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertCreateTable(array $table)
@@ -81,7 +89,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param array $table The table array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCreateIndexes(array $table)
@@ -107,7 +114,6 @@ class DALPostgresConverter extends DALConverter
      * @param array  $idx       Single index array.
      * @param string $tableName Name of the table.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleIndex(array $idx, $tableName)
@@ -124,7 +130,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param array $sequence Info array of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleSequence(array $sequence)
@@ -166,7 +171,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param array $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqNextVal(array $seqName)
@@ -185,7 +189,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param array $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqCurrVal(array $seqName)
@@ -201,7 +204,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param (array|string) $sequenceName Sequence name.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionSequenceExists($sequenceName)
@@ -226,7 +228,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param array $args The arguments of the concat function.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionConcat(array $args)
@@ -242,7 +243,6 @@ class DALPostgresConverter extends DALConverter
      *
      * @param array $callQuery The structure defining the CALL query.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCallQuery(array $callQuery)
@@ -260,7 +260,6 @@ class DALPostgresConverter extends DALConverter
      * @param (array|string) $tableName Table name argument.
      * @param string         $schema    The schema to check the table exists in.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionTableExists($tableName, $schema=NULL)

@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -18,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  *
  * validateAlterQuery() method validates specified alter query.
  *
- * @since 4.0.0
  */
 class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -27,7 +38,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -40,7 +50,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that validateAlterQuery throws exception when there is no alter tag.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNoAlterTag()
@@ -69,7 +78,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when alter tag has no
      * table attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNoTableAttribute()
@@ -106,7 +114,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when add-column tag has no
      * columns tag.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testAddColumnNoColumnsTag()
@@ -138,7 +145,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when columns tag has no
      * column tags.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testAddColumnNoColumns()
@@ -172,7 +178,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when column tag has no
      * type attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testAddColumnNoColumnTypeAttr()
@@ -208,7 +213,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when modify-column tag has
      * no columns tag.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testModifyColumnNoColumnsTag()
@@ -240,7 +244,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when modify-column tag has
      * no column tags.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testModifyColumnNoColumns()
@@ -274,7 +277,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when column tag has no
      * type attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testModifyColumnNoColumnTypeAttr()
@@ -310,7 +312,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when there is an invalid
      * tag.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testInvalidAlterTag()
@@ -342,7 +343,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when drop-column tag has
      * no value.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testDropColumnNoValue()
@@ -374,7 +374,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when rename-column tag has
      * no value.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testRenameColumnNoValue()
@@ -406,7 +405,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when rename-column tag has
      * no 'old' attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testRenameColumnNoOldAttribute()
@@ -438,7 +436,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when rename-table tag has
      * no value.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testRenameTableNoValue()
@@ -470,7 +467,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when rename-table tag has
      * no 'old' attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testRenameTableNoOldAttribute()
@@ -502,7 +498,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when add-constraints has
      * invalid constraint.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testAddConstraintInvalidConstraintPk()
@@ -542,7 +537,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when add-constraints has
      * invalid constraint.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testAddConstraintInvalidConstraintFk()
@@ -582,7 +576,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when add-constraints has
      * invalid constraint.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testAddConstraintInvalidConstraintUn()
@@ -622,7 +615,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when add-constraints has
      * invalid constraint.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testAddConstraintValidConstraintPk()
@@ -665,7 +657,6 @@ class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
      * Test that validateAlterQuery throws exception when drop-constraint tag
      * has no value.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testDropConstraintNoValue()

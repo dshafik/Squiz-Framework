@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -16,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 /**
  * Unit tests for DROP TABLE query conversion.
  *
- * @since 4.0.0
  */
 class DropTableQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -25,7 +36,6 @@ class DropTableQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -40,7 +50,6 @@ class DropTableQueryUnitTest extends AbstractMySourceUnitTest
      *
      * @param string $dbType Type of the database.
      *
-     * @since  4.0.0
      * @return object
      */
     private function _getConverterClass($dbType)
@@ -62,7 +71,6 @@ class DropTableQueryUnitTest extends AbstractMySourceUnitTest
      * @param array $expected Expected results.
      * @param array $parsed   Parsed SQL array.
      *
-     * @since  4.0.0
      * @return void
      */
     private function _testQuery(array $expected, array $parsed)
@@ -81,7 +89,6 @@ class DropTableQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that validateDropQuery() throws exception if no table attr found.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testInvalidDropQuery()
@@ -108,7 +115,6 @@ class DropTableQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that validateDropQuery() doesn't throw an exception if attr found.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidDropQuery()
@@ -135,7 +141,6 @@ class DropTableQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that DROP TABLE is converted correctly for each db type.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testConvertedDropTableQuery()

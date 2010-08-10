@@ -2,12 +2,24 @@
 /**
  * DALSchemaParser.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'DAL/Parsers/DALQueryParser.inc';
@@ -18,7 +30,6 @@ require_once 'DAL/DALBaker.inc';
  *
  * Parses anything that is related to schemas (create table, constraints, etc).
  *
- * @since 4.0.0
  */
 class DALSchemaParser extends DALQueryParser
 {
@@ -28,7 +39,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @var   array $_requiresSizeAttr List of field types that require the size
      *                                 attribute.
-     * @since 4.0.0
      */
     private static $_requiresSizeAttr = array(
                                          'VARCHAR',
@@ -41,7 +51,6 @@ class DALSchemaParser extends DALQueryParser
      * List of data types.
      *
      * @var   array $_columnDataTypes List of SQL constructs.
-     * @since 4.0.0
      */
     private static $_columnDataTypes = array(
                                         'CHAR',
@@ -68,7 +77,6 @@ class DALSchemaParser extends DALQueryParser
      * A list of User Defined Types.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_udts = array();
 
@@ -78,7 +86,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -91,7 +98,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $schema Schema node of a schema.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function parse(DomElement $schema)
@@ -124,7 +130,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $schema Schema node of a schema.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getSchemaUdts(DomElement $schema)
@@ -167,7 +172,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Table node of a schema.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getTableSequences(DomElement $table)
@@ -197,7 +201,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $parent Parent node.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getConstraintsFromParent(DomElement $parent)
@@ -227,7 +230,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Table node of a schema.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getTableConstraints(DomElement $table)
@@ -251,7 +253,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $parent Parent node.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getPrimaryKeyConstraints(DomElement $parent)
@@ -283,7 +284,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $parent Parent node.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getForeignKeyConstraints(DomElement $parent)
@@ -324,7 +324,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $parent Parent node.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getUniqueConstraints(DomElement $parent)
@@ -354,7 +353,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Table node of a schema.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getTableIndexes(DomElement $table)
@@ -392,7 +390,6 @@ class DALSchemaParser extends DALQueryParser
      * @param DomElement $column The column element to convert.
      * @param array      $udts   The list of UDTs.
      *
-     * @since  4.0.0
      * @return array The partial php representation of the column.
      */
     private static function _getColumnFromUdt(DomElement $column, array $udts)
@@ -412,7 +409,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Table node of a schema.
      *
-     * @since  4.0.0
      * @return array
      * @throws DALParserException If an invalid User-Defined Type is referenced.
      */
@@ -483,7 +479,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $schema Xml elements for a single schema.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the parsed element is not a schema.
      */
@@ -516,7 +511,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Xml elements for a single table.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the table doesn't contain a name.
      */
@@ -549,7 +543,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Xml node of the table.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the Table columns are incorrectly defined.
      */
@@ -623,7 +616,6 @@ class DALSchemaParser extends DALQueryParser
      * @param DomElement $table Table or schema that this column belongs to.
      * @param string     $type  Type of the column.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function validSchemaColumnType(DomElement $table, $type)
@@ -662,7 +654,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Xml elements of the table.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If there is no constraints tag or if the
      *                            constraints are invalid.
@@ -750,7 +741,6 @@ class DALSchemaParser extends DALQueryParser
      * @param DomElement $parent Parent node of the constraints.
      * @param string     $prefix Exception message prefix.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function validateConstraints(DomElement $parent, $prefix='')
@@ -786,7 +776,6 @@ class DALSchemaParser extends DALQueryParser
      * @param DomElement $pk     Primary key constraint.
      * @param string     $prefix Exception message prefix.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the primary key has no name specified, or
      *                            has no columns specified.
@@ -817,7 +806,6 @@ class DALSchemaParser extends DALQueryParser
      * @param integer    $keyPosition Keys position in the constraints list.
      * @param string     $prefix      Exception message prefix.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the Foreign Key is invalid.
      */
@@ -887,7 +875,6 @@ class DALSchemaParser extends DALQueryParser
      * @param integer    $keyPosition Keys position in the constraints list.
      * @param string     $prefix      Exception message prefix.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the unique constraint doesn't have a name
      *                            or any columns.
@@ -921,7 +908,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Xml elements of the table.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If an index doesn't have a name, doesn't have
      *                            any columns, or references a column that
@@ -969,7 +955,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $table Xml elements of the table.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If a sequence has no sequence tags, or is
      *                            missing a name attribute.
@@ -1006,7 +991,6 @@ class DALSchemaParser extends DALQueryParser
      *
      * @param DomElement $schema Xml elements of the schema.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the UDTs are invalid.
      */
@@ -1080,7 +1064,6 @@ class DALSchemaParser extends DALQueryParser
      * @param DomElement $table      Xml elements of the table.
      * @param string     $columnName Search for this column name.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws DALParserException If the DomElement passed is not a valid table
      *                            element.

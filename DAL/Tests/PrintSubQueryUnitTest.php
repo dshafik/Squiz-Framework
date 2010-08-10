@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -16,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 /**
  * Unit tests for the printSubQueries() method.
  *
- * @since 4.0.0
  */
 class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -25,7 +36,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
      * Base query for testing the addSubQuery() method.
      *
      * @var   string $_baseQuery The XML source of a test query.
-     * @since 4.0.0
      */
     private static $_baseQuery = '<query id="testone">
                                   <primary>
@@ -65,7 +75,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
      * Test sub-query for testing the addSubQuery() method.
      *
      * @var   string $_subQuery The XML source of a test query.
-     * @since 4.0.0
      */
     private static $_subQuery = '<query id="testoneFragment" hookid="TestSys1.testone.hook1">
                                  <primary>
@@ -91,7 +100,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -107,7 +115,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Adds a base query used by the tests.
      *
-     * @since  4.0.0
      * @return void
      */
     public function addBaseQuery()
@@ -125,7 +132,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Adds a fragment used for the tests.
      *
-     * @since  4.0.0
      * @return void
      */
     public function addSubQuery()
@@ -141,7 +147,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns the added sub-query node for use in the tests.
      *
-     * @since  4.0.0
      * @return DomElement
      */
     public function getSubQueryCode()
@@ -155,7 +160,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that after evaluating the sub query code the hook array is set.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHookArrayIsset()
@@ -177,7 +181,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that after evaluating the hook array contains the right count.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHookArrayCount()
@@ -199,7 +202,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that after evaluating the hook array contains the right count.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHookArrayContents()
@@ -222,7 +224,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Tests that the hook placeholder is replaced.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHookContentsReplace()
@@ -245,7 +246,6 @@ class PrintSubQueryUnitTest extends AbstractMySourceUnitTest
      *
      * This is when there os no sub queries present for this hook.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testHookContentsNotReplaced()

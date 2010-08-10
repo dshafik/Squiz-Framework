@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -18,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  *
  * validateTableConstraints method throws exception if there are any errors.
  *
- * @since 4.0.0
  */
 class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
 {
@@ -27,7 +38,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -43,7 +53,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has no
      * constraints.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNoConstraints()
@@ -73,7 +82,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has no
      * primary-key constraint.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNoPrimaryKeyConstraint()
@@ -103,7 +111,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * primary-key constraint with no name attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testPrimaryKeyWithNoName()
@@ -134,7 +141,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * primary-key constraint with no columns.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testPrimaryKeyWithNoColumns()
@@ -165,7 +171,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * primary-key constraint with columns that are not defined.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testPrimaryKeyWithInvalidColumn()
@@ -198,7 +203,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * foreign-key constraint with no name attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testForeignKeyWithNoName()
@@ -234,7 +238,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * foreign-key constraint with no foreign-table attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testForeignKeyWithNoForeignTableAttr()
@@ -270,7 +273,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * foreign-key constraint with invalid on-delete attribute value.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testForeignKeyWithInvalidDeleteAttr()
@@ -307,7 +309,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * foreign-key constraint with no columns.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testForeignKeyWithNoColumns()
@@ -345,7 +346,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * foreign-key constraint with a column that has no references attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testForeignKeyMissingReferenceAttr()
@@ -384,7 +384,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * foreign-key constraint with a column that has no value.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testForeignKeyColumnMissingValue()
@@ -423,7 +422,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * foreign-key constraint with a column that was not defined.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testForeignKeyUnDefinedColumn()
@@ -462,7 +460,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * unique constraint with no name.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testUniqueNoName()
@@ -501,7 +498,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * unique constraint with no columns.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testUniqueNoColumns()
@@ -539,7 +535,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints throws exception when table has
      * unique constraint with no columns.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testUniqueUndefinedColumn()
@@ -578,7 +573,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints does not throws exception when
      * constraint is valid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidPrimaryKey()
@@ -613,7 +607,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints does not throws exception when
      * constraint is valid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidForeignKey()
@@ -651,7 +644,6 @@ class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
      * Test that validateTableConstraints does not throws exception when
      * constraint is valid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidUnique()

@@ -2,12 +2,24 @@
 /**
  * The Query Object used to store database objects.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'DAL/DAL.inc';
@@ -17,7 +29,6 @@ require_once 'DAL/DAL.inc';
  *
  * Object that represents a query in the MySource 4 system.
  *
- * @since 4.0.0
  */
 class Query
 {
@@ -26,7 +37,6 @@ class Query
      * The ID of this query.
      *
      * @var   string $_queryid Full ID of the query.
-     * @since 4.0.0
      */
     private $_queryid = '';
 
@@ -34,7 +44,6 @@ class Query
      * Total number of bindings in this query.
      *
      * @var   integer Number of bindings.
-     * @since 4.0.0
      */
     private $_lastBindNum = 0;
 
@@ -43,7 +52,6 @@ class Query
      *
      * @var   array $_arrayRepresentation The multidimensional structure of the
      *                                    array.
-     * @since 4.0.0
      */
     private $_arrayRepresentation = array();
 
@@ -54,7 +62,6 @@ class Query
      * SQL string will need to be regenerated.
      *
      * @var   string $_sqlString The SQL of the query.
-     * @since 4.0.0
      */
     private $_sqlString = '';
 
@@ -62,7 +69,6 @@ class Query
      * List of bindings.
      *
      * @var   array $_bindings Array of bind variables in this query.
-     * @since 4.0.0
      */
     private $_bindings = array();
 
@@ -72,7 +78,6 @@ class Query
      * Keywords will be replaced just before query prepare.
      *
      * @var   array $_keywords Array of keywords in this query.
-     * @since 4.0.0
      */
     private $_keywords = array();
 
@@ -82,7 +87,6 @@ class Query
      * Query will be executed using the given method (i.e. executeAll).
      *
      * @var   string $_execMethod
-     * @since 4.0.0
      */
     private $_execMethod = NULL;
 
@@ -90,7 +94,6 @@ class Query
      * Set to TRUE when the query array is converted to SQL string.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     private $_converted = FALSE;
 
@@ -98,7 +101,6 @@ class Query
      * The list of hooks in the query that may need to be replaced during prepare.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     private $_hookStrs = array();
 
@@ -111,7 +113,6 @@ class Query
      *                                    of the query.
      * @param string $sqlString           The SQL of the query.
      *
-     * @since  4.0.0
      * @throws DALException If query represantation is invalid.
      */
     public function __construct(
@@ -134,7 +135,6 @@ class Query
     /**
      * Returns the type of execution this method has specified.
      *
-     * @since  4.0.0
      * @return string
      */
     public function getQueryType()
@@ -147,7 +147,6 @@ class Query
     /**
      * Returns the array representation.
      *
-     * @since  4.0.0
      * @return string
      */
     public function getArrayRepresentation()
@@ -163,7 +162,6 @@ class Query
      * @param string $bindName The bind variable the query will replace.
      * @param Query  $query    The query to merge as part of this one.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public function merge($bindName, Query $query)
@@ -187,7 +185,6 @@ class Query
      *
      * @param Query $subQuery Query object.
      *
-     * @since  4.0.0
      * @return void
      */
     private function _addBindingsFromQuery(Query $subQuery)
@@ -212,7 +209,6 @@ class Query
      *
      * @param integer $offset Offset is used to prevent overlapping bind names.
      *
-     * @since  4.0.0
      * @return string
      */
     private function _getNextValidBindName($offset=0)
@@ -234,7 +230,6 @@ class Query
      * @param integer $type     Data type of the bind variable.
      * @param string  $realName Real name of the bind var.
      *
-     * @since  4.0.0
      * @return void
      */
     private function _addBindVar($name, $value, $type, $realName)
@@ -257,7 +252,6 @@ class Query
      *
      * @param string $count Number of bind variables to remove.
      *
-     * @since  4.0.0
      * @return void
      */
     private function _removeLastBindVar($count=1)
@@ -272,7 +266,6 @@ class Query
     /**
      * Returns the number of bindings in the query.
      *
-     * @since  4.0.0
      * @return integer
      */
     public function getLastBindNum()
@@ -288,7 +281,6 @@ class Query
      * @param string $oldName Old name of the bind variable.
      * @param string $newName New name of the bind variable.
      *
-     * @since  4.0.0
      * @return void
      */
     public function replaceBindVarName($oldName, $newName)
@@ -301,7 +293,6 @@ class Query
     /**
      * Returns this query's id.
      *
-     * @since  4.0.0
      * @return string
      */
     public function getQueryid()
@@ -314,7 +305,6 @@ class Query
     /**
      * Returns list of bind variables.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getBindings()
@@ -327,7 +317,6 @@ class Query
     /**
      * Returns the array representaion of this Query.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getQueryArray()
@@ -344,7 +333,6 @@ class Query
      *                         SQL before returning, otherwise the SQL is
      *                         returned in its' current form.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getSql($convert=FALSE)
@@ -367,7 +355,6 @@ class Query
     /**
      * Prepare the query for execution and returns the PDOStatement.
      *
-     * @since  4.0.0
      * @return PDOStatement
      */
     public function prepare()
@@ -409,7 +396,6 @@ class Query
      *
      * @param string $method The method to set for the query.
      *
-     * @since  4.0.0
      * @return void
      */
     public function setExecMethod($method)
@@ -424,7 +410,6 @@ class Query
      *
      * For example: executeAssoc
      *
-     * @since  4.0.0
      * @return string
      */
     public function getExecMethod()
@@ -444,7 +429,6 @@ class Query
      * @param mixed   $value    The value to set the variable to.
      * @param integer $dataType The type to bind the value with.
      *
-     * @since  4.0.0
      * @return void
      */
     public function bind($name, $value, $dataType)
@@ -498,7 +482,6 @@ class Query
      * @param string $placeHolder Name of the place holder.
      * @param mixed  $value       Value that will replace the placeHolder.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private function _findAndReplacePlaceHolder($placeHolder, $value)
@@ -524,7 +507,6 @@ class Query
      * @param string $subQueryid The sub hookid to merge.
      * @param array  $queries    The queries to add.
      *
-     * @since  4.0.0
      * @return void
      */
     public function subQueries($subQueryid, array $queries)
@@ -547,7 +529,6 @@ class Query
      *
      * @param array $keywords Array of keywords to add.
      *
-     * @since  4.0.0
      * @return void
      */
     public function keywords(array $keywords)
@@ -560,7 +541,6 @@ class Query
     /**
      * Returns the hook strings inside th query.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getHookStrings()
@@ -573,7 +553,6 @@ class Query
     /**
      * Returns the actual query string with bindings replaced with their values.
      *
-     * @since  4.0.0
      * @return string
      */
     public function __toString()

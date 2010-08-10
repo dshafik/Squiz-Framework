@@ -2,12 +2,24 @@
 /**
  * Class for the conversion of DB/2 specific SQL structures.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(__FILE__).'/DALConverter.inc';
@@ -20,7 +32,6 @@ require_once dirname(__FILE__).'/DALConverter.inc';
  * class "DALConverter", and if any conversions need to be altered for this
  * database the corresponding methods of DALConverter should be redefined here.
  *
- * @since 4.0.0
  */
 class DALDb2Converter extends DALConverter
 {
@@ -29,7 +40,6 @@ class DALDb2Converter extends DALConverter
      * Name of the database.
      *
      * @var   string $name Database name.
-     * @since 4.0.0
      */
     protected $name = 'DB2';
 
@@ -37,7 +47,6 @@ class DALDb2Converter extends DALConverter
      * List of data types for DB2.
      *
      * @var   $dataTypes List of sql constructs.
-     * @since 4.0.0
      */
     protected $dataTypes = array(
                             'char'                => 'CHAR',
@@ -61,7 +70,6 @@ class DALDb2Converter extends DALConverter
     /**
      * Constructor.
      *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -76,7 +84,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param string $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqNextVal($seqName)
@@ -94,7 +101,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param string $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqCurrVal($seqName)
@@ -111,7 +117,6 @@ class DALDb2Converter extends DALConverter
      * @param array|string $tableName Table name argument.
      * @param string       $schema    The schema to check the table for.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionTableExists($tableName, $schema=NULL)
@@ -132,7 +137,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param (array|string) $sequenceName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionSequenceExists($sequenceName)
@@ -152,7 +156,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param array $union Array of a union/union-all.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function getUnionType(array $union)
@@ -174,7 +177,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param string $type The type of the union (UNION or UNION-ALL).
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertUnionDisplayName($type)
@@ -193,7 +195,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionConcat(array $args)
@@ -209,7 +210,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param array $condition The condition information.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertLikeCondition(array $condition)
@@ -233,7 +233,6 @@ class DALDb2Converter extends DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionBindcast(array $args)

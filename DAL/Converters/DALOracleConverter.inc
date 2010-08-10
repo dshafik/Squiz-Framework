@@ -2,12 +2,24 @@
 /**
  * Class for the conversion of Oracle specific SQL structures.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(__FILE__).'/DALConverter.inc';
@@ -20,7 +32,6 @@ require_once dirname(__FILE__).'/DALConverter.inc';
  * class "DALConverter", and if any conversions need to be altered for this
  * database the corresponding methods of DALConverter should be redefined here.
  *
- * @since 4.0.0
  */
 class DALOracleConverter extends DALConverter
 {
@@ -29,7 +40,6 @@ class DALOracleConverter extends DALConverter
      * Name of the database.
      *
      * @var   string $name Database name.
-     * @since 4.0.0
      */
     protected $name = 'Oracle';
 
@@ -37,7 +47,6 @@ class DALOracleConverter extends DALConverter
      * List of data types for Oracle.
      *
      * @var   $dataTypes List of sql constructs.
-     * @since 4.0.0
      */
     protected $dataTypes = array(
                             'char'                => 'CHAR',
@@ -62,7 +71,6 @@ class DALOracleConverter extends DALConverter
     /**
      * Constructor.
      *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -79,7 +87,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param array $table CREATE array.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertCreateTable(array $table)
@@ -113,7 +120,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param array $col Single column in create clause.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleCreateColumn(array $col)
@@ -142,7 +148,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param string $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqNextVal($seqName)
@@ -160,7 +165,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param string $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqCurrVal($seqName)
@@ -177,7 +181,6 @@ class DALOracleConverter extends DALConverter
      * @param (array|string) $tableName Table name argument.
      * @param string         $schema    The schema to check the table for.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionTableExists($tableName, $schema=NULL)
@@ -197,7 +200,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param (array|string) $sequenceName Sequence name.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionSequenceExists($sequenceName)
@@ -217,7 +219,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param array $withQuery Array containing the with query information.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertWithQuery(array $withQuery)
@@ -249,7 +250,6 @@ class DALOracleConverter extends DALConverter
      * @param boolean $cascade   If TRUE, deletions will be cascaded to
      *                           dependent objects.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertDropTable($tableName, $cascade=FALSE)
@@ -272,7 +272,6 @@ class DALOracleConverter extends DALConverter
      * @param array   $ignore   Tag names that will be ignored while converting
      *                          the select statement. Example: where,join..
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSelectQuery(
@@ -310,7 +309,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param string $alias Table alias.
      *
-     * @since  4.0.0
      * @return array
      */
     protected function convertTableAlias($alias)
@@ -326,7 +324,6 @@ class DALOracleConverter extends DALConverter
      * @param array   $union Array of selects in union/union-all.
      * @param integer $level Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertUnionsInFromClause(array $union, $level=0)
@@ -345,7 +342,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param array $limit Single LIMIT clause.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertLimit(array $limit)
@@ -364,7 +360,6 @@ class DALOracleConverter extends DALConverter
      * @param array   $fields Array of fields.
      * @param integer $level  Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSelectFieldList(array $fields, $level=1)
@@ -409,7 +404,6 @@ class DALOracleConverter extends DALConverter
      *
      * @param array $sqlArray The Query array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function addSqlFilters(array $sqlArray)

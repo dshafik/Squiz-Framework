@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -18,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  *
  * getTableColumnTypes() gets the column types of a specific table in a system.
  *
- * @since 4.0.0
  */
 class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
 {
@@ -27,7 +38,6 @@ class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -43,7 +53,6 @@ class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that getTableColumnTypes return NULL when system does not exist.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNonExistentSystem()
@@ -57,7 +66,6 @@ class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that getTableColumnTypes return NULL when table does not exist.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNonExistentTable()
@@ -71,7 +79,6 @@ class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that getTableColumnTypes return correct array values.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testArrayOfColumns()
@@ -94,7 +101,6 @@ class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that getTableColumnTypes with column specified return correct value.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testSingleColumn()
@@ -113,7 +119,6 @@ class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
      * Test that getTableColumnTypes with non existent column specified return
      * NULL.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNonExistentSingleColumn()

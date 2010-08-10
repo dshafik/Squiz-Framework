@@ -2,12 +2,24 @@
 /**
  * Main class for the conversion of DAL arrays into SQL.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/Exceptions/DALConverterException.inc';
@@ -20,7 +32,6 @@ require_once dirname(dirname(__FILE__)).'/Exceptions/DALConverterException.inc';
  * If new databases have different SQL constructs then they should extend this
  * class and override its functions & members.
  *
- * @since 4.0.0
  */
 class DALConverter
 {
@@ -31,7 +42,6 @@ class DALConverter
      * Sub classes will need to override this array and change the array values.
      *
      * @var   $dataTypes List of SQL constructs.
-     * @since 4.0.0
      */
     protected $dataTypes = array(
                             'char'             => 'CHAR',
@@ -57,7 +67,6 @@ class DALConverter
      * Sub classes will need to override this array and change the array values.
      *
      * @var   $sqlConstructs List of SQL constructs.
-     * @since 4.0.0
      */
     protected $sqlConstructs = array(
                                 'select'     => 'SELECT',
@@ -86,7 +95,6 @@ class DALConverter
      * other. For example: ((table.col1 - table.col2) + value)
      *
      * @var   array $mathOps List of available math operators.
-     * @since 4.0.0
      */
     protected $mathOps = array(
                           'SUBTRACT' => '-',
@@ -99,7 +107,6 @@ class DALConverter
      * SQL query array that is being converted.
      *
      * @var   array $_query SQL query array.
-     * @since 4.0.0
      */
     protected $query = array();
 
@@ -107,7 +114,6 @@ class DALConverter
      * Name of the database.
      *
      * @var   string $name Database name.
-     * @since 4.0.0
      */
     protected $name = '';
 
@@ -116,7 +122,6 @@ class DALConverter
      *
      * @var   array $_whereConditions List of conditions that can be used in
      *                                where clause.
-     * @since 4.0.0
      */
     private $_whereConditions = array(
                                  'equal'            => '=',
@@ -137,7 +142,6 @@ class DALConverter
      * Structure should be the [hookSqlCode] = value if not replaced.
      *
      * @var   array
-     * @since 4.0.0
      */
     private $_hookStrings = array();
 
@@ -149,7 +153,6 @@ class DALConverter
      *
      * @param string $type Base data type.
      *
-     * @since  4.0.0
      * @return string
      */
     public function getDataType($type)
@@ -167,7 +170,6 @@ class DALConverter
     /**
      * Returns the readable database name.
      *
-     * @since  4.0.0
      * @return string
      */
     public function getName()
@@ -184,7 +186,6 @@ class DALConverter
      *
      * @param string $name Base name of the construct to get.
      *
-     * @since  4.0.0
      * @return string
      */
     public function getConstructName($name)
@@ -204,7 +205,6 @@ class DALConverter
      *
      * @param array $sqlArray Single query.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertToSql(array $sqlArray)
@@ -260,7 +260,6 @@ class DALConverter
      * @param array   $ignore   Tag names that will be ignored while converting
      *                          the select statement. Example: where,join..
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSelectQuery(
@@ -350,7 +349,6 @@ class DALConverter
      *
      * @param array $sqlArray The Query array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function addSqlFilters(array $sqlArray)
@@ -389,7 +387,6 @@ class DALConverter
      * @param array   $fields Array of fields.
      * @param integer $level  Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSelectFieldList(array $fields, $level=1)
@@ -413,7 +410,6 @@ class DALConverter
      *
      * @param (string|array) $field The field array or string.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleField($field)
@@ -459,7 +455,6 @@ class DALConverter
      *
      * @param array $caseStatement The CASE array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCaseStatement(array $caseStatement)
@@ -496,7 +491,6 @@ class DALConverter
      *
      * @param array $field Single field from select field list.
      *
-     * @since  4.0.0
      * @return array
      */
     protected function getSelectFieldName(array $field)
@@ -539,7 +533,6 @@ class DALConverter
      * @param array  $field A field from Select field list.
      * @param string $alias New alias for the field.
      *
-     * @since  4.0.0
      * @return array
      */
     protected function setSelectFieldAlias(array $field, $alias)
@@ -567,7 +560,6 @@ class DALConverter
      *
      * @param array $fields Fields from Select field list.
      *
-     * @since  4.0.0
      * @return array
      */
     protected function getSelectFieldNames(array $fields)
@@ -587,7 +579,6 @@ class DALConverter
      *
      * @param array $field Field's name.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertField(array $field)
@@ -617,7 +608,6 @@ class DALConverter
      *
      * @param array|string $field The field value.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleValue($field)
@@ -651,7 +641,6 @@ class DALConverter
      *
      * @param array $function Function array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleFunction(array $function)
@@ -693,7 +682,6 @@ class DALConverter
      * @param array   $from  The from clause array.
      * @param integer $level Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertFromList(array $from, $level=1)
@@ -757,7 +745,6 @@ class DALConverter
      *
      * @param string $alias Alias of the table.
      *
-     * @since  4.0.0
      * @return array
      */
     protected function convertTableAlias($alias)
@@ -776,7 +763,6 @@ class DALConverter
      *
      * @param array $mathOp The math op block.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertMathOperation(array $mathOp)
@@ -832,7 +818,6 @@ class DALConverter
      *
      * @param array $fields Array of fields to separate.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function separateFields(array $fields)
@@ -848,7 +833,6 @@ class DALConverter
      *
      * @param array $tables Array of fields to separate.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function separateTables(array $tables)
@@ -866,7 +850,6 @@ class DALConverter
      * @param integer $level       Number of levels to indent.
      * @param boolean $addBrackets Add brackets around first where condition.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException Fails to convert where clause.
      */
@@ -963,7 +946,6 @@ class DALConverter
      * @param integer $level Number of levels to indent.
      * @param string  $type  Type of in condition (in/not-in).
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertInCondition(array $in, $level=0, $type='IN')
@@ -1086,7 +1068,6 @@ class DALConverter
      * @param integer $level  Number of levels to indent.
      * @param string  $type   The type of exists condition (exists/not-exists).
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertExistsCondition(
@@ -1112,7 +1093,6 @@ class DALConverter
      *
      * @param array $isNull IS NULL array.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException Is-null value is empty.
      */
@@ -1142,7 +1122,6 @@ class DALConverter
      *
      * @param array $notNull IS NULL array.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException Not null value is empty.
      */
@@ -1175,7 +1154,6 @@ class DALConverter
      *
      * @param array $not Condition.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertNot(array $not)
@@ -1194,7 +1172,6 @@ class DALConverter
      * @param array   $union Array of selects in union/union-all.
      * @param integer $level Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertUnionsInFromClause(array $union, $level=0)
@@ -1213,7 +1190,6 @@ class DALConverter
      *
      * @param array $union Array of a union/union-all.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function getUnionType(array $union)
@@ -1236,7 +1212,6 @@ class DALConverter
      * @param array   $union Array of selects in union/union-all.
      * @param integer $level Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertUnions(array $union, $level=1)
@@ -1271,7 +1246,6 @@ class DALConverter
      *
      * @param string $type The type of the union (UNION or UNION-ALL).
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertUnionDisplayName($type)
@@ -1288,7 +1262,6 @@ class DALConverter
      * @param string  $type   EXCEPT or EXCEPT-ALL.
      * @param integer $level  Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertExcepts(array $except, $type, $level=1)
@@ -1319,7 +1292,6 @@ class DALConverter
      * @param array   $intersect Array of selects in intersect.
      * @param integer $level     Number of levels to indent.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertIntersect(array $intersect, $level=1)
@@ -1350,7 +1322,6 @@ class DALConverter
      *
      * @param array $groupBy Single GROUP BY clause.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertGroupBy(array $groupBy)
@@ -1377,7 +1348,6 @@ class DALConverter
      *
      * @param array $orderBys Multiple ORDER BY clauses.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertOrderBy(array $orderBys)
@@ -1422,7 +1392,6 @@ class DALConverter
      *
      * @param array $limit Single LIMIT clause.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertLimit(array $limit)
@@ -1440,7 +1409,6 @@ class DALConverter
      *
      * @param array $joins Array of joins.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertJoins(array $joins)
@@ -1466,7 +1434,6 @@ class DALConverter
      * @param array   $join  Single join array.
      * @param boolean $first TRUE if this join is the first join in the table.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleJoin(array $join, $first=FALSE)
@@ -1509,7 +1476,6 @@ class DALConverter
      *
      * @param array $sqlArray The insert query.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertInsertQuery(array $sqlArray)
@@ -1529,7 +1495,6 @@ class DALConverter
      * @param integer $level  Number of levels to indent.
      * @param integer $spaces Number of spaces for each indent level.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function addSpaces($level=0, $spaces=4)
@@ -1545,7 +1510,6 @@ class DALConverter
      *
      * @param array $fields Array of fields.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertInsertQueryFields(array $fields)
@@ -1568,7 +1532,6 @@ class DALConverter
      *
      * @param array $insert Array of the insert query.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException If field is missing.
      */
@@ -1610,7 +1573,6 @@ class DALConverter
      *
      * @param array $sqlArray Delete query array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertUpdateQuery(array $sqlArray)
@@ -1641,7 +1603,6 @@ class DALConverter
      *
      * @param array $values Array of values to set.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertUpdateQuerySetValues(array $values)
@@ -1670,7 +1631,6 @@ class DALConverter
      *
      * @param array $sqlArray Delete query array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertDeleteQuery(array $sqlArray)
@@ -1694,7 +1654,6 @@ class DALConverter
      *
      * @param string $tableName Name of the table to alter.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertAlterQueryHeader($tableName)
@@ -1710,7 +1669,6 @@ class DALConverter
      *
      * @param array $sqlArray Single ALTER TABLE query.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertAlterQuery(array $sqlArray)
@@ -1737,7 +1695,6 @@ class DALConverter
      *
      * @param array $addColumn ADD COLUMN array.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException If columns not specified.
      */
@@ -1771,7 +1728,6 @@ class DALConverter
      *
      * @param string $column Column name.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException If column name is not specified.
      */
@@ -1798,7 +1754,6 @@ class DALConverter
      *
      * @param array $renameColumn Old and New column names.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException If old or new column name is not specified.
      */
@@ -1826,7 +1781,6 @@ class DALConverter
      *
      * @param array $modifyColumns Columns to be modified.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException If columns not specified.
      */
@@ -1861,7 +1815,6 @@ class DALConverter
      * @param array  $constraints List of constraints.
      * @param string $tableName   Name of the table to alter.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertAlterQueryAddConstraint(
@@ -1890,7 +1843,6 @@ class DALConverter
      *
      * @param string $dropConstraint Name of the constraint to drop.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException If constraint name is empty.
      */
@@ -1917,7 +1869,6 @@ class DALConverter
      *
      * @param array $renameTable Old and New table name.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALConverterException If old or new name is not specified.
      */
@@ -1948,7 +1899,6 @@ class DALConverter
      *
      * @param array $table CREATE array.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertCreateTable(array $table)
@@ -1983,7 +1933,6 @@ class DALConverter
      *
      * @param array $table CREATE array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCreateHeader(array $table)
@@ -2002,7 +1951,6 @@ class DALConverter
      *
      * @param array $table CREATE array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCreateFooter(array $table)
@@ -2018,7 +1966,6 @@ class DALConverter
      *
      * @param array $table The table array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCreateColumns(array $table)
@@ -2045,7 +1992,6 @@ class DALConverter
      *
      * @param array $col Single column in create clause.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleCreateColumn(array $col)
@@ -2090,7 +2036,6 @@ class DALConverter
      * @param array   $constraintsList The constraints array.
      * @param boolean $asArray         If true result will be array of strings.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertConstraints(array $constraintsList, $asArray=FALSE)
@@ -2133,7 +2078,6 @@ class DALConverter
      *
      * @param array $pk Single primary key constraint.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSinglePrimaryKey(array $pk)
@@ -2153,7 +2097,6 @@ class DALConverter
      *
      * @param array $fk Single foreign key constraint.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleForeignKey(array $fk)
@@ -2185,7 +2128,6 @@ class DALConverter
      *
      * @param array $un Single unique constraint.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleUnique(array $un)
@@ -2202,7 +2144,6 @@ class DALConverter
      *
      * @param array $table The table array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCreateIndexes(array $table)
@@ -2230,7 +2171,6 @@ class DALConverter
      * @param array  $idx       Single index array.
      * @param string $tableName Name of the table.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleIndex(array $idx, $tableName)
@@ -2247,7 +2187,6 @@ class DALConverter
      *
      * @param array $sequences Create sequence stataments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCreateSequences(array $sequences)
@@ -2274,7 +2213,6 @@ class DALConverter
      *
      * @param array $sequence Info array of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleSequence(array $sequence)
@@ -2294,7 +2232,6 @@ class DALConverter
      * @param boolean $cascade   If TRUE, deletions will be cascaded to
      *                           dependent objects.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertDropTable($tableName, $cascade=FALSE)
@@ -2314,7 +2251,6 @@ class DALConverter
      *
      * @param string $tableName Name of the table to truncate.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertTruncateTable($tableName)
@@ -2330,7 +2266,6 @@ class DALConverter
      *
      * @param string $sequenceName Name of the sequence to drop from the db.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertDropSequence($sequenceName)
@@ -2346,7 +2281,6 @@ class DALConverter
      *
      * @param string $sequenceName Name of the sequence to drop from the db.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertResetSequence($sequenceName)
@@ -2363,7 +2297,6 @@ class DALConverter
      *
      * @param array $withQuery Array containing the with query information.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertWithQuery(array $withQuery)
@@ -2385,7 +2318,6 @@ class DALConverter
      *
      * @param array $callQuery The array containing the function structure.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCallQuery(array $callQuery)
@@ -2403,7 +2335,6 @@ class DALConverter
      * @param (array|string) $tableName Table name argument.
      * @param string         $schema    The schema to check the table for.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionTableExists($tableName, $schema=NULL)
@@ -2428,7 +2359,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionConcat(array $args)
@@ -2444,7 +2374,6 @@ class DALConverter
      *
      * @param array $args String to cast to array.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionArray(array $args)
@@ -2460,7 +2389,6 @@ class DALConverter
      *
      * @param array $condition The condition information.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertLikeCondition(array $condition)
@@ -2479,7 +2407,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionCast(array $args)
@@ -2497,7 +2424,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionBindcast(array $args)
@@ -2513,7 +2439,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionLength(array $args)
@@ -2529,7 +2454,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionCoalesce(array $args)
@@ -2552,7 +2476,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionMax(array $args)
@@ -2575,7 +2498,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionMin(array $args)
@@ -2598,7 +2520,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionCount(array $args)
@@ -2621,7 +2542,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSum(array $args)
@@ -2644,7 +2564,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionReplace(array $args)
@@ -2667,7 +2586,6 @@ class DALConverter
      *
      * @param array $args Method arguments.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionLower(array $args)
@@ -2690,7 +2608,6 @@ class DALConverter
      *
      * @param string $type Type of the condition. It will return its sign.
      *
-     * @since  4.0.0
      * @return array
      */
     protected function getComparisonOperators($type=NULL)
@@ -2711,7 +2628,6 @@ class DALConverter
     /**
      * Returns list of hooks that needs to be replaced during sql prepare by Query.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getHookStrings()

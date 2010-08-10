@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -18,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  *
  * validateQuery() method throws exception if there is an error in the query.
  *
- * @since 4.0.0
  */
 class ValidateQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -27,7 +38,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
      * Queries xml string.
      *
      * @var   string $_queries Queries xml.
-     * @since 4.0.0
      */
     private $_queries = '<queries system="test">
                  <query id="test">
@@ -66,7 +76,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -82,7 +91,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
      * It should throw an excepion for missing tags and attributes or when node
      * or attr values are invalid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidateSelectQuery()
@@ -116,7 +124,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
      * It should throw an excepion for missing tags and attributes or when node
      * or attr values are invalid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidateInsertQuery()
@@ -150,7 +157,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
      * It should throw an excepion for missing tags and attributes or when node
      * or attr values are invalid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidateDeleteQuery()
@@ -184,7 +190,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
      * It should throw an excepion for missing tags and attributes or when node
      * or attr values are invalid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidateUpdateQuery()
@@ -217,7 +222,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
      *
      * ValidateQuery() should throw an exception in this case.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidateQueryDuplicateId()
@@ -245,7 +249,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that validateQuery throws exception when query has no query id attr.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidateQueryNoQueryId()
@@ -275,7 +278,6 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that validateQuery throws exception when query has no query id attr.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testInvalidQueryType()

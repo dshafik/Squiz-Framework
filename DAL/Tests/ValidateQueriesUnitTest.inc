@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -18,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  *
  * validateQueries() Validates all the queries under the given queries node.
  *
- * @since 4.0.0
  */
 class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
 {
@@ -27,7 +38,6 @@ class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
      * Schema xml for this unit test.
      *
      * @var   string $_schema Schema xml.
-     * @since 4.0.0
      */
     private $_queries = '<queries system="system1">
                             <query id="test1"></query>
@@ -38,7 +48,6 @@ class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -51,7 +60,6 @@ class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that validateQueries throws exception when system attr is not found.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testNoSystemAttribute()
@@ -79,7 +87,6 @@ class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
      *
      * An exception should be thrown by validateQueries in this situation.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testUniqueQueryIds()
@@ -107,7 +114,6 @@ class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
     /**
      * Test validateQueries doesn't throw an exception when queries are valid.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidQueries()

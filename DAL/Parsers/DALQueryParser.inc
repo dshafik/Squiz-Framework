@@ -2,12 +2,24 @@
 /**
  * Main class for the Parsing of Queries into arrays.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'DAL/Exceptions/DALParserException.inc';
@@ -34,7 +46,6 @@ require_once 'Libs/XML/XML.inc';
  *
  * Base query parser. Contains common parsing functions like field parser etc.
  *
- * @since 4.0.0
  */
 class DALQueryParser
 {
@@ -46,7 +57,6 @@ class DALQueryParser
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -62,7 +72,6 @@ class DALQueryParser
      *
      * @param DomElement $query DomElement that represents a single query.
      *
-     * @since  4.0.0
      * @return array
      * @throws DALParserException If the element passed is not a query or is of
      *                            an invalid type.
@@ -181,7 +190,6 @@ class DALQueryParser
      * @param array &$sqlArray The main query array.
      * @param array &$aliases  Array of bind variables.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _convertAliases(array &$sqlArray, array &$aliases)
@@ -224,7 +232,6 @@ class DALQueryParser
      *
      * @param DomElement $select Select Node of the XML.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function parseLimitClause(DomElement $select)
@@ -266,7 +273,6 @@ class DALQueryParser
      * @param DomElement $inCond Select Node of the XML.
      * @param integer    $level  Indentation level.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function parseInClause(DomElement $inCond, $level=0)
@@ -353,7 +359,6 @@ class DALQueryParser
      * @param DomElement $existsCond Select Node of the XML.
      * @param integer    $level      Indentation level.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function parseExistsClause(DomElement $existsCond, $level=0)
@@ -381,7 +386,6 @@ class DALQueryParser
      *
      * @param DomElement $call The tag defining the call.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function parseCallQuery(DomElement $call)
@@ -405,7 +409,6 @@ class DALQueryParser
      *
      * @param DomElement $parent Fields Node of the XML.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function parseChildFields(DomElement $parent)
@@ -435,7 +438,6 @@ class DALQueryParser
      *
      * @param DomElement $fieldXML Singel field element.
      *
-     * @since  4.0.0
      * @return (array|boolean)
      */
     protected static function parseSingleField(DomElement $fieldXML)
@@ -502,7 +504,6 @@ class DALQueryParser
      *
      * @param DomElement $parent The math-op element.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function parseCaseStatement(DomElement $parent)
@@ -582,7 +583,6 @@ class DALQueryParser
      * @param DomElement $parent The math-op element.
      * @param string     $op     Math operator description (i.e. ADD).
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function parseMathOperation(DomElement $parent, $op='MATH-OP')
@@ -636,7 +636,6 @@ class DALQueryParser
      *
      * @param DomElement $function Function XML node.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function parseSqlFunction(DomElement $function)
@@ -686,7 +685,6 @@ class DALQueryParser
      * @param DomElement $field      Single field tag.
      * @param boolean    $allowAlias Allow field alias.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If a field doesn't have a table or a column
      *                            specified, or if an alias is used incorrectly.
@@ -713,7 +711,6 @@ class DALQueryParser
      *
      * @param DomElement $fields The query element.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the fields tag is invalid for any reason.
      */
@@ -750,7 +747,6 @@ class DALQueryParser
      *
      * @param DomElement $valuesTag The values tag.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If the values tag contains no value or select
      *                            tags.
@@ -785,7 +781,6 @@ class DALQueryParser
      *
      * @param DomElement $value The value tag.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If a value tag doesn't have a column
      *                            specified.
@@ -805,7 +800,6 @@ class DALQueryParser
      *
      * @param DomElement $parentNode Parent node.
      *
-     * @since  4.0.0
      * @return object
      */
     protected static function getUnionTag(DomElement $parentNode)
@@ -825,7 +819,6 @@ class DALQueryParser
      *
      * @param DomElement $xmlQuery DomElement that represents a single query.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function addHookIds(DomElement $xmlQuery)
@@ -851,7 +844,6 @@ class DALQueryParser
      *
      * @param DomElement $function Single function tag.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If a function tag doesn't have a function
      *                            specified.
@@ -873,7 +865,6 @@ class DALQueryParser
      *
      * @param DomElement $hook Single hook tag.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException If a hook doesn't have an ID specified.
      */

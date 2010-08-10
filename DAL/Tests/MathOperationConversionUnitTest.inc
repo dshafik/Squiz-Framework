@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -16,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 /**
  * Unit tests for the parsing and conversion of math operations.
  *
- * @since 4.0.0
  */
 class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
 {
@@ -25,7 +36,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -40,7 +50,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
      *
      * @param string $dbType Type of the database.
      *
-     * @since  4.0.0
      * @return object
      */
     private function _getConverterClass($dbType)
@@ -62,7 +71,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
      * @param array $expected Expected results.
      * @param array $parsed   Parsed SQL array.
      *
-     * @since  4.0.0
      * @return void
      */
     private function _testQuery(array $expected, array $parsed)
@@ -84,7 +92,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
      * Test that math operations are parsed and converted correctly when they
      * are in SELECT query.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testMathOpInSelectFields()
@@ -141,7 +148,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
      * Test that math operations are parsed and converted correctly for each db
      * type when they are in WHERE conditions.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testMathOpInWhereConditions()
@@ -206,7 +212,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
      * Test that math operations are parsed and converted correctly for each db
      * type when they are part of a IN condition.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testMathOpInInCondition()
@@ -272,7 +277,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
      * type when math-op has different value types like, function, value, field,
      * and hook.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testMathOpWithDifferentValueTypes()
@@ -343,7 +347,6 @@ class MathOperationConversionUnitTest extends AbstractMySourceUnitTest
      * Test that math operations are parsed and converted correctly when they
      * are in UPDATE query.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testMathOpInUpdateQuery()

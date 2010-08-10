@@ -2,12 +2,24 @@
 /**
  * DALBaker.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(__FILE__).'/DAL.inc';
@@ -25,7 +37,6 @@ require_once dirname(__FILE__).'/Query.inc';
  * Baker class for the Database Abstraction Layer, containing methods for
  * converting XML queries into PHP code.
  *
- * @since 4.0.0
  */
 class DALBaker
 {
@@ -35,7 +46,6 @@ class DALBaker
      *
      * @var   array $_whereConditions List of conditions that can be used in
      *                                where clause.
-     * @since 4.0.0
      */
     private static $_whereConditions = array(
                                         'equal'            => '=',
@@ -53,7 +63,6 @@ class DALBaker
      * The types of assertions that can be specified by systems.
      *
      * @var   array $_assertionTypes Assertion Tag Names.
-     * @since 4.0.0
      */
     private static $_assertionTypes = array(
                                        'assert-true',
@@ -75,7 +84,6 @@ class DALBaker
      * @var   array $_forbiddenVariablecharacters Characters that should be
      *                                            removed when generating
      *                                            variable names.
-     * @since 4.0.0
      */
     private static $_forbiddenVariablecharacters = array(
                                                     "'",
@@ -97,7 +105,6 @@ class DALBaker
      *
      * @var   array $_dynamicTableColDiff Array of column with different type.
      *
-     * @since 4.0.0
      */
     private static $_dynamicTableColDiff = array();
 
@@ -108,7 +115,6 @@ class DALBaker
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -129,7 +135,6 @@ class DALBaker
      * @param string $systemName The name of the system to retrieve the schema
      *                           for.
      *
-     * @since  4.0.0
      * @return DomDocument The schema document.
      */
     public static function getSystemSchemaDocument($systemName)
@@ -155,7 +160,6 @@ class DALBaker
      * @param string  $systemName The system whose schema to add.
      * @param boolean $dropTable  Flag to drop existing table.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function addSystemSchema($systemName, $dropTable=FALSE)
@@ -187,7 +191,6 @@ class DALBaker
      * @param string  $systemName The system whose schema to add.
      * @param boolean $dropTable  Flag to drop existing table.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function execSchemaQuery($systemName, $dropTable=FALSE)
@@ -237,7 +240,6 @@ class DALBaker
      * @param string       $tableName Name of the table to drop.
      * @param DALConverter $converter DAL Converter object.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _dbDropTable($tableName, DALConverter $converter=NULL)
@@ -263,7 +265,6 @@ class DALBaker
      * @param string       $tableName Name of the table to drop.
      * @param DALConverter $converter DAL Converter object.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _dbTableExists($tableName, DALConverter $converter=NULL)
@@ -292,7 +293,6 @@ class DALBaker
      *
      * @param string $systemName The system to add the query to.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws DALBakerException When an ID isn't specifued for a query.
      */
@@ -373,7 +373,6 @@ class DALBaker
      * @param string $systemName The system to which the query belongs.
      * @param string $queryName  The name of the query to generate.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALBakerException When there is no primary query found.
      */
@@ -508,7 +507,6 @@ class DALBaker
      * @param string     $contents  The PHP code to execute if the condition
      *                              is met.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printAlternateAssertions(
@@ -551,7 +549,6 @@ class DALBaker
      * @param array $currentStack An array of assertions that currently apply
      *                            to this branch of the tree.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _recurseAddAssertion(
@@ -607,7 +604,6 @@ class DALBaker
      * @param integer    $level       The level that the current assertion is at.
      *                                This is used to indent the code.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _recursePrintAssertions(
@@ -695,7 +691,6 @@ class DALBaker
      * @param array      $assertions An array of DomElements representing each
      *                               assertion that needs to be merged.
      *
-     * @since  4.0.0
      * @return DomElement
      */
     private static function _mergeAllAssertions(
@@ -724,7 +719,6 @@ class DALBaker
      * @param string $systemName The system where the query belongs.
      * @param string $queryName  The name of the query.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getQueryAssertions($systemName, $queryName)
@@ -754,7 +748,6 @@ class DALBaker
      *
      * @param DomElement $assertion The channel to generate the variable for.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALBakerException If an assetion doesn't have a funciton call.
      */
@@ -821,7 +814,6 @@ class DALBaker
      * @param string $queryName  The name of the query to create the XML file
      *                           for.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function generateQueryXML($systemName, $queryName)
@@ -853,7 +845,6 @@ class DALBaker
      * @param string $queryName  The name of the query to check the XML file
      *                           for.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function queryXMLExists($systemName, $queryName)
@@ -874,7 +865,6 @@ class DALBaker
      * @param string $queryName  The name of the query to retrieve the XML file
      *                           for.
      *
-     * @since  4.0.0
      * @return DomDocument
      */
     public static function getQueryXML($systemName, $queryName)
@@ -901,7 +891,6 @@ class DALBaker
      * @param DomDocument $doc       The Object representing the new XML
      *                               contents.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function saveQueryXML($system, $queryName, DomDocument $doc)
@@ -927,7 +916,6 @@ class DALBaker
      * @param string     $systemName The system to add the query to.
      * @param DomElement $query      The node containing the query to add.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function addQuery($systemName, DomElement $query)
@@ -972,7 +960,6 @@ class DALBaker
      * @param string     $systemName The system the fragment has come from.
      * @param DomElement $fragment   The node containing the fragment to add.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addQueryFragment($systemName, DomElement $fragment)
@@ -1016,7 +1003,6 @@ class DALBaker
      * @param string     $systemName The system the fragment has come from.
      * @param DomElement $subQuery   The node containing the fragment to add.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addSubQuery($systemName, DomElement $subQuery)
@@ -1070,7 +1056,6 @@ class DALBaker
      *                             a representation of the fragment from the
      *                             opening select tag onwards.
      *
-     * @since  4.0.0
      * @return DomElement
      */
     private static function _combineFragment(DomElement $query, DomElement $fragment)
@@ -1130,7 +1115,6 @@ class DALBaker
      *
      * @param DomElement $query The fragment or query to prepare.
      *
-     * @since  4.0.0
      * @return DomElement
      */
     private static function _prepareFragment(DomElement $query)
@@ -1165,7 +1149,6 @@ class DALBaker
      *
      * @param string $systemName Name of the system to bake the code for.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALBakerException If the system name supplied is empty.
      */
@@ -1216,7 +1199,6 @@ class DALBaker
      *                           belongs.
      * @param string $queryName  The name of the query to bake.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function bakeQueryMethod($systemName, $queryName)
@@ -1281,7 +1263,6 @@ class DALBaker
      *
      * @param array $assertions The assertions to print calls for.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printAssertionCalls(array $assertions)
@@ -1337,7 +1318,6 @@ class DALBaker
      * @param DomElement $assertion The assertion to print the initialisation
      *                              for.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALBakerException When the assertion contains no function call.
      */
@@ -1486,7 +1466,6 @@ class DALBaker
      *
      * @param DomElement $argNode The argument object to print.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printAssertionArgument(DomElement $argNode)
@@ -1522,7 +1501,6 @@ class DALBaker
      * @param array      $idParts The parts of the ID to make up the hash of to
      *                            add to the end of the filename.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printNodeSql(
@@ -1549,7 +1527,6 @@ class DALBaker
      * @param array  $sqlArray The array representation of the query.
      * @param string $sql      The SQL of the query.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALException When the query object being written already exists.
      */
@@ -1579,7 +1556,6 @@ class DALBaker
      * @param string $systemName The system to print the placeholders for.
      * @param string $queryName  The query to print the placeholders for.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printPlaceHolderVariables($systemName, $queryName)
@@ -1607,7 +1583,6 @@ class DALBaker
      * @param string $systemName The system to print the sub-queries for.
      * @param string $queryName  The query to print the sub-queries for.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function printSubQueries($systemName, $queryName)
@@ -1624,7 +1599,6 @@ class DALBaker
      * @param string $systemName The system to print the sub-queries for.
      * @param string $queryName  The query to print the sub-queries for.
      *
-     * @since  4.0.0
      * @return array
      * @throws DALBakerException When a specified hook doesn't exist.
      */
@@ -1722,7 +1696,6 @@ class DALBaker
      *
      * @param array $hookIds Data for the hooks to print.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printHookCode(array $hookIds)
@@ -1783,7 +1756,6 @@ class DALBaker
      *
      * @param string $hookId The hook id to retireve the code ID for.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getHookCodeId($hookId)
@@ -1801,7 +1773,6 @@ class DALBaker
      *
      * @param string $hookId The hook id to retrieve the array ID for.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getHookArrayId($hookId)
@@ -1817,7 +1788,6 @@ class DALBaker
      *
      * @param string $tagName The tag name to get the seperator for.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALParserException Unidentified separator passed.
      */
@@ -1859,7 +1829,6 @@ class DALBaker
      * @param string $systemName The system to print the bindings for.
      * @param string $queryName  The query to print the bindings for.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printKeywords($systemName, $queryName)
@@ -1909,7 +1878,6 @@ class DALBaker
      * @param boolean $printBindings If TRUE, will print bindings, otherwise
      *                               will print entries into the query array.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printBindings(
@@ -2029,7 +1997,6 @@ class DALBaker
      * @param DomElement $fragment The object representing the fragment to
      *                             search in.
      *
-     * @since  4.0.0
      * @return DomElement
      */
     private static function _extractBindings(DomElement $fragment)
@@ -2140,7 +2107,6 @@ class DALBaker
      * @param DomElement $fragment The object representing the fragment to
      *                             search in.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _extractKeywords(DomElement $fragment)
@@ -2183,7 +2149,6 @@ class DALBaker
      * @param DomElement $fragment The object representing the fragment to
      *                             search in.
      *
-     * @since  4.0.0
      * @return DomElement
      */
     private static function _extractPlaceHolders(DomElement $fragment)
@@ -2299,7 +2264,6 @@ class DALBaker
      * @param string $dataType The datatype to bind this value with. Will
      *                         override any other value.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getPdoDataType(
@@ -2342,7 +2306,6 @@ class DALBaker
      *
      * @param DomElement $schema Schema node of a schema.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function parseSchema(DomElement $schema)
@@ -2367,7 +2330,6 @@ class DALBaker
      *
      * @param DomElement $queries The queries node of the queries XML file.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException When a query tag doesn't have a system
      *                            attribute.
@@ -2400,7 +2362,6 @@ class DALBaker
      * @param DomDocument $doc   DomDocument object.
      * @param DomElement  $query Query element.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function queryIdIsUnique(DomDocument $doc, DomElement $query)
@@ -2427,7 +2388,6 @@ class DALBaker
      *
      * @param DomElement $query The query element.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALParserException When a query is missing an ID, its' ID is
      *                            not unique, or the query is invalidly
@@ -2462,7 +2422,6 @@ class DALBaker
      *
      * @param DomElement $query The query element.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getQueryType(DomElement $query)
@@ -2485,7 +2444,6 @@ class DALBaker
      * @param string $queryid Id of the main query.
      * @param string $hookid  Id of the fragment.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function fragmentExists($system, $queryid, $hookid)
@@ -2520,7 +2478,6 @@ class DALBaker
      * @param array      $sqlArray The Array representation of the SQL, if it
      *                             has already been generated.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function convertToSql(
@@ -2546,7 +2503,6 @@ class DALBaker
      *
      * @param string $dbType Database Type.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getConverter($dbType=NULL)
@@ -2568,7 +2524,6 @@ class DALBaker
      * @param string $table    Name of the table.
      * @param string $column   Name of a single column.
      *
-     * @since  4.0.0
      * @return (array|string)
      */
     public static function getTableColumnTypes($systemid, $table, $column=NULL)
@@ -2624,7 +2579,6 @@ class DALBaker
      *
      * @param string $systemid Id of the system.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getDynamicTableColumnTypes($systemid)
@@ -2678,7 +2632,6 @@ class DALBaker
      * @param string $systemid System name that the query belongs to.
      * @param string $queryid  Id of the query.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getQuerySource($systemid, $queryid)
@@ -2708,7 +2661,6 @@ class DALBaker
      *
      * @param string $system System name.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException When the path cannot be created.
      */
@@ -2736,7 +2688,6 @@ class DALBaker
      *
      * @param string $systemid System name.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function loadQueriesXML($systemid)
@@ -2760,7 +2711,6 @@ class DALBaker
      * @param string $systemid Id of the system.
      * @param string $queryid  Id of the query.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getBakedQueryFileName($systemid, $queryid)
@@ -2777,7 +2727,6 @@ class DALBaker
      * @param string $systemid Id of the system.
      * @param string $queryid  Id of the query.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function loadBakedQuery($systemid, $queryid)
@@ -2802,7 +2751,6 @@ class DALBaker
      *
      * @param string $systemid Id of the system.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function loadSystemSchemaXML($systemid)
@@ -2833,7 +2781,6 @@ class DALBaker
      *
      * @param DomElement $query DomElement that represents a single query.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function constructSql(DomElement $query)
@@ -2857,7 +2804,6 @@ class DALBaker
      * Baker will later on look for this prefix in SQL query string and replace
      * them with other SQL queries.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getHookPrefix()
@@ -2873,7 +2819,6 @@ class DALBaker
      *
      * @param string $type Type of the condition. It will return its sign.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getComparisonOperators($type=NULL)
@@ -2897,7 +2842,6 @@ class DALBaker
      * @param string $dsn The string to parse. If NULL, the DSN setting of the
      *                    system will be used.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getDatabaseType($dsn=NULL)

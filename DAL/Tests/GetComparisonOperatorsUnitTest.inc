@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -16,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
 /**
  * Unit Tests for the checking of getComparisonOperators() in DALBaker.
  *
- * @since 4.0.0
  */
 class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
 {
@@ -25,7 +36,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -38,7 +48,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('equal').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonEqual()
@@ -53,7 +62,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('not-equal').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonNotEqual()
@@ -68,7 +76,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('equal-or-greater').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonEqualOrGreater()
@@ -83,7 +90,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('equal-or-less').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonEqualOrLess()
@@ -98,7 +104,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('greater').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonGreater()
@@ -113,7 +118,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('less').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonLess()
@@ -128,7 +132,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('like').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonLike()
@@ -143,7 +146,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('is-null').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonIsNull()
@@ -158,7 +160,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for getComparisonOperators('not-null').
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonNotNull()
@@ -173,7 +174,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned is empty for an invalid comparison.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonInvalid()
@@ -188,7 +188,6 @@ class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
     /**
      * Test the value returned for a NULL argument.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testGetComparisonNullArgument()

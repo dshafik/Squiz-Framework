@@ -2,6 +2,25 @@
 /**
  * DAL. Database Abstraction Layer.
  *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage DAL
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
+ */
  * @version    4.0.0
  * @package    MySource4
  * @subpackage DAL
@@ -25,7 +44,6 @@ require_once 'DAL/Query.inc';
  *
  * DAL class also handles database connection and access.
  *
- * @since 4.0.0
  */
 class DAL
 {
@@ -36,7 +54,6 @@ class DAL
      * Prepare statements will use this PDO object.
      *
      * @var   object
-     * @since 4.0.0
      */
     private static $_dbh = NULL;
 
@@ -47,7 +64,6 @@ class DAL
      * be started. Commit and rollBack will set this var to FALSE.
      *
      * @var   boolean $_inTransaction Transaction handler.
-     * @since 4.0.0
      */
     private static $_inTransaction = FALSE;
 
@@ -57,7 +73,6 @@ class DAL
      * A database type must be specified in the DALConfig file.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_dbNames = array(
                                 'db2'   => 'DB2',
@@ -71,7 +86,6 @@ class DAL
      * Name of the current database.
      *
      * @var   string
-     * @since 4.0.0
      */
     private static $_currentDbName = NULL;
 
@@ -79,7 +93,6 @@ class DAL
      * Transaction counter.
      *
      * @var   integer
-     * @since 4.0.0
      */
     private static $_transactionCount = 0;
 
@@ -87,7 +100,6 @@ class DAL
      * List of querys that were executed and their timings.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_queryLog = array();
 
@@ -95,7 +107,6 @@ class DAL
      * Log queries.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     private static $_logQueries = FALSE;
 
@@ -103,7 +114,6 @@ class DAL
      * Current query.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_currentQueryLog = NULL;
 
@@ -113,7 +123,6 @@ class DAL
      * When its
      *
      * @var   string
-     * @since 4.0.0
      */
     public static $confId = '';
 
@@ -124,7 +133,6 @@ class DAL
      * Private to avoid instantiating the object.
      * All DAL methods should be called statically.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -141,7 +149,6 @@ class DAL
      *                            object and bind its' variables. Otherwise, it
      *                            will return an array representation of it.
      *
-     * @since  4.0.0
      * @return object
      * @throws DALException If failed to load the query.
      */
@@ -175,7 +182,6 @@ class DAL
      * @param mixed   $dalQuery SQL Query to execute.
      * @param integer $col      Column to retrieve.
      *
-     * @since  4.0.0
      * @return array
      * @throws PDOException Column index is invalid.
      */
@@ -234,7 +240,6 @@ class DAL
      *
      * @param Query $dalQuery SQL Query to execute.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAll(Query $dalQuery)
@@ -257,7 +262,6 @@ class DAL
      * @param mixed   $dalQuery    SQL Query to execute.
      * @param integer $columnIndex The column to retrieve.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getOne($dalQuery, $columnIndex=0)
@@ -316,7 +320,6 @@ class DAL
      * @param string $queryid  ID of the query.
      * @param string $method   Method used to retrieve the query(getAssoc etc).
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getDALQuery($systemid, $queryid, $method='')
@@ -335,7 +338,6 @@ class DAL
      *
      * @param mixed $dalQuery SQL Query to execute.
      *
-     * @since  4.0.0
      * @return array
      * @throws DALException If query execution fails.
      */
@@ -418,7 +420,6 @@ class DAL
      *                        will be returned per group.
      *                        E.g. array('x' => array('c2' => 1, 'c3' => 2)).
      *
-     * @since  4.0.0
      * @return array
      * @throws DALException If pdo fails to execute the query.
      */
@@ -518,7 +519,6 @@ class DAL
      * @param string $systemid System's ID.
      * @param string $queryid  ID of the SQL query.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function executeGrouped($systemid, $queryid)
@@ -539,7 +539,6 @@ class DAL
      * @param string  $queryid  ID of the SQL query.
      * @param integer $col      Column to retrieve.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function executeAssoc($systemid, $queryid, $col=NULL)
@@ -559,7 +558,6 @@ class DAL
      * @param string $systemid System's ID.
      * @param string $queryid  ID of the SQL query.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function executeAll($systemid, $queryid)
@@ -579,7 +577,6 @@ class DAL
      * @param string $systemid System's ID.
      * @param string $queryid  ID of the SQL query.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function executeOne($systemid, $queryid)
@@ -607,7 +604,6 @@ class DAL
      * @param string|object $systemid System's ID.
      * @param string        $queryid  ID of the SQL query.
      *
-     * @since  4.0.0
      * @return integer
      * @throws DALException If no query provided or query execution failed.
      */
@@ -652,7 +648,6 @@ class DAL
      * @param string|object $systemid System's ID.
      * @param string        $queryid  ID of the SQL query.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function getExecuteQuery($systemid, $queryid=NULL)
@@ -669,7 +664,6 @@ class DAL
      * @param string $systemid System's ID.
      * @param string $queryid  ID of the SQL query.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function getExecuteAll($systemid, $queryid)
@@ -686,7 +680,6 @@ class DAL
      * @param Query  $query      The Query to execute.
      * @param string $execMethod Optional execute method i.e. Assoc, Grouped.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function executeDALQuery(Query $query, $execMethod=NULL)
@@ -711,7 +704,6 @@ class DAL
      *
      * @param PDOStatement $query PDOStatement object.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function execPdoQuery(PDOStatement $query)
@@ -728,7 +720,6 @@ class DAL
      *
      * @param string $sql Sql query to execute.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function executeSql($sql)
@@ -750,7 +741,6 @@ class DAL
      *
      * @param string $sql SQL statements.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function executeQueries($sql)
@@ -773,7 +763,6 @@ class DAL
      *
      * @param string $sql The sql statement.
      *
-     * @since  4.0.0
      * @return PDOStatement
      */
     public static function query($sql)
@@ -788,7 +777,6 @@ class DAL
     /**
      * Returns the number of open transactions.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function getTransactionCount()
@@ -801,7 +789,6 @@ class DAL
     /**
      * Initiates a transaction.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALException If transaction counter is not zero.
      */
@@ -830,7 +817,6 @@ class DAL
     /**
      * Commits a transaction.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function commit()
@@ -850,7 +836,6 @@ class DAL
      *
      * All changes made since last commit will be lost.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function rollBack()
@@ -871,7 +856,6 @@ class DAL
      * @param string $sequenceName Name of the sequence from which the ID
      *                             should be returned.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function lastInsertId($sequenceName)
@@ -895,7 +879,6 @@ class DAL
      *
      * @param array $dsn DSN array.
      *
-     * @since  4.0.0
      * @return object
      * @throws DALException If db connection fails.
      */
@@ -940,7 +923,6 @@ class DAL
     /**
      * Close the database connection.
      *
-     * @since  4.0.0
      * @return void
      * @throws DALException If there is a transaction.
      */
@@ -961,7 +943,6 @@ class DAL
     /**
      * Returns true if there is an active database connection.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function dbConnected()
@@ -978,7 +959,6 @@ class DAL
     /**
      * Returns DAL Configuration file path.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function getDALConfPath()
@@ -998,7 +978,6 @@ class DAL
     /**
      * Returns the DSN array for the current database configuration.
      *
-     * @since  4.0.0
      * @return array
      * @throws DALException If DSN not configured.
      */
@@ -1018,7 +997,6 @@ class DAL
     /**
      * Returns the current database name using its DSN.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getDbName()
@@ -1044,7 +1022,6 @@ class DAL
     /**
      * Returns the PDO object for the current database.
      *
-     * @since  4.0.0
      * @return PDO
      */
     public static function getDb()
@@ -1065,7 +1042,6 @@ class DAL
      * @param boolean $readable If true readable name will be returned.
      *                          For example, myql => Mysql, pgsql => Postgres.
      *
-     * @since  4.0.0
      * @return string
      * @throws DALException If db type is not found or it is invalid.
      */
@@ -1095,7 +1071,6 @@ class DAL
      *
      * @param string $dbType Database Type.
      *
-     * @since  4.0.0
      * @return object
      */
     public static function getConverter($dbType=NULL)
@@ -1120,7 +1095,6 @@ class DAL
      *
      * @param string $dbType The Database Type.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getConverterType($dbType)
@@ -1161,7 +1135,6 @@ class DAL
      *
      * @param string $systemid ID of the system.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function requireQueryClass($systemid)
@@ -1181,7 +1154,6 @@ class DAL
      *
      * @param string $system System name.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getOvenPath($system=NULL)
@@ -1200,7 +1172,6 @@ class DAL
     /**
      * Returns the path to store query objects.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getQueryStorePath()
@@ -1216,7 +1187,6 @@ class DAL
      *
      * @param string $id The ID of the query to retrieve.
      *
-     * @since  4.0.0
      * @return Query
      * @throws DALException When object is not found.
      */
@@ -1241,7 +1211,6 @@ class DAL
      *
      * @param string $path File path of the SQL file.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getSqlQueriesFromFile($path)
@@ -1262,7 +1231,6 @@ class DAL
      *
      * @param mixed $query Variable to test.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isDALQuery($query)
@@ -1281,7 +1249,6 @@ class DAL
      *
      * @param string $queryid Id of the query.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _startQueryTimer($queryid)
@@ -1298,7 +1265,6 @@ class DAL
     /**
      * Stops query timer.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _endQueryTimer()
@@ -1320,7 +1286,6 @@ class DAL
     /**
      * Returns list of logged queries.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getLoggedQueries()
@@ -1336,7 +1301,6 @@ class DAL
      * @param array $queries An array of database queries in the form returned
      *                       by getLoggedQueries().
      *
-     * @since  4.0.0
      * @return void
      */
     public static function setLoggedQueries(array $queries)
@@ -1349,7 +1313,6 @@ class DAL
     /**
      * Clears the list of logged queries.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function clearLoggedQueries()
@@ -1364,7 +1327,6 @@ class DAL
      *
      * @param string $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function seqNextVal($seqName)
@@ -1385,7 +1347,6 @@ class DAL
      *
      * @param string $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function seqCurrVal($seqName)

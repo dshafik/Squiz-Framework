@@ -2,12 +2,24 @@
 /**
  * Class for the conversion of MSSQL specific SQL structures.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(__FILE__).'/DALConverter.inc';
@@ -20,7 +32,6 @@ require_once dirname(__FILE__).'/DALConverter.inc';
  * class "DALConverter", and if any conversions need to be altered for this
  * database the corresponding methods of DALConverter should be redefined here.
  *
- * @since 4.0.0
  */
 class DALMysqlConverter extends DALConverter
 {
@@ -29,7 +40,6 @@ class DALMysqlConverter extends DALConverter
      * Name of the table that is being converted.
      *
      * @var   string $tableName
-     * @since 4.0.0
      */
     protected $tableName = '';
 
@@ -37,7 +47,6 @@ class DALMysqlConverter extends DALConverter
      * Name of the database.
      *
      * @var   string $name Database name.
-     * @since 4.0.0
      */
     protected $name = 'MySQL';
 
@@ -45,7 +54,6 @@ class DALMysqlConverter extends DALConverter
      * List of data types for MySQL.
      *
      * @var   $dataTypes List of sql constructs.
-     * @since 4.0.0
      */
     protected $dataTypes = array(
                             'char'                => 'CHAR',
@@ -69,7 +77,6 @@ class DALMysqlConverter extends DALConverter
     /**
      * Constructor.
      *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -82,7 +89,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param array $table CREATE array.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertCreateTable(array $table)
@@ -121,7 +127,6 @@ class DALMysqlConverter extends DALConverter
      * @param array   $constraints List of constraints.
      * @param boolean $incHeader   If true ALTER query header will be added.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertAlterQueryAddConstraint(
@@ -156,7 +161,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param array $sequence Info array of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertSingleSequence(array $sequence)
@@ -176,7 +180,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param array $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqNextVal(array $seqName)
@@ -195,7 +198,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param array $seqName Name of the sequence.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionSeqCurrVal(array $seqName)
@@ -213,7 +215,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param string $sequenceName Name of the sequence to drop from the db.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertDropSequence($sequenceName)
@@ -231,7 +232,6 @@ class DALMysqlConverter extends DALConverter
      * @param boolean $cascade   If TRUE, deletions will be cascaded to
      *                           dependent objects.
      *
-     * @since  4.0.0
      * @return string
      */
     public function convertDropTable($tableName, $cascade=FALSE)
@@ -251,7 +251,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param (array|string) $sequenceName Sequence name.
      *
-     * @since  4.0.0
      * @return string
      */
     public function handleFunctionSequenceExists($sequenceName)
@@ -267,7 +266,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param array $args The arguments to the concat function.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function handleFunctionConcat(array $args)
@@ -283,7 +281,6 @@ class DALMysqlConverter extends DALConverter
      *
      * @param array $callQuery The structure of the call query to convert.
      *
-     * @since  4.0.0
      * @return string
      */
     protected function convertCallQuery(array $callQuery)

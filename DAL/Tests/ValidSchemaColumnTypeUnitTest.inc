@@ -2,12 +2,24 @@
 /**
  * Tests for functionality of the Database Abstraction Layer.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
@@ -18,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  *
  * validSchemaColumnType() determines if the given type is a valid column type.
  *
- * @since 4.0.0
  */
 class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
 {
@@ -27,7 +38,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
      * Schema xml for this unit test.
      *
      * @var   string $_schema Schema xml.
-     * @since 4.0.0
      */
     private $_schema = '<schema system="asset">
                          <udts>
@@ -42,7 +52,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
     /**
      * Returns an array of systems that this test requires to run.
      *
-     * @since  4.0.0
      * @return array(string)
      */
     public function getRequiredSystems()
@@ -55,7 +64,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that getQuerySource returns null if system does not exist.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testLowercaseColumnType()
@@ -76,7 +84,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
      * Test that validSchemaColumnType returns TRUE for a type that was defined
      * in DALBaker::$_columnDataTypes array.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testBaseColumnType()
@@ -97,7 +104,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
      * Test that validSchemaColumnType returns FALSE for a type that is not
      * defined anywhere in the schema or not a base type.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testInvalidColumnType()
@@ -118,7 +124,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
      * Test that validSchemaColumnType returns TRUE for a type that was defined
      * as a local UDT (User Defined Type).
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidLocalUdtColumnType()
@@ -139,7 +144,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
      * Test that validSchemaColumnType returns TRUE for a type that was defined
      * as a foreign UDT (User Defined Type).
      *
-     * @since  4.0.0
      * @return void
      */
     public function testValidForeignUdtColumnType()
@@ -157,7 +161,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that validSchemaColumnType returns FALSE for an empty type.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testEmptyColumnType()
@@ -175,7 +178,6 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
     /**
      * Test that validSchemaColumnType returns FALSE for schema with no UDTs.
      *
-     * @since  4.0.0
      * @return void
      */
     public function testEmptyUdts()
