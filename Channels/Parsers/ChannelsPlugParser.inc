@@ -2,12 +2,24 @@
 /**
  * Main class for the Parsing of Plugs into string.
  *
- * @version    4.0.0
- * @package    MySource4
- * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Channels
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Channels/Parsers/ChannelsBlockerParser.inc';
@@ -26,7 +38,6 @@ require_once 'Channels/ChannelsBaker.inc';
  *
  * Base query parser. Contains common parsing functions like field parser etc.
  *
- * @since 4.0.0
  */
 class ChannelsPlugParser
 {
@@ -35,7 +46,6 @@ class ChannelsPlugParser
      * Cache for the required elements list.
      *
      * @var   arary
-     * @since 4.0.0
      */
     private static $_requiredElementsCache = array();
 
@@ -45,7 +55,6 @@ class ChannelsPlugParser
      *
      * @param DOMElement $xmlNode DomElement that represents a plug.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function bake(DOMElement $xmlNode)
@@ -155,7 +164,6 @@ class ChannelsPlugParser
      * @param string $plugSystem Name of the system the plug belong to.
      * @param object $plugXml    DomElement that represents a plug.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getTestingPlugIfCode($plugSystem, $plugXml)
@@ -173,7 +181,6 @@ class ChannelsPlugParser
      * @param DOMElement $plugElement DomElement that represents a plug.
      * @param boolean    $nonBaked    If TRUE, non-baked plugs are included.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getPlugInfo(DOMElement $plugElement, $nonBaked=FALSE)
@@ -198,7 +205,6 @@ class ChannelsPlugParser
      *
      * @param string $type Name of the plug type.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getPlugHandler($type)
@@ -248,7 +254,6 @@ class ChannelsPlugParser
      *
      * @param DOMElement $plugElement DomElement that represents a plug.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function xmlToArray(DOMElement $plugElement)
@@ -282,7 +287,6 @@ class ChannelsPlugParser
      * @param string $plugType If this is not NULl then only this plug type
      *                         elements are returned.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function getRequiredElements($plugType=NULL)
@@ -311,7 +315,6 @@ class ChannelsPlugParser
     /**
      * Returns an array of the valid plug types for the channels system.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getPlugTypes()
@@ -334,7 +337,6 @@ class ChannelsPlugParser
     /**
      * Returns plug location types.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getLocTypes()
@@ -355,7 +357,6 @@ class ChannelsPlugParser
      *
      * Returned array is index by listen type (beofre/after).
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getPlugTypeLocs($location=NULL)
@@ -386,7 +387,6 @@ class ChannelsPlugParser
      * @param array      $parameters An array of names of parameters that the
      *                               plug method requires.
      *
-     * @since  4.0.0
      * @return DomElement
      */
     public static function getPlugPosition(
@@ -467,7 +467,6 @@ class ChannelsPlugParser
      *
      * @param string $plugName The name/type of the plug to check.
      *
-     * @since  4.0.0
      * @return integer
      */
     public static function getPlugWeight($plugName)
@@ -490,7 +489,6 @@ class ChannelsPlugParser
      * @param DomElement $xmlNode XML Node of the plug to retrieve the system
      *                            for.
      *
-     * @since  4.0.0
      * @return string
      */
     protected static function getPlugSystem(DomElement $xmlNode)
@@ -508,7 +506,6 @@ class ChannelsPlugParser
      *
      * @param string $plugSystem The name of the system specified in XML.
      *
-     * @since  4.0.0
      * @return string
      * @throws Exception If plug exists when system isnt an exclusive interface.
      */
@@ -571,7 +568,6 @@ class ChannelsPlugParser
      * @param DomElement $xmlNode XML Node of the plug to retrieve the method
      *                            call for.
      *
-     * @since  4.0.0
      * @return string
      */
     protected static function getPlugMethodSignature(DomElement $xmlNode)
@@ -604,7 +600,6 @@ class ChannelsPlugParser
      *
      * @param DomElement $xmlNode The plug node.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelPlugException If parameters tag includes more parameters
      *                              than actual function signature.
@@ -679,7 +674,6 @@ class ChannelsPlugParser
      * @param DOMElement $plug   DomElement that represents a plug.
      * @param string     $system Name of the system.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the given plug XML is not valid.
      */
@@ -736,7 +730,6 @@ class ChannelsPlugParser
      * @param DOMElement $plug   DomElement that represents a plug.
      * @param string     $system Name of the system.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the given plug XML is not valid.
      */
@@ -764,7 +757,6 @@ class ChannelsPlugParser
      * @param DOMElement $plug   DomElement that represents a plug.
      * @param string     $system Name of the system.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the given plug XML is not valid.
      */
@@ -797,7 +789,6 @@ class ChannelsPlugParser
      * @param string     $system           Name of the system.
      * @param string     $requiredTagValue Value of required tag.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the given plug XML is not valid.
      */
@@ -840,7 +831,6 @@ class ChannelsPlugParser
      * @param DOMElement $plug   DomElement that represents a plug.
      * @param string     $system Name of the system.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the given plug XML is not valid.
      */
@@ -878,7 +868,6 @@ class ChannelsPlugParser
      * @param DOMElement $plug   DomElement that represents a plug.
      * @param string     $system Name of the system.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the given plug XML is not valid.
      */
@@ -931,7 +920,6 @@ class ChannelsPlugParser
      * @param DOMElement $plug   DomElement that represents a plug.
      * @param string     $system Name of the system.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If the given plug XML is not valid.
      */
@@ -979,7 +967,6 @@ class ChannelsPlugParser
      * @param string $methodName Method name to check.
      * @param string $systemName System that this plug belongs to.
      *
-     * @since  4.0.0
      * @return boolean
      */
     protected static function plugMethodExists($methodName, $systemName)
@@ -1018,7 +1005,6 @@ class ChannelsPlugParser
      *
      * @param string $actionStr SystemName::method.
      *
-     * @since  4.0.0
      * @return boolean
      */
     protected static function actionMethodExists($actionStr)
@@ -1038,7 +1024,6 @@ class ChannelsPlugParser
      *                         valid after channel action. Otherwise
      *                         check if valid before.
      *
-     * @since  4.0.0
      * @return boolean
      */
     protected static function isValidMySourcePlug(
@@ -1072,7 +1057,6 @@ class ChannelsPlugParser
      * During the baking process gatherer field names will be checked to make
      * sure that they are not one of these reserved words.
      *
-     * @since  4.0.0
      * @return array
      */
     protected static function getReservedWords()

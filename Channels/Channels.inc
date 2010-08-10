@@ -2,12 +2,24 @@
 /**
  * Provides methods to retrieve information about channel data.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Channels
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(__FILE__).'/Exceptions/ChannelException.inc';
@@ -23,7 +35,6 @@ require_once 'Systems/BaseSystem.inc';
 /**
  * Provides methods to retrieve information about channel data.
  *
- * @since 4.0.0
  */
 class Channels
 {
@@ -34,7 +45,6 @@ class Channels
      * Array is indexed by the event names.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_eventBasket = array();
 
@@ -46,7 +56,6 @@ class Channels
      * create 'debugOven'.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     public static $channelsMode = '';
 
@@ -54,7 +63,6 @@ class Channels
      * List of included systems.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_includedSystems = array();
 
@@ -62,7 +70,6 @@ class Channels
      * If TRUE the system is currently being installed.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     public static $installing = FALSE;
 
@@ -72,7 +79,6 @@ class Channels
      * Introduced to be used during the testing.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_runPlugList = array();
 
@@ -82,7 +88,6 @@ class Channels
      * Introduced to be used during the testing.
      *
      * @var   boolean
-     * @since 4.0.0
      */
     public static $runAllPlugs = FALSE;
 
@@ -90,7 +95,6 @@ class Channels
     /**
      * Channels constructor.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -101,7 +105,6 @@ class Channels
     /**
      * Will be called from MySource System only.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function init()
@@ -118,7 +121,6 @@ class Channels
      *
      * This is the main channel action for MySource 4.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function main()
@@ -134,7 +136,6 @@ class Channels
      *
      * @param Exception $e Exception object thrown.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception If given eception is unknown.
      */
@@ -161,7 +162,6 @@ class Channels
      *
      * @param string $system System name.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException If the actions path doesn't exist.
      */
@@ -192,7 +192,6 @@ class Channels
      *
      * @param string $systemName System name.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getSystemsPath($systemName='')
@@ -218,7 +217,6 @@ class Channels
     /**
      * Returns a DomDocument containing the contents of the systems XML file.
      *
-     * @since  4.0.0
      * @return DomDocument
      */
     public static function getSystemXml()
@@ -245,7 +243,6 @@ class Channels
      *
      * @param string $systemName System name.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getOvenPath($systemName='')
@@ -275,7 +272,6 @@ class Channels
      *
      * @param string $var Variable name.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function eventVarExists($var)
@@ -301,7 +297,6 @@ class Channels
      * @param mixed   $value  Value of the variable.
      * @param boolean $update If true var value will be updated.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function addToBasket($var, $value, $update=FALSE)
@@ -326,7 +321,6 @@ class Channels
      * @param string $var      Name of the event basket variable.
      * @param mixed  $newValue Value of the variable.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function modifyBasket($var, $newValue)
@@ -349,7 +343,6 @@ class Channels
      *
      * @param string $var Variable name.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function removeFromBasket($var)
@@ -368,7 +361,6 @@ class Channels
     /**
      * Returns the current event/channel's data.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getCurrentEventBasketData()
@@ -390,7 +382,6 @@ class Channels
      *
      * Adds an empty array to the end of the event basket array.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function createEventBasket()
@@ -404,7 +395,6 @@ class Channels
     /**
      * Removes the last basket from the event Basket array.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeEventBasket()
@@ -419,7 +409,6 @@ class Channels
      *
      * @param string $system System name.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function systemExists($system)
@@ -441,7 +430,6 @@ class Channels
      *
      * @param string $system System name.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException When the system path doesn't exist.
      */
@@ -472,7 +460,6 @@ class Channels
      * @param boolean $namesOnly     Returns the system names only if set to
      *                               true, else it will return full file paths.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getSystemList(
@@ -526,7 +513,6 @@ class Channels
      *                    any combination of 'concrete', 'optional',
      *                    'inheritance' and 'install'.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAllDependencies($type=NULL)
@@ -565,7 +551,6 @@ class Channels
      *                           any combination of 'concrete', 'optional',
      *                           'inheritance' and 'install'.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getSystemDependencies($systemName, $type=NULL)
@@ -604,7 +589,6 @@ class Channels
      *                        any combination of 'concrete', 'optional',
      *                        'inheritance' and 'install'.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getSystemDependencies(
@@ -647,7 +631,6 @@ class Channels
      *
      * @param string $systemName Name of the system.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAvailableSystemActions($systemName)
@@ -680,7 +663,6 @@ class Channels
     /**
      * Returns the list of Widget Type systems with its inheritance info.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getWidgetSystemsMapArray()
@@ -762,7 +744,6 @@ class Channels
      *
      * @param string $pid Unique id of the plug to run.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function runPlug($pid)
@@ -792,7 +773,6 @@ class Channels
      *
      * Introduced to be used in the testing.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function resetRunPlug()
@@ -809,7 +789,6 @@ class Channels
      *
      * @param string $plugid Unique id of the plug to run.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addPlugToRun($plugid)
@@ -826,7 +805,6 @@ class Channels
      *
      * @param string $plugid Unique id of the plug to run.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removePlugToRun($plugid)

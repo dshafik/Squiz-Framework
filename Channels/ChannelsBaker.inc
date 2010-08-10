@@ -5,12 +5,24 @@
  * The files handled include both the XML channels definitions files, as well
  * as the PHP classes that are baked out to represent these channel definitions.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Channels
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once dirname(__FILE__).'/Channels.inc';
@@ -25,7 +37,6 @@ require_once dirname(__FILE__).'/Debug/ChannelsDebugger.inc';
  * The files handled include both the XML channels definitions files, as well
  * as the PHP classes that are baked out to represent these channel definitions.
  *
- * @since 4.0.0
  */
 class ChannelsBaker
 {
@@ -34,7 +45,6 @@ class ChannelsBaker
      * The channels that will be generated for the main MySource system.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_mySourceChannels = array(
                                          'init'        => array(
@@ -112,7 +122,6 @@ class ChannelsBaker
      * Array of type locations.
      *
      * @var   array
-     * @since 4.0.0
      */
      private static $_typeLocs = array(
                                   'before' => array(
@@ -137,7 +146,6 @@ class ChannelsBaker
       * type, and this will facilitate adding those locations.
       *
       * @var   array
-      * @since 4.0.0
       */
      private static $_locTypes = array(
                                   'before',
@@ -148,7 +156,6 @@ class ChannelsBaker
      * Stores the current system being painted to be used by the debug output.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_currentSystem = '';
 
@@ -156,7 +163,6 @@ class ChannelsBaker
      * List of the system to be installed.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_systemsInfo = array();
 
@@ -164,7 +170,6 @@ class ChannelsBaker
      * List of the system names to be installed.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_systemNames = array();
 
@@ -172,7 +177,6 @@ class ChannelsBaker
      * Turns on channel execution path report mode.
      *
      * @var   array
-     * @since 4.0.0
      */
     public static $addReportCode = FALSE;
 
@@ -180,7 +184,6 @@ class ChannelsBaker
      * System implementers cache.
      *
      * @var   array
-     * @since 4.0.0
      */
     private static $_systemImplementersCache = array();
 
@@ -188,7 +191,6 @@ class ChannelsBaker
     /**
      * ChannelsBaker constructor.
      *
-     * @since 4.0.0
      */
     private function __construct()
     {
@@ -207,7 +209,6 @@ class ChannelsBaker
      *                           path the system will be looked for in the
      *                           system's directory.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function addSystem($systemPath)
@@ -226,7 +227,6 @@ class ChannelsBaker
      * @param array $systems An array of system names or full system paths
      *                       to add.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception When an exclusive systems' rules are violated.
      */
@@ -340,7 +340,6 @@ class ChannelsBaker
      * @param array $realSystems An array of system names or full system paths
      *                           to add.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception When an exclusive systems' rules are violated.
      */
@@ -400,7 +399,6 @@ class ChannelsBaker
      *                          to add.
      * @param array $allSystems The list of enabled systems.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _prepareSystemsToInstall(
@@ -451,7 +449,6 @@ class ChannelsBaker
      * @param boolean $enabled         Should the added system be flagged as enabled.
      * @param array   $inheritanceInfo Inheritance information for all systems.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException When the system being added already exists.
      */
@@ -592,7 +589,6 @@ class ChannelsBaker
      *                         in the systems dir.
      * @param boolean $enabled Should the added system(s) be flagged as enabled.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException When the system being added already exists.
      */
@@ -652,7 +648,6 @@ class ChannelsBaker
      * @param string $sysName The name of the system.
      * @param string $sysPath The path to the system folder.
      *
-     * @since  4.0.0
      * @return array
      * @throws Exception Inconsistency found in system dependencies.
      */
@@ -710,7 +705,6 @@ class ChannelsBaker
      * @param string $className The name of the class.
      * @param string $filePath  The path to the file.
      *
-     * @since  4.0.0
      * @return array
      * @throws Exception Inconsistency found in system dependencies.
      */
@@ -784,7 +778,6 @@ class ChannelsBaker
      *
      * @param string $funcBody The string of function body.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _dependencyGetSystemNamesInFunc($funcBody)
@@ -841,7 +834,6 @@ class ChannelsBaker
      *
      * @param string $text The string of function body.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _dependencyGetOptionalSystems($text)
@@ -867,7 +859,6 @@ class ChannelsBaker
      * This is to generate new PHP code for each system, from each channel
      * XML file that has been generated.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException When the a system fails to install.
      */
@@ -902,7 +893,6 @@ class ChannelsBaker
      *
      * @param string $system System to test.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function systemInstalled($system)
@@ -937,7 +927,6 @@ class ChannelsBaker
      * This check is done by reading the [SystemName]Actions.inc file of systems
      * and comparing them to the baked xml files. Does not check baked PHP files.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getNonBakedPlugs($system=NULL)
@@ -997,7 +986,6 @@ class ChannelsBaker
      * All XML files for the system's present are regenerated, and all PHP
      * code is baked out.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function cleanBake()
@@ -1032,7 +1020,6 @@ class ChannelsBaker
      * Single plugs are able to be added (by interfaces or triggers etc) by
      * using the addPlug and addPlugXML methods.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function cleanDataBake()
@@ -1064,7 +1051,6 @@ class ChannelsBaker
      * This is treated differently to other baked out code files, as it is
      * created dynamically, rather than from an actions file.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _bakeMySourceCode()
@@ -1110,7 +1096,6 @@ class ChannelsBaker
      * @param boolean $fullPath Return Full Paths to the exceptions files, or
      *                          just their file names.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getChannelsExceptionsFiles($fullPath=TRUE)
@@ -1156,7 +1141,6 @@ class ChannelsBaker
      *
      * @param string $system The name of the system to bake.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException When there is a problem with the declaration of
      *                          the system.
@@ -1237,7 +1221,6 @@ class ChannelsBaker
      * @param array  $method      Array containing method information.
      * @param string $displayName The name this system is getting baked as.
      *
-     * @since  4.0.0
      * @return string
      * @throws ChannelException If the file for the event isn't found.
      */
@@ -1411,7 +1394,6 @@ class ChannelsBaker
      * @param boolean $addDefaultValues If TRUE any param with a "value" attribute
      *                                  will have a default value set for it.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _bakeActionParams(array $params, $addDefaultValues=TRUE)
@@ -1442,7 +1424,6 @@ class ChannelsBaker
      *
      * @param array $method Details about the channel being written.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _printParentMethodContents(array $method)
@@ -1480,7 +1461,6 @@ class ChannelsBaker
      * @param boolean $concreteOnly If TRUE, will only return actions defined
      *                              in this system, rather than parent actions.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException When there is no <actions> node present in the
      *                          actions file for a system.
@@ -1569,7 +1549,6 @@ class ChannelsBaker
      *
      * @param string $systemName The name of the system to get the inheritance for.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getSystemTypeData($systemName)
@@ -1632,7 +1611,6 @@ class ChannelsBaker
      *
      * @param string $system Name of the system.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getSystemImplementers($system)
@@ -1697,7 +1675,6 @@ class ChannelsBaker
      * @param ReflectionClass $ref ReflectionClass object of the current
      *                             Actions' class to get its parents.
      *
-     * @since  4.0.0
      * @return array
      * @throws Exception If a concrete system implements more than one interfaces.
      */
@@ -1730,7 +1707,6 @@ class ChannelsBaker
      * @param boolean         $returnName If TRUE, it return the name of the parent
      *                                    system in string.
      *
-     * @since  4.0.0
      * @return array
      * @throws Exception If a concrete system implements more than one interfaces.
      */
@@ -1775,7 +1751,6 @@ class ChannelsBaker
      * @param array $systems An array of systems to delete data files for.
      *                       Empty array for all systems(remove all XML Files).
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _removeBakedDataFiles(array $systems=array())
@@ -1846,7 +1821,6 @@ class ChannelsBaker
      *
      * @param string $systemName The name of the system to bake data for.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException When a plug within the system doesn't validate,
      *                          when the the system is not enabled or doesn't
@@ -1944,7 +1918,6 @@ class ChannelsBaker
      *
      * @param string $systemName The system to find plugs for.
      *
-     * @since  4.0.0
      * @return DomDocument
      */
     private static function _getStandbyFile($systemName)
@@ -1969,7 +1942,6 @@ class ChannelsBaker
      * @param string     $systemName The system to add the plug to.
      * @param DomElement $plug       The node of the plug to add.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _addToStandbyFile($systemName, DomElement $plug)
@@ -2009,7 +1981,6 @@ class ChannelsBaker
      *
      * @param string $systemName The system to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _systemEnabled($systemName)
@@ -2044,7 +2015,6 @@ class ChannelsBaker
      * @param string $xmlSource The raw XML definition of the plug.
      * @param string $system    The system that the plug is defined in.
      *
-     * @since  4.0.0
      * @return void
      * @throws ChannelException When a plug fails to validate.
      */
@@ -2144,7 +2114,6 @@ class ChannelsBaker
      * @param string  $xmlSource The source of the plug.
      * @param boolean $after     Does the plug act on the after event?.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException When the plug is trying to be inserted onto a
      *                          query channel but is not allowed.
@@ -2258,7 +2227,6 @@ class ChannelsBaker
      * plugs that exist on one of the MySource Channels, and have them added
      * successfully.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _initMySourceXml()
@@ -2286,7 +2254,6 @@ class ChannelsBaker
      *
      * @param array $systemList The systems to create files for.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _initActionsXml(array $systemList)
@@ -2318,7 +2285,6 @@ class ChannelsBaker
      *
      * @param string $event The name of the event to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _xmlFileExists($event)
@@ -2342,7 +2308,6 @@ class ChannelsBaker
      * @param string $event       The name of the event to create the file for.
      * @param string $channelType The type of channel (action|query).
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _createXmlFile($event, $channelType='method')
@@ -2364,7 +2329,6 @@ class ChannelsBaker
      *
      * @param string $system Name of the system to find the directory for.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _createSystemBakedDir($system)
@@ -2388,7 +2352,6 @@ class ChannelsBaker
      * @param string $blockerExists The source of the plug.
      * @param array  $method        Array containing method information.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _bakeAction(
@@ -2441,7 +2404,6 @@ class ChannelsBaker
     /**
      * Bakes out a warning for each baked out class.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _bakeCodeHeader()
@@ -2461,7 +2423,6 @@ class ChannelsBaker
      * @param ReflectionMethod $method The ReflectionMethod obj to retrieve
      *                                 the signature information.
      *
-     * @since  4.0.0
      * @return array
      * @throws ChannelException When one of the params has no name or its' name
      *                          is reserved within channels.
@@ -2510,7 +2471,6 @@ class ChannelsBaker
      *                         written to.
      * @param string $contents The content to write to the file.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _writeBakeFile($fileName, $contents)
@@ -2537,7 +2497,6 @@ class ChannelsBaker
      *
      * @param DomDocument $doc The object containing the XML structure.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception Data directory does not exist.
      */
@@ -2570,7 +2529,6 @@ class ChannelsBaker
     /**
      * Writes plugs.xml file to cache the list of all plugs in the system.
      *
-     * @since  4.0.0
      * @return void
      */
     private static function _writePlugsList()
@@ -2623,7 +2581,6 @@ class ChannelsBaker
      *
      * @param DomDocument $doc The object containing the XML structure.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _writeSystemXml(DomDocument $doc)
@@ -2645,7 +2602,6 @@ class ChannelsBaker
      *
      * @param string $systemName System name to validate.
      *
-     * @since  4.0.0
      * @return boolean
      */
     private static function _isValidSystemName($systemName)
@@ -2664,7 +2620,6 @@ class ChannelsBaker
      *
      * @param string $system Name of the system.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException When the file doesn't exist or there is no
      *                          'actions' node present in the actions file.
@@ -2701,7 +2656,6 @@ class ChannelsBaker
      * @param string $returnActionList Optionally if it is TRUE, then
      *                                 it returns the list of actions.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function actionMethodExists($actionStr, $returnActionList=FALSE)
@@ -2738,7 +2692,6 @@ class ChannelsBaker
     /**
      * Creates a new empty XML file for the sytems to be stored in.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function refreshSystemList()
@@ -2762,7 +2715,6 @@ class ChannelsBaker
      *
      * @param array $systems Systems to enable.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function enableSystems(array $systems)
@@ -2791,7 +2743,6 @@ class ChannelsBaker
      *
      * @param array $systems Systems to disable.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function disableSystems(array $systems)
@@ -2818,7 +2769,6 @@ class ChannelsBaker
      *
      * @param array $systems An array of systems remove from the system list.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removefromSystemsList(array $systems)
@@ -2848,7 +2798,6 @@ class ChannelsBaker
      *
      * @param DomElement $element Element to retrieve attributes for.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getElementAttributes(DomElement $element)
@@ -2873,7 +2822,6 @@ class ChannelsBaker
      * @param string $method The method the plug calls.
      * @param string $field  The field that initial gatherer uses.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function removePlug(
@@ -2900,7 +2848,6 @@ class ChannelsBaker
      * @param string $system System to remove plugs for.
      * @param string $method Method to remove plugs for.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function removeSystemPlugs($system, $method=NULL)
@@ -2954,7 +2901,6 @@ class ChannelsBaker
      * @param string  $field  The field that initial gatherer use.
      * @param boolean $remove Should this plug be removed if found?.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function plugExists(
@@ -3031,7 +2977,6 @@ class ChannelsBaker
      *
      * @param string $systemName Name of the system to check.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function systemExists($systemName)
@@ -3054,7 +2999,6 @@ class ChannelsBaker
     /**
      * Returns the list of MySource Channels.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getMySourceChannels()
@@ -3069,7 +3013,6 @@ class ChannelsBaker
      *
      * @param string $systemName System that this plug belongs to.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws ChannelException The given system is not valid.
      */
@@ -3099,7 +3042,6 @@ class ChannelsBaker
      *
      * @param string $systemName System name to validate.
      *
-     * @since  4.0.0
      * @return boolean
      * @throws Exception If inheritance inconsistency found.
      */
@@ -3189,7 +3131,6 @@ class ChannelsBaker
      *
      * @param string $event The event string.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getEventFilePath($event)
@@ -3206,7 +3147,6 @@ class ChannelsBaker
      *
      * @param string $event The event to create the file name for.
      *
-     * @since  4.0.0
      * @return string
      */
     private static function _getEventFileName($event)
@@ -3224,7 +3164,6 @@ class ChannelsBaker
      *
      * @param string $event The event string.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getEventSystem($event)
@@ -3242,7 +3181,6 @@ class ChannelsBaker
      *
      * @param string $event The event string.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getEventAction($event)
@@ -3263,7 +3201,6 @@ class ChannelsBaker
      * @param string $event        The event string.
      * @param string $returnSystem If FALSE it returns the action name instead.
      *
-     * @since  4.0.0
      * @return string
      * @throws ChannelException When the event string is empty.
      */
@@ -3303,7 +3240,6 @@ class ChannelsBaker
      * @param boolean $namesOnly If true, only the event names will be returned.
      *                           Else full file paths.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getEventList($namesOnly=FALSE)
@@ -3335,7 +3271,6 @@ class ChannelsBaker
      * @param boolean $namesOnly If true, only the event names will be returned.
      *                           Else full file paths.
      *
-     * @since  4.0.0
      * @return array
      */
     private static function _getEventFiles($path, $namesOnly=FALSE)
@@ -3368,7 +3303,6 @@ class ChannelsBaker
      * @param string  $string String to add indentation in front.
      * @param integer $spaces Number of spaces to add.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function indent($string, $spaces=4)

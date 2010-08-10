@@ -2,12 +2,24 @@
 /**
  * ChannelsDebugger class.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage Channels
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Channels/Channels.inc';
@@ -15,7 +27,6 @@ require_once 'Channels/Channels.inc';
 /**
  * ChannelsDebugger.
  *
- * @since 4.0.0
  */
 class ChannelsDebugger
 {
@@ -27,7 +38,6 @@ class ChannelsDebugger
      * @param string $eventCall The call that this action was called with.
      * @param array  $method    The details of the method.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintStartActionCode($eventCall, array $method)
@@ -59,7 +69,6 @@ class ChannelsDebugger
     /**
      * Print the code to signify that an action has finished in execution.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintEndActionCode()
@@ -85,7 +94,6 @@ class ChannelsDebugger
      *
      * @param string $methodName The name if the channel being called.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintStartChannelCode($methodName)
@@ -123,7 +131,6 @@ class ChannelsDebugger
      * @param string $system      The system that the channel belongs to.
      * @param string $channelName The name of the channel that is being closed.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintEndChannelCode($system, $channelName)
@@ -151,7 +158,6 @@ class ChannelsDebugger
      * @param string     $plugSystem The system that the plug belongs to.
      * @param DomElement $xmlNode    The node that represents the plug's XML.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintStartPlugCode($plugSystem, DomElement $xmlNode)
@@ -195,7 +201,6 @@ class ChannelsDebugger
      * @param string $paramName The name of the parameter that should be stored
      *                          as the return value of the plug.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugAddPlugReturnValue($paramName)
@@ -218,7 +223,6 @@ class ChannelsDebugger
     /**
      * Prints the code to end a plug in the current execution.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintEndPlugCode()
@@ -241,7 +245,6 @@ class ChannelsDebugger
     /**
      * Print the code to start a query in debug execution.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintStartQueryCode()
@@ -264,7 +267,6 @@ class ChannelsDebugger
     /**
      * Print the code to close a query in debug execution.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function debugPrintEndQueryCode()
