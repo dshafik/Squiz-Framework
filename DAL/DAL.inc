@@ -21,13 +21,6 @@
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
- * @version    4.0.0
- * @package    MySource4
- * @subpackage DAL
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
- */
 
 require_once dirname(dirname(__FILE__)).'/Channels/Channels.inc';
 require_once dirname(__FILE__).'/Exceptions/DALException.inc';
