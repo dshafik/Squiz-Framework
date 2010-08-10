@@ -137,7 +137,8 @@ class APIActions
         Channels::includeSystem('User');
         Channels::includeSystem('Session');
         $userid = User::getCurrentUserid();
-        if ($userid !== NULL) {
+
+        if ($userid !== NULL && $userid !== 0) {
             include_once 'Libs/Security/Security.inc';
             $apiToken = Security::getRequestData('_api_token', NULL, TRUE);
             if ($apiToken === NULL) {
@@ -455,7 +456,7 @@ class APIActions
                 && $encrypted !== NULL
                 && array_key_exists($param['name'], $encrypted) === TRUE
             ) {
-                $value = $encrypted[$param['name']];
+                $value = json_decode($encrypted[$param['name']], TRUE);
             }
 
             if ($value === NULL && $param['optional'] === FALSE) {
