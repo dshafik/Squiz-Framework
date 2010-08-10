@@ -124,6 +124,12 @@ class SquizSuiteActions
     {
         $query  = DAL::getDALQuery('SquizSuite', 'getProductsByType');
         $result = DAL::getAssoc($query);
+
+        foreach ($result as &$product) {
+            $product['connection'] = unserialize($product['connection']);
+            self::$_productCache[$product['systemid']] = $product;
+        }
+
         return $result;
 
     }//end getProductsByType()
