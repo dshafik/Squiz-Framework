@@ -1087,6 +1087,7 @@ class Install
             // JSMin is the 3rd party library file and the way we include is
             // different from MySource standards.
             $wdgtJsContent = JSMin::minify($wdgtJsContent);
+            $dfxJsContent  = JSMin::minify($dfxJsContent);
             // @codingStandardsIgnoreEnd
         }
 
