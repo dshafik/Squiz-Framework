@@ -223,6 +223,28 @@ class XML
 
 
     /**
+     * Returns the index of the specified node.
+     *
+     * @oaram DOMNode A valid XML_ELEMENT_NODE.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function getIndex(DOMNode $node)
+    {
+        $count = 0;
+        while ($node = $node->previousSibling) {
+            if ($node->nodeType === XML_ELEMENT_NODE) {
+                $count++;
+            }
+        }
+
+        return $count;
+
+    }//end getIndex()
+
+
+    /**
      * Returns the number of child nodes for specified node.
      *
      * @param DomNode $node Dom node.
@@ -241,6 +263,30 @@ class XML
         return $count;
 
     }//end childCount()
+
+
+    /**
+     * Returns TRUE node has any of the specified tags as a parent.
+     *
+     * @param DOMNode $node     The Node to check.
+     * @param array   $tagNames The name of the tags to test.
+     *
+     * @since  4.0.0
+     * @return boolean
+     */
+    public static function hasParentTag(DOMNode $node, array $tagNames)
+    {
+        if (empty($node->parentNode) === FALSE) {
+            if (in_array($node->parentNode->tagName, $tagNames) === TRUE) {
+                return TRUE;
+            } else {
+                return self::hasParentTag($node->parentNode, $tagNames);
+            }
+        }
+
+        return FALSE;
+
+    }//end hasParentTag()
 
 
     /**
