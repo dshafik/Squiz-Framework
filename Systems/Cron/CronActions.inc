@@ -934,17 +934,18 @@ class CronActions
     /**
      * Returns the list of cron jobs for the Cron Screen table.
      *
-     * @param array $settings Settings for the widget.
+     * @param string $widgetid Id of the widget thats painting the jobs list.
      *
      * @return array
      */
-    public static function getCronScreenJobsList(array $settings)
+    public static function getCronScreenJobsList($widgetid)
     {
         $jobs        = array();
         $cronScripts = Cron::getCronJobs();
 
         foreach ($cronScripts as $cronScript) {
-            $jobs[$cronScript['name']] = self::_getCronScreenJobInfo($cronScript, $settings);
+            $rowid        = $cronScript['system'].'_'.$cronScript['script'];
+            $jobs[$rowid] = self::_getCronScreenJobInfo($cronScript, $widgetid);
         }
 
         return $jobs;
@@ -955,15 +956,15 @@ class CronActions
     /**
      * Returns a single row content for the Cron Screen jobs table.
      *
-     * @param array $script   Cron Job script info.
-     * @param array $settings Settings for the widget.
+     * @param array  $script   Cron Job script info.
+     * @param string $widgetid Id of the widget thats painting the jobs list.
      *
      * @return string
      */
-    private static function _getCronScreenJobInfo(array $script, array $settings)
+    private static function _getCronScreenJobInfo(array $script, $widgetid)
     {
         $info = array();
-        $id   = $settings['id'].'-'.$script['name'];
+        $id   = $widgetid.'-'.$script['system'].'_'.$script['script'];
 
         $jobDesc  = '<strong>'.$script['name'].'</strong><br />';
         $jobDesc .= '<em>'.$script['description'].'</h4>';
@@ -972,7 +973,7 @@ class CronActions
 
         $runTime = '--';
 
-        $script['last_run'] = strtotime(time());
+        $script['last_run'] = time();
 
         if ($script['last_run'] !== NULL) {
             include_once 'Libs/String/String.inc';
@@ -993,7 +994,10 @@ class CronActions
         CHannels::includeSystem('GUI');
 
         $settings          = array(
-                              'items' => array('options' => $intervalOpts),
+                              'items' => array(
+                                          'selected' => $script['interval'],
+                                          'options'  => $intervalOpts
+                                         ),
                              );
         $templateCode      = GUI::createWidget($id.'-frequency', 'GUISelect', $settings);
         $info['frequency'] = $templateCode;
@@ -1007,6 +1011,231 @@ class CronActions
         return $info;
 
     }//end _getCronScreenJobInfo()
+
+
+    public static function getCronInterval($cronType)
+    {
+
+        return '5';
+
+    }//end getCronInterval()
+
+
+    public static function getLastRunTime($cronType)
+    {
+
+        return '511';
+
+    }//end getLastRunTime()
+
+
+    public static function getCronSettingsSubTitle()
+    {
+        include_once 'Libs/String/String.inc';
+        $str = _('Current time: ').String::easyDatetime(time());
+
+        return $str;
+
+    }//end getCronSettingsSubTitle()
+
+
+    /**
+     * Returns the cron setting item.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getCronSettingsFrequentSection()
+    {
+        $id      = 'frequentRunInterval';
+        $items   = array();
+        $content = _('Runs every');
+
+        $typeData = DAL::getAssoc(Cron::getCronType('frequent'), 2);
+        $interval = Cron::getCronTypeInterval($typeData['condition']);
+
+        Channels::includeSystem('GUI');
+        $settings     = array(
+                         'default' => ($interval / 60),
+                         'inline'  => TRUE,
+                         'width'   => 2,
+                        );
+        $templateCode = GUI::createWidget($id, 'GUITextBox', $settings);
+
+        $content .= ' '.$templateCode;
+        $content .= ' '._('minute(s)');
+
+        $items[] = $content;
+
+        // Last Run.
+        $items[] = _('Last run ').String::easyDatetime(time());
+
+        return $items;
+
+    }//end getCronSettingsFrequentSection()
+
+
+    /**
+     * Returns the cron setting item.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getCronSettingsHourlySection()
+    {
+        $id      = 'hourlyRunInterval';
+        $items   = array();
+        $content = _('Runs at');
+
+        $typeData = DAL::getAssoc(Cron::getCronType('hourly'), 2);
+        $interval = explode(' ', $typeData['condition']);
+        $interval = $interval[0];
+
+        Channels::includeSystem('GUI');
+        $settings     = array(
+                         'default' => $interval,
+                         'inline'  => TRUE,
+                         'width'   => 2,
+                        );
+        $templateCode = GUI::createWidget($id, 'GUITextBox', $settings);
+
+        $content .= ' '.$templateCode;
+        $content .= ' '._('minutes past the hour');
+
+        $items[] = $content;
+
+        // Last Run.
+        $items[] = _('Last run ').String::easyDatetime(time());
+
+        return $items;
+
+    }//end getCronSettingsHourlySection()
+
+
+    /**
+     * Returns the cron setting item.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    public static function getCronSettingsDailySection()
+    {
+        $id      = 'dailyRunInterval';
+        $items   = array();
+        $content = _('Runs every');
+
+        $typeData = DAL::getAssoc(Cron::getCronType('daily'), 2);
+        $interval = explode(' ', $typeData['condition']);
+
+        Channels::includeSystem('GUI');
+        $settings     = array(
+                         'default' => $interval[1],
+                         'inline'  => TRUE,
+                         'width'   => 2,
+                        );
+        $templateCode = GUI::createWidget($id.'-hour', 'GUITextBox', $settings);
+
+        $content .= ' '.$templateCode;
+        $content .= ' : ';
+
+        $settings     = array(
+                         'default' => $interval[0],
+                         'inline'  => TRUE,
+                         'width'   => 2,
+                        );
+        $templateCode = GUI::createWidget($id.'-min', 'GUITextBox', $settings);
+        $content     .= $templateCode;
+
+        $items[] = $content;
+
+        // Last Run.
+        $items[] = _('Last run ').String::easyDatetime(time());
+
+        return $items;
+
+    }//end getCronSettingsDailySection()
+
+
+    /**
+     * Save the CronScreen settings.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function saveCronScreen(array $data)
+    {
+        $errors = array();
+
+        try {
+            DAL::beginTransaction();
+            // Save Cron Job changes.
+            $jobList = Util::getArrayIndex($data, 'cronJobsList', array());
+            foreach ($jobList as $systemScript => $info) {
+                list($system, $scriptName) = explode('_', $systemScript);
+
+                Channels::addToBasket('interval', $info['frequency'], TRUE);
+                Channels::addToBasket('enabled', $info['enabled'], TRUE);
+                Channels::addToBasket('system', $system, TRUE);
+                Channels::addToBasket('scriptName', $scriptName, TRUE);
+                DAL::executeQuery('Cron', 'updateCronIntervalAndStatus');
+            }
+
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollBack();
+            $errors[] = $e->getMessage();
+        }
+
+        // Update frequent interval.
+        $cronSettings = Util::getArrayIndex($data, 'cronSettings', array());
+        if (isset($cronSettings['frequentRunInterval']) === TRUE) {
+            $intervalStr = '*/'.$cronSettings['frequentRunInterval'].' *';
+            self::_updateFrequencyInterval('frequent', $intervalStr);
+        }
+
+        if (isset($cronSettings['hourlyRunInterval']) === TRUE) {
+            $intervalStr = $cronSettings['hourlyRunInterval'].' *';
+            self::_updateFrequencyInterval('hourly', $intervalStr);
+        }
+
+        if (isset($cronSettings['dailyRunInterval-hour']) === TRUE
+            && isset($cronSettings['dailyRunInterval-min']) === TRUE
+        ) {
+            $intervalStr = $cronSettings['dailyRunInterval-min'].' '.$cronSettings['dailyRunInterval-hour'];
+            self::_updateFrequencyInterval('daily', $intervalStr);
+        }
+
+        $retVal = TRUE;
+        if (empty($errors) === FALSE) {
+            $retVal = array('errors' => $errors);
+        }
+
+        return $retVal;
+
+    }//end saveCronScreen()
+
+
+    private static function _updateFrequencyInterval($typeid, $intervalStr)
+    {
+        Channels::createEventBasket();
+        try {
+            DAL::beginTransaction();
+            Channels::addToBasket('typeid', $typeid);
+            Channels::addToBasket('condition', $intervalStr);
+            DAL::executeQuery('Cron', 'updateFrequencyInterval');
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollBack();
+            Channels::removeEventBasket();
+            return $e->getMessage();
+        }
+
+        Channels::removeEventBasket();
+        return TRUE;
+
+    }
 
 
 }//end class

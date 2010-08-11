@@ -88,6 +88,42 @@
       </update>
     </primary>
   </query>
+
+  <query id="updateCronIntervalAndStatus">
+    <primary>
+      <update>
+        <fields table="cron">
+          <field>interval</field>
+          <field>enabled</field>
+        </fields>
+        <values>
+          <value column="interval">:interval</value>
+          <value column="enabled">:enabled</value>
+        </values>
+        <where>
+          <equal table="cron" column="system">:system</equal>
+          <equal table="cron" column="script">:scriptName</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+
+  <query id="updateFrequencyInterval">
+    <primary>
+      <update>
+        <fields table="cron_types">
+          <field>condition</field>
+        </fields>
+        <values>
+          <value column="condition">:condition</value>
+        </values>
+        <where>
+          <equal table="cron_types" column="typeid">:typeid</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+
   <query id="addCronType">
     <primary>
       <insert>
