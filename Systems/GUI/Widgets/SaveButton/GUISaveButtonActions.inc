@@ -33,35 +33,24 @@ class GUISaveButtonActions
 
 
     /**
-     * Returns this widgets content.
+     * Prints this widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
-        $content  = '<div id="%id%" class="%class%">';
+        $id        = $settings['widget']['id'];
+        $className = $settings['widget']['type'];
+
+        $content  = '<div id="'.$id.'" class="'.$className.'">';
         $content .= '<input type="button" value="'._('Save').'" />';
         $content .= '</div>';
 
-        return $content;
+        echo $content;
 
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
 }//end class

@@ -26,23 +26,22 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Button Actions Class.
- *
  */
 class GUIButtonActions
 {
 
 
     /**
-     * Returns this widgets content.
+     * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
-        $value = $settings['value'];
-        $color = $settings['color'];
+        $value = Util::getArrayIndex($settings, 'value', '');
+        $color = Util::getArrayIndex($settings, 'color');
 
         if (empty($color) === TRUE) {
             $color = 'Default';
@@ -69,27 +68,11 @@ class GUIButtonActions
             }
         }
 
-        $content  = '<button class="%class% button'.$color.'" type="button"'.$onClick.'>';
-        $content .= '<span>'.$value.'</span>';
-        $content .= '</button>';
+        echo '<button class="'.$settings['widget']['type'].' button'.$color.'" type="button"'.$onClick.'>';
+        echo '<span>'.$value.'</span>';
+        echo '</button>';
 
-        return $content;
-
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
 }//end class

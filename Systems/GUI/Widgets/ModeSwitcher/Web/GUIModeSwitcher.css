@@ -77,3 +77,11 @@
     border-top-right-radius: 14px;
     border-bottom-right-radius: 14px;
 }
+
+.GUIModeSwitcher-itemContent {
+    display: none;
+}
+
+.GUIModeSwitcher-itemContent.visible {
+    display: block;
+}

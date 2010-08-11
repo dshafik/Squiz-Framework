@@ -2,12 +2,24 @@
 /**
  * Actions for the GUI System.
  *
- * @version    4.0.0
- * @package    MySource4
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
  * @subpackage GUI
- * @author     Squiz Pty Ltd <mysource4@squiz.net>
- * @copyright  2006-2007 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license    http://matrix.squiz.net/licence Squiz.Net Open Source Licence
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
 require_once 'Systems/BaseSystem.inc';
@@ -23,94 +35,60 @@ class GUIActions
     /**
      * The docType to use for DOMDocument.
      *
-     * @var   string
-     * @since 4.0.0
+     * @var string
      */
     private static $_docType = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
 
     /**
-     * The widget settings required by a template, organised by template key.
-     *
-     * @var   array
-     * @since 4.0.0
-     */
-    private static $_requiredWidgets = array();
-
-    /**
-     * Array of what templates require which other templates (notably, widgets).
-     *
-     * @var   array
-     * @since 4.0.0
-     */
-    private static $_dependants = array();
-
-    /**
      * The JS files to include.
      *
-     * @var   array
-     * @since 4.0.0
+     * @var array
      */
     private static $_jsIncludes = array();
 
     /**
      * The CSS files to include.
      *
-     * @var   array
-     * @since 4.0.0
+     * @var array
      */
     private static $_cssIncludes = array();
 
     /**
      * The name of the publicly accessible directory for systems.
      *
-     * @var   string
-     * @since 4.0.0
+     * @var string
      */
     private static $_publicDirName = 'Web';
-
-    /**
-     * List if systems and their settings that needs to do post bake processing.
-     *
-     * @var   array
-     * @since 4.0.0
-     */
-    private static $_postBakeProcessors = array();
-
-    /**
-     * List of widgets to initialise in main template.
-     *
-     * @var   array
-     * @since 4.0.0
-     */
-    private static $_tmpWidgetList = array();
-
-    /**
-     * List of widget settings for a template.
-     *
-     * @var   array
-     * @since 4.0.0
-     */
-    private static $_tmpWidgetSettings = array();
-
-    /**
-     * Template stack.
-     *
-     * Only populated during getTemplateContent() calls.
-     *
-     * @var   array
-     * @since 4.0.0
-     */
-    private static $_templateStack = array();
 
     /**
      * Variable to keep track of baking process.
      *
      * If TRUE then templates are being baked.
      *
-     * @var   boolean
-     * @since 4.0.0
+     * @var boolean
      */
     private static $_isBaking = FALSE;
+
+    /**
+     * Current template key used during template baking.
+     *
+     * @var string
+     */
+    private static $_currentTemplateKey = '';
+
+    /**
+     * Template variable counter used during template baking.
+     *
+     * @var integer
+     */
+    private static $_templateVarCounter = 0;
+
+    /**
+     * Templates initialisation PHP code.
+     *
+     * @var string
+     */
+    private static $_templateInitCode = '';
 
 
     /**
@@ -126,25 +104,6 @@ class GUIActions
     {
         $dataPath = BaseSystem::getDataDir($systemName);
         $dest     = $dataPath.'/Templates/'.$template.'.php';
-
-        if (file_exists($dest) === FALSE) {
-            // It might not have been baked yet, try it now..
-            $tplFilePath = Channels::getSystemsPath($systemName).'/Templates/'.$template;
-            if (file_exists($tplFilePath) === TRUE) {
-                ob_start();
-                    $tplDoc = GUI::getTemplateContent($systemName, array(), $tplFilePath);
-                    if ($tplDoc !== NULL) {
-                        GUI::bakeTemplate($systemName, $template, $tplDoc);
-                    }
-
-                ob_end_clean();
-            } else {
-                echo '<div>ERROR: Template ('.$template.') file not found. ('.$dest.')</div>';
-                return;
-            }
-        }//end if
-
-        $deps = GUI::getTemplateDependentFiles($systemName, $template);
 
         // Start template output.
         if (self::$_isBaking === TRUE) {
@@ -226,12 +185,11 @@ class GUIActions
                 // Get the system name for the template.
                 if ($systemName === NULL) {
                     $systemName = GUI::getSystemNameFromTemplate($file);
-                    Channels::includeSystem($systemName);
                 }
 
-                $tplDoc = GUI::getTemplateContent($systemName, array(), $file);
+                $tplDoc = GUI::loadTemplate($file);
                 if ($tplDoc !== NULL) {
-                    GUI::bakeTemplate($systemName, basename($file), $tplDoc);
+                    GUI::bakeTemplate($systemName, str_replace('.tpl', '', basename($file)), $tplDoc);
                 }
             }
         }//end foreach
@@ -239,6 +197,676 @@ class GUIActions
         self::$_isBaking = FALSE;
 
     }//end bakeTemplates()
+
+
+    /**
+     * Bakes out the template's PHP file.
+     *
+     * @param string  $systemName   Name of the system that owns the template.
+     * @param string  $templateName Name of the template.
+     * @param DOMNode $tplDoc       The HTML of the template as DOM object.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function bakeTemplate($systemName, $templateName, DOMNode $tplDoc)
+    {
+        $tplKey = $systemName.'::'.$templateName;
+
+        // TODO: We may need to use a stack for this.
+        self::$_currentTemplateKey = $tplKey;
+        self::$_templateVarCounter = 0;
+
+        $php  = '// Initialise template var.'."\n";
+        $php .= 'if (isset($templateVars) === FALSE) $templateVars = array();'."\n";
+        $php .= self::_getVarCode().' = array();'."\n";
+
+        self::$_templateInitCode = $php;
+
+        GUI::parseTemplate($tplDoc);
+
+        $phpNode = $tplDoc->createProcessingInstruction('php', self::$_templateInitCode);
+        $tplDoc->insertBefore($phpNode, $tplDoc->firstChild);
+
+        // Now add the dependent files to the HEAD tag, if it exists.
+        $head = $tplDoc->getElementsByTagName('head');
+        if ($head->length !== 0) {
+            $head = $head->item(0);
+
+            foreach (self::$_jsIncludes as $jsInclude) {
+                GUI::addJS(NULL, $jsInclude, $head);
+            }
+
+            foreach (self::$_cssIncludes as $cssInclude) {
+                GUI::addCSS(NULL, $cssInclude, $head);
+            }
+        }
+
+        include_once 'Libs/XML/XML.inc';
+        $htmlCont = XML::xmlToXHTML($tplDoc->saveXML());
+
+        // If <head> element exists, insert API token hidden input field
+        // for the interface to work.
+        if ($head->length !== 0) {
+            $replacement  = '<?php '."\n";
+            $replacement .= 'Channels::includeSystem(\'User\');'."\n";
+            $replacement .= 'Channels::includeSystem(\'API\');'."\n";
+            $replacement .= '$currUserid = User::getCurrentUserid();'."\n";
+            $replacement .= 'if ($currUserid !== NULL) {'."\n";
+            $replacement .= '   Channels::includeSystem(\'Session\');'."\n";
+            $replacement .= '   $currToken = Session::getSessionData(\'API\', \'userToken:\'.$currUserid);'."\n";
+            $replacement .= '   if ($currToken === NULL) {'."\n";
+            $replacement .= '       $currToken = API::getUniqueToken();'."\n";
+            $replacement .= '       Session::setSessionData(\'API\', \'userToken:\'.$currUserid, $currToken);'."\n";
+            $replacement .= '   }'."\n";
+            $replacement .= '   echo \'<input id="__api_token" type="hidden" value="\'.$currToken.\'" />\';'."\n";
+            $replacement .= '}'."\n";
+            $replacement .= '?'.'>'."\n";
+            $replacement .= '</body>'."\n";
+
+            $htmlCont = str_replace('</body>', $replacement, $htmlCont);
+        }//end if
+
+        // Do some cleanup.
+        $htmlCont = str_replace(self::$_docType, '', $htmlCont);
+        $htmlCont = trim(str_replace('<?xml version="1.0"?>', '', $htmlCont));
+
+        $htmlCont = str_replace('&lt;?php', '<'.'?php', $htmlCont);
+        $htmlCont = str_replace('?&gt;', '?'.'>', $htmlCont);
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
+        if (file_exists($syDataPath) === FALSE) {
+            FileSystem::mkdir($syDataPath, 0755, TRUE);
+        }
+
+        // Write to data file.
+        $dest = $syDataPath.'/'.$templateName.'.tpl.php';
+        file_put_contents($dest, $htmlCont);
+
+    }//end bakeTemplate()
+
+
+    /**
+     * Parses the specified template, converting the special tags to HTML/PHP.
+     *
+     * @param DOMNode $tplDoc The Template DOMDocument.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function parseTemplate(DOMNode $tplDoc)
+    {
+        include_once 'Libs/XML/XML.inc';
+        $tagNames = array(
+                     'widget',
+                     'text',
+                     'dataProvider',
+                    );
+
+        foreach ($tagNames as $tagName) {
+            $tags     = $tplDoc->getElementsByTagName($tagName);
+            $topLevel = array();
+            foreach ($tags as $tag) {
+                if (XML::hasParentTag($tag, $tagNames) === FALSE) {
+                    $topLevel[] = $tag;
+                }
+            }
+
+            foreach ($topLevel as $tag) {
+                call_user_func(array('self', '_parse'.ucfirst($tagName).'Tag'), $tag);
+            }
+        }
+
+    }//end parseTemplate()
+
+
+    /**
+     * Converts widget tags to HTML/PHP.
+     *
+     * @param DOMNode $parent The parent tag.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _convertWidgetTags(DOMNode $parent)
+    {
+        $php .= self::_getVarCode('widget').' = array();'."\n";
+
+        while (TRUE) {
+            $widgets = $parent->getElementsByTagName('widget');
+            if ($widgets->length === 0) {
+                break;
+            }
+
+            $php .= self::_parseWidgetTag($widgets->item(0));
+        }
+
+        return $php;
+
+    }//end _convertWidgetTags()
+
+
+    /**
+     * Returns the PHP variable string for the current template and widget.
+     *
+     * @param string $type Type of the variable (e.g. widget).
+     * @param string $id   If of the variable (e.g. a valid widgetid).
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _getVarCode($type=NULL, $id=NULL)
+    {
+        $php = '$templateVars["'.self::$_currentTemplateKey.'"]';
+
+        if ($type !== NULL) {
+            $php .= '["'.$type.'"]';
+        }
+
+        if ($id !== NULL) {
+            $php .= '["'.$id.'"]';
+        }
+
+        return $php;
+
+    }//end _getVarCode()
+
+
+    /**
+     * Returns the next variable name for the current template.
+     *
+     * Used during template baking to create valid variable names.
+     *
+     * @param string $prefix The prefix to use for the variable name.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _getNextVarName($prefix='var')
+    {
+        self::$_templateVarCounter++;
+        $key  = str_replace('::', '', self::$_currentTemplateKey);
+        $name = $prefix.'_'.$key.'_'.self::$_templateVarCounter;
+        return $name;
+
+    }//end _getNextVarName()
+
+
+    /**
+     * Returns the PHP script of the given widget tag.
+     *
+     * @param DOMNode $widget   The tag to convert.
+     * @param string  $assignTo The variable to assign to. This must be a valid PHP
+     *                          variable name (e.g. $example['value']). if NULL
+     *                          then value will be printed.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseWidgetTag(DOMNode $widget, $assignTo=NULL)
+    {
+        $widgetid         = $widget->getAttribute('id');
+        $widgetType       = $widget->getAttribute('type');
+        $widgetSystemName = GUI::getSystemNameFromWidgetType($widgetType);
+        $php              = '';
+
+        $settingsVar  = self::_getVarCode('widget', $widgetid).'["settings"]';
+        $settingsCode = self::_getWidgetSettings($widget);
+
+        if ($assignTo === NULL) {
+            self::$_templateInitCode .= $settingsCode;
+        } else {
+            $php .= $settingsCode;
+        }
+
+        // Include widget system.
+        $php .= 'Channels::includeSystem("'.$widgetSystemName.'");'."\n";
+
+        if ($assignTo !== NULL) {
+            // Need to assign the printed content to given variable so
+            // use output buffering.
+            $php .= "ob_start();\n";
+        }
+
+        // Add the widget paint() call.
+        $php .= $widgetSystemName.'::paint('.$settingsVar.');'."\n";
+
+        // If this widget has a JS file then add it its JS init code.
+        // Note that there is no need to include the JS file here since it should
+        // have been included at the beginning.
+        $jsFilePath  = Channels::getSystemsPath($widgetSystemName).'/Web/';
+        $jsFilePath .= $widgetSystemName.'.js';
+        if (file_exists($jsFilePath) === TRUE) {
+            $php .= "echo '<script>'.GUI::getJSInitCode('".$widgetSystemName."', '".$widgetid."', ".$settingsVar.").'</script>';\n";
+        }
+
+        if ($assignTo !== NULL) {
+            // End output buffering.
+            $php .= $assignTo." = ob_get_clean();\n";
+        } else {
+            // Top level widget. Need to replace the widget tag with the PHP code.
+            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
+            $node    = $widget->ownerDocument->importNode($tmpNode, TRUE);
+            $widget->parentNode->insertBefore($node, $widget);
+            $widget->parentNode->removeChild($widget);
+        }//end if
+
+        return $php;
+
+    }//end _parseWidgetTag()
+
+
+    /**
+     * Returns the PHP script of settings code of the given widget tag.
+     *
+     * @param DOMNode $widget The widget tag to convert.
+     *
+     * @since  4.0.0
+     * @return string
+     * @throws ChannelException If a reserved tag name is used in the widget.
+     */
+    private static function _getWidgetSettings(DOMNode $widget)
+    {
+        $settings = array();
+        $widgetid = $widget->getAttribute('id');
+        $type     = $widget->getAttribute('type');
+
+        $widgetSystem = GUI::getSystemNameFromWidgetType($type);
+        list($templateSystem, $templateName) = explode('::', self::$_currentTemplateKey);
+
+        $php  = self::_getVarCode('widget', $widgetid).'["settings"] = ';
+        $php .= 'array(
+                    "widget" => array(
+                                 "id"   => "'.$widgetid.'",
+                                 "type" => "'.$widgetSystem.'",
+                                ),
+                    "template" => array(
+                                   "system" => "'.$templateSystem.'",
+                                   "name"   => "'.$templateName.'",
+                                  ),
+                 );'."\n";
+
+        // These setting names are reserved and cannot be used by templates.
+        $reservedNames = array(
+                          'widget',
+                          'template',
+                         );
+
+        // Widget tags contain setting tags.
+        foreach ($widget->childNodes as $node) {
+            if ($node->nodeType !== XML_ELEMENT_NODE || $node->tagName !== 'setting') {
+                continue;
+            }
+
+            $setting     = $node;
+            $settingName = $setting->getAttribute('name');
+
+            if (in_array($settingName, $reservedNames) === TRUE) {
+                $msg = sprintf(
+                    _('% is a reserved setting name. (Used by widget #%)'),
+                    $settingName,
+                    $widgetid
+                );
+                throw new ChannelException($msg);
+            }
+
+            $varName = self::_getVarCode('widget', $widgetid).'["settings"]["'.$settingName.'"]';
+            $php    .= self::_parseSettingTag($setting, $varName);
+        }
+
+        return $php;
+
+    }//end _getWidgetSettings()
+
+
+    /**
+     * Returns the PHP script of the setting tag.
+     *
+     * @param DOMNode $setting Tag to convert.
+     * @param string  $varName Name of the variable to assign to.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseSettingTag(DOMNode $setting, $varName)
+    {
+        $php = '';
+
+        include_once 'Libs/XML/XML.inc';
+        if (XML::hasChildElements($setting) === FALSE) {
+            $php .= $varName." = '".$setting->nodeValue."';\n";
+            return $php;
+        }
+
+        foreach ($setting->childNodes as $node) {
+            if ($node->nodeType === XML_TEXT_NODE) {
+                //$php .= $varName." = '".$node->nodeValue."';\n";
+                continue;
+            } else if ($node->nodeType === XML_ELEMENT_NODE) {
+                // There are a few special/reserved tags.
+                switch ($node->tagName) {
+                    case 'text':
+                        $php .= self::_parseTextTag($node, $varName);
+                    break;
+
+                    case 'widget':
+                        $php .= self::_parseWidgetTag($node, $varName);
+                    break;
+
+                    case 'dataProvider':
+                        $php .= self::_parseDataProviderTag($node, $varName);
+                    break;
+
+                    case 'widget-settings':
+                        $php .= self::_parseWidgetSettingsTag($node, $varName);
+                    break;
+
+                    default:
+                        if (XML::getIndex($node) === 0) {
+                            $php .= $varName.' = array();'."\n";
+                        }
+
+                        $php .= self::_parseTag($node, $varName);
+                    break;
+                }//end switch
+            }//end if
+        }//end foreach
+
+        return $php;
+
+    }//end _parseSettingTag()
+
+
+    /**
+     * Returns the PHP code for the widget-settings tag.
+     *
+     * @param DOMNode $node     The tag to convert.
+     * @param string  $assignTo The variable to assign to. This must be a valid PHP
+     *                          variable name (e.g. $example['value']). if NULL
+     *                          then value will be printed.
+     *
+     * @return string
+     */
+    private static function _parseWidgetSettingsTag(DOMNode $node, $assignTo)
+    {
+        $widgetid = $node->getAttribute('id');
+
+        $php  = $assignTo.' = ';
+        $php .= self::_getVarCode('widget', $widgetid).'["settings"];'."\n";
+
+        return $php;
+
+    }//end _parseWidgetSettingsTag()
+
+
+    /**
+     * Returns the PHP code of the given tag.
+     *
+     * @param DOMNode $node     The tag to convert.
+     * @param string  $assignTo The variable to assign to. This must be a valid PHP
+     *                          variable name (e.g. $example['value']). if NULL
+     *                          then value will be printed.
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseTag(DOMNode $node, $assignTo=NULL)
+    {
+        $php = '';
+        switch ($node->tagName) {
+            case 'text':
+                $php .= self::_parseTextTag($node, $assignTo);
+            break;
+
+            case 'widget':
+                $php .= self::_parseWidgetTag($node, $assignTo);
+            break;
+
+            case 'dataProvider':
+                $php .= self::_parseDataProviderTag($node, $assignTo);
+            break;
+
+            case 'widget-settings':
+                $php .= self::_parseWidgetSettingsTag($node, $assignTo);
+            break;
+
+            default:
+                include_once 'Libs/XML/XML.inc';
+                if ($node->tagName === 'content'
+                    && $node->parentNode->tagName === 'setting'
+                    && $node->parentNode->getAttribute('name') === 'content'
+                ) {
+                    $varName = $assignTo;
+                } else if ($node->tagName === 'value') {
+                    $varName = $assignTo.'['.XML::getIndex($node).']';
+                } else {
+                    $varName = $assignTo.'["'.$node->tagName.'"]';
+                }
+
+                $php .= $varName.' = ';
+
+                $counter = 0;
+                if (XML::hasChildElements($node) === TRUE) {
+                    $php .= 'array();'."\n";
+                    foreach ($node->childNodes as $childTag) {
+                        if ($childTag->nodeType !== XML_ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if ($node->tagName === 'content') {
+                            $php .= self::_parseTag($childTag, $varName.'['.($counter++).']');
+                        } else {
+                            $php .= self::_parseTag($childTag, $varName);
+                        }
+                    }
+
+                    if ($node->tagName === 'content') {
+                         $php .= $varName.' = implode("", '.$varName.');'."\n";
+                    }
+                } else {
+                    $php .= "'".$node->nodeValue."';\n";
+                }
+            break;
+        }//end switch
+
+        return $php;
+
+    }//end _parseTag()
+
+
+    /**
+     * Returns the PHP script of the given dataProvider tag.
+     *
+     * @param DOMNode $dp       The dataProvider tag to convert.
+     * @param string  $assignTo The variable to assign to. This must be a valid PHP
+     *                          variable name (e.g. $example['value']).
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseDataProviderTag(DOMNode $dp, $assignTo=NULL)
+    {
+        include_once 'Libs/XML/XML.inc';
+
+        $php = '';
+
+        // Data provider can have a widget or an action.
+        $action = $dp->getAttribute('action');
+        if (empty($action) === TRUE) {
+            // Must be a widget thats returning some data.
+            $firstChild = XML::getFirstChildElement($dp);
+            if ($firstChild !== NULL && $firstChild->tagName('widget') === TRUE) {
+                self::_parseWidgetTag($firstChild, $assignTo);
+            }
+        } else {
+            // Channel action.
+            // First initialise the argument vars for this data provider action call.
+            $argListCodes = self::_getArgumentListCodes($dp);
+
+            $php .= $argListCodes['init'];
+
+            // Include the system.
+            list($systemName, $methodName) = explode('::', $action);
+            $php .= 'Channels::includeSystem("'.$systemName.'");'."\n";
+
+            if ($assignTo !== NULL) {
+                $php .= $assignTo.' = ';
+            } else {
+                $php .= 'echo ';
+            }
+
+            $php .= $action.'('.$argListCodes['list'].');'."\n";
+        }//end if
+
+        if ($assignTo === NULL) {
+            // Top level.
+            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
+            $node    = $dp->ownerDocument->importNode($tmpNode, TRUE);
+            $dp->parentNode->insertBefore($node, $dp);
+            $dp->parentNode->removeChild($dp);
+        }
+
+        return $php;
+
+    }//end _parseDataProviderTag()
+
+
+    /**
+     * Returns the PHP code for argument initialisation and argument list.
+     *
+     * Example: array(
+     *           'init' => "$exampleArg = 123;\n$exampleArg2 = 'example'",
+     *           'list' => '$exampleArg, $exampleArg2',
+     *          ).
+     *
+     * @param DOMNode $parent The parent node with child "arg" tags.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    private static function _getArgumentListCodes(DOMNode $parent)
+    {
+        include_once 'Libs/XML/XML.inc';
+
+        $php     = '';
+        $argList = array();
+
+        foreach ($parent->childNodes as $argNode) {
+            if ($argNode->nodeType === XML_ELEMENT_NODE
+                && $argNode->tagName === 'arg'
+            ) {
+                $arg       = XML::getFirstChildElement($argNode);
+                $argName   = '$'.self::_getNextVarName('arg');
+                $argList[] = $argName;
+
+                if ($arg === NULL) {
+                    // Must be a text node.
+                    $php .= $argName." = '".$argNode->firstChild->nodeValue."';";
+                } else {
+                    $php .= self::_parseTag($arg, $argName);
+                }
+            }
+        }
+
+        $code = array(
+                 'init' => $php,
+                 'list' => implode(', ', $argList),
+                );
+
+        return $code;
+
+    }//end _getArgumentListCodes()
+
+
+    /**
+     * Returns the PHP script of the given text tag.
+     *
+     * @param DOMNode $text     The text node to convert.
+     * @param string  $assignTo The variable to assign to. This must be a valid PHP
+     *                          variable name (e.g. $example['value']).
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseTextTag(DOMNode $text, $assignTo=NULL)
+    {
+        $php     = "\n";
+        $tagInfo = self::_getTextTagInfo($text);
+        $args    = Util::getArrayIndex($tagInfo, 'argsCode', array());
+
+        if (empty($args) === TRUE) {
+            if ($assignTo !== NULL) {
+                $php .= $assignTo.' = ';
+            } else {
+                $php .= 'echo ';
+            }
+
+            $php .= '_("'.$tagInfo['value'].'");'."\n";
+        } else {
+            // Init code for the arguments.
+            $php .= $tagInfo['argsCode']['init'];
+
+            $printArgCode = '_("'.$tagInfo['value'].'"), '.$tagInfo['argsCode']['list'];
+
+            if ($assignTo !== NULL) {
+                $php .= $assignTo.' = sprintf('.$printArgCode.');'."\n";
+            } else {
+                $php .= 'printf('.$printArgCode.');'."\n";
+            }
+        }
+
+        if ($assignTo === NULL) {
+            // Top level text. Need to replace the text tag with the PHP code.
+            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
+            $node    = $text->ownerDocument->importNode($tmpNode, TRUE);
+            $text->parentNode->insertBefore($node, $text);
+            $text->parentNode->removeChild($text);
+        }
+
+        return $php;
+
+    }//end _parseTextTag()
+
+
+    /**
+     * Returns information about the text tag.
+     *
+     * @param DOMNode $text The text node to parse.
+     *
+     * @since  4.0.0
+     * @return array
+     */
+    private static function _getTextTagInfo(DOMNode $text)
+    {
+        $tagInfo = array(
+                    'value'    => '',
+                    'argsCode' => array(),
+                   );
+
+        foreach ($text->childNodes as $node) {
+            if ($node->nodeType === XML_TEXT_NODE) {
+                $tagInfo['value'] .= addslashes($node->nodeValue);
+            } else if ($node->nodeType === XML_ELEMENT_NODE) {
+                if ($node->tagName === 'value') {
+                    $tagInfo['value'] = addslashes($node->nodeValue);
+                } else if ($node->tagName === 'args') {
+                    $tagInfo['argsCode'] = self::_getArgumentListCodes($node);
+
+                    // Cannot have any more tags.
+                    break;
+                }
+            }
+        }
+
+        $tagInfo['value'] = trim($tagInfo['value']);
+
+        return $tagInfo;
+
+    }//end _getTextTagInfo()
 
 
     /**
@@ -303,110 +931,6 @@ class GUIActions
 
 
     /**
-     * Returns the template contents as DOMNode.
-     *
-     * @param string $systemName Name of the system.
-     * @param array  $settings   List of settings.
-     * @param string $tplFile    The template file to load.
-     *
-     * @since  4.0.0
-     * @return DOMNode
-     */
-    public static function getTemplateContent(
-        $systemName,
-        array $settings=array(),
-        $tplFile=NULL
-    ) {
-        Channels::includeSystem('GUI');
-
-        // Build required template key, something like 'systemName:templateName'.
-        // Default templateName's (tplFile === NULL) have the same name as the
-        // system name.
-        $templateKey = self::_getTemplateKey($systemName, $tplFile);
-
-        // Add the template to the stack.
-        array_unshift(self::$_templateStack, explode(':', $templateKey, 2));
-
-        // Get the template content from the system as a string.
-        if ($systemName === 'GUI') {
-            return NULL;
-        } else {
-            Channels::includeSystem($systemName);
-            $content = trim(call_user_func(array($systemName, 'getTemplateContent'), $settings, $tplFile));
-        }
-
-        if (empty($content) === TRUE) {
-            $content = '<div>(ERROR) Empty Template file in '.$systemName.': '.$tplFile.'</div>';
-        }
-
-        $content = self::_replaceKeywords($content, $systemName, $settings);
-
-        // Add it to dom object.
-        $doc = new DOMDocument('1.0');
-        $doc->loadXML($content);
-
-        // Find what widgets we have, and store them by widget type.
-        $includedWidgets = array();
-        $widgetNodes     = $doc->documentElement->getElementsByTagName('widget');
-
-        foreach ($widgetNodes as $widgetNode) {
-            $widgetId       = (string) $widgetNode->getAttribute('id');
-            $widgetName     = (string) $widgetNode->getAttribute('type');
-            $widgetName     = str_replace('/', '', $widgetName);
-            $widgetSettings = self::_getSettingsForWidget($widgetNode);
-
-            // Widgets always use the default template.
-            $widgetTemplateKey = self::_getTemplateKey($widgetName, NULL);
-
-            $thisWidget = array(
-                           'id'       => $widgetId,
-                           'type'     => $widgetName,
-                           'settings' => $widgetSettings,
-                          );
-
-            $includedWidgets[$widgetTemplateKey][] = $thisWidget;
-        }//end foreach
-
-        self::$_requiredWidgets[$templateKey] = $includedWidgets;
-
-        // Convert all widget tags.
-        GUI::convertWidgetTags($doc->documentElement);
-
-        // Work out which templates require which.
-        self::$_dependants[$templateKey] = array();
-
-        foreach ($includedWidgets as $widgetTemplateKey => $typeWidgets) {
-            foreach ($typeWidgets as $includedWidget) {
-                $widgetId = $includedWidget['id'];
-
-                self::$_dependants[$templateKey] = array_merge(
-                    self::$_dependants[$templateKey],
-                    Util::getArrayIndex(
-                        self::$_dependants,
-                        $widgetTemplateKey,
-                        array()
-                    ),
-                    array($widgetTemplateKey)
-                );
-            }//end foreach
-        }//end foreach
-
-        self::$_dependants[$templateKey] = array_unique(
-            self::$_dependants[$templateKey]
-        );
-
-        // Call prepareBake.
-        call_user_func(array($systemName, 'prepareBake'), $doc->documentElement, $settings);
-
-        // Remove the template from the stack.
-        array_shift(self::$_templateStack);
-
-        return $doc->documentElement;
-
-    }//end getTemplateContent()
-
-
-    /**
      * Creates a new widget and returns its contents as string.
      *
      * This method should be used to create widgets at run time (e.g. by data provider).
@@ -431,443 +955,12 @@ class GUIActions
             $templateCode = ob_get_contents();
         ob_end_clean();
 
-        $templateCode  = self::_replaceKeywords($templateCode, $type, $settings);
         $templateCode .= '<script>'.GUI::getJSInitCode($type, $id, $settings);
         $templateCode .= '</script>';
 
         return $templateCode;
 
     }//end createWidget()
-
-
-    /**
-     * Get the details of the template including the current widget during bake time.
-     *
-     * Only gives meaningful information when getTemplateContent() is being called,
-     * and we are getting the contents of a widget (more correctly, we are not working
-     * on a top-level template). Otherwise, returns NULL.
-     *
-     * We get the SECOND template on the stack, since the first one will be the
-     * currently printed template.
-     *
-     * @since  4.0.0
-     * @return array
-     */
-    public static function getBakeTimeIncludingTemplate()
-    {
-        if (count(self::$_templateStack) > 1) {
-            $retval = array(
-                       'system'   => self::$_templateStack[1][0],
-                       'template' => self::$_templateStack[1][1],
-                      );
-        } else {
-            $retval = NULL;
-        }
-
-        return $retval;
-
-    }//end getBakeTimeIncludingTemplate()
-
-
-    /**
-     * Converts widget tags to their HTML.
-     *
-     * @param DOMNode $parent The parent tag.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function convertWidgetTags(DOMNode $parent)
-    {
-        $warray  = array();
-        $widgets = $parent->getElementsByTagName('widget');
-        foreach ($widgets as $widget) {
-            $warray[] = $widget;
-        }
-
-        Channels::includeSystem('GUI');
-        foreach ($warray as $widget) {
-            GUI::convertWidgetToHTML($widget);
-        }
-
-    }//end convertWidgetTags()
-
-
-    /**
-     * Replaces the specified widget tag with its HTML tags.
-     *
-     * @param DOMNode $widget The widget tag to replace.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function convertWidgetToHTML(DOMNode $widget)
-    {
-        Channels::includeSystem('GUI');
-        $type     = $widget->getAttribute('type');
-        $system   = GUI::getSystemNameFromWidgetType($type);
-        $settings = self::_getSettingsForWidget($widget);
-
-        // Get the widget contents as DOMNode.
-        $content = GUI::getTemplateContent($system, $settings);
-
-        if (is_string($content) === TRUE) {
-            $content = DOMDocument::loadXML($content);
-        }
-
-        // Replace widget tag with the html.
-        $node = $widget->ownerDocument->importNode($content, TRUE);
-        $widget->parentNode->insertBefore($node, $widget);
-        $widget->parentNode->removeChild($widget);
-
-    }//end convertWidgetToHTML()
-
-
-    /**
-     * Returns the HTML content of the specified widget.
-     *
-     * @param DOMNode $widget The widget tag to replace.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    public static function getWidgetHTML(DOMNode $widget)
-    {
-        Channels::includeSystem('GUI');
-        $type     = $widget->getAttribute('type');
-        $system   = GUI::getSystemNameFromWidgetType($type);
-        $settings = self::_getSettingsForWidget($widget);
-
-        // Get the widget contents as DOMNode.
-        $content = GUI::getTemplateContent($system, $settings);
-
-        if (is_string($content) === TRUE) {
-            $content = DOMDocument::loadXML($content);
-        }
-
-        $content = $content->ownerDocument->saveXML();
-        $content = trim(str_replace('<?xml version="1.0"?>', '', $content));
-        return $content;
-
-    }//end getWidgetHTML()
-
-
-    /**
-     * Returns the list of settings for a widget tag.
-     *
-     * Settings array will contain all the attributes of widget tag and its
-     * child setting tags which have name and value attributes.
-     *
-     * @param DOMNode $widget The widget tag with attributes and setting nodes.
-     *
-     * @since  4.0.0
-     * @return array
-     */
-    private static function _getSettingsForWidget(DOMNode $widget)
-    {
-        $widgetid = $widget->getAttribute('id');
-        if (isset(self::$_tmpWidgetSettings[$widgetid]) === TRUE) {
-            return self::$_tmpWidgetSettings[$widgetid];
-        }
-
-        $settings = array();
-
-        // Get the widget attributes.
-        foreach ($widget->attributes as $attr) {
-            $settings[$attr->name] = $attr->value;
-        }
-
-        foreach ($widget->childNodes as $node) {
-            if ($node->nodeType !== XML_ELEMENT_NODE
-                || $node->tagName !== 'setting'
-            ) {
-                continue;
-            }
-
-            // Found a setting node.
-            $setting = $node->getAttribute('name');
-            $value   = self::_parseSettingValue($node);
-
-            // TODO: Make this work with array setting values.
-            if (strpos($value, '#') === 0) {
-                $value = self::_replaceWidgetIds($value);
-            }
-
-            $settings[$setting] = $value;
-        }//end foreach
-
-        self::$_tmpWidgetSettings[$widgetid] = $settings;
-
-        return $settings;
-
-    }//end _getSettingsForWidget()
-
-
-    /**
-     * Parses specified widget setting node.
-     *
-     * @param DOMNode $settingNode A single setting for a widget.
-     *
-     * @since  4.0.0
-     * @return mixed
-     */
-    private static function _parseSettingValue(DOMNode $settingNode)
-    {
-        if ($settingNode->hasAttribute('value') === TRUE) {
-            return $settingNode->getAttribute('value');
-        }
-
-        include_once 'Libs/XML/XML.inc';
-
-        if (XML::hasChildElements($settingNode) === FALSE) {
-            return $settingNode->nodeValue;
-        }
-
-        $value = array();
-
-        foreach ($settingNode->childNodes as $childNode) {
-            if ($childNode->nodeType !== XML_ELEMENT_NODE) {
-                continue;
-            }
-
-            switch ($childNode->tagName) {
-                case 'widget':
-                    $value = GUI::getWidgetHTML($childNode);
-                break;
-
-                case 'value':
-                    $value[] = self::_parseSettingValue($childNode);
-                break;
-
-                case 'content':
-                    // Content tags can contain multiple widgets.
-                    $widgetContent = array();
-                    foreach ($childNode->childNodes as $contentNode) {
-                        if ($contentNode->nodeType === XML_ELEMENT_NODE
-                            && $contentNode->tagName === 'widget'
-                        ) {
-                            $widgetContent[] = GUI::getWidgetHTML($contentNode);
-                        }
-                    }
-
-                    if (count($widgetContent) <= 1) {
-                        $value[$childNode->tagName] = self::_parseSettingValue($childNode);
-                    } else {
-                        $value = implode('', $widgetContent);
-                    }
-                break;
-
-                default:
-                    $value[$childNode->tagName] = self::_parseSettingValue($childNode);
-                break;
-            }//end switch
-        }//end foreach
-
-        return $value;
-
-    }//end _parseSettingValue()
-
-
-    /**
-     * Bakes out the templates PHP file.
-     *
-     * @param string  $systemName Name of the system that owns the template.
-     * @param string  $tplName    Name of the template file.
-     * @param DOMNode $html       The HTML of the template.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    public static function bakeTemplate($systemName, $tplName, DOMNode $html)
-    {
-        Channels::includeSystem('GUI');
-
-        // Run post bake processes.
-        self::_runPostbakeFunctions($html->ownerDocument);
-
-        // Reset post bake processors.
-        self::$_postBakeProcessors = array();
-
-        // Now work out exactly which ones we need for this template.
-        $templateKey = self::_getTemplateKey($systemName, $tplName);
-        $widgets     = Util::getArrayIndex(self::$_requiredWidgets, $templateKey, array());
-
-        self::$_tmpWidgetList[$templateKey] = array();
-        foreach ($widgets as $k => $tplWidgets) {
-            foreach ($tplWidgets as $j => $widget) {
-                $widgets[$k][$j]['parentTemplateKey'] = $templateKey;
-                self::$_tmpWidgetList[$templateKey][] = $widgets[$k][$j];
-            }
-        }
-
-        // Write out the list of dependents.
-        $saveArray = array('widgets' => $widgets);
-
-        include_once 'Libs/FileSystem/FileSystem.inc';
-        $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
-        if (file_exists($syDataPath) === FALSE) {
-            FileSystem::mkdir($syDataPath, 0755, TRUE);
-        }
-
-        $dest = $syDataPath.'/'.$tplName.'.deps.php';
-        FileSystem::arrayToFile($saveArray, 'dependentFiles', $dest);
-
-        // Now add the dependent files to the HEAD tag, if it exists.
-        $head = $html->getElementsByTagName('head');
-
-        if ($head->length !== 0) {
-            $head = $head->item(0);
-
-            foreach (self::$_jsIncludes as $jsInclude) {
-                GUI::addJS(NULL, $jsInclude, $head);
-            }
-
-            foreach (self::$_cssIncludes as $cssInclude) {
-                GUI::addCSS(NULL, $cssInclude, $head);
-            }
-
-            $js = array();
-
-           //foreach (self::$_tmpWidgetList as $tplkey => $widgets) {
-           //    foreach ($widgets as $widgetid => $widget) {
-           //        $js[] = GUI::getJSInitCode($widget['type'], $widget['id'], $widget['settings'], $widget['parentTemplateKey']);
-           //    }
-           //}
-
-           foreach ($widgets as $key => $tplWidgets) {
-               foreach ($tplWidgets as $widget) {
-                   $js[] = GUI::getJSInitCode($widget['type'], $widget['id'], $widget['settings'], $widget['parentTemplateKey']);
-               }
-           }
-
-            // Wrote out all the widgets in this template, clear widget list.
-            self::$_tmpWidgetList     = array();
-            self::$_tmpWidgetSettings = array();
-
-            // Create the script tag that contains JS init codes.
-            $jsElem = $head->ownerDocument->createElement('script');
-            $js     = implode("\n", $js);
-
-            // All these needs to be wrapped with onLoad.
-            $js = "dfx.addLoadEvent(function() {\n\t".$js."\n});";
-
-            $jsElem->nodeValue = $js;
-            $head->appendChild($jsElem);
-        }//end if
-
-        // Get the HTML string.
-        include_once 'Libs/XML/XML.inc';
-        $htmlCont = $html->ownerDocument->saveXML();
-        $htmlCont = XML::xmlToXHTML($htmlCont);
-
-        // If <head> element exists, insert API token hidden input field
-        // for the interface to work.
-        if ($head->length !== 0) {
-            $replacement  = '<?php '."\n";
-            $replacement .= 'Channels::includeSystem(\'User\');'."\n";
-            $replacement .= 'Channels::includeSystem(\'API\');'."\n";
-            $replacement .= '$currUserid = User::getCurrentUserid();'."\n";
-            $replacement .= 'if ($currUserid !== NULL) {'."\n";
-            $replacement .= '   Channels::includeSystem(\'Session\');'."\n";
-            $replacement .= '   $currToken = Session::getSessionData(\'API\', \'userToken:\'.$currUserid);'."\n";
-            $replacement .= '   if ($currToken === NULL) {'."\n";
-            $replacement .= '       $currToken = API::getUniqueToken();'."\n";
-            $replacement .= '       Session::setSessionData(\'API\', \'userToken:\'.$currUserid, $currToken);'."\n";
-            $replacement .= '   }'."\n";
-            $replacement .= '   echo \'<input id="__api_token" type="hidden" value="\'.$currToken.\'" />\';'."\n";
-            $replacement .= '}'."\n";
-            $replacement .= '?'.'>'."\n";
-            $replacement .= '</body>'."\n";
-
-            $htmlCont = str_replace('</body>', $replacement, $htmlCont);
-        }//end if
-
-        // Do some cleanup.
-        $htmlCont = str_replace(self::$_docType, '', $htmlCont);
-        $htmlCont = trim(str_replace('<?xml version="1.0"?>', '', $htmlCont));
-
-        $htmlCont = str_replace('&lt;?php', '<'.'?php', $htmlCont);
-        $htmlCont = str_replace('?&gt;', '?'.'>', $htmlCont);
-
-        // Write to data file.
-        $dest = $syDataPath.'/'.$tplName.'.php';
-        file_put_contents($dest, $htmlCont);
-
-        return $htmlCont;
-
-    }//end bakeTemplate()
-
-
-    /**
-     * Adds a new post bake process.
-     *
-     * @param string $system   Name of the system that will processes the settings.
-     * @param array  $settings Settings for the post bake process or widget.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function addPostBakeProcess($system, array $settings)
-    {
-        self::$_postBakeProcessors[$settings['id']] = array(
-                                                       'system'   => $system,
-                                                       'settings' => $settings,
-                                                      );
-
-    }//end addPostBakeProcess()
-
-
-    /**
-     * Runs the post bake functions.
-     *
-     * @param DOMNode $html The whole HTML node.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    private static function _runPostbakeFunctions(DOMNode $html)
-    {
-        foreach (self::$_postBakeProcessors as $p) {
-            call_user_func(array($p['system'], 'postBake'), $html, $p['settings']);
-        }
-
-    }//end _runPostbakeFunctions()
-
-
-    /**
-     * Adds JS includes.
-     *
-     * @param string $systemName Name of the system.
-     * @param array  $jsFiles    List of JS files to be included for the system.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function addJSInclude($systemName, array $jsFiles=array())
-    {
-        if (isset(self::$_jsIncludes[$systemName]) === FALSE) {
-            self::$_jsIncludes[$systemName] = array();
-        }
-
-        self::$_jsIncludes[$systemName] = array_merge(
-            self::$_jsIncludes[$systemName],
-            $jsFiles
-        );
-
-    }//end addJSInclude()
-
-
-    /**
-     * Returns list of JS files to include.
-     *
-     * @since  4.0.0
-     * @return array
-     */
-    private static function _getJSIncludes()
-    {
-        return self::$_jsIncludes;
-
-    }//end _getJSIncludes()
 
 
     /**
@@ -890,19 +983,6 @@ class GUIActions
         $head->appendChild($script);
 
     }//end addJS()
-
-
-    /**
-     * Returns list of CSS files to include.
-     *
-     * @since  4.0.0
-     * @return array
-     */
-    private static function _getCSSIncludes()
-    {
-        return self::$_cssIncludes;
-
-    }//end _getCSSIncludes()
 
 
     /**
@@ -987,54 +1067,6 @@ class GUIActions
         return $system;
 
     }//end getSystemNameFromWidgetType()
-
-
-    /**
-     * Wraps the given DOMNode with specified IF conditions.
-     *
-     * @param DOMNode $elem The element to wrap.
-     * @param string  $cond Valid PHP if conditions.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function wrapConditionAroundElement(DOMNode $elem, $cond)
-    {
-        $doc = $elem->ownerDocument;
-
-        // First all systems used in the conditions must be included.
-        $matches = array();
-        preg_match_all('/([a-zA-Z]+)::/', $cond, $matches);
-
-        $includes = '';
-        if (empty($matches) === FALSE && isset($matches[1]) === TRUE) {
-            $ignoreSystems = array(
-                              'Channels',
-                              'BaseSystem',
-                              'DAL',
-                             );
-
-            foreach ($matches[1] as $systemName) {
-                if (in_array($systemName, $ignoreSystems) === FALSE) {
-                    $includes       .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
-                    $ignoreSystems[] = $systemName;
-                }
-            }
-        }
-
-        $cond   = $includes.'if ('.$cond.') {';
-        $before = $doc->createProcessingInstruction('php', $cond);
-        $after  = $doc->createProcessingInstruction('php', '}');
-
-        $elem->parentNode->insertBefore($before, $elem);
-
-        if ($elem->nextSibling !== NULL) {
-            $elem->parentNode->insertBefore($after, $elem->nextSibling);
-        } else {
-            $elem->parentNode->appendChild($after);
-        }
-
-    }//end wrapConditionAroundElement()
 
 
     /**
@@ -1154,98 +1186,6 @@ class GUIActions
 
 
     /**
-     * Adds CSS includes.
-     *
-     * @param string $systemName Name of the system.
-     * @param array  $cssFiles   List of CSS files to be included for the system.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function addCSSInclude($systemName, array $cssFiles=array())
-    {
-        if (isset(self::$_cssIncludes[$systemName]) === FALSE) {
-            self::$_cssIncludes[$systemName] = array();
-        }
-
-        self::$_cssIncludes[$systemName] = array_merge(
-            self::$_cssIncludes[$systemName],
-            $cssFiles
-        );
-
-    }//end addCSSInclude()
-
-
-    /**
-     * Replaces the GUI related keywords using the given settings array.
-     *
-     * @param string $content    Content to search.
-     * @param string $systemName Name of the system.
-     * @param array  $settings   Settings for the content (widget).
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    private static function _replaceKeywords($content, $systemName, array $settings)
-    {
-        $content = str_replace('%class%', $systemName, $content);
-
-        include_once 'Libs/Util/Util.inc';
-        $id      = Util::getArrayIndex($settings, 'id', '');
-        $content = str_replace('%id%', $id, $content);
-
-        return $content;
-
-    }//end _replaceKeywords()
-
-
-    /**
-     * Replaces the widgetids (#widgetid) in template strings.
-     *
-     * @param string $str The template content.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    private static function _replaceWidgetIds($str)
-    {
-        $matches = array();
-        preg_match_all('/^#([A-Za-z0-9]+)/', $str, $matches);
-
-        if (isset($matches[1]) === TRUE) {
-            foreach ($matches[1] as $match) {
-                $str = str_replace('#'.$match, 'GUI.getWidget(\''.$match.'\')', $str);
-            }
-        }
-
-        return $str;
-
-    }//end _replaceWidgetIds()
-
-
-    /**
-     * Build a template key from the system name and template file.
-     *
-     * @param string $systemName The name of the system.
-     * @param string $tplFile    Filename of the template.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    private static function _getTemplateKey($systemName, $tplFile=NULL)
-    {
-        if ($tplFile === NULL) {
-            $tplFile = $systemName;
-        } else {
-            $tplFile = basename($tplFile, '.tpl');
-        }
-
-        return $systemName.':'.$tplFile;
-
-    }//end _getTemplateKey()
-
-
-    /**
      * Used to act like PHP 5.3 static:: call.
      *
      * When widgets are calling methods in their own class they should use this
@@ -1276,6 +1216,51 @@ class GUIActions
         return $retVal;
 
     }//end callStatic()
+
+
+    /**
+     * Saves the widget data for each specified template.
+     *
+     * @param array $templateData List if templates and data for its widgets.
+     *
+     * @return mixed
+     * @throws ChannelException If there was an error while processing save data.
+     *
+     * @api write
+     */
+    public static function saveTemplateData(array $templateData)
+    {
+        $errors = array();
+        foreach ($templateData as $key => $data) {
+            list($system, $templateName) = explode(':', $key);
+            Channels::includeSystem($system);
+            $templateName = 'save'.$templateName;
+
+            $callback = array(
+                         $system,
+                         $templateName,
+                        );
+            $retVal   = call_user_func($callback, $data);
+
+            if ($retVal === TRUE) {
+                // Data saved with no problems.
+                continue;
+            } else if (is_array($retVal) === TRUE) {
+                if (isset($retVal['errors']) === TRUE) {
+                    $errors[] = implode("\n", $retVal['errors']);
+                }
+            } else {
+                throw new ChannelException('Invalid return type. ('.$system.'::'.$templateName.')');
+            }
+        }//end foreach
+
+        if (empty($errors) === TRUE) {
+            return 'success';
+        }
+
+        return 'Errors: '.implode("\n", $errors);
+
+    }//end saveTemplateData()
 
 
     /**
@@ -1345,6 +1330,37 @@ class GUIActions
         return $path;
 
     }//end getSystemWebPath()
+
+
+    /**
+     * Serves any file on the file system, using X-Sendfile.
+     *
+     * @param string $filePath Path to the file.
+     * @param string $mimeType Content type of the file.
+     * @param array  $headers  Extra headers to send.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    public static function serveFile(
+        $filePath,
+        $mimeType,
+        array $headers=array()
+    ) {
+        // Set the content type header, X-Sendfile headers.
+        $headers['Content-type']         = $mimeType;
+        $headers['X-Sendfile']           = $filePath;
+        $headers['x-lighttpd-send-file'] = $filePath;
+
+        if (headers_sent() === FALSE) {
+            foreach ($headers as $header => $value) {
+                header($header.': '.$value);
+            }
+        }
+
+        exit();
+
+    }//end serveFile()
 
 
     /**
@@ -1432,37 +1448,6 @@ class GUIActions
         exit;
 
     }//end serveWebFile()
-
-
-    /**
-     * Serves any file on the file system, using X-Sendfile.
-     *
-     * @param string $filePath Path to the file.
-     * @param string $mimeType Content type of the file.
-     * @param array  $headers  Extra headers to send.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function serveFile(
-        $filePath,
-        $mimeType,
-        array $headers=array()
-    ) {
-        // Set the content type header, X-Sendfile headers.
-        $headers['Content-type']         = $mimeType;
-        $headers['X-Sendfile']           = $filePath;
-        $headers['x-lighttpd-send-file'] = $filePath;
-
-        if (headers_sent() === FALSE) {
-            foreach ($headers as $header => $value) {
-                header($header.': '.$value);
-            }
-        }
-
-        exit();
-
-    }//end serveFile()
 
 
 }//end class

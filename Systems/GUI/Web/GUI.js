@@ -142,6 +142,10 @@ var GUI = new function()
         };
     };
 
+    this.sendRequest = function(system, action, params, callback) {
+        sfapi.get(system, action, params, callback);
+    };
+
     /**
      * Loads content in to the specified element or elementid.
      *
@@ -153,11 +157,11 @@ var GUI = new function()
             targetElement = dfx.getId(targetElement);
         }
 
-        sfapi.get(system, method, params, function(data) {
+        GUI.sendRequest(system, method, params, function(data) {
             // Set the contents.
             dfx.setHtml(targetElement, data.result.contents);
 
-            dfx.foreach(data.result.widgets, function(templateKey) {
+           /* dfx.foreach(data.result.widgets, function(templateKey) {
                 var widgets = data.result.widgets[templateKey];
                 var wln     = widgets.length;
                 for (var i = 0; i < wln; i++) {
@@ -168,7 +172,7 @@ var GUI = new function()
                         GUI.addWidget(widget.id, widgetObj, widget.parentTemplateKey);
                     }
                 }
-            });
+            });*/
         });
     };
 
@@ -180,6 +184,7 @@ var GUI = new function()
         // Retrieve the save values in reverse order.
         for (var i = (ln - 1); i >= 0; i--) {
             var template     = this.templateLineage[i];
+            console.info('Getting values for ' + template + ' template');
             var isEmpty      = true;
             values[template] = {};
             dfx.foreach(self.widgetTemplates[template], function(widgetid) {
@@ -200,6 +205,13 @@ var GUI = new function()
         }//end for
 
         console.info(values);
+        var params = {
+            templateData: dfx.jsonEncode(values)
+        };
+
+        GUI.sendRequest('GUI', 'saveTemplateData', params, function() {
+            console.info(arguments);
+        });
 
         return values;
     };

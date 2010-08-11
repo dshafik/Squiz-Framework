@@ -4,6 +4,10 @@
     line-height: 24px;
 }
 
+.GUITextBox.container.inline {
+    display: inline;
+}
+
 .GUITextBox.input {
     background-color: #FFFFFF;
     color: #000000;

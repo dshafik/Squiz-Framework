@@ -26,48 +26,33 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Toolbar Actions Class.
- *
  */
 class GUIToolbarActions
 {
 
 
     /**
-     * Returns this widgets content.
+     * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
-        $content = '<div class="%class%">
-                        <div class="%class%-logo" style="background-url: ('.$settings['logo'].')" />
-                        <div class="%class%-content">';
+        $className = $settings['widget']['type'];
+        echo '<div class="'.$className.'">
+                <div class="'.$className.'-logo" style="background-url: ('.$settings['logo'].')"></div>
+                    <div class="'.$className.'-content">';
 
         if (isset($settings['content']) === TRUE) {
-            $content .= $settings['content'];
+            echo $settings['content'];
         }
 
-        $content .= '</div></div>';
+        echo '</div>
+            </div><!-- end toolbar: '.$settings['widget']['id'].' -->'."\n";
 
-        return $content;
-
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
 }//end class

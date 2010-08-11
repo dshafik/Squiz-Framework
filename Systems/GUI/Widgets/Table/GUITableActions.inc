@@ -33,16 +33,15 @@ class GUITableActions
 
 
     /**
-     * Returns this widgets content.
+     * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
-     * @throws ChannelException If settings are incorrect.
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
-        $tableClass = '%class%';
+        $tableClass = $settings['widget']['type'];
 
         include_once 'Libs/Util/Util.inc';
         $columns = Util::getArrayIndex($settings, 'columns', array());
@@ -67,14 +66,12 @@ class GUITableActions
             $tableClass .= ' selectable';
         }
 
-        $content = '<table class="'.$tableClass.'" id="%id%" cellspacing="0" cellpadding="0">';
+        echo '<table class="'.$tableClass.'" id="'.$settings['widget']['id'].'" cellspacing="0" cellpadding="0">';
 
         if (isset($settings['hideHeader']) === FALSE
             || $settings['hideHeader'] !== 'true'
         ) {
-            $content .= '<thead>';
-            $content .= '<tr>';
-
+            echo '<thead><tr>';
             $colids     = array_keys($columns);
             $lastColid  = $colids[(count($colids) - 1)];
             $firstColid = $colids[0];
@@ -87,46 +84,19 @@ class GUITableActions
                     $colClass = 'middle';
                 }
 
-                $content .= '<th align="'.$column['align'].'" class="%class%-'.$colClass.'Col">&lt;?php echo _('.var_export($column['name'], TRUE).'); ?&gt;</th>';
+                echo '<th align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col">'.$column['name'].'</th>';
             }
 
-            $content .= '</tr>';
-            $content .= '</thead>';
+            echo '</tr></thead>';
         }//end if
 
-        $content .= '<tbody>';
+        echo '<tbody>';
 
-        // Load the table rows.
-        list($providerSystem, $providerMethod) = explode('::', $settings['dataProvider']);
-        $content .= '<?'.'php ';
-        $content .= 'Channels::includeSystem(\'GUITable\');';
-        $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-        $content .= '$settings = '.var_export($settings, TRUE).';';
-        $content .= '$columns = '.var_export($columns, TRUE).';';
-        $content .= '$data = '.$settings['dataProvider'].'($settings);';
-        $content .= 'GUITable::paintRows($data, $columns, $settings);';
-        $content .= ' ?'.'>';
+        GUITable::paintRows($settings['rows'], $columns, $settings);
 
-        $content .= '</tbody>';
-        $content .= '</table>';
-
-        return $content;
+        echo '</tbody></table>';
 
     }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
 
 
     /**
@@ -140,7 +110,7 @@ class GUITableActions
      */
     public static function paintRows(array $rows, array $columns, array $settings)
     {
-        $id         = $settings['id'];
+        $id         = $settings['widget']['id'];
         $class      = 'GUITable';
         $colids     = array_keys($columns);
         $lastColid  = $colids[(count($colids) - 1)];

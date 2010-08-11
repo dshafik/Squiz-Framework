@@ -39,49 +39,35 @@ class GUIInfoBoxActions
      *
      * @return string
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
-        $content = '<div id="%id%" class="%class%">';
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
+        echo '<div id="'.$id.'" class="'.$class.'">';
 
         // Top section.
-        $content .= '<div class="%class%-top">';
-        $content .= '<div class="%class%-title">';
-        $content .= '<div class="%class%-title-icon"></div>';
-        $content .= '<div class="%class%-title-value">'.$settings['title'].'</div>';
-        $content .= '</div>';
-        $content .= '</div>';
+        echo  '<div class="'.$class.'-top">';
+        echo  '<div class="'.$class.'-title">';
+        echo  '<div class="'.$class.'-title-icon"></div>';
+        echo  '<div class="'.$class.'-title-value">'.$settings['title'].'</div>';
+        echo  '</div>';
+        echo  '</div>';
 
         // Mid section.
-        $content .= '<div class="%class%-mid">';
-        $content .= '<div class="%class%-thumbContainer">';
-        $content .= '<img src="'.$settings['thumbURL'].'" />';
-        $content .= '</div>';
-        $content .= '</div>';
+        echo  '<div class="'.$class.'-mid">';
+        echo  '<div class="'.$class.'-thumbContainer">';
+        echo  '<img src="'.$settings['thumbURL'].'" />';
+        echo  '</div>';
+        echo  '</div>';
 
         // Bottom section.
-        $content .= '<div class="%class%-bottom">';
-        $content .= $settings['content'];
-        $content .= '</div>';
+        echo  '<div class="'.$class.'-bottom">';
+        echo  $settings['content'];
+        echo  '</div>';
 
-        $content .= '</div>';
-
-        return $content;
+        echo  '</div>';
 
     }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
 
 
 }//end class

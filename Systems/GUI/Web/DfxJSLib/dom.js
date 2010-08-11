@@ -135,7 +135,7 @@ dfx.getTag = function(tagName, startElement)
 
 
 /**
- * Retrieves all elements that are match the string passed.
+ * Retrieves all elements that match the string passed.
  *
  * These can be '.className', '#id', 'tagname', or 'tagname.classname'.
  *
@@ -168,7 +168,7 @@ dfx.getElements = function(searchString, startElement)
         } else if (searchElems[i].match(/^#/)) {
             // An ID query.
             var idString = searchElems[i].substring(1);
-            searchResults.push(dfx.getId(idString, startElement));
+            searchResults.push(dfx.getId(idString));
         } else {
             // Just a tag query.
             searchResults = dfx.getTag(searchElems[i], startElement);

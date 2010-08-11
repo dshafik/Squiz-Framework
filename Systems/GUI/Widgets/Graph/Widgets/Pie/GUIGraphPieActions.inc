@@ -28,67 +28,45 @@ require_once 'Libs/Web/Web.inc';
 
 /**
  * Actions Class for the Pie Graph Widget (GUIGraphPie) System.
- *
  */
 class GUIGraphPieActions
 {
 
 
     /**
-     * Returns this widgets content.
+     * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
-        Channels::includeSystem('GUI');
-        $currentTemplate = GUI::getBakeTimeIncludingTemplate();
         // Size of the graph on the page, in pixels. Height and width will be the
         // same size.
         $size = (int) Util::getArrayIndex($settings, 'size');
 
+        echo '<span>';
+
+        include_once 'Libs/Web/Web.inc';
         $params = Web::getQueryStringParams();
         unset($params['_callback']);
-
         $url = '/__api/raw/GUIGraphPie/getSVGContents';
 
-        $content  = '<span>';
-        $content .= '&lt;?php'."\n";
-        $content .= 'include_once \'Libs/Web/Web.inc\';'."\n\n";
-        $content .= '$url    = \''.addslashes($url).'\';'."\n";
-        $content .= '$params = Web::getQueryStringParams();'."\n";
-        $content .= 'unset($params[\'_callback\']);'."\n\n";
-        $content .= '$params[\'system\']   = \''.addslashes($currentTemplate['system']).'\';'."\n";
-        $content .= '$params[\'template\'] = \''.addslashes($currentTemplate['template']).'\';'."\n";
-        $content .= '$params[\'widgetId\'] = \''.addslashes($settings['id']).'\';'."\n\n";
-        $content .= '$url = Web::appendQueryString($params, $url);';
-        $content .= '?&gt;'."\n";
-        $content .= '<object data="&lt;?php echo $url; ?&gt;"';
-        $content .= ' style="width: '.$size.'px; height: '.$size.'px;"';
-        $content .= ' type="image/svg+xml">'."\n";
-        $content .= '</object>'."\n";
-        $content .= '</span>';
+        $params             = Web::getQueryStringParams();
+        $params['system']   = $settings['template']['system'];
+        $params['template'] = $settings['template']['name'];
+        $params['widgetId'] = $settings['widget']['id'];
 
-        return $content;
+        $url = Web::appendQueryString($params, $url);
 
-    }//end getTemplateContent()
+        echo '<object data="'.$url.'"';
+        echo ' style="width: '.$size.'px; height: '.$size.'px;"';
+        echo ' type="image/svg+xml">'."\n";
+        echo '</object>'."\n";
+        echo '</span>';
 
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl  The HTML content of the widget.
-     * @param array   $settings The list of settings for this widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl, array $settings=array())
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
     /**
@@ -120,8 +98,6 @@ class GUIGraphPieActions
         if ($total <= 0) {
             return;
         }
-
-
 
         if (empty($borderConf) === FALSE) {
             $radius = (int) Util::getArrayIndex($borderConf, 'radius', 0);
@@ -279,6 +255,7 @@ class GUIGraphPieActions
      *
      * @return string
      * @throws ChannelException If the widget settings are not well-formed.
+     *
      * @api             read
      * @api-contentType image/svg+xml
      */

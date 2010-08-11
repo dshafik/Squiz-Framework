@@ -70,18 +70,16 @@ class GUIGraphBarActions
 
 
     /**
-     * Returns this widgets content.
+     * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
-        list($providerSystem, $providerMethod) = explode(
-            '::',
-            $settings['dataProvider']
-        );
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
 
         // Get the total height of the graph.
         $graphHeight = Util::getArrayIndex(
@@ -211,42 +209,25 @@ class GUIGraphBarActions
                   'minor' => Util::getArrayIndex($settings, 'minorTick', NULL),
                  );
 
-        $content  = '<div id="%id%" class="%class%">';
-        $content .= '<div class="%class%-outer-list" style="height: ';
-        $content .= $graphHeight.'px;">';
-        $content .= '<?php ';
-        $content .= 'Channels::includeSystem(\'GUIGraphBar\');';
-        $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-        $content .= '$groups = '.var_export($groups, TRUE).'; ';
-        $content .= '$flags  = '.var_export($flags, TRUE).'; ';
-        $content .= '$data   = '.$settings['dataProvider'].'(); ';
-        $content .= '$max    = '.var_export($max, TRUE).'; ';
-        $content .= '$tick   = '.var_export($tick, TRUE).'; ';
-        $content .= '$height = '.$graphHeight.'; ';
-        $content .= 'GUIGraphBar::paintGraph($data, $groups, $flags, $height, $max, $tick, ';
-        $content .= ' \'%id%\', \'%class%\'); ';
-        $content .= '?>';
-        $content .= '</div>';
-        $content .= '</div>';
+        echo '<div id="'.$id.'" class="'.$class.'">';
+        echo '<div class="'.$class.'-outer-list" style="height: ';
+        echo $graphHeight.'px;">';
 
-        return $content;
+        GUIGraphBar::paintGraph(
+            $settings['dataProvider'],
+            $groups,
+            $flags,
+            $graphHeight,
+            $max,
+            $tick,
+            $settings['widget']['id'],
+            $settings['widget']['type']
+        );
 
-    }//end getTemplateContent()
+        echo '</div>';
+        echo '</div>';
 
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl  The HTML content of the widget.
-     * @param array   $settings The list of settings for this widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl, array $settings=array())
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
     /**

@@ -32,7 +32,7 @@ GUISelect.prototype = {
 
     getValue: function()
     {
-        return dfx.getId(this.id).selectedIndex;
+        return dfx.getId(this.id).value;
 
     }
 

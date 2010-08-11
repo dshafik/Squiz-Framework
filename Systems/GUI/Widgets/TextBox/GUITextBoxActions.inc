@@ -46,6 +46,13 @@ class GUITextBoxActions
     private static $_width = '30';
 
 
+    public static function paint(array $settings)
+    {
+        echo '<input type="textbox" />';
+
+    }//end paint()
+
+
     /**
      * Returns this widgets content.
      *
@@ -55,8 +62,17 @@ class GUITextBoxActions
      */
     public static function getTemplateContent(array $settings=array())
     {
-        $content  = '<div class="%class% container" id="%id%">';
+        $content = '<div class="%class% container';
+
+        if (Util::getArrayIndex($settings, 'inline', FALSE) === TRUE) {
+            $content .= ' inline';
+        }
+
+        $content .= '" id="%id%">';
+
         $content .= '<?php ';
+
+        $valueCont = '';
         if (isset($settings['dataProvider']) === TRUE) {
             list($providerSystem, $providerMethod) = explode(
                 '::',
@@ -65,13 +81,15 @@ class GUITextBoxActions
 
             $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
             $content .= '$value = '.$settings['dataProvider'].'();';
+
+            $valueCont = '&lt;?php echo $value; ?&gt;';
         } else {
             $defaultValue = "'".self::$_defaultValue."'";
-            $content     .= '$value = '.Util::getArrayIndex(
+            $valueCont    = Util::getArrayIndex(
                 $settings,
                 'default',
                 $defaultValue
-            ).';';
+            );
         }
 
         $content .= ' ?>';
@@ -93,7 +111,7 @@ class GUITextBoxActions
         }
 
         // The input field.
-        $content .= '<input class="%class% input"'.$name.' type="text" value="&lt;?php echo $value; ?&gt;" size="'.$width.'"'.$maxlength.' />';
+        $content .= '<input class="%class% input"'.$name.' type="text" value="'.$valueCont.'" size="'.$width.'"'.$maxlength.' />';
 
         $content .= '</div>';
 

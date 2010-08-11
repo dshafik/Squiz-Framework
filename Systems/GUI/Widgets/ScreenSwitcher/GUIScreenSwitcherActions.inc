@@ -26,29 +26,31 @@ require_once 'Systems/GUI/Widgets/ContentSwitcher/GUIContentSwitcherActions.inc'
 
 /**
  * GUI Screen Switcher Widget Actions Class.
- *
  */
 class GUIScreenSwitcherActions extends GUIContentSwitcherActions
 {
 
 
     /**
-     * Returns the contents of the switcher buttons.
+     * Prints the contents of the switcher buttons.
      *
      * @param array $settings The settings of the widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getButtonsContent(array $settings=array())
+    public static function printButtonsContent(array $settings)
     {
         Channels::includeSystem('GUI');
 
-        $content  = '<div id="%id%" class="%class%">';
-        $content .= '<div class="%class%-left">';
-        $content .= '</div>';
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
 
-        $content .= '<div class="%class%-right">';
-        $content .= '</div>';
+        echo '<div id="'.$id.'" class="'.$class.'">';
+        echo '<div class="'.$class.'-left">';
+        echo '</div>';
+
+        echo '<div class="'.$class.'-right">';
+        echo '</div>';
 
         $screens = array();
         if (isset($settings['items']) === TRUE) {
@@ -58,12 +60,12 @@ class GUIScreenSwitcherActions extends GUIContentSwitcherActions
         }
 
         foreach ($screens as $screen) {
-            $screenid = $settings['id'].'-'.$screen['id'];
-            if (strtolower($screen['disabled']) === 'true') {
-                $content .= '<div id="'.$screenid.'" class="%class%-button disabled">';
+            $screenid = $id.'-'.$screen['id'];
+            if (strtolower(Util::getArrayIndex($screen, 'disabled')) === 'true') {
+                echo '<div id="'.$screenid.'" class="'.$class.'-button disabled">';
             } else {
-                $content .= '<div id="'.$screenid.'" class="%class%-button inactive">';
-            }//end if screen disabled
+                echo '<div id="'.$screenid.'" class="'.$class.'-button inactive">';
+            }
 
             // Work out the name of the template and web icon we expect from the
             // system we are referencing.
@@ -75,38 +77,36 @@ class GUIScreenSwitcherActions extends GUIContentSwitcherActions
             $path .= $screenBaseName.'.png';
 
             // Screen icon.
-            $content .= '<div class="%class%-icon"';
-            $content .= ' style="background-image: url('.$path.')"';
-            $content .= '>';
-            $content .= '</div>';
+            echo '<div class="'.$class.'-icon"';
+            echo ' style="background-image: url('.$path.')"';
+            echo '>';
+            echo '</div>';
 
             // Name of screen.
-            $content .= '<div class="%class%-text">';
-            $content .= $screen['label'];
-            $content .= '</div>';
+            echo '<div class="'.$class.'-text">';
+            echo $screen['label'];
+            echo '</div>';
 
             // Selected arrow - shown only when active.
-            $content .= '<div class="%class%-arrow">';
-            $content .= '</div>';
+            echo '<div class="'.$class.'-arrow">';
+            echo '</div>';
 
             // Divider line on right hand side of block.
-            $content .= '<div class="%class%-divider">';
-            $content .= '</div>';
+            echo '<div class="'.$class.'-divider">';
+            echo '</div>';
 
             // No access icon - shown only when disabled.
-            $content .= '<div class="%class%-no-entry">';
-            $content .= '</div>';
+            echo '<div class="'.$class.'-no-entry">';
+            echo '</div>';
 
-            $content .= '</div>';
+            echo '</div>';
 
             $firstScreen = FALSE;
         }//end foreach
 
-        $content .= '</div>';
+        echo '</div>';
 
-        return $content;
-
-    }//end getButtonsContent()
+    }//end printButtonsContent()
 
 
 }//end class

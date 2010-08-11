@@ -33,16 +33,19 @@ class GUIBoxActions
 
 
     /**
-     * Returns this widgets content.
+     * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings)
     {
         // Check border settings.
         $borderClass = '';
+
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
 
         include_once 'Libs/Util/Util.inc';
         $borderLeft  = Util::getArrayIndex($settings, 'borderLeft', 'true');
@@ -56,69 +59,50 @@ class GUIBoxActions
             $borderClass .= ' noRightBorder';
         }
 
-        $content  = '<div id="%id%" class="%class%'.$borderClass.'">';
-        $content .= '<div class="%class%-header">';
+        echo '<div id="'.$id.'" class="'.$class.$borderClass.'">';
+        echo '<div class="'.$class.'-header">';
 
         if (isset($settings['title']) === TRUE) {
             // Simple title text/widget.
             if (is_array($settings['title']) === FALSE) {
                 if (empty($settings['title']) === FALSE) {
-                    $content .= '<div class="%class%-title">'.$settings['title'].'</div>';
+                    echo '<div class="'.$class.'-title">'.$settings['title'].'</div>';
                 }
             } else if (isset($settings['title']['dataProvider']) === TRUE) {
                 // Dynamic title.
-                $content .= self::_getContentFromDataProvider($settings['title']['dataProvider']);
+                self::_getContentFromDataProvider($settings['title']['dataProvider']);
             }
         }
 
         if (isset($settings['headerContent']) === TRUE) {
-            $content .= '<div class="%class%-headerContent">';;
-            // Simple extra header text or widget.
-            if (is_array($settings['headerContent']) === FALSE) {
-                if (empty($settings['headerContent']) === FALSE) {
-                    $content .= '<div class="%class%-title">'.$settings['headerContent'].'</div>';
-                }
-            } else if (isset($settings['headerContent']['dataProvider']) === TRUE) {
-                // Dynamic header content.
-                $content .= self::_getContentFromDataProvider(
-                    $settings['headerContent']['dataProvider']
-                );
-            }
-
-            $content .= '</div>';
+            echo '<div class="'.$class.'-headerContent">';
+            echo '<div class="'.$class.'-title">'.$settings['headerContent'].'</div>';
+            echo '</div>';
         }
 
-        $content .= '</div>';
-        $content .= '<div class="%class%-content">';
+        echo '</div><!-- end box header -->';
+        echo '<div class="'.$class.'-content">';
 
-        // Content setting can be a single widget or a data provider.
-        if (is_array($settings['content']) === FALSE
-        ) {
-            // Simple content.
-            $content .= $settings['content'];
-        } else if (isset($settings['content']['dataProvider']) === TRUE) {
-            $content .= self::_getContentFromDataProvider(
-                $settings['content']['dataProvider']
-            );
+        if (isset($settings['content']) === TRUE) {
+            echo $settings['content'];
         }
 
-        $content .= '</div><!--end box content-->';
-        $content .= '</div>';
+        echo '</div><!--end box content-->';
+        echo '</div>';
 
-        return $content;
-
-    }//end getTemplateContent()
+    }//end paint()
 
 
     private static function _getContentFromDataProvider($dataProvider)
     {
-        list($providerSystem, $providerMethod) = explode('::', $dataProvider);
+        /*list($providerSystem, $providerMethod) = explode('::', $dataProvider);
         $content  = '<?php '."\n";
         $content .= 'Channels::includeSystem(\''.$providerSystem.'\');'."\n";
         $content .= 'echo '.$dataProvider.'();'."\n";
         $content .= ' ?>';
 
-        return $content;
+        return $content;*/
+        echo 'DATA PROVIDER';
 
     }//end _getContentFromDataProvider()
 
