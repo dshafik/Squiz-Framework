@@ -153,7 +153,7 @@ class GUIContentSwitcherActions
      *
      * @return string
      */
-    public static function getItemContent(array $settings, array $item)
+    public static function getItemContent(array $settings, $item)
     {
         if ($settings['loadType'] === 'dynamic'
             && $settings['initialItem'] !== $item['id']
@@ -174,8 +174,8 @@ class GUIContentSwitcherActions
 
         $content .= ' id="'.$settings['widget']['id'].'-itemContent-'.$item['id'].'">';
 
-        if (isset($item['content']) === TRUE) {
-            $content .= $item['content'];
+        if (isset($item['itemContent']) === TRUE) {
+            $content .= $item['itemContent'];
         } else {
             Channels::includeSystem('GUI');
             ob_start();

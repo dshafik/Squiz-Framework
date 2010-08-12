@@ -115,6 +115,37 @@ class GUIActions
     }//end printTemplate()
 
 
+
+    /**
+     * Loads the specified template file and returns it as DOMDocument.
+     *
+     * @param string $filePath The template file path.
+     *
+     * @since  4.0.0
+     * @return DOMDocument
+     */
+    public static function loadTemplate($filePath)
+    {
+        if (file_exists($filePath) === FALSE) {
+            return FALSE;
+        }
+
+        $fileCont = trim(file_get_contents($filePath));
+        if (empty($fileCont) === TRUE) {
+            return FALSE;
+        }
+
+        // Need to wrap content.
+        $contents  = self::$_docType;
+        $contents .= $fileCont;
+
+        $tpl = new DOMDocument('1.0');
+        $tpl->loadXML($contents);
+        return $tpl;
+
+    }//end loadTemplate()
+
+
     /**
      * Bakes all the templates in the Systems dir.
      *
@@ -634,10 +665,7 @@ class GUIActions
 
             default:
                 include_once 'Libs/XML/XML.inc';
-                if ($node->tagName === 'content'
-                    && $node->parentNode->tagName === 'setting'
-                    && $node->parentNode->getAttribute('name') === 'content'
-                ) {
+                if ($node->tagName === 'content') {
                     $varName = $assignTo;
                 } else if ($node->tagName === 'value') {
                     $varName = $assignTo.'['.XML::getIndex($node).']';
@@ -870,67 +898,6 @@ class GUIActions
 
 
     /**
-     * Includes the PHP file containing the dependencies of the template.
-     *
-     * The template dependencies file contains:
-     * - the widgets that exist in this template.
-     *
-     * The intention is to provide enough information for such files and widgets to
-     * be dynamically loaded if necessary, instead of just being hard-coded into a
-     * template.
-     *
-     * @param string $systemName Name of the system.
-     * @param string $template   The template to load.
-     *
-     * @since  4.0.0
-     * @return array
-     */
-    public static function getTemplateDependentFiles($systemName, $template)
-    {
-        $dataPath = BaseSystem::getDataDir($systemName);
-        $depFile  = $dataPath.'/Templates/'.$template.'.deps.php';
-        if (file_exists($depFile) === FALSE) {
-            return array();
-        }
-
-        include $depFile;
-
-        return $dependentFiles;
-
-    }//end getTemplateDependentFiles()
-
-
-    /**
-     * Loads the specified template file and returns it as DOMDocument.
-     *
-     * @param string $filePath The template file path.
-     *
-     * @since  4.0.0
-     * @return DOMDocument
-     */
-    public static function loadTemplate($filePath)
-    {
-        if (file_exists($filePath) === FALSE) {
-            return FALSE;
-        }
-
-        $fileCont = trim(file_get_contents($filePath));
-        if (empty($fileCont) === TRUE) {
-            return FALSE;
-        }
-
-        // Need to wrap content.
-        $contents  = self::$_docType;
-        $contents .= $fileCont;
-
-        $tpl = new DOMDocument('1.0');
-        $tpl->loadXML($contents);
-        return $tpl;
-
-    }//end loadTemplate()
-
-
-    /**
      * Creates a new widget and returns its contents as string.
      *
      * This method should be used to create widgets at run time (e.g. by data provider).
@@ -943,22 +910,34 @@ class GUIActions
      * @since  4.0.0
      * @return string
      */
-    public static function createWidget($id, $type, array $settings=array(), $tplFile=NULL)
+    public static function createWidget($id, $type, array $settings=array())
     {
-        ob_start();
-            $settings['id'] = $id;
+        $settings['widget'] = array(
+                               'id'   => $id,
+                               'type' => $type,
+                              );
 
-            Channels::includeSystem($type);
-            $templateCode = call_user_func(array($type, 'getTemplateContent'), $settings, $tplFile);
-            $templateCode = '?>'.$templateCode.'<?';
-            eval($templateCode);
-            $templateCode = ob_get_contents();
+        $settings['template'] = array(
+                                 'system' => 'RUNTIME',
+                                 'name'   => 'RUNTIME',
+                                );
+
+        Channels::includeSystem($type);
+
+        $jsFilePath  = Channels::getSystemsPath($type).'/Web/';
+        $jsFilePath .= $type.'.js';
+
+        ob_start();
+            call_user_func(array($type, 'paint'), $settings);
+
+            // Add its JS code.
+            if (file_exists($jsFilePath) === TRUE) {
+                echo '<script>'.GUI::getJSInitCode($type, $id, $settings).'</script>';
+            }
+            $content = ob_get_contents();
         ob_end_clean();
 
-        $templateCode .= '<script>'.GUI::getJSInitCode($type, $id, $settings);
-        $templateCode .= '</script>';
-
-        return $templateCode;
+        return $content;
 
     }//end createWidget()
 
@@ -1067,74 +1046,6 @@ class GUIActions
         return $system;
 
     }//end getSystemNameFromWidgetType()
-
-
-    /**
-     * Returns a template's associated JS file path.
-     *
-     * For compiling widgets, the template file will be NULL. In that case, we will
-     * use the same name as the system.
-     *
-     * @param string $systemName System name from which the template is drawn.
-     * @param string $tplFile    Name of the template file.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    public static function getTemplateJSFilePath($systemName, $tplFile=NULL)
-    {
-        if ($tplFile === NULL) {
-            $tplFile = $systemName;
-        } else {
-            $tplFile = basename($tplFile, '.tpl');
-        }
-
-        $path  = GUI::getSystemWebPath($systemName);
-        $path .= '/'.$tplFile.'.js';
-
-        $fullPath = dirname(Channels::getSystemsPath()).'/'.$path;
-
-        if (file_exists($path) === TRUE) {
-            return $path;
-        }
-
-        return NULL;
-
-    }//end getTemplateJSFilePath()
-
-
-    /**
-     * Returns a template's associated CSS file path.
-     *
-     * For compiling widgets, the template file will be NULL. In that case, we will
-     * use the same name as the system.
-     *
-     * @param string $systemName System name from which the template is drawn.
-     * @param string $tplFile    Name of the template file.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    public static function getTemplateCSSFilePath($systemName, $tplFile=NULL)
-    {
-        if ($tplFile === NULL) {
-            $tplFile = $systemName;
-        } else {
-            $tplFile = basename($tplFile, '.tpl');
-        }
-
-        $path  = GUI::getSystemWebPath($systemName);
-        $path .= '/'.$tplFile.'.css';
-
-        $fullPath = dirname(Channels::getSystemsPath()).'/'.$path;
-
-        if (file_exists($path) === TRUE) {
-            return $path;
-        }
-
-        return NULL;
-
-    }//end getTemplateCSSFilePath()
 
 
     /**

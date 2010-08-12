@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI Table Actions Class.
- *
  */
 class GUITableActions
 {
@@ -38,6 +37,7 @@ class GUITableActions
      * @param array $settings The list of settings for this widget.
      *
      * @return void
+     * @throws ChannelException If no table columns specified.
      */
     public static function paint(array $settings)
     {
@@ -96,7 +96,7 @@ class GUITableActions
 
         echo '</tbody></table>';
 
-    }//end getTemplateContent()
+    }//end paint()
 
 
     /**
@@ -151,7 +151,9 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.'">'.$col.'</td>';
+                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.'">';
+                echo $col;
+                echo '</td>';
 
                 $colIdx++;
             }//end foreach

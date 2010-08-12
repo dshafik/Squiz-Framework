@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * SaveButton Actions Class.
- *
  */
 class GUISaveButtonActions
 {

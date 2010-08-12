@@ -1,0 +1,35 @@
+.GUIScreenSettings {
+    -moz-border-radius: 9px;
+    border: 1px solid #CCC;
+}
+
+.GUIScreenSettings-top {
+    -moz-border-radius: 9px 9px 0 0;
+    background-color: #BBB;
+    padding: 13px;
+    background-image: -moz-linear-gradient(0% 0 -90deg, #F6F6F6, #AAA);
+}
+
+.GUIScreenSettings-title-value {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.GUIScreenSettings-title-subTitle {
+    margin-top: 5px;
+    color: #444;
+}
+
+.GUIScreenSettings-section-title {
+    padding: 0 10px;
+    background-image: -moz-linear-gradient(0% 0 -90deg, #F6F6F6, #BBB);
+    line-height: 23px;
+}
+
+.GUIScreenSettings-item {
+    border-bottom: 1px solid #CCC;
+    padding: 7px 10px;
+    font-size: 10px;
+}
+
+

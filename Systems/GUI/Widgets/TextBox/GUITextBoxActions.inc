@@ -26,73 +26,44 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI TextBox Actions Class.
- *
  */
 class GUITextBoxActions
 {
 
     /**
-     * Default value of the field.
-     *
-     * @var   string
-     */
-    private static $_defaultValue = '';
-
-    /**
      * Width of the field.
      *
-     * @var   string
+     * @var string
      */
     private static $_width = '30';
 
 
-    public static function paint(array $settings)
-    {
-        echo '<input type="textbox" />';
-
-    }//end paint()
-
-
     /**
-     * Returns this widgets content.
+     * Prints this widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings=array())
     {
-        $content = '<div class="%class% container';
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
 
-        if (Util::getArrayIndex($settings, 'inline', FALSE) === TRUE) {
-            $content .= ' inline';
+        echo '<div class="'.$class.' container';
+
+        $inline = Util::getArrayIndex($settings, 'inline', FALSE);
+        if ($inline === TRUE || strtolower($inline) === 'true') {
+            echo ' inline';
         }
 
-        $content .= '" id="%id%">';
+        echo '" id="'.$id.'">';
 
-        $content .= '<?php ';
-
-        $valueCont = '';
-        if (isset($settings['dataProvider']) === TRUE) {
-            list($providerSystem, $providerMethod) = explode(
-                '::',
-                $settings['dataProvider']
-            );
-
-            $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-            $content .= '$value = '.$settings['dataProvider'].'();';
-
-            $valueCont = '&lt;?php echo $value; ?&gt;';
-        } else {
-            $defaultValue = "'".self::$_defaultValue."'";
-            $valueCont    = Util::getArrayIndex(
-                $settings,
-                'default',
-                $defaultValue
-            );
-        }
-
-        $content .= ' ?>';
+        $value = Util::getArrayIndex(
+            $settings,
+            'value',
+            ''
+        );
 
         $width         = Util::getArrayIndex($settings, 'width', self::$_width);
         $maxLengthProp = Util::getArrayIndex($settings, 'maxlength', 0);
@@ -111,27 +82,11 @@ class GUITextBoxActions
         }
 
         // The input field.
-        $content .= '<input class="%class% input"'.$name.' type="text" value="'.$valueCont.'" size="'.$width.'"'.$maxlength.' />';
+        echo '<input class="'.$class.' input"'.$name.' type="text" value="'.$value.'" size="'.$width.'"'.$maxlength.' />';
 
-        $content .= '</div>';
+        echo '</div>';
 
-        return $content;
-
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
 }//end class

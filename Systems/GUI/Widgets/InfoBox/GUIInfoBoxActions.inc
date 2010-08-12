@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI InfoBox Actions Class.
- *
  */
 class GUIInfoBoxActions
 {
@@ -37,7 +36,7 @@ class GUIInfoBoxActions
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
     public static function paint(array $settings)
     {
@@ -46,28 +45,28 @@ class GUIInfoBoxActions
         echo '<div id="'.$id.'" class="'.$class.'">';
 
         // Top section.
-        echo  '<div class="'.$class.'-top">';
-        echo  '<div class="'.$class.'-title">';
-        echo  '<div class="'.$class.'-title-icon"></div>';
-        echo  '<div class="'.$class.'-title-value">'.$settings['title'].'</div>';
-        echo  '</div>';
-        echo  '</div>';
+        echo '<div class="'.$class.'-top">';
+        echo '<div class="'.$class.'-title">';
+        echo '<div class="'.$class.'-title-icon"></div>';
+        echo '<div class="'.$class.'-title-value">'.$settings['title'].'</div>';
+        echo '</div>';
+        echo '</div>';
 
         // Mid section.
-        echo  '<div class="'.$class.'-mid">';
-        echo  '<div class="'.$class.'-thumbContainer">';
-        echo  '<img src="'.$settings['thumbURL'].'" />';
-        echo  '</div>';
-        echo  '</div>';
+        echo '<div class="'.$class.'-mid">';
+        echo '<div class="'.$class.'-thumbContainer">';
+        echo '<img src="'.$settings['thumbURL'].'" />';
+        echo '</div>';
+        echo '</div>';
 
         // Bottom section.
-        echo  '<div class="'.$class.'-bottom">';
-        echo  $settings['content'];
-        echo  '</div>';
+        echo '<div class="'.$class.'-bottom">';
+        echo $settings['content'];
+        echo '</div>';
 
-        echo  '</div>';
+        echo '</div>';
 
-    }//end getTemplateContent()
+    }//end paint()
 
 
 }//end class

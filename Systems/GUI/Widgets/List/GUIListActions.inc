@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI List Actions Class.
- *
  */
 class GUIListActions
 {
@@ -37,44 +36,27 @@ class GUIListActions
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings=array())
     {
-        $content  = '<div class="%class%-left" id="%id%-left">';
-        $content .= '<div class="%class%-right" id="%id%-right">';
-        $content .= '<ul class="%class%" id="%id%">';
+        echo '<div class="%class%-left" id="%id%-left">';
+        echo '<div class="%class%-right" id="%id%-right">';
+        echo '<ul class="%class%" id="%id%">';
 
-        // Load the list items.
-        list($providerSystem, $providerMethod) = explode('::', $settings['dataProvider']);
-        $content .= '<?php ';
-        $content .= 'Channels::includeSystem(\'GUIList\');';
-        $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-        $content .= '$data = '.$settings['dataProvider'].'();';
-        $content .= 'GUIList::paintItems($data, \''.(bool) $settings['sortable'].'\', \'%id%\', \'%class%\');';
-        $content .= ' ?>';
+        // Print the list items.
+        GUIList::paintItems(
+            $settings['dataProvider'],
+            (bool) $settings['sortable'],
+            $settings['widget']['id'],
+            $settings['widget']['type']
+        );
 
-        $content .= '</ul>';
-        $content .= '</div>';
-        $content .= '</div>';
+        echo '</ul>';
+        echo '</div>';
+        echo '</div>';
 
-        return $content;
-
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
     /**

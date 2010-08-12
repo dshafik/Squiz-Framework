@@ -107,20 +107,6 @@ class GUIBoxActions
     }//end _getContentFromDataProvider()
 
 
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
-
-
 }//end class
 
 ?>

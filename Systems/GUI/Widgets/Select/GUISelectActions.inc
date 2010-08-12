@@ -26,21 +26,23 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Select GUI Widget Actions Class.
- *
  */
 class GUISelectActions
 {
 
 
     /**
-     * Returns this widgets content.
+     * Prints this widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array())
+    public static function paint(array $settings=array())
     {
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
+
         $minWidth     = Util::getArrayIndex($settings, 'minWidth');
         $inlineStyles = array();
 
@@ -48,71 +50,34 @@ class GUISelectActions
             $inlineStyles[] = 'min-width: '.$minWidth.';';
         }
 
-        // Load the list items.
-        if (isset($settings['dataProvider']) === TRUE) {
-            list($providerSystem, $providerMethod) = explode(
-                '::',
-                $settings['dataProvider']
-            );
-        }
-
-        $content = '<select id="%id%" class="%class%"';
+        echo '<select id="'.$id.'" class="'.$class.'"';
 
         if (count($inlineStyles) > 0) {
-            $content .= ' style="'.implode(' ', $inlineStyles).'"';
+            echo ' style="'.implode(' ', $inlineStyles).'"';
         }
 
-        $content .= '>';
+        echo '>';
 
-        if (isset($settings['dataProvider']) === TRUE) {
-            $content .= '<?php ';
-            $content .= 'Channels::includeSystem(\'GUISelect\');';
-            $content .= 'Channels::includeSystem(\''.$providerSystem.'\');';
-            $content .= '$data = '.$settings['dataProvider'].'();';
-            $content .= 'GUISelect::paintItems($data, \'%id%\', \'%class%\');';
-            $content .= ' ?>';
-        } else if (isset($settings['items']) === TRUE) {
-            $data     = $settings['items'];
-            ob_start();
-                GUISelect::paintItems($data, $settings['id'], 'GUISelect');
-                $content .= ob_get_contents();
-            ob_end_clean();
-        }
+        GUISelect::paintItems($settings);
 
-        $content .= '</select>';
+        echo '</select>';
 
-        return $content;
-
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
     /**
      * Paint the items of the select field.
      *
-     * @param array  $data  Data provided by the specified data provider.
-     * @param string $id    The ID used by the list.
-     * @param string $class The class used by the list.
+     * @param array $settings List of settings for the widget.
      *
      * @return void
      */
-    public static function paintItems(array $data, $id, $class)
+    public static function paintItems(array $settings)
     {
-        $selected = Util::getArrayIndex($data, 'selected');
-        $options  = $data['options'];
+        $id       = $settings['widget']['id'];
+        $class    = $settings['widget']['type'];
+        $selected = Util::getArrayIndex($settings, 'selected');
+        $options  = Util::getArrayIndex($settings, 'options', array());
         $depths   = array();
 
         while (count($options) > 0) {
