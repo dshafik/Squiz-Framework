@@ -24,7 +24,6 @@
 
 /**
  * Library for development and debugging.
- *
  */
 class DebugExecutionPath
 {
@@ -32,21 +31,21 @@ class DebugExecutionPath
     /**
      * Channel call stack.
      *
-     * @var   array
+     * @var array
      */
     private static $_stack = array();
 
     /**
      * Stack element counter.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_stackCounter = 0;
 
     /**
      * Completed array.
      *
-     * @var   array
+     * @var array
      */
     private static $_completed = array();
 
@@ -57,21 +56,21 @@ class DebugExecutionPath
      * It is possible to add the poped elements to another array but this gives
      * random exec path.
      *
-     * @var   array $_toEnd
+     * @var array
      */
     private static $_toEnd = array();
 
     /**
      * Path to the report directory.
      *
-     * @var   string
+     * @var string
      */
     private static $_reportDir = '';
 
     /**
      * Channel type.
      *
-     * @var   string
+     * @var string
      */
     private static $_channelType = '';
 

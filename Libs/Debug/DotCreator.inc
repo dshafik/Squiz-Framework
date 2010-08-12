@@ -24,7 +24,6 @@
 
 /**
  * Library for creating DOT files.
- *
  */
 class DotCreator
 {
@@ -32,35 +31,34 @@ class DotCreator
     /**
      * List of nodes.
      *
-     * @var   array
+     * @var array
      */
     private $_nodes = array();
 
     /**
      * List of node connections.
      *
-     * @var   array
+     * @var array
      */
     private $_nodeConnections = array();
 
     /**
      * Path of the DOT template file.
      *
-     * @var   string
+     * @var string
      */
     private $_templateFile = '';
 
     /**
      * If true then any dupe connections will be shown on 1 line.
      *
-     * @var   boolean
+     * @var boolean
      */
     private $_singleConnections = TRUE;
 
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

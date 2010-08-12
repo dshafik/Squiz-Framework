@@ -24,7 +24,6 @@
 
 /**
  * Library for development and debugging.
- *
  */
 class Debug
 {
@@ -32,28 +31,28 @@ class Debug
     /**
      * Stores the last time recording from speedCheck().
      *
-     * @var   float $_speedCheckLastHit Time Total.
+     * @var float
      */
     private static $_speedCheckLastHit = NULL;
 
     /**
      * Stores the overall total from all speedCheck() calls.
      *
-     * @var   float $_speedCheckTotal Time Total.
+     * @var float
      */
     private static $_speedCheckTotal = NULL;
 
     /**
      * Used by mem_check to store the last memory usage recording.
      *
-     * @var   float $_memCheckLastHit Time Total.
+     * @var float
      */
     private static $_memCheckLastHit = NULL;
 
     /**
      * Used by mem_check to store the first memory usage recording.
      *
-     * @var   float $_memCheckFirstHit Time Total.
+     * @var float
      */
     private static $_memCheckFirstHit = NULL;
 

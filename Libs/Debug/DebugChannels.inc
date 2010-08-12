@@ -27,7 +27,6 @@ require_once 'Libs/Debug/DotCreator.inc';
 
 /**
  * Library for development and debugging.
- *
  */
 class DebugChannels
 {
@@ -35,14 +34,14 @@ class DebugChannels
     /**
      * If TRUE then debugging is ON.
      *
-     * @var   boolean
+     * @var boolean
      */
     private static $_debugging = TRUE;
 
     /**
      * List of classes that are ignored by debugger.
      *
-     * @var   array
+     * @var array
      */
     private static $_ignoredClasses = array(
                                        'Channels',
@@ -56,42 +55,42 @@ class DebugChannels
     /**
      * This var will change to FALSE after first valid tick.
      *
-     * @var   boolean
+     * @var boolean
      */
     private static $_firstTick = TRUE;
 
     /**
      * Tracks the backtrace level.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_prevCount = 0;
 
     /**
      * Tracks the previous method call.
      *
-     * @var   string
+     * @var string
      */
     private static $_prevMethodCalled = NULL;
 
     /**
      * DotCreator object.
      *
-     * @var   object
+     * @var object
      */
     public static $dotCreator = NULL;
 
     /**
      * List of called methods.
      *
-     * @var   string
+     * @var string
      */
     private static $_called = array();
 
     /**
      * Function call stack.
      *
-     * @var   array
+     * @var array
      */
      private static $_stack = array();
 
