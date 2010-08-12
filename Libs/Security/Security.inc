@@ -24,7 +24,6 @@
 
 /**
  * Library for security.
- *
  */
 class Security
 {
