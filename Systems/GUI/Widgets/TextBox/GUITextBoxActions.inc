@@ -31,11 +31,26 @@ class GUITextBoxActions
 {
 
     /**
-     * Width of the field.
+     * Size attribute of the text field.
      *
      * @var string
      */
-    private static $_width = '30';
+    protected static $size = '30';
+
+    /**
+     * Value attribute of the text field.
+     *
+     * @var string
+     */
+    protected static $value = '';
+
+    /**
+     * If TRUE then the container will have the style display:inline.
+     *
+     * @var boolean
+     * @internal
+     */
+    protected static $inline = FALSE;
 
 
     /**
@@ -65,7 +80,7 @@ class GUITextBoxActions
             ''
         );
 
-        $width         = Util::getArrayIndex($settings, 'width', self::$_width);
+        $size          = Util::getArrayIndex($settings, 'size', self::$size);
         $maxLengthProp = Util::getArrayIndex($settings, 'maxlength', 0);
         $nameProp      = Util::getArrayIndex($settings, 'name', '');
 
@@ -82,7 +97,7 @@ class GUITextBoxActions
         }
 
         // The input field.
-        echo '<input class="'.$class.' input"'.$name.' type="text" value="'.$value.'" size="'.$width.'"'.$maxlength.' />';
+        echo '<input class="'.$class.' input"'.$name.' type="text" value="'.$value.'" size="'.$size.'"'.$maxlength.' />';
 
         echo '</div>';
 

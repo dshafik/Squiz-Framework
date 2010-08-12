@@ -30,6 +30,27 @@ require_once 'Systems/BaseSystem.inc';
 class GUIInfoBoxActions
 {
 
+    /**
+     * The main title of the info box.
+     *
+     * @var string
+     */
+    protected static $title = '';
+
+    /**
+     * Thumbnail URL.
+     *
+     * @var string
+     */
+    protected static $thumbURL = '';
+
+    /**
+     * Content for the bottom section.
+     *
+     * @var string
+     */
+    protected static $content = '';
+
 
     /**
      * Returns this widgets content.

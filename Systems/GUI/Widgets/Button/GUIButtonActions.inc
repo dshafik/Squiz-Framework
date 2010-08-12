@@ -30,6 +30,20 @@ require_once 'Systems/BaseSystem.inc';
 class GUIButtonActions
 {
 
+    /**
+     * Value of button.
+     *
+     * @var string
+     */
+    protected static $value = '';
+
+    /**
+     * The onlcick action for the button.
+     *
+     * @var string
+     */
+    protected static $click = '';
+
 
     /**
      * Prints widgets content.

@@ -30,6 +30,48 @@ require_once 'Systems/BaseSystem.inc';
 class GUIContentSwitcherActions
 {
 
+    /**
+     * List of items for the content switcher.
+     *
+     * @var array
+     */
+    protected static $items = array();
+
+    /**
+     * The initial item.
+     *
+     * @var string
+     */
+    protected static $initialItem = NULL;
+
+    /**
+     * If FALSE then buttons for the switcher will not be shown.
+     *
+     * @var boolean
+     */
+    protected static $showButtons = TRUE;
+
+    /**
+     * The load type of the switcher (dynamic | static).
+     *
+     * @var string
+     */
+    protected static $loadType = 'dynamic';
+
+    /**
+     * If TRUE then all switcher buttons will be displayed.
+     *
+     * @var boolean
+     */
+    protected static $showAll = TRUE;
+
+    /**
+     * The target element id where the content will be shown.
+     *
+     * @var string
+     */
+    protected static $target;
+
 
     /**
      * Prints widgets content.
@@ -149,7 +191,7 @@ class GUIContentSwitcherActions
      * Returns the single item body content.
      *
      * @param array $settings The settings of the widget.
-     * @param array $item     Information about the item.
+     * @param mixed $item     Information about the item.
      *
      * @return string
      */

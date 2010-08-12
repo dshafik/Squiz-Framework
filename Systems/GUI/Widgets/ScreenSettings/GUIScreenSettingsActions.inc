@@ -30,6 +30,27 @@ require_once 'Systems/BaseSystem.inc';
 class GUIScreenSettingsActions
 {
 
+    /**
+     * Title of the box.
+     *
+     * @var string
+     */
+    protected static $title;
+
+    /**
+     * The sub title of the box.
+     *
+     * @var string
+     */
+    protected static $subTitle = '';
+
+    /**
+     * List of sections.
+     *
+     * @var array
+     */
+    protected static $sections;
+
 
     /**
      * Prints widgets content.

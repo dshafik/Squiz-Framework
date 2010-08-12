@@ -30,6 +30,38 @@ require_once 'Systems/BaseSystem.inc';
 class GUITableActions
 {
 
+    /**
+     * Show/hide table borders.
+     *
+     * @var boolean
+     */
+    protected static $showBorders = TRUE;
+
+    /**
+     * If TRUE then table rows are selectable.
+     *
+     * @var boolean
+     */
+    protected static $selectable = TRUE;
+
+    /**
+     * List of table columns.
+     *
+     * Expected array structure is array('columnid' => 'Column Title').
+     *
+     * @var array
+     */
+    protected static $columns = array();
+
+    /**
+     * List of rows.
+     *
+     * Expected array structure is array('rowid' => array('colid' => 'value')).
+     *
+     * @var array
+     */
+    protected static $rows = array();
+
 
     /**
      * Prints widgets content.

@@ -55,8 +55,6 @@ class GUIScreenSwitcherActions extends GUIContentSwitcherActions
         $screens = array();
         if (isset($settings['items']) === TRUE) {
             $screens = $settings['items'];
-        } else if (isset($settings['screens']) === TRUE) {
-            $screens = $settings['screens'];
         }
 
         foreach ($screens as $screen) {

@@ -90,6 +90,13 @@ class GUIActions
      */
     private static $_templateInitCode = '';
 
+    /**
+     * List of available widget settings.
+     *
+     * @var array
+     */
+    private static $_widgetSettings = array();
+
 
     /**
      * Includes the template PHP file.
@@ -105,6 +112,9 @@ class GUIActions
         $dataPath = BaseSystem::getDataDir($systemName);
         $dest     = $dataPath.'/Templates/'.$template.'.php';
 
+        if ($template === '.tpl')
+        throw new Exception();
+
         // Start template output.
         if (self::$_isBaking === TRUE) {
             echo '<?php include_once "'.$dest.'"; ?>';
@@ -113,7 +123,6 @@ class GUIActions
         }
 
     }//end printTemplate()
-
 
 
     /**
@@ -224,6 +233,17 @@ class GUIActions
                 }
             }
         }//end foreach
+
+        // Store the list of widget settings in a file so that they are accessible
+        // at runtime.
+        $widgetSettingsFile = BaseSystem::getDataDir('GUI').'/widgetSettings.inc';
+        $settingsContent    = '<';
+        $settingsContent   .= '?php $settings = ';
+        $settingsContent   .= var_export(self::$_widgetSettings, TRUE);
+        $settingsContent   .= '; ?';
+        $settingsContent   .= '>';
+
+        file_put_contents($widgetSettingsFile, $settingsContent);
 
         self::$_isBaking = FALSE;
 
@@ -543,6 +563,16 @@ class GUIActions
                 throw new ChannelException($msg);
             }
 
+            if (self::_isValidWidgetSetting($widgetSystem, $settingName) === FALSE) {
+                $msg = sprintf(
+                    _('"%s" is not a valid setting for %s. (Found in %s template)'),
+                    $settingName,
+                    $widgetSystem,
+                    self::$_currentTemplateKey
+                );
+                throw new ChannelException($msg);
+            }
+
             $varName = self::_getVarCode('widget', $widgetid).'["settings"]["'.$settingName.'"]';
             $php    .= self::_parseSettingTag($setting, $varName);
         }
@@ -550,6 +580,93 @@ class GUIActions
         return $php;
 
     }//end _getWidgetSettings()
+
+
+    /**
+     * Returns TRUE if the specified setting for the specified widget type is valid.
+     *
+     * @param string  $widgetName  Type of the widget.
+     * @param string  $settingName Name of the setting to check.
+     * @param boolean $jsOnly      If TRUE then the setting must also be available
+     *                             for JavaScript.
+     *
+     * @since  4.0.0
+     * @return void
+     */
+    private static function _isValidWidgetSetting($widgetName, $settingName, $jsOnly=FALSE)
+    {
+        if ($settingName === 'widget' || $settingName === 'template') {
+            return TRUE;
+        }
+
+        $settings = self::_getAvaiableSettingsForWidget($widgetName);
+
+        if (isset($settings[$settingName]) === TRUE) {
+            if ($jsOnly === TRUE) {
+                if ($settings[$settingName]['internal'] === FALSE) {
+                    return TRUE;
+                }
+            } else {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+
+    }//end _isValidWidgetSetting()
+
+
+    /**
+     * Returns the list of avialable settings for the specified widget type.
+     *
+     * @param string $widgetName The widget type.
+     *
+     * @return array
+     */
+    private static function _getAvaiableSettingsForWidget($widgetName)
+    {
+        if (self::$_isBaking === FALSE) {
+            if (empty(self::$_widgetSettings[$widgetName]) === TRUE) {
+                // At run time we need to include the widget settings file.
+                $path = BaseSystem::getDataDir('GUI').'/widgetSettings.inc';
+
+                include $path;
+                self::$_widgetSettings = $settings;
+            }
+
+            return Util::getArrayIndex(self::$_widgetSettings, $widgetName, array());
+        }
+
+        if (isset(self::$_widgetSettings[$widgetName]) === TRUE) {
+            return self::$_widgetSettings[$widgetName];
+        }
+
+        $settings = array();
+        Channels::includeSystem($widgetName);
+        $ref   = new ReflectionClass($widgetName.'Actions');
+        $props = $ref->getProperties(ReflectionProperty::IS_PROTECTED);
+
+        foreach ($props as $prop) {
+            if ($prop->isStatic() === FALSE) {
+                continue;
+            }
+
+            $docComment = $prop->getDocComment();
+            $internal   = FALSE;
+            if (strpos($docComment, ' * @internal') !== FALSE) {
+                $internal = TRUE;
+            }
+
+            $settings[$prop->getName()] = array(
+                                           'internal' => $internal,
+                                          );
+        }//end foreach
+
+        self::$_widgetSettings[$widgetName] = $settings;
+
+        return $settings;
+
+    }//end _getAvaiableSettingsForWidget()
 
 
     /**
@@ -567,13 +684,12 @@ class GUIActions
 
         include_once 'Libs/XML/XML.inc';
         if (XML::hasChildElements($setting) === FALSE) {
-            $php .= $varName." = '".$setting->nodeValue."';\n";
+            $php .= $varName." = ".self::_getPHPValue(trim($setting->nodeValue)).";\n";
             return $php;
         }
 
         foreach ($setting->childNodes as $node) {
             if ($node->nodeType === XML_TEXT_NODE) {
-                //$php .= $varName." = '".$node->nodeValue."';\n";
                 continue;
             } else if ($node->nodeType === XML_ELEMENT_NODE) {
                 // There are a few special/reserved tags.
@@ -681,9 +797,9 @@ class GUIActions
                     foreach ($node->childNodes as $childTag) {
                         if ($childTag->nodeType !== XML_ELEMENT_NODE) {
                             if ($node->tagName === 'content') {
-                                $val = trim($childTag->nodeValue);
+                                $val = self::_getPHPValue(trim($childTag->nodeValue));
                                 if (empty($val) === FALSE) {
-                                    $php .= $varName.'['.($counter++).'] = "'.$val."\";\n";
+                                    $php .= $varName.'['.($counter++).'] = '.$val.";\n";
                                 }
                             }
 
@@ -701,7 +817,7 @@ class GUIActions
                          $php .= $varName.' = implode("", '.$varName.');'."\n";
                     }
                 } else {
-                    $php .= "'".$node->nodeValue."';\n";
+                    $php .= self::_getPHPValue(trim($node->nodeValue)).";\n";
                 }
             break;
         }//end switch
@@ -709,6 +825,33 @@ class GUIActions
         return $php;
 
     }//end _parseTag()
+
+
+    /**
+     * Converts a string to real PHP variable.
+     *
+     * @param string $value The string to convert.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    private static function _getPHPValue($value)
+    {
+        if (strtolower($value) === 'true') {
+            $value = var_export(TRUE, TRUE);
+        } else if (strtolower($value) === 'false') {
+            $value = var_export(FALSE, TRUE);
+        } else if (is_float($value) === TRUE) {
+            $value = (float) $value;
+        } else if (is_int($value) === TRUE) {
+            $value = (int) $value;
+        } else {
+            $value = '"'.addslashes((string) $value).'"';
+        }
+
+        return $value;
+
+    }//end _getPHPValue()
 
 
     /**
@@ -799,7 +942,7 @@ class GUIActions
 
                 if ($arg === NULL) {
                     // Must be a text node.
-                    $php .= $argName." = '".$argNode->firstChild->nodeValue."';";
+                    $php .= $argName." = ".self::_getPHPValue(trim($argNode->nodeValue)).";";
                 } else {
                     $php .= self::_parseTag($arg, $argName);
                 }
@@ -1073,8 +1216,14 @@ class GUIActions
      */
     public static function getJSInitCode($systemName, $id, array $settings=array(), $template=NULL)
     {
-        // Need to remove all settings that have widget in them.
-        $settings = self::_removePHPSettings($settings);
+        // Need to remove all settings that are internal.
+        foreach ($settings as $settingName => $value) {
+            if (self::_isValidWidgetSetting($systemName, $settingName, TRUE) === FALSE) {
+                unset($settings[$settingName]);
+            }
+        }
+
+
 
         $code = 'if (window["'.$systemName.'"]) {GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'), "'.$template.'");}';
         return $code;

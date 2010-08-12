@@ -26,10 +26,51 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Box Actions Class.
- *
  */
 class GUIBoxActions
 {
+
+    /**
+     * Title for the header.
+     *
+     * @var string
+     */
+    protected static $title = '';
+
+    /**
+     * The body content for the box container.
+     *
+     * @var string
+     */
+    protected static $content = '';
+
+    /**
+     * Extra header content.
+     *
+     * @var string
+     */
+    protected static $headerContent = '';
+
+    /**
+     * The button style.
+     *
+     * @var string
+     */
+    protected static $style = '';
+
+    /**
+     * If FALSE then the right border wont be shown.
+     *
+     * @var boolean
+     */
+    protected static $borderRight = TRUE;
+
+    /**
+     * If FALSE then the left border wont be shown.
+     *
+     * @var boolean
+     */
+    protected static $borderLeft = TRUE;
 
 
     /**
@@ -95,13 +136,6 @@ class GUIBoxActions
 
     private static function _getContentFromDataProvider($dataProvider)
     {
-        /*list($providerSystem, $providerMethod) = explode('::', $dataProvider);
-        $content  = '<?php '."\n";
-        $content .= 'Channels::includeSystem(\''.$providerSystem.'\');'."\n";
-        $content .= 'echo '.$dataProvider.'();'."\n";
-        $content .= ' ?>';
-
-        return $content;*/
         echo 'DATA PROVIDER';
 
     }//end _getContentFromDataProvider()

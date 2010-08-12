@@ -30,6 +30,20 @@ require_once 'Systems/BaseSystem.inc';
 class GUIToolbarActions
 {
 
+    /**
+     * URL of the toolbar logo.
+     *
+     * @var string
+     */
+    protected static $logo;
+
+    /**
+     * Content of the toolbar
+     *
+     * @var string
+     */
+    protected static $content;
+
 
     /**
      * Prints widgets content.

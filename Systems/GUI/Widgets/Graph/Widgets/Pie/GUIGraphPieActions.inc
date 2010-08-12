@@ -32,6 +32,41 @@ require_once 'Libs/Web/Web.inc';
 class GUIGraphPieActions
 {
 
+    /**
+     * Size.
+     *
+     * @var string
+     */
+    protected static $size;
+
+    /**
+     * Rings.
+     *
+     * @var array
+     */
+    protected static $rings;
+
+    /**
+     * DataPoints.
+     *
+     * @var array
+     */
+    protected static $dataPoints;
+
+    /**
+     * DataProvider.
+     *
+     * @var string
+     */
+    protected static $dataProvider;
+
+    /**
+     * Border.
+     *
+     * @var array
+     */
+    protected static $border;
+
 
     /**
      * Prints widgets content.

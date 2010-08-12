@@ -32,6 +32,55 @@ class GUIGraphBarActions
 {
 
     /**
+     * The height of the graph.
+     *
+     * @var string
+     */
+    protected static $height = '500';
+
+    /**
+     * Groups.
+     *
+     * @var array
+     */
+    protected static $groups = array();
+
+    /**
+     * Flags.
+     *
+     * @var array
+     */
+    protected static $flags = array();
+
+    /**
+     * Major tick.
+     *
+     * @var string
+     */
+    protected static $majorTick = '';
+
+    /**
+     * DataProvider.
+     *
+     * @var string
+     */
+    protected static $dataProvider = '';
+
+    /**
+     * Max.
+     *
+     * @var string
+     */
+    protected static $max = '';
+
+    /**
+     * Minor tick.
+     *
+     * @var string
+     */
+    protected static $minorTick = '';
+
+    /**
      * Default height of the graph.
      *
      * Overridden using 'height' setting.
