@@ -26,7 +26,6 @@ require_once 'Libs/Datastructure/AbstractNode.inc';
 
 /**
  * SystemNode class.
- *
  */
 class SystemNode extends AbstractNode
 {
@@ -34,21 +33,21 @@ class SystemNode extends AbstractNode
     /**
      * The reference to the graph that this node is conntected to.
      *
-     * @var   object
+     * @var object
      */
     private $_graph = NULL;
 
     /**
      * The list of nodes which have outgoing link to this node.
      *
-     * @var   array
+     * @var array
      */
     private $_ins = array();
 
     /**
      * The list of nodes which this node has outgoing link.
      *
-     * @var   array
+     * @var array
      */
     private $_outs = array();
 

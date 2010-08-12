@@ -24,7 +24,6 @@
 
 /**
  * Abstract class for generic node in Datastructure.
- *
  */
 abstract class AbstractNode
 {
@@ -32,14 +31,14 @@ abstract class AbstractNode
     /**
      * Unique id for the node.
      *
-     * @var   string
+     * @var string
      */
     protected $id = '';
 
     /**
      * Data storage for each node.
      *
-     * @var   array
+     * @var array
      */
     protected $data = array();
 

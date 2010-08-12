@@ -28,7 +28,6 @@ require_once 'Libs/Datastructure/Graph/AbstractGraph.inc';
 
 /**
  * DirectedAcyclicGraph class.
- *
  */
 class DirectedAcyclicGraph extends AbstractGraph
 {
@@ -36,21 +35,20 @@ class DirectedAcyclicGraph extends AbstractGraph
     /**
      * The list of cycle strings found in the graph.
      *
-     * @var   array
+     * @var array
      */
     protected $cycles = array();
 
     /**
      * The list of nodes containing cycle(s).
      *
-     * @var   array
+     * @var array
      */
     protected $cycleNodes = array();
 
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

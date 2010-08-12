@@ -24,7 +24,6 @@
 
 /**
  * Abstract class for generic graph in Datastructure.
- *
  */
 abstract class AbstractGraph
 {
@@ -32,7 +31,7 @@ abstract class AbstractGraph
     /**
      * List of nodes in the graph.
      *
-     * @var   array
+     * @var array
      */
     protected $nodes = array();
 
