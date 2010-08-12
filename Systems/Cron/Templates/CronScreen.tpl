@@ -28,7 +28,7 @@
                                         <arg>
                                             <widget type="GUI/TextBox" id="frequentInterval">
                                                 <setting name="inline">true</setting>
-                                                <setting name="width">2</setting>
+                                                <setting name="size">2</setting>
                                                 <setting name="value">
                                                     <dataProvider action="Cron::getCronInterval">
                                                         <arg>frequent</arg>
@@ -43,7 +43,11 @@
                         <value>
                             <content>
                                  <text>
-                                    <value>Last run at %s</value>
+                                    <value>
+                                        <![CDATA[
+                                            Last run at <strong>%s</strong>
+                                        ]]>
+                                    </value>
                                     <args>
                                         <arg>
                                             <dataProvider action="Cron::getLastRunTime">
@@ -67,7 +71,7 @@
                                         <arg>
                                             <widget type="GUI/TextBox" id="hourlyInterval">
                                                 <setting name="inline">true</setting>
-                                                <setting name="width">2</setting>
+                                                <setting name="size">2</setting>
                                                 <setting name="value">
                                                     <dataProvider action="Cron::getCronInterval">
                                                         <arg>hourly</arg>
@@ -106,7 +110,7 @@
                                         <arg>
                                             <widget type="GUI/TextBox" id="dailyInterval">
                                                 <setting name="inline">true</setting>
-                                                <setting name="width">2</setting>
+                                                <setting name="size">2</setting>
                                                 <setting name="value">
                                                     <dataProvider action="Cron::getCronInterval">
                                                         <arg>daily</arg>
