@@ -24,7 +24,6 @@
 
 /**
  * Util methods.
- *
  */
 class Util
 {
