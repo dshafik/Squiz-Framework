@@ -27,7 +27,6 @@
  *
  * Methods for adding, deleting and modifying directories and files should
  * reside here.
- *
  */
 class String
 {
