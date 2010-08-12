@@ -26,7 +26,6 @@ require_once 'Libs/Web/HTTPRequest.inc';
 
 /**
  * XMLRPC client.
- *
  */
 class XMLRPCClient
 {
@@ -34,21 +33,21 @@ class XMLRPCClient
     /**
      * List of glossary term ids.
      *
-     * @var   array
+     * @var array
      */
     private $_uri = '';
 
     /**
      * List of glossary term ids.
      *
-     * @var   array
+     * @var array
      */
     private $_options = array();
 
     /**
      * List of glossary term ids.
      *
-     * @var   array
+     * @var array
      */
     private $_reqObj = NULL;
 
@@ -58,7 +57,6 @@ class XMLRPCClient
      *
      * @param string $uri     URI to connect.
      * @param array  $options Options to pass to HTTPRequest obj.
-     *
      */
     public function __construct($uri, array $options=array())
     {
