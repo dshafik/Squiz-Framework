@@ -385,7 +385,7 @@ class ChannelsBaker
                                                   'parents' => self::_getAllParentsSystems($ref),
                                                  );
             }//end if
-        }//end foreach $realSystems
+        }//end foreach
 
         return $result;
 
@@ -1249,7 +1249,6 @@ class ChannelsBaker
             $fileName     = self::getEventFilePath($method['system'].'::'.$method['name']);
         }
 
-
         // Get all the plug info.
         $doc = new DomDocument();
         $doc->load($fileName);
@@ -1402,6 +1401,10 @@ class ChannelsBaker
 
         foreach ($params as $param) {
             $content = '';
+
+            if (isset($param['passed_by_ref']) === TRUE && $param['passed_by_ref'] === TRUE) {
+                $content .= '&';
+            }
 
             $content .= '$'.$param['name'];
 
@@ -2452,6 +2455,10 @@ class ChannelsBaker
                 }
             }
 
+            if ($param->isPassedByReference() === TRUE) {
+                $newParam['passed_by_ref'] = TRUE;
+            }
+
             $result[] = $newParam;
         }//end foreach
 
@@ -2564,10 +2571,10 @@ class ChannelsBaker
 
                         $imported = $plugsDoc->importNode($plug, TRUE);
                         $plugsElem->appendChild($imported);
-                    }//end foreach plugs
-                }//end foreach loc
-            }//end foreach event (i.e xml file)
-        }//end foreach system
+                    }//end foreach
+                }//end foreach
+            }//end foreach
+        }//end foreach
 
         $ovenDir   = Channels::getOvenPath();
         $plugsFile = $ovenDir.'/plugs.xml';
