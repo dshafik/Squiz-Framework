@@ -24,7 +24,6 @@
 
 /**
  * Library for handling LDAP methods.
- *
  */
 class LDAP
 {
