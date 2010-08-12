@@ -24,7 +24,6 @@
 
 /**
  * General Exception.
- *
  */
 class GeneralException extends Exception
 {
