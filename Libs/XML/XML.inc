@@ -24,7 +24,6 @@
 
 /**
  * Library for handling data in XML form.
- *
  */
 class XML
 {
@@ -225,10 +224,10 @@ class XML
     /**
      * Returns the index of the specified node.
      *
-     * @oaram DOMNode A valid XML_ELEMENT_NODE.
+     * @param DOMNode $node A valid XML_ELEMENT_NODE.
      *
      * @since  4.0.0
-     * @return void
+     * @return integer
      */
     public static function getIndex(DOMNode $node)
     {
