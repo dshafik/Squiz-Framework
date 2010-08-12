@@ -27,7 +27,6 @@
  *
  * Methods for adding, deleting and modifying directories and files should
  * reside here.
- *
  */
 class FileSystem
 {
@@ -53,7 +52,7 @@ class FileSystem
     /**
      * The number of files within a hash directory.
      *
-     * @var   array
+     * @var array
      */
     public static $changedFiles = array();
 
@@ -267,7 +266,7 @@ class FileSystem
 
                 $dir->next();
                 continue;
-            }//end if $dir->isDir()
+            }//end if
 
             // We have a file or symbolic link, we need to unlink it.
             if (in_array($dir->getFileName(), $omitFiles) === FALSE) {
@@ -399,10 +398,10 @@ class FileSystem
                         }
                     }
                 }//end if
-            }//end if isFile()
+            }//end if
 
             $dir->next();
-        }//end while valid()
+        }//end while
 
         sort($files);
         return $files;
@@ -539,7 +538,7 @@ class FileSystem
      * Format File Size.
      *
      * @param integer $size If specified then $path argument will not be used.
-     * @param string  $unit The maximum unit that can be used to display the file size.
+     * @param string  $unit The maximum unit that can be used to display size.
      *
      * @return string
      * @access public
