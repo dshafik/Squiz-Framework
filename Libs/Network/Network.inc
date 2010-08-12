@@ -24,7 +24,6 @@
 
 /**
  * Network methods.
- *
  */
 class Network
 {
@@ -32,70 +31,70 @@ class Network
     /**
      * Network interface definition file path.
      *
-     * @var   string
+     * @var string
      */
     private static $_interfaceFilePath = '/etc/network/interfaces';
 
     /**
      * Directory path where PEM files locate.
      *
-     * @var   string
+     * @var string
      */
     private static $_pemFileDirectoryPath = '/etc/lighttpd/ssl';
 
     /**
      * Directory path where Lighttpd configuration files locate.
      *
-     * @var   string
+     * @var string
      */
     private static $_lighttpdConfDirectoryPath = '/etc/lighttpd/conf-enabled';
 
     /**
      * SSL lighttpd configuration file suffix.
      *
-     * @var   string
+     * @var string
      */
     private static $_lighttpdConfFilePrefix = '99-ssl-';
 
     /**
      * OpenSSL command line tool path.
      *
-     * @var   string
+     * @var string
      */
     private static $_openSSLCommandPath = '/usr/bin/openssl';
 
     /**
      * Lighttpd Web Server command line tool path.
      *
-     * @var   string
+     * @var string
      */
     private static $_lighttpdCommandPath = '/usr/sbin/lighttpd';
 
     /**
      * Invoke RC command line tool path.
      *
-     * @var   string
+     * @var string
      */
     private static $_invokeRCCommandPath = '/usr/sbin/invoke-rc.d';
 
     /**
      * Command line tool path of ifup.
      *
-     * @var   string
+     * @var string
      */
     private static $_ifconfigCommandPath = '/sbin/ifconfig';
 
     /**
      * Command line tool path of ifup.
      *
-     * @var   string
+     * @var string
      */
     private static $_ifupCommandPath = '/sbin/ifup';
 
     /**
      * Command line tool path of ifdown.
      *
-     * @var   string
+     * @var string
      */
     private static $_ifdownCommandPath = '/sbin/ifdown';
 
