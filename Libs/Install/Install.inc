@@ -33,7 +33,6 @@ require_once 'Systems/BaseSystem.inc';
  *
  * This class contains methods that are useful during installation but nowhere
  * else.
- *
  */
 class Install
 {
