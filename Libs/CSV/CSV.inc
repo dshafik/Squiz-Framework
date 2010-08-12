@@ -24,7 +24,6 @@
 
 /**
  * A library class used to create and parse CSV files.
- *
  */
 class CSV
 {
@@ -32,7 +31,7 @@ class CSV
     /**
      * Name of this CSV file.
      *
-     * @var   string
+     * @var string
      */
     private $_filename = '';
 
@@ -41,14 +40,14 @@ class CSV
      *
      * This is normally a comma or a tab character
      *
-     * @var   string
+     * @var string
      */
     private $_deliminator = ',';
 
     /**
      * An array of CSV line values.
      *
-     * @var   array
+     * @var array
      */
     private $_values = array();
 
@@ -57,7 +56,6 @@ class CSV
      * Constructor.
      *
      * @param string $filename The name of this CSV file.
-     *
      */
     public function __construct($filename='file.csv')
     {
