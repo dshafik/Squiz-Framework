@@ -680,6 +680,13 @@ class GUIActions
                     $php .= 'array();'."\n";
                     foreach ($node->childNodes as $childTag) {
                         if ($childTag->nodeType !== XML_ELEMENT_NODE) {
+                            if ($node->tagName === 'content') {
+                                $val = trim($childTag->nodeValue);
+                                if (empty($val) === FALSE) {
+                                    $php .= $varName.'['.($counter++).'] = "'.$val."\";\n";
+                                }
+                            }
+
                             continue;
                         }
 
@@ -876,7 +883,9 @@ class GUIActions
                    );
 
         foreach ($text->childNodes as $node) {
-            if ($node->nodeType === XML_TEXT_NODE) {
+            if ($node->nodeType === XML_TEXT_NODE
+                || $node->nodeType === XML_CDATA_SECTION_NODE
+            ) {
                 $tagInfo['value'] .= addslashes($node->nodeValue);
             } else if ($node->nodeType === XML_ELEMENT_NODE) {
                 if ($node->tagName === 'value') {
