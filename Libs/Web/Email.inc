@@ -24,7 +24,6 @@
 
 /**
  * Email related methods.
- *
  */
 class Email
 {
@@ -34,7 +33,6 @@ class Email
      * Constructor.
      *
      * Private to prevent instantiation.
-     *
      */
     private function __construct()
     {

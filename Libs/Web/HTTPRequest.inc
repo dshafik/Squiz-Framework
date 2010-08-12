@@ -24,7 +24,6 @@
 
 /**
  * HTTP Request class using cUrl.
- *
  */
 class HTTPRequest
 {
@@ -32,70 +31,70 @@ class HTTPRequest
     /**
      * URI to send the request.
      *
-     * @var   array
+     * @var array
      */
     private $_uri = '';
 
     /**
      * Curl object.
      *
-     * @var   array
+     * @var array
      */
     private $_ch = NULL;
 
     /**
      * Request data string.
      *
-     * @var   array
+     * @var array
      */
     private $_requestData;
 
     /**
      * Response data string.
      *
-     * @var   array
+     * @var array
      */
     private $_responseData;
 
     /**
      * Proxy URI.
      *
-     * @var   array
+     * @var array
      */
     private $_proxy = NULL;
 
     /**
      * Proxy Auth information.
      *
-     * @var   array
+     * @var array
      */
     private $_proxyAuth = NULL;
 
     /**
      * SSL infomation.
      *
-     * @var   array
+     * @var array
      */
     private $_sslverify = TRUE;
 
     /**
      * Encoding type.
      *
-     * @var   array
+     * @var array
      */
     private $_encoding = 'iso-8859-1';
 
     /**
      * Cookie file path.
      *
-     * @var   array
+     * @var array
      */
     private $_cookiefile = NULL;
 
     /**
      * When it's TRUE, it sends HTTP_GET request instead.
      *
-     * @var   array
+     * @var array
      */
     private $_httpGet = FALSE;
 

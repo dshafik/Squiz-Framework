@@ -24,7 +24,6 @@
 
 /**
  * Web related methods.
- *
  */
 class Web
 {
@@ -32,22 +31,22 @@ class Web
     /**
      * List of HTTP headers being sent out.
      *
-     * @var   array
+     * @var array
      */
     public static $headersSent = array();
 
     /**
      * The current URL.
      *
-     * @var   string
-     * @see   getCurrentUrl()
+     * @var string
+     * @see getCurrentUrl()
      */
     private static $_currentUrl = '';
 
     /**
      * The current URL with query string.
      *
-     * @var   string
+     * @var string
      */
     private static $_currentUrlWithQueryStr = '';
 
@@ -56,7 +55,6 @@ class Web
      * Constructor.
      *
      * Private to prevent instantiation.
-     *
      */
     private function __construct()
     {
