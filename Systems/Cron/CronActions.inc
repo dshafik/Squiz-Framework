@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Cron System Actions Class.
- *
  */
 class CronActions
 {
@@ -40,7 +39,7 @@ class CronActions
      *
      * @return string
      */
-    public static function getTemplateContent(array $settings=array(), $tplFile=NULL)
+    public static function paint(array $settings=array(), $tplFile=NULL)
     {
         $content = '';
         if ($tplFile !== NULL) {
@@ -49,21 +48,7 @@ class CronActions
 
         return $content;
 
-    }//end getTemplateContent()
-
-
-    /**
-     * Prepare for baking.
-     *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
-     */
-    public static function prepareBake(DOMNode $htmlTpl)
-    {
-        return $htmlTpl;
-
-    }//end prepareBake()
+    }//end paint()
 
 
     /**
@@ -994,10 +979,8 @@ class CronActions
         CHannels::includeSystem('GUI');
 
         $settings          = array(
-                              'items' => array(
-                                          'selected' => $script['interval'],
-                                          'options'  => $intervalOpts
-                                         ),
+                              'selected' => $script['interval'],
+                              'options'  => $intervalOpts,
                              );
         $templateCode      = GUI::createWidget($id.'-frequency', 'GUISelect', $settings);
         $info['frequency'] = $templateCode;
@@ -1013,147 +996,53 @@ class CronActions
     }//end _getCronScreenJobInfo()
 
 
+    /**
+     * Returns the run interval for the specified cron type.
+     *
+     * @param string $cronType Type of the cron.
+     *
+     * @return string
+     */
     public static function getCronInterval($cronType)
     {
+        $typeData = DAL::getAssoc(Cron::getCronType($cronType), 2);
+        $interval = Cron::getCronTypeInterval($typeData['condition']);
 
-        return '5';
+        return $interval;
 
     }//end getCronInterval()
 
 
+    /**
+     * Returns the last run time for the specified cron type.
+     *
+     * @param string $cronType Type of the cron.
+     *
+     * @return string
+     */
     public static function getLastRunTime($cronType)
     {
+        include_once 'Libs/String/String.inc';
+        $runTime = String::easyDatetime(time());
 
-        return '511';
+        return $runTime;
 
     }//end getLastRunTime()
 
 
-    public static function getCronSettingsSubTitle()
+    /**
+     * Returns the current date and time.
+     *
+     * @return string
+     */
+    public static function getCurrentDateTime()
     {
         include_once 'Libs/String/String.inc';
-        $str = _('Current time: ').String::easyDatetime(time());
+        $time = String::easyDatetime(time());
 
-        return $str;
+        return $time;
 
-    }//end getCronSettingsSubTitle()
-
-
-    /**
-     * Returns the cron setting item.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    public static function getCronSettingsFrequentSection()
-    {
-        $id      = 'frequentRunInterval';
-        $items   = array();
-        $content = _('Runs every');
-
-        $typeData = DAL::getAssoc(Cron::getCronType('frequent'), 2);
-        $interval = Cron::getCronTypeInterval($typeData['condition']);
-
-        Channels::includeSystem('GUI');
-        $settings     = array(
-                         'default' => ($interval / 60),
-                         'inline'  => TRUE,
-                         'width'   => 2,
-                        );
-        $templateCode = GUI::createWidget($id, 'GUITextBox', $settings);
-
-        $content .= ' '.$templateCode;
-        $content .= ' '._('minute(s)');
-
-        $items[] = $content;
-
-        // Last Run.
-        $items[] = _('Last run ').String::easyDatetime(time());
-
-        return $items;
-
-    }//end getCronSettingsFrequentSection()
-
-
-    /**
-     * Returns the cron setting item.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    public static function getCronSettingsHourlySection()
-    {
-        $id      = 'hourlyRunInterval';
-        $items   = array();
-        $content = _('Runs at');
-
-        $typeData = DAL::getAssoc(Cron::getCronType('hourly'), 2);
-        $interval = explode(' ', $typeData['condition']);
-        $interval = $interval[0];
-
-        Channels::includeSystem('GUI');
-        $settings     = array(
-                         'default' => $interval,
-                         'inline'  => TRUE,
-                         'width'   => 2,
-                        );
-        $templateCode = GUI::createWidget($id, 'GUITextBox', $settings);
-
-        $content .= ' '.$templateCode;
-        $content .= ' '._('minutes past the hour');
-
-        $items[] = $content;
-
-        // Last Run.
-        $items[] = _('Last run ').String::easyDatetime(time());
-
-        return $items;
-
-    }//end getCronSettingsHourlySection()
-
-
-    /**
-     * Returns the cron setting item.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    public static function getCronSettingsDailySection()
-    {
-        $id      = 'dailyRunInterval';
-        $items   = array();
-        $content = _('Runs every');
-
-        $typeData = DAL::getAssoc(Cron::getCronType('daily'), 2);
-        $interval = explode(' ', $typeData['condition']);
-
-        Channels::includeSystem('GUI');
-        $settings     = array(
-                         'default' => $interval[1],
-                         'inline'  => TRUE,
-                         'width'   => 2,
-                        );
-        $templateCode = GUI::createWidget($id.'-hour', 'GUITextBox', $settings);
-
-        $content .= ' '.$templateCode;
-        $content .= ' : ';
-
-        $settings     = array(
-                         'default' => $interval[0],
-                         'inline'  => TRUE,
-                         'width'   => 2,
-                        );
-        $templateCode = GUI::createWidget($id.'-min', 'GUITextBox', $settings);
-        $content     .= $templateCode;
-
-        $items[] = $content;
-
-        // Last Run.
-        $items[] = _('Last run ').String::easyDatetime(time());
-
-        return $items;
-
-    }//end getCronSettingsDailySection()
+    }//end getCurrentDateTime()
 
 
     /**
@@ -1217,6 +1106,15 @@ class CronActions
     }//end saveCronScreen()
 
 
+    /**
+     * Updates the run interval of a cron type.
+     *
+     * @param string $typeid      Type of the cron.
+     * @param string $intervalStr A valid cron time string.
+     *
+     * @since  4.0.0
+     * @return boolean
+     */
     private static function _updateFrequencyInterval($typeid, $intervalStr)
     {
         Channels::createEventBasket();
@@ -1235,7 +1133,7 @@ class CronActions
         Channels::removeEventBasket();
         return TRUE;
 
-    }
+    }//end _updateFrequencyInterval()
 
 
 }//end class

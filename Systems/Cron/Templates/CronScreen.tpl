@@ -7,7 +7,14 @@
                 <text>Cron Setting</text>
             </setting>
             <setting name="subTitle">
-                <dataProvider action="Cron::getCronSettingsSubTitle" />
+                <content>
+                    <text>
+                        <value>Current time: %s</value>
+                        <args>
+                            <arg><dataProvider action="Cron::getCurrentDateTime" /></arg>
+                        </args>
+                    </text>
+                </content>
             </setting>
             <setting name="sections">
                 <frequent>
@@ -20,7 +27,9 @@
                                     <args>
                                         <arg>
                                             <widget type="GUI/TextBox" id="frequentInterval">
-                                                <setting name="default">
+                                                <setting name="inline">true</setting>
+                                                <setting name="width">2</setting>
+                                                <setting name="value">
                                                     <dataProvider action="Cron::getCronInterval">
                                                         <arg>frequent</arg>
                                                     </dataProvider>
@@ -32,9 +41,18 @@
                             </content>
                         </value>
                         <value>
-                            <dataProvider action="Cron::getLastRunTime">
-                                <arg>frequent</arg>
-                            </dataProvider>
+                            <content>
+                                 <text>
+                                    <value>Last run at %s</value>
+                                    <args>
+                                        <arg>
+                                            <dataProvider action="Cron::getLastRunTime">
+                                                <arg>frequent</arg>
+                                            </dataProvider>
+                                        </arg>
+                                    </args>
+                                </text>
+                            </content>
                         </value>
                     </items>
                 </frequent>
@@ -48,7 +66,9 @@
                                     <args>
                                         <arg>
                                             <widget type="GUI/TextBox" id="hourlyInterval">
-                                                <setting name="default">
+                                                <setting name="inline">true</setting>
+                                                <setting name="width">2</setting>
+                                                <setting name="value">
                                                     <dataProvider action="Cron::getCronInterval">
                                                         <arg>hourly</arg>
                                                     </dataProvider>
@@ -60,9 +80,18 @@
                             </content>
                         </value>
                         <value>
-                            <dataProvider action="Cron::getLastRunTime">
-                                <arg>hourly</arg>
-                            </dataProvider>
+                            <content>
+                                 <text>
+                                    <value>Last run at %s</value>
+                                    <args>
+                                        <arg>
+                                            <dataProvider action="Cron::getLastRunTime">
+                                                <arg>hourly</arg>
+                                            </dataProvider>
+                                        </arg>
+                                    </args>
+                                </text>
+                            </content>
                         </value>
                     </items>
                 </hourly>
@@ -76,7 +105,9 @@
                                     <args>
                                         <arg>
                                             <widget type="GUI/TextBox" id="dailyInterval">
-                                                <setting name="default">
+                                                <setting name="inline">true</setting>
+                                                <setting name="width">2</setting>
+                                                <setting name="value">
                                                     <dataProvider action="Cron::getCronInterval">
                                                         <arg>daily</arg>
                                                     </dataProvider>
@@ -88,9 +119,18 @@
                             </content>
                         </value>
                         <value>
-                            <dataProvider action="Cron::getLastRunTime">
-                                <arg>daily</arg>
-                            </dataProvider>
+                            <content>
+                                 <text>
+                                    <value>Last run at %s</value>
+                                    <args>
+                                        <arg>
+                                            <dataProvider action="Cron::getLastRunTime">
+                                                <arg>daily</arg>
+                                            </dataProvider>
+                                        </arg>
+                                    </args>
+                                </text>
+                            </content>
                         </value>
                     </items>
                 </daily>
