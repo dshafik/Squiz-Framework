@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/AttributeType.inc';
 
 /**
  * DataSourceFloat.
- *
  */
 class DataSourceFloat implements AttributeType
 {

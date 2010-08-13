@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/DataSourceText.inc';
 
 /**
  * FileDataSourceFile.
- *
  */
 class FileDataSourceFile extends DataSourceText
 {

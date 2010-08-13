@@ -24,7 +24,6 @@
 
 /**
  * Asset Asset Type Class.
- *
  */
 class AssetAssetType
 {
@@ -34,7 +33,6 @@ class AssetAssetType
      * Constructor.
      *
      * Private to prevent instantiation.
-     *
      */
     private function __construct()
     {

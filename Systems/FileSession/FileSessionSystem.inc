@@ -26,7 +26,6 @@ require_once 'Systems/Session/SessionSystem.inc';
 
 /**
  * FileSessionSystem.
- *
  */
 class FileSessionSystem extends SessionSystem
 {
@@ -34,7 +33,6 @@ class FileSessionSystem extends SessionSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/DataSourceLongText.inc';
 
 /**
  * AttributeDataSourceLongText.
- *
  */
 class AttributeDataSourceLongText extends DataSourceLongText
 {
@@ -34,7 +33,7 @@ class AttributeDataSourceLongText extends DataSourceLongText
     /**
      * Table postfix.
      *
-     * @var   string $_tablePostfix Table postfix.
+     * @var string $_tablePostfix Table postfix.
      */
     private static $_tablePostfix = 'long_text';
 

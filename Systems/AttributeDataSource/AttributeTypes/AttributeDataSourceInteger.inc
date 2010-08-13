@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/DataSourceInteger.inc';
 
 /**
  * AttributeDataSourceInteger.
- *
  */
 class AttributeDataSourceInteger extends DataSourceInteger
 {
@@ -34,7 +33,7 @@ class AttributeDataSourceInteger extends DataSourceInteger
     /**
      * Table postfix.
      *
-     * @var   string $_tablePostfix Table postfix.
+     * @var string $_tablePostfix Table postfix.
      */
     private static $_tablePostfix = 'integer';
 

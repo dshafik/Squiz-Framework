@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Backup System Class.
- *
  */
 class BackupSystem extends BaseSystem
 {

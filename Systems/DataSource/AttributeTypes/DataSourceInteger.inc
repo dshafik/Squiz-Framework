@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/AttributeType.inc';
 
 /**
  * DataSourceInteger.
- *
  */
 class DataSourceInteger implements AttributeType
 {

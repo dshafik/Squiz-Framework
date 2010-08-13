@@ -30,7 +30,6 @@
  * Provides the interface for getting and setting attribute
  * values. All other data source systems must implement these
  * actions.
- *
  */
 interface DataSourceActions
 {

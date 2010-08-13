@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * DataSourceSystem.
- *
  */
 class DataSourceSystem extends BaseSystem
 {
@@ -34,7 +33,6 @@ class DataSourceSystem extends BaseSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

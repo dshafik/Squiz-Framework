@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Backup System Actions Class.
- *
  */
 class BackupActions
 {

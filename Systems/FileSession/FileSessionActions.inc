@@ -26,7 +26,6 @@ require_once 'Systems/Session/SessionActions.inc';
 
 /**
  * FileSessionActions.
- *
  */
 class FileSessionActions implements SessionActions
 {
@@ -34,7 +33,7 @@ class FileSessionActions implements SessionActions
     /**
      * If TRUE, the sesssion has already been started.
      *
-     * @var   boolean
+     * @var boolean
      */
     private static $_sessionStarted = FALSE;
 

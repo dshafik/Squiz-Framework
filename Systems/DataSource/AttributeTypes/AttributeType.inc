@@ -26,7 +26,6 @@
  * AttributeType.
  *
  * Defines methods that each attribute type must implement.
- *
  */
 interface AttributeType
 {

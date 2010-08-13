@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/DataSourceDatetime.inc';
 
 /**
  * AttributeDataSourceDatetime.
- *
  */
 class AttributeDataSourceDatetime extends DataSourceDatetime
 {
@@ -34,7 +33,7 @@ class AttributeDataSourceDatetime extends DataSourceDatetime
     /**
      * Table postfix.
      *
-     * @var   string $_tablePostfix Table postfix.
+     * @var string $_tablePostfix Table postfix.
      */
     private static $_tablePostfix = 'datetime';
 

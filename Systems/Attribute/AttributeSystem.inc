@@ -28,7 +28,6 @@ require_once 'Systems/BaseSystem.inc';
  * Attribute System Class.
  *
  * Installs any additional components of the Asset Attribute System.
- *
  */
 class AttributeSystem extends BaseSystem
 {

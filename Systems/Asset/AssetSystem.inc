@@ -28,7 +28,6 @@ require_once 'Systems/BaseSystem.inc';
  * AssetSystem.
  *
  * Installs all local asset types for this system.*
- *
  */
 class AssetSystem extends BaseSystem
 {
@@ -36,7 +35,6 @@ class AssetSystem extends BaseSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {
@@ -85,7 +83,7 @@ class AssetSystem extends BaseSystem
 
                 if (empty($currentInfo) === FALSE) {
                     $currentInfo['path'] = $xmlFile;
-                    $assetTypes[] = $currentInfo;
+                    $assetTypes[]        = $currentInfo;
                 }
             }//end if
         }//end foreach

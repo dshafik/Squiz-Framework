@@ -26,7 +26,6 @@ require_once dirname(dirname(dirname(__FILE__))).'/Cron/Scripts/CronScript.inc';
 
 /**
  * BackupCron Class.
- *
  */
 class BackupCron implements CronScript
 {

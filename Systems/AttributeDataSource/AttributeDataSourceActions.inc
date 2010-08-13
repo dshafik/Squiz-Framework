@@ -29,7 +29,6 @@ require_once 'Systems/DataSource/DataSourceActions.inc';
  *
  * Implementation of the abstract DataSource System. Uses
  * the local database for storage of attribute values.
- *
  */
 class AttributeDataSourceActions implements DataSourceActions
 {

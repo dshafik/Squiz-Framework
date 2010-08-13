@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Cron System Class.
- *
  */
 class CronSystem extends BaseSystem
 {

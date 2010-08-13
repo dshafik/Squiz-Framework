@@ -24,7 +24,6 @@
 
 /**
  * KeywordSystem.
- *
  */
 class ContextSystem extends BaseSystem
 {

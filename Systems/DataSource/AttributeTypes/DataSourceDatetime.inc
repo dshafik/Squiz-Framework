@@ -26,8 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/AttributeType.inc';
 
 /**
  * DataSourceDatetime.
- *
- * @since 4.0.0
  */
 class DataSourceDatetime implements AttributeType
 {
@@ -39,7 +37,6 @@ class DataSourceDatetime implements AttributeType
      * @param integer $assetid     Id of the asset.
      * @param string  $attributeid Id of the attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function getValue($assetid, $attributeid)
@@ -55,7 +52,6 @@ class DataSourceDatetime implements AttributeType
      * @param string  $attributeid Id of the attribute.
      * @param mixed   $value       Value of the attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function setValue($assetid, $attributeid, $value)
@@ -71,7 +67,6 @@ class DataSourceDatetime implements AttributeType
      * @param string $typeid      Id of the attribute type.
      * @param mixed  $value       Value of the attribute.
      *
-     * @since  4.0.0
      * @return void
      */
     public static function findAssetsByValue($attributeid, $typeid, $value)

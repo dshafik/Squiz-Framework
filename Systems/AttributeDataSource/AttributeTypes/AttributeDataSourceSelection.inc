@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/DataSourceSelection.inc';
 
 /**
  * AttributeDataSourceSelection.
- *
  */
 class AttributeDataSourceSelection extends DataSourceSelection
 {
@@ -34,7 +33,7 @@ class AttributeDataSourceSelection extends DataSourceSelection
     /**
      * Table postfix.
      *
-     * @var   string $_tablePostfix Table postfix.
+     * @var string $_tablePostfix Table postfix.
      */
     private static $_tablePostfix = 'selection';
 

@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/DataSourceSystem.inc';
 
 /**
  * FileDataSourceSystem.
- *
  */
 class FileDataSourceSystem extends BaseSystem
 {
@@ -34,7 +33,6 @@ class FileDataSourceSystem extends BaseSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

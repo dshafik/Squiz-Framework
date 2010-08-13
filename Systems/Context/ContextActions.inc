@@ -24,7 +24,6 @@
 
 /**
  * ContextActions.
- *
  */
 class ContextActions
 {
@@ -32,14 +31,14 @@ class ContextActions
     /**
      * Maximum context levels.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_maxContextLevels = 4;
 
     /**
      * Master context string.
      *
-     * @var   string
+     * @var string
      */
     private static $_masterContext = '00000000';
 
@@ -49,7 +48,6 @@ class ContextActions
      *
      * All methods should be called statically, and therefore this class should
      * never need to be instantiated.
-     *
      */
     private function __construct()
     {

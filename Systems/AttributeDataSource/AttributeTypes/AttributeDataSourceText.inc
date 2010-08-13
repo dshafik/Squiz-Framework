@@ -26,7 +26,6 @@ require_once 'Systems/DataSource/AttributeTypes/DataSourceText.inc';
 
 /**
  * AttributeDataSourceText.
- *
  */
 class AttributeDataSourceText extends DataSourceText
 {
@@ -34,7 +33,7 @@ class AttributeDataSourceText extends DataSourceText
     /**
      * Table postfix.
      *
-     * @var   string $_tablePostfix Table postfix.
+     * @var string $_tablePostfix Table postfix.
      */
     private static $_tablePostfix = 'text';
 
