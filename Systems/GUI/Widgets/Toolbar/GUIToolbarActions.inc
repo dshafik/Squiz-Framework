@@ -54,15 +54,23 @@ class GUIToolbarActions
      */
     public static function paint(array $settings)
     {
+        if (isset($settings['logo']) === FALSE
+            || $settings['logo'] === ''
+        ) {
+            $settings['logo'] = '/__web/Systems/GUI/Widgets/Toolbar/Web/logo.png';
+        }
+
         $className = $settings['widget']['type'];
         echo '<div class="'.$className.'">
-                <div class="'.$className.'-logo" style="background-url: ('.$settings['logo'].')"></div>';
+                <div class="'.$className.'-logo" style="background: url(\''.$settings['logo'].'\') no-repeat 0 0;"></div>
+                    <div class="'.$className.'-content">';
 
         if (isset($settings['content']) === TRUE) {
             echo $settings['content'];
         }
 
-        echo '</div></div>'."\n";
+        echo '</div>
+            </div>'."\n";
 
     }//end paint()
 
