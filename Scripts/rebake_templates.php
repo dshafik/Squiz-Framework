@@ -51,4 +51,7 @@ include_once 'Channels/Channels.inc';
 Channels::includeSystem('GUI');
 GUI::bakeTemplates();
 
+// Fix perms.
+system($rootdir.'/Scripts/fix_perms.sh');
+
 ?>
