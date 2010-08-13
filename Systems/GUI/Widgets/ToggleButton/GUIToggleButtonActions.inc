@@ -31,7 +31,12 @@ require_once 'Systems/BaseSystem.inc';
 class GUIToggleButtonActions
 {
 
-    private static $defaultValue = FALSE;
+    /**
+     * The default value of the toggle.
+     *
+     * @var boolean
+     */
+    protected static $value = FALSE;
 
 
     /**
@@ -48,7 +53,7 @@ class GUIToggleButtonActions
 
         echo '<div class="'.$class.'" id="'.$id.'">';
 
-        $selected = Util::getArrayIndex($settings, 'default', self::$defaultValue);
+        $selected = Util::getArrayIndex($settings, 'default', self::$value);
         if ($selected === TRUE || strtolower($selected) === 'true') {
             $selected = TRUE;
         } else {

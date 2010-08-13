@@ -34,7 +34,7 @@ function GUIToggleButton(id, settings) {
     GUI.addWidgetEvent(this, 'toggleOn');
     GUI.addWidgetEvent(this, 'toggleOff');
 
-    this.currentValue = settings['default'];
+    this.currentValue = settings.value;
 
     this.init();
 }

@@ -30,6 +30,20 @@ require_once 'Systems/BaseSystem.inc';
 class GUISelectActions
 {
 
+    /**
+     * Id of the selected option.
+     *
+     * @var string
+     */
+    protected static $selected;
+
+    /**
+     * List of options.
+     *
+     * @var array
+     */
+    protected static $options;
+
 
     /**
      * Prints this widgets content.
@@ -102,9 +116,12 @@ class GUISelectActions
             // Then add the sub elements to the start of the options so we know
             // to work with them first. Ignore the key provided.
             if (is_array($option) === TRUE) {
-                $newLength = count($depths) + count($option);
-                $depths[]  = array($depth + 1, count($option));
-                $options   = $option + $options;
+                $newLength = (count($depths) + count($option));
+                $depths[]  = array(
+                              ($depth + 1),
+                              count($option),
+                             );
+                $options   = ($option + $options);
             } else {
                 echo '<option value="'.$optionKey.'"';
 
@@ -115,13 +132,12 @@ class GUISelectActions
                 echo '>';
 
                 if ($depth > 0) {
-                    echo str_repeat('&nbsp;', ($depth - 1) * 4 + 1);
+                    echo str_repeat('&nbsp;', (($depth - 1) * 4 + 1));
                     echo '--&nbsp;';
                 }
 
                 echo $option.'</option>';
             }//end if
-
         }//end while
 
     }//end paintItems()

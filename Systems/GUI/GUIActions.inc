@@ -112,9 +112,6 @@ class GUIActions
         $dataPath = BaseSystem::getDataDir($systemName);
         $dest     = $dataPath.'/Templates/'.$template.'.php';
 
-        if ($template === '.tpl')
-        throw new Exception();
-
         // Start template output.
         if (self::$_isBaking === TRUE) {
             echo '<?php include_once "'.$dest.'"; ?>';
@@ -234,6 +231,20 @@ class GUIActions
             }
         }//end foreach
 
+        self::_createWidgetSettingsFile();
+
+        self::$_isBaking = FALSE;
+
+    }//end bakeTemplates()
+
+
+    /**
+     * Creates the widget settings file so that the list can be used during run time.
+     *
+     * @return void
+     */
+    private static function _createWidgetSettingsFile()
+    {
         // Store the list of widget settings in a file so that they are accessible
         // at runtime.
         $widgetSettingsFile = BaseSystem::getDataDir('GUI').'/widgetSettings.inc';
@@ -244,10 +255,9 @@ class GUIActions
         $settingsContent   .= '>';
 
         file_put_contents($widgetSettingsFile, $settingsContent);
+        chmod($widgetSettingsFile, 0755);
 
-        self::$_isBaking = FALSE;
-
-    }//end bakeTemplates()
+    }//end _createWidgetSettingsFile()
 
 
     /**
@@ -270,14 +280,26 @@ class GUIActions
 
         $php  = '// Initialise template var.'."\n";
         $php .= 'if (isset($templateVars) === FALSE) $templateVars = array();'."\n";
+
+        $tplVarName = $systemName.'_'.$templateName.'_prevTpl';
+        $php       .= '// Set the current template key.'."\n";
+        $php       .= '$'.$tplVarName.' = GUI::getCurrentTemplateKey();'."\n";
+        $php       .= 'GUI::setCurrentTemplateKey('.var_export($tplKey, TRUE).");\n";
+
         $php .= self::_getVarCode().' = array();'."\n";
 
+        // Add the PHP code to member var so that during parsing it can be updated.
         self::$_templateInitCode = $php;
 
+        // Parse the special tags in the template file.
         GUI::parseTemplate($tplDoc);
 
         $phpNode = $tplDoc->createProcessingInstruction('php', self::$_templateInitCode);
         $tplDoc->insertBefore($phpNode, $tplDoc->firstChild);
+
+        $resetCurrTemplateCode = 'GUI::setCurrentTemplateKey($'.$tplVarName.');'."\n";
+        $phpNode = $tplDoc->createProcessingInstruction('php', $resetCurrTemplateCode);
+        $tplDoc->appendChild($phpNode);
 
         // Now add the dependent files to the HEAD tag, if it exists.
         $head = $tplDoc->getElementsByTagName('head');
@@ -312,7 +334,7 @@ class GUIActions
             $replacement .= '   }'."\n";
             $replacement .= '   echo \'<input id="__api_token" type="hidden" value="\'.$currToken.\'" />\';'."\n";
             $replacement .= '}'."\n";
-            $replacement .= '?'.'>'."\n";
+            $replacement .= '?'.">\n";
             $replacement .= '</body>'."\n";
 
             $htmlCont = str_replace('</body>', $replacement, $htmlCont);
@@ -336,6 +358,32 @@ class GUIActions
         file_put_contents($dest, $htmlCont);
 
     }//end bakeTemplate()
+
+
+    /**
+     * Returns the template key thats being parsed/painted.
+     *
+     * @return string
+     */
+    public static function getCurrentTemplateKey()
+    {
+        return self::$_currentTemplateKey;
+
+    }//end getCurrentTemplateKey()
+
+
+    /**
+     * Set the template key thats being parsed/painted.
+     *
+     * @param string $tplKey The template key.
+     *
+     * @return void
+     */
+    public static function setCurrentTemplateKey($tplKey)
+    {
+        self::$_currentTemplateKey = $tplKey;
+
+    }//end setCurrentTemplateKey()
 
 
     /**
@@ -575,7 +623,7 @@ class GUIActions
 
             $varName = self::_getVarCode('widget', $widgetid).'["settings"]["'.$settingName.'"]';
             $php    .= self::_parseSettingTag($setting, $varName);
-        }
+        }//end foreach
 
         return $php;
 
@@ -591,7 +639,7 @@ class GUIActions
      *                             for JavaScript.
      *
      * @since  4.0.0
-     * @return void
+     * @return boolean
      */
     private static function _isValidWidgetSetting($widgetName, $settingName, $jsOnly=FALSE)
     {
@@ -633,8 +681,6 @@ class GUIActions
                 include $path;
                 self::$_widgetSettings = $settings;
             }
-
-            return Util::getArrayIndex(self::$_widgetSettings, $widgetName, array());
         }
 
         if (isset(self::$_widgetSettings[$widgetName]) === TRUE) {
@@ -657,12 +703,15 @@ class GUIActions
                 $internal = TRUE;
             }
 
-            $settings[$prop->getName()] = array(
-                                           'internal' => $internal,
-                                          );
+            $settings[$prop->getName()] = array('internal' => $internal);
         }//end foreach
 
         self::$_widgetSettings[$widgetName] = $settings;
+
+        if (self::$_isBaking === FALSE) {
+            // New widget type found during run time so store the new settings array.
+            self::_createWidgetSettingsFile();
+        }
 
         return $settings;
 
@@ -684,7 +733,7 @@ class GUIActions
 
         include_once 'Libs/XML/XML.inc';
         if (XML::hasChildElements($setting) === FALSE) {
-            $php .= $varName." = ".self::_getPHPValue(trim($setting->nodeValue)).";\n";
+            $php .= $varName.' = '.self::_getPHPValue(trim($setting->nodeValue)).";\n";
             return $php;
         }
 
@@ -818,7 +867,7 @@ class GUIActions
                     }
                 } else {
                     $php .= self::_getPHPValue(trim($node->nodeValue)).";\n";
-                }
+                }//end if
             break;
         }//end switch
 
@@ -942,7 +991,7 @@ class GUIActions
 
                 if ($arg === NULL) {
                     // Must be a text node.
-                    $php .= $argName." = ".self::_getPHPValue(trim($argNode->nodeValue)).";";
+                    $php .= $argName.' = '.self::_getPHPValue(trim($argNode->nodeValue)).';';
                 } else {
                     $php .= self::_parseTag($arg, $argName);
                 }
@@ -1057,22 +1106,33 @@ class GUIActions
      * @param string $id       The id to use for the widget.
      * @param string $type     The type of the widget.
      * @param array  $settings Settings for the widget.
-     * @param string $tplFile  Template file to use.
      *
-     * @since  4.0.0
      * @return string
+     * @throws ChannelException If an invalid setting is used.
      */
     public static function createWidget($id, $type, array $settings=array())
     {
+        foreach ($settings as $settingName => $value) {
+            if (self::_isValidWidgetSetting($type, $settingName) === FALSE) {
+                $msg = sprintf(
+                    _('"%s" is not a valid setting for %s.'),
+                    $settingName,
+                    $type
+                );
+                throw new ChannelException($msg);
+            }
+        }
+
         $settings['widget'] = array(
                                'id'   => $id,
                                'type' => $type,
                               );
 
-        $settings['template'] = array(
-                                 'system' => 'RUNTIME',
-                                 'name'   => 'RUNTIME',
-                                );
+        list($tplSystem, $tplName) = explode('::', GUI::getCurrentTemplateKey());
+        $settings['template']      = array(
+                                      'system' => $tplSystem,
+                                      'name'   => $tplName,
+                                     );
 
         Channels::includeSystem($type);
 
@@ -1086,6 +1146,7 @@ class GUIActions
             if (file_exists($jsFilePath) === TRUE) {
                 echo '<script>'.GUI::getJSInitCode($type, $id, $settings).'</script>';
             }
+
             $content = ob_get_contents();
         ob_end_clean();
 
@@ -1209,12 +1270,11 @@ class GUIActions
      * @param string $systemName Name of the system.
      * @param string $id         Unique ID of the widget object.
      * @param array  $settings   Settings array of the widget object.
-     * @param string $template   The template that this widget belongs to.
      *
      * @since  4.0.0
      * @return string
      */
-    public static function getJSInitCode($systemName, $id, array $settings=array(), $template=NULL)
+    public static function getJSInitCode($systemName, $id, array $settings=array())
     {
         // Need to remove all settings that are internal.
         foreach ($settings as $settingName => $value) {
@@ -1223,9 +1283,7 @@ class GUIActions
             }
         }
 
-
-
-        $code = 'if (window["'.$systemName.'"]) {GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'), "'.$template.'");}';
+        $code = 'if (window["'.$systemName.'"]) {GUI.addWidget("'.$id.'", new '.$systemName.'("'.$id.'", '.json_encode($settings).'));}';
         return $code;
 
     }//end getJSInitCode()
@@ -1304,6 +1362,11 @@ class GUIActions
             list($system, $templateName) = explode(':', $key);
             Channels::includeSystem($system);
             $templateName = 'save'.$templateName;
+
+            if (is_callable($system.'::'.$templateName) === FALSE) {
+                // No save method for this template.
+                continue;
+            }
 
             $callback = array(
                          $system,

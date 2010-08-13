@@ -34,12 +34,15 @@ var GUI = new function()
         return this.widgetStore[id];
     };
 
-    this.addWidget = function(id, obj, parent) {
-        this.widgetStore[id] = obj;
-
-        if (!parent) {
+    this.addWidget = function(id, obj) {
+        if (!obj.id || !obj.settings || !obj.settings.template) {
+            // Invalid widget.
             return;
         }
+
+        this.widgetStore[id] = obj;
+
+        var parent = obj.settings.template.system + ':' + obj.settings.template.name;
 
         if (!this.widgetTemplates[parent]) {
             this.widgetTemplates[parent] = {};
@@ -160,19 +163,6 @@ var GUI = new function()
         GUI.sendRequest(system, method, params, function(data) {
             // Set the contents.
             dfx.setHtml(targetElement, data.result.contents);
-
-           /* dfx.foreach(data.result.widgets, function(templateKey) {
-                var widgets = data.result.widgets[templateKey];
-                var wln     = widgets.length;
-                for (var i = 0; i < wln; i++) {
-                    var widget = widgets[i];
-
-                    if (window[widget.type]) {
-                        var widgetObj = eval('new ' + widget.type + '(widget.id, widget.settings)');
-                        GUI.addWidget(widget.id, widgetObj, widget.parentTemplateKey);
-                    }
-                }
-            });*/
         });
     };
 
@@ -184,7 +174,6 @@ var GUI = new function()
         // Retrieve the save values in reverse order.
         for (var i = (ln - 1); i >= 0; i--) {
             var template     = this.templateLineage[i];
-            console.info('Getting values for ' + template + ' template');
             var isEmpty      = true;
             values[template] = {};
             dfx.foreach(self.widgetTemplates[template], function(widgetid) {
