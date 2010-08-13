@@ -34,8 +34,8 @@ class PDFExportActions
     /**
      * Generate a PDF from a URL.
      *
-     * @param string  $url  URL to generate.
-     * @param string  $dest Where the PDF will be saved.
+     * @param string $url  URL to generate.
+     * @param string $dest Where the PDF will be saved.
      *
      * @return boolean
      */
