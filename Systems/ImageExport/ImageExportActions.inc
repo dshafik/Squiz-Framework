@@ -72,15 +72,16 @@ class ImageExportActions
                 }
             } else {
                 ImageExport::generateFromImage($dest.'.tmp', $dest, $width, $height, TRUE);
+                exec('rm '.$dest.'.tmp');
             }
 
             $success = TRUE;
         } catch (ChannelException $e) {
             echo $e->getMessage();
             $success = FALSE;
+            exec('rm '.$dest.'.tmp');
         }//end try
 
-        exec('rm '.$dest.'.tmp');
         return $success;
 
     }//end generateFromURL()
