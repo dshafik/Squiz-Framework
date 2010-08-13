@@ -23,8 +23,12 @@
 
 function GUISaveButton(id, settings)
 {
-    this.id       = id;
-    this.settings = settings;
+    this.id        = id;
+    this.settings  = settings;
+    this.className = settings.widget.type;
+
+    this._saveButton   = null;
+    this._revertButton = null;
 
     this.init();
 
@@ -34,9 +38,42 @@ GUISaveButton.prototype = {
 
     init: function()
     {
-        dfx.addEvent(dfx.getId(this.id), 'click', function() {
+        var self           = this;
+        this._saveButton   = dfx.getId(this.id + '-save');
+        this._revertButton = dfx.getId(this.id + '-revert');
+
+        dfx.addEvent(this._saveButton, 'click', function() {
             GUI.save();
         });
+
+        dfx.addEvent(this._revertButton, 'click', function() {
+            GUI.revert();
+        });
+
+        GUI.addModifiedCallback(function(widgetid, modified) {console.info(modified);
+            if (modified === true) {
+                self.enable();
+            } else {
+                self.disable();
+            }
+        });
+
+    },
+
+    enable: function()
+    {
+        dfx.attr(this._saveButton, 'disabled', false);
+        dfx.attr(this._revertButton, 'disabled', false);
+
+        dfx.addClass(dfx.getId(this.id), this.className + 'Active');
+
+    },
+
+    disable: function()
+    {
+        dfx.attr(this._saveButton, 'disabled', true);
+        dfx.attr(this._revertButton, 'disabled', true);
+        dfx.removeClass(dfx.getId(this.id), this.className + 'Active');
 
     }
 

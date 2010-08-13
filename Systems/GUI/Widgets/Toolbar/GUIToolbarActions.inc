@@ -56,15 +56,13 @@ class GUIToolbarActions
     {
         $className = $settings['widget']['type'];
         echo '<div class="'.$className.'">
-                <div class="'.$className.'-logo" style="background-url: ('.$settings['logo'].')"></div>
-                    <div class="'.$className.'-content">';
+                <div class="'.$className.'-logo" style="background-url: ('.$settings['logo'].')"></div>';
 
         if (isset($settings['content']) === TRUE) {
             echo $settings['content'];
         }
 
-        echo '</div>
-            </div><!-- end toolbar: '.$settings['widget']['id'].' -->'."\n";
+        echo '</div></div>'."\n";
 
     }//end paint()
 

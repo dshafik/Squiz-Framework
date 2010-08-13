@@ -40,14 +40,13 @@ class GUISaveButtonActions
      */
     public static function paint(array $settings)
     {
-        $id        = $settings['widget']['id'];
-        $className = $settings['widget']['type'];
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
 
-        $content  = '<div id="'.$id.'" class="'.$className.'">';
-        $content .= '<input type="button" value="'._('Save').'" />';
-        $content .= '</div>';
-
-        echo $content;
+        echo '<div id="'.$id.'" class="'.$class.' GUI-alignRight">';
+        echo '<button id="'.$id.'-save" disabled="true" class="GUIButton buttonSave GUI-alignleft"><span class="GUIButtonLabel">'._('Save').'</span></button>';
+        echo '<button id="'.$id.'-revert" disabled="true" class="GUIButton buttonSaveRevert GUI-alignleft"><span class="GUIButtonLabel">'._('Revert').'</span><span class="GUIButtonIcon"></span></button>';
+        echo '</div>';
 
     }//end paint()
 

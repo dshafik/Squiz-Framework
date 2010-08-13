@@ -338,10 +338,12 @@ class GUIActions
             $replacement .= '</body>'."\n";
 
             $htmlCont = str_replace('</body>', $replacement, $htmlCont);
-        }//end if
+        } else {
+            // Replce the doc type for sub level templates.
+            $htmlCont = str_replace(self::$_docType, '', $htmlCont);
+        }
 
         // Do some cleanup.
-        $htmlCont = str_replace(self::$_docType, '', $htmlCont);
         $htmlCont = trim(str_replace('<?xml version="1.0"?>', '', $htmlCont));
 
         $htmlCont = str_replace('&lt;?php', '<'.'?php', $htmlCont);

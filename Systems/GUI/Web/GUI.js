@@ -27,6 +27,8 @@ var GUI = new function()
 {
     this.widgetStore     = {};
     var _publicDirName   = 'Web';
+    var _modifiedWidgets = {};
+    var _reverting       = false;
     this.widgetTemplates = {};
     this.templateLineage = [];
 
@@ -134,7 +136,7 @@ var GUI = new function()
             if (obj.__eventCallbacks) {
                 var len = obj.__eventCallbacks[eventName].length;
                 for (var i = 0; i < len; i++) {
-                    obj.__eventCallbacks[eventName][i].call(obj);
+                    obj.__eventCallbacks[eventName][i].apply(obj, arguments);
                 }
             }
         };
@@ -204,5 +206,36 @@ var GUI = new function()
 
         return values;
     };
+
+    this.revert = function() {
+        _reverting = true;
+        dfx.foreach(_modifiedWidgets, function(widgetid) {
+            var widget = GUI.getWidget(widgetid);
+            if (widget && widget.revert) {
+                widget.revert();
+            }
+        });
+
+        _modifiedWidgets = {};
+        _reverting = false;
+
+    };
+
+    this.setModified = function(widget, state) {
+        if (_reverting === true) {
+            return;
+        }
+
+        if (state === true) {
+            _modifiedWidgets[widget.id] = true;
+        } else if (_modifiedWidgets[widget.id] === true) {
+            delete _modifiedWidgets[widget.id];
+        }
+
+        this.fireModifiedCallbacks(widget.id, state);
+    };
+
+
+    this.addWidgetEvent(this, 'modified');
 
 };

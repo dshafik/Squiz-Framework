@@ -5,7 +5,6 @@ function GUIScreenSettings(id, settings)
 
     this.className = 'GUIScreenSettings';
 
-    console.info(this.settings);
 }
 
 GUIScreenSettings.prototype = {

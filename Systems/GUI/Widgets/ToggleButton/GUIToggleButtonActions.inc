@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI Toggle Button Actions Class.
- *
  */
 class GUIToggleButtonActions
 {
@@ -44,7 +43,7 @@ class GUIToggleButtonActions
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return string
+     * @return void
      */
     public static function paint(array $settings)
     {
@@ -53,19 +52,41 @@ class GUIToggleButtonActions
 
         echo '<div class="'.$class.'" id="'.$id.'">';
 
-        $selected = Util::getArrayIndex($settings, 'default', self::$value);
-        if ($selected === TRUE || strtolower($selected) === 'true') {
+        $selected = Util::getArrayIndex($settings, 'value', self::$value);
+        if ($selected === TRUE) {
             $selected = TRUE;
         } else {
             $selected = FALSE;
         }
 
         // Defaults etc.
-        $optionY     = Util::getArrayIndex($settings, 'yes', 'Yes');
-        $optionN     = Util::getArrayIndex($settings, 'no', 'No');
-        $classY      = $class.' option yes'.((strlen($optionY) === 2) ? ' smallYes' : '').(($selected === TRUE) ? ' selected' : '');
-        $classN      = $class.' option no'.((strlen($optionN) === 2) ? ' smallNo' : '').(($selected === FALSE) ? ' selected' : '');
-        $classToggle = $class.' toggle '.(($selected === TRUE) ? 'toggleY' : 'toggleN');
+        $optionY = Util::getArrayIndex($settings, 'yes', _('Yes'));
+        $optionN = Util::getArrayIndex($settings, 'no', _('No'));
+
+        $classY = $class.' option yes';
+        if (strlen($optionY) === 2) {
+            $classY .= ' smallYes';
+        }
+
+        if ($selected === TRUE) {
+            $classY .= ' selected';
+        }
+
+        $classN = $class.' option no';
+        if ((strlen($optionN) === 2)) {
+            $classN .= ' smallNo';
+        }
+
+        if ($selected === FALSE) {
+            $classN .= ' selected';
+        }
+
+        $classToggle = $class.' toggle ';
+        if ($selected === TRUE) {
+            $classToggle .= 'toggleY';
+        } else {
+            $classToggle .= 'toggleN';
+        }
 
         // Toggle Icon.
         echo '<div class="'.$classToggle.'">&nbsp;</div>';
@@ -75,8 +96,8 @@ class GUIToggleButtonActions
 
         // Options.
         echo '<div class="'.$class.' middle">';
-        echo '<div class="'.$classY.'">'._($optionY).'</div>';
-        echo '<div class="'.$classN.'">'._($optionN).'</div>';
+        echo '<div class="'.$classY.'">'.$optionY.'</div>';
+        echo '<div class="'.$classN.'">'.$optionN.'</div>';
         echo '</div>';
 
         // Right container.
