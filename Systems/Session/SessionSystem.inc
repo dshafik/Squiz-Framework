@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Basic session handling system.
- *
  */
 class SessionSystem extends BaseSystem
 {
@@ -34,7 +33,6 @@ class SessionSystem extends BaseSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

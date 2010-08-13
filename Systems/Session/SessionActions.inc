@@ -24,8 +24,6 @@
 
 /**
  * Basic structure for all session handling systems.
- *
- * @since 4.0.0
  */
 interface SessionActions
 {
@@ -34,7 +32,6 @@ interface SessionActions
     /**
      * Starts a new session.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function startSession();
@@ -43,7 +40,6 @@ interface SessionActions
     /**
      * Destroys the current session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function destroySession();
@@ -52,7 +48,6 @@ interface SessionActions
     /**
      * Custom handler for the opening of a new session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionOpenHandler();
@@ -61,7 +56,6 @@ interface SessionActions
     /**
      * Custom handler for the closing of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionCloseHandler();
@@ -79,7 +73,6 @@ interface SessionActions
     /**
      * Custom handler for the writing of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionWriteHandler();
@@ -88,7 +81,6 @@ interface SessionActions
     /**
      * Custom handler for the destruction of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionDestroyHandler();
@@ -97,7 +89,6 @@ interface SessionActions
     /**
      * Custom handler for the garbage collection of an existing session.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function sessionCleanHandler();
@@ -106,7 +97,6 @@ interface SessionActions
     /**
      * Returns the id of the current session.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getSessionid();
@@ -115,7 +105,6 @@ interface SessionActions
     /**
      * Regenerates and returns the current session id.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function regenerateSessionid();
@@ -127,7 +116,6 @@ interface SessionActions
      * If this returns TRUE, the default PHP session handling operations
      * will be overridden with the session handler channels in this system.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function usesCustomHandler();
@@ -141,7 +129,6 @@ interface SessionActions
      *                              identifier as in php.ini.
      * @param string $value         Value to set.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function setSessionConfig($sessionConfig, $value);
@@ -156,7 +143,6 @@ interface SessionActions
      *                           be identified/referenced.
      * @param mixed  $data       The data to set.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function setSessionData($systemName, $dataKey, $data);
@@ -171,7 +157,6 @@ interface SessionActions
      *                           set the value.
      * @param string $dataKey    Identifier/reference of value to get.
      *
-     * @since  4.0.0
      * @return mixed
      */
     public static function getSessionData($systemName, $dataKey);
