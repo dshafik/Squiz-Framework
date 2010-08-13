@@ -43,16 +43,11 @@ class ImageExportActions
      */
     public static function generateFromURL($url, $dest, $width=NULL, $height=NULL)
     {
-        // Start the server.
-        $start = dirname(__FILE__).'/Scripts/start_server.sh';
-        exec($start.' > /dev/null');
-
         $command = dirname(__FILE__).'/Scripts/url.sh png '.$dest.'.tmp '.$url;
-        $success = self::_generateScreenshot($command, $dest.'.tmp');
 
-        // Stop the server.
-        $stop = dirname(__FILE__).'/Scripts/stop_server.sh';
-        exec($stop.' > /dev/null');
+        ImageExport::startServer();
+        $success = self::_generateScreenshot($command, $dest.'.tmp');
+        ImageExport::stopServer();
 
         if ($success === FALSE) {
             return FALSE;
@@ -366,6 +361,32 @@ class ImageExportActions
 
 
     /**
+     * Starts the virtual X server.
+     *
+     * @return void
+     */
+    public static function startServer()
+    {
+        $start = dirname(__FILE__).'/Scripts/start_server.sh';
+        exec($start.' > /dev/null');
+
+    }//end startServer()
+
+
+    /**
+     * Stops the virtual X server.
+     *
+     * @return void
+     */
+    public static function stopServer()
+    {
+        $stop = dirname(__FILE__).'/Scripts/stop_server.sh';
+        exec($stop.' > /dev/null');
+
+    }//end stopServer()
+
+
+    /**
      * Executes a screenshot script and waits until it is done.
      *
      * @param string $command The command that will generate the screenshot.
@@ -373,7 +394,7 @@ class ImageExportActions
      *
      * @return boolean
      */
-    private static function _generateScreenshot($command, $dest)
+    public static function generateScreenshot($command, $dest)
     {
         // If the image already exists, remove it first or else the
         // while loop will exit early.
@@ -410,7 +431,7 @@ class ImageExportActions
 
         return $created;
 
-    }//end _generateScreenshot()
+    }//end generateScreenshot()
 
 
 }//end class
