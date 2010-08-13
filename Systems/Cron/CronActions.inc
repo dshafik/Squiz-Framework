@@ -986,7 +986,7 @@ class CronActions
         $info['frequency'] = $templateCode;
 
         $settings        = array(
-                            'default' => $script['enabled'],
+                            'value' => $script['enabled'],
                            );
         $templateCode    = GUI::createWidget($id.'-enabled', 'GUIToggleButton', $settings);
         $info['enabled'] = $templateCode;
@@ -1064,8 +1064,11 @@ class CronActions
             foreach ($jobList as $systemScript => $info) {
                 list($system, $scriptName) = explode('_', $systemScript);
 
-                Channels::addToBasket('interval', $info['frequency'], TRUE);
-                Channels::addToBasket('enabled', $info['enabled'], TRUE);
+                $frequency = Util::getArrayIndex($info, 'frequency', 'daily');
+                $enabled   = Util::getArrayIndex($info, 'enabled', FALSE);
+
+                Channels::addToBasket('interval', $frequency, TRUE);
+                Channels::addToBasket('enabled', $enabled, TRUE);
                 Channels::addToBasket('system', $system, TRUE);
                 Channels::addToBasket('scriptName', $scriptName, TRUE);
                 DAL::executeQuery('Cron', 'updateCronIntervalAndStatus');
