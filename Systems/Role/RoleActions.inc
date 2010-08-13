@@ -28,7 +28,6 @@
  * Actions for the Role system. This system stores all standard assets.
  * It contains actions for deleting, creating, cloning and morphing local
  * assets.
- *
  */
 class RoleActions
 {
@@ -39,7 +38,6 @@ class RoleActions
      *
      * All methods should be called statically, and therefore this class should
      * never need to be instantiated.
-     *
      */
     private function __construct()
     {

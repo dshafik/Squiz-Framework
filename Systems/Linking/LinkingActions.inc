@@ -26,7 +26,6 @@ require_once 'Systems/Linking/LinkingActions.inc';
 
 /**
  * Linking Actions Class.
- *
  */
 class LinkingActions
 {
@@ -36,7 +35,7 @@ class LinkingActions
      *
      * TODO: Should use gatherer.
      *
-     * @var   array
+     * @var array
      */
     private static $_oldContextParents = array();
 

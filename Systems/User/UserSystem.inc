@@ -28,7 +28,6 @@ require_once 'Systems/BaseSystem.inc';
  * UserSystem.
  *
  * Installs all local asset types for this system.*
- *
  */
 class UserSystem extends BaseSystem
 {
@@ -36,7 +35,6 @@ class UserSystem extends BaseSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

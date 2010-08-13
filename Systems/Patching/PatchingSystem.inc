@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Patching System Class.
- *
  */
 class PatchingSystem extends BaseSystem
 {

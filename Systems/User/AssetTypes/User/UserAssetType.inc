@@ -29,7 +29,6 @@ Asset::includeAsset('asset');
  * UserAssetType.
  *
  * Represents an individual user.
- *
  */
 class UserAssetType extends AssetAssetType
 {

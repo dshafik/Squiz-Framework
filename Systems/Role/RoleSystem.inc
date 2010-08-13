@@ -28,7 +28,6 @@ require_once 'Systems/BaseSystem.inc';
  * RoleSystem.
  *
  * Installs all local asset types for this system.*
- *
  */
 class RoleSystem extends BaseSystem
 {
@@ -36,7 +35,6 @@ class RoleSystem extends BaseSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

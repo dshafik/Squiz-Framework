@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * SquizSuite Actions Class.
- *
  */
 class SquizSuiteActions
 {
@@ -34,21 +33,21 @@ class SquizSuiteActions
     /**
      * User Agent String prefix.
      *
-     * @var   string
+     * @var string
      */
     private static $_userAgentPrefix = 'SquizSuite-';
 
     /**
      * Encryption algorithm.
      *
-     * @var   string
+     * @var string
      */
     private static $_opensslEncryptionAlgorithm = 'blowfish';
 
     /**
      * Local cache variable for product information.
      *
-     * @var   string
+     * @var string
      */
     private static $_productCache = array();
 
@@ -392,7 +391,8 @@ class SquizSuiteActions
      *
      * @return void
      * @throws ChannelException Error occurred.
-     * @api    read
+     *
+     * @api read
      */
     public static function suiteConnect()
     {
@@ -460,7 +460,7 @@ class SquizSuiteActions
                 $connection['url']  = $systemUrl;
                 $connection['cert'] = $certificate;
                 SquizSuite::registerProduct($systemid, $systemType, $connection);
-            }
+            }//end if
 
             // Now we are all good. Register the system and set the status
             // as pending. Then send acknowlegement message back.
@@ -492,7 +492,8 @@ class SquizSuiteActions
      *
      * @return void
      * @throws ChannelException Error occurred.
-     * @api    read
+     *
+     * @api read
      */
     public static function suiteConnectAck()
     {
@@ -565,7 +566,8 @@ class SquizSuiteActions
      *
      * @return void
      * @throws ChannelException Error occurred.
-     * @api    read
+     *
+     * @api read
      */
     public static function suiteConnectAckAck()
     {
@@ -824,7 +826,6 @@ class SquizSuiteActions
      *
      * @param string $system System name where action resides.
      * @param string $action Action name to call.
-     * @param array  $args   Parameters to pass to the action.
      *
      * @return void
      */

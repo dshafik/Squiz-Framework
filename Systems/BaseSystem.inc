@@ -34,8 +34,6 @@ require_once dirname(dirname(__FILE__)).'/DAL/DAL.inc';
  * are created, so things like adding new asset types should be done here.
  * Each system should have a file in its' base directory containing a class that
  * extends this class.
- *
- * @since 4.0.0
  */
 class BaseSystem
 {
@@ -43,8 +41,7 @@ class BaseSystem
     /**
      * The system options.
      *
-     * @var   array
-     * @since 4.0.0
+     * @var array
      */
     protected $systemData = array(
                              'exclusive' => FALSE,
@@ -60,32 +57,27 @@ class BaseSystem
     /**
      * Unique id for data directory.
      *
-     * @var   array
-     * @since 4.0.0
+     * @var array
      */
     public static $dataId = '';
 
     /**
      * Data dir cache.
      *
-     * @var   array
-     * @since 4.0.0
+     * @var array
      */
     private static $_dataDirs;
 
     /**
      * Addons cache.
      *
-     * @var   array
-     * @since 4.0.0
+     * @var array
      */
     private static $_addons = array();
 
 
     /**
      * Constructor.
-     *
-     * @since 4.0.0
      */
     public function __construct()
     {
@@ -96,7 +88,6 @@ class BaseSystem
     /**
      * Returns the all system options.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getAllSystemOptions()
@@ -111,7 +102,6 @@ class BaseSystem
      *
      * @param string $key The key for the system option.
      *
-     * @since  4.0.0
      * @return mixed
      */
     protected function getSystemOption($key)
@@ -131,7 +121,6 @@ class BaseSystem
      * @param string $key The key for the system option.
      * @param mixed  $val The value for the system option.
      *
-     * @since  4.0.0
      * @return void
      */
     protected function setSystemOption($key, $val)
@@ -146,7 +135,6 @@ class BaseSystem
      *
      * The data dir can be used to store information related to the system.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getSystemRootPath()
@@ -163,7 +151,6 @@ class BaseSystem
      *
      * @param string $system The system name to retrieve the path for.
      *
-     * @since  4.0.0
      * @return string
      */
     public static function getDataDir($system='')
@@ -200,7 +187,6 @@ class BaseSystem
     /**
      * Run any operations that are needed after this system is installed.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public function install()
@@ -230,7 +216,6 @@ class BaseSystem
      * @param string $cleanOnly If TRUE will empty out this system's tables, but
      *                          will not completely remove them.
      *
-     * @since  4.0.0
      * @return void
      * @throws Exception If there is a problem uninstalling the system from
      *                   the database.
@@ -333,7 +318,6 @@ class BaseSystem
     /**
      * Cleans away this system.
      *
-     * @since  4.0.0
      * @return void
      */
     public function clean()
@@ -359,7 +343,6 @@ class BaseSystem
      *                             FALSE or omitted then only files will be
      *                             checked and returned.
      *
-     * @since  4.0.0
      * @return array
      */
     public static function getAddons($addonName, $directories=TRUE)
@@ -399,7 +382,6 @@ class BaseSystem
      *
      * @param string $sysPath Path to system directory.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getJSFiles($sysPath)
@@ -418,7 +400,6 @@ class BaseSystem
      *
      * @param string $sysPath Path to system directory.
      *
-     * @since  4.0.0
      * @return array
      * @throws Exception When a JS file returned from each system
      *                   getJSDependencyList() function does not exist in web
@@ -469,7 +450,6 @@ class BaseSystem
      *
      * Each system only needs to list the files with dependencies.
      *
-     * @since  4.0.0
      * @return array
      */
     public function getJSDependencyList()
@@ -483,7 +463,6 @@ class BaseSystem
     /**
      * Returns TRUE if all Javascript files are minified.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isJavascriptMinified()
@@ -500,7 +479,6 @@ class BaseSystem
     /**
      * Returns TRUE if all Javascript files are minified and gzipped.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isJavascriptGzipped()
@@ -517,7 +495,6 @@ class BaseSystem
     /**
      * Returns TRUE if all CSS files are minified.
      *
-     * @since  4.0.0
      * @return boolean
      */
     public static function isCSSMinified()

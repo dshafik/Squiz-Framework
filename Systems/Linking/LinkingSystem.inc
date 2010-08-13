@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * LinkingSystem.
- *
  */
 class LinkingSystem extends BaseSystem
 {
@@ -34,7 +33,6 @@ class LinkingSystem extends BaseSystem
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

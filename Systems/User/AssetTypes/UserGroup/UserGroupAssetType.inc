@@ -29,7 +29,6 @@ Asset::includeAsset('asset');
  * UserGroupAssetType.
  *
  * A container for User or other User Group assets.
- *
  */
 class UserGroupAssetType extends AssetAssetType
 {

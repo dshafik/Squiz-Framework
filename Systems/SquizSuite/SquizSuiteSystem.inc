@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * SquizSuite System Class.
- *
  */
 class SquizSuiteSystem extends BaseSystem
 {
