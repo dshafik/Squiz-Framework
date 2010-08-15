@@ -71,7 +71,6 @@ require_once 'Libs/Web/Web.inc';
  * a method of revoking a token will be provided (Google Data does this, overlaying
  * its AuthSub "revoke token" endpoint to accept OAuth token requests). These can
  * likely be called as normal doRequest() calls using the token to revoke.
- *
  */
 class OAuth
 {
