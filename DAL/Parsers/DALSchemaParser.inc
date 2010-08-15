@@ -29,7 +29,6 @@ require_once 'DAL/DALBaker.inc';
  * DALSchemaParser.
  *
  * Parses anything that is related to schemas (create table, constraints, etc).
- *
  */
 class DALSchemaParser extends DALQueryParser
 {
@@ -37,7 +36,7 @@ class DALSchemaParser extends DALQueryParser
     /**
      * List of field types that require the size attribute.
      *
-     * @var   array $_requiresSizeAttr List of field types that require the size
+     * @var array $_requiresSizeAttr List of field types that require the size
      *                                 attribute.
      */
     private static $_requiresSizeAttr = array(
@@ -50,7 +49,7 @@ class DALSchemaParser extends DALQueryParser
     /**
      * List of data types.
      *
-     * @var   array $_columnDataTypes List of SQL constructs.
+     * @var array $_columnDataTypes List of SQL constructs.
      */
     private static $_columnDataTypes = array(
                                         'CHAR',
@@ -76,7 +75,7 @@ class DALSchemaParser extends DALQueryParser
     /**
      * A list of User Defined Types.
      *
-     * @var   array
+     * @var array
      */
     private static $_udts = array();
 
@@ -85,7 +84,6 @@ class DALSchemaParser extends DALQueryParser
      * Constructor.
      *
      * Private to avoid instantiating the object.
-     *
      */
     private function __construct()
     {
@@ -862,7 +860,7 @@ class DALSchemaParser extends DALQueryParser
                 }
 
                 $colLoc++;
-            }//end foreach foreign-key columns
+            }//end foreach
         }//end if
 
     }//end _validateForeignKeyConstraint()
@@ -942,8 +940,8 @@ class DALSchemaParser extends DALQueryParser
                         }
                     }
                 }
-            }//end foreach indexes
-        }//end if indexes !== NULL
+            }//end foreach
+        }//end if
 
     }//end validateTableIndexes()
 
@@ -1034,7 +1032,7 @@ class DALSchemaParser extends DALQueryParser
                             throw new DALParserException($msg);
                         }
                     }
-                }//end foreach ludts
+                }//end foreach
             }//end if
 
             // Get foreign UDTs.

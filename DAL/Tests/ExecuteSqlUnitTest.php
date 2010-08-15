@@ -28,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the executeSql method.
- *
  */
 class ExecuteSqlUnitTest extends AbstractMySourceUnitTest
 {
@@ -36,7 +35,7 @@ class ExecuteSqlUnitTest extends AbstractMySourceUnitTest
     /**
      * Query xml for this unit test.
      *
-     * @var   string $_query
+     * @var string $_query
      */
     private static $_query = '<query id="dalTestExecuteQuery">
         <update>

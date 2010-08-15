@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Converters/DALConverter.inc';
 
 /**
  * Unit tests for the validateQuery method.
- *
  */
 class ParseConvertExceptQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -37,7 +36,7 @@ class ParseConvertExceptQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * The converted Except sub query.
      *
-     * @var   $_subQuery The converted Except sub query
+     * @var $_subQuery The converted Except sub query
      */
     private $_subQuery = 'DELETE FROM role_permission
 WHERE(
@@ -68,7 +67,7 @@ WHERE(
     /**
      * The converted Except primary query.
      *
-     * @var   $_subQuery The converted Except primary query
+     * @var $_subQuery The converted Except primary query
      */
     private $_primaryQuery = 'SELECT
         asset_link.childid as assetid

@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/DALException.inc';
  * DALBakerException.
  *
  * Exception type that is thrown during the baking of XML query definitions.
- *
  */
 class DALBakerException extends DALException
 {

@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
 
 /**
  * Unit Tests for the checking of getComparisonOperators() in DALBaker.
- *
  */
 class GetComparisonOperatorsUnitTest extends AbstractMySourceUnitTest
 {

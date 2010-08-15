@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the isDALQuery() method.
- *
  */
 class IsDALQueryUnitTest extends AbstractMySourceUnitTest
 {

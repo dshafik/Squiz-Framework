@@ -31,7 +31,6 @@ require_once dirname(__FILE__).'/DALConverter.inc';
  * The methods to convert XML structures into SQL are defined in the parent
  * class "DALConverter", and if any conversions need to be altered for this
  * database the corresponding methods of DALConverter should be redefined here.
- *
  */
 class DALMysqlConverter extends DALConverter
 {
@@ -39,21 +38,21 @@ class DALMysqlConverter extends DALConverter
     /**
      * Name of the table that is being converted.
      *
-     * @var   string $tableName
+     * @var string $tableName
      */
     protected $tableName = '';
 
     /**
      * Name of the database.
      *
-     * @var   string $name Database name.
+     * @var string $name Database name.
      */
     protected $name = 'MySQL';
 
     /**
      * List of data types for MySQL.
      *
-     * @var   $dataTypes List of sql constructs.
+     * @var $dataTypes List of sql constructs.
      */
     protected $dataTypes = array(
                             'char'                => 'CHAR',
@@ -76,7 +75,6 @@ class DALMysqlConverter extends DALConverter
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

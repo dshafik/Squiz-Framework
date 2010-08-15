@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the getTableColumns() method.
  *
  * getTableColumns() converts XML table columns to php array.
- *
  */
 class GetTableColumnsUnitTest extends AbstractMySourceUnitTest
 {
@@ -37,7 +36,7 @@ class GetTableColumnsUnitTest extends AbstractMySourceUnitTest
     /**
      * Schema xml for this unit test.
      *
-     * @var    string $_schema Schema xml.
+     * @var string $_schema Schema xml.
      */
     private $_schema = '<schema system="asset">
                          <tables>

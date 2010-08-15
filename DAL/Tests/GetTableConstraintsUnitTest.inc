@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the getTableConstraints method.
  *
  * getTableConstraints method returns correct values.
- *
  */
 class GetTableConstraintsUnitTest extends AbstractMySourceUnitTest
 {

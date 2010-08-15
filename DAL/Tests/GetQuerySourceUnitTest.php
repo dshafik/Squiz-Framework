@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
  * Unit tests for the getQuerySource() method.
  *
  * getQuerySource() returns query in its XML format.
- *
  */
 class GetQuerySourceUnitTest extends AbstractMySourceUnitTest
 {

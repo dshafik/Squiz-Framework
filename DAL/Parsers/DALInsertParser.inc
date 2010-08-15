@@ -30,7 +30,6 @@ require_once 'Libs/XML/XML.inc';
  * DALInsertParser.
  *
  * INSERT query parser.
- *
  */
 class DALInsertParser extends DALQueryParser
 {
@@ -41,7 +40,6 @@ class DALInsertParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

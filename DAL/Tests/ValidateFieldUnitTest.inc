@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the validateField method.
  *
  * validateField() method throws exception if there is an error in the query.
- *
  */
 class ValidateFieldUnitTest extends AbstractMySourceUnitTest
 {

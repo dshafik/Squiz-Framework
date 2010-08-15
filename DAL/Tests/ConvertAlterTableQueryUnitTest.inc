@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for ALTER TABLE query conversion.
- *
  */
 class ConvertAlterTableQueryUnitTest extends AbstractMySourceUnitTest
 {

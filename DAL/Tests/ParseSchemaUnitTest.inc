@@ -30,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  *
  * validateSchemaUdts() method throws exception if there is a problem with the
  * definition of a system's User-Defined types (UDT's).
- *
  */
 class ParseSchemaUnitTest extends AbstractMySourceUnitTest
 {
@@ -38,7 +37,7 @@ class ParseSchemaUnitTest extends AbstractMySourceUnitTest
     /**
      * The schema source used by unit tests.
      *
-     * @var   string $_schemaSrc The XML source of the schema.
+     * @var string $_schemaSrc The XML source of the schema.
      */
     private static $_schemaSrc = '<schema system="asset_type">
              <udts>

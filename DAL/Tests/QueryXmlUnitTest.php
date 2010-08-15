@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit Tests for the reading and writing Query XML files.
- *
  */
 class QueryXmlUnitTest extends AbstractMySourceUnitTest
 {

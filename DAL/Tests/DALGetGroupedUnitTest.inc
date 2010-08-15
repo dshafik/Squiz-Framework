@@ -21,9 +21,9 @@
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
+
 /**
  * GetGrouped UnitTest.
- *
  */
 class DALGetGroupedUnitTest extends AbstractDataCleanUnitTest
 {

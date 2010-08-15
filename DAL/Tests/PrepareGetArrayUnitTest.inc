@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit Tests for the getArray() method of DAL.
- *
  */
 class PrepareGetArrayUnitTest extends AbstractMySourceUnitTest
 {
@@ -35,7 +34,7 @@ class PrepareGetArrayUnitTest extends AbstractMySourceUnitTest
     /**
      * Base Query XML.
      *
-     * @var   string $_baseQuery Base query XML.
+     * @var string $_baseQuery Base query XML.
      */
     private static $_baseQuery = '<query id="testone">
                                   <primary>

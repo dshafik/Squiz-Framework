@@ -24,7 +24,6 @@
 
 /**
  * Unit tests for the transaction methods.
- *
  */
 class DALTransactionsUnitTest extends AbstractDataCleanUnitTest
 {

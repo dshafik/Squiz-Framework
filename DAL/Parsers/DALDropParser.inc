@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/DALQueryParser.inc';
  * DALDropParser.
  *
  * DROP query parser.
- *
  */
 class DALDropParser extends DALQueryParser
 {
@@ -39,7 +38,6 @@ class DALDropParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

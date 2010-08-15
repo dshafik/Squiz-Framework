@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the loadQueriesXml() method.
  *
  * loadQueriesXml() returns the DomDocument object for the system's queries XML.
- *
  */
 class LoadQueriesXmlUnitTest extends AbstractMySourceUnitTest
 {

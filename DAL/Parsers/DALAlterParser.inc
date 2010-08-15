@@ -29,7 +29,6 @@ require_once 'DAL/Parsers/DALSchemaParser.inc';
  * DALAlterParser.
  *
  * ALTER TABLE query parser.
- *
  */
 class DALAlterParser extends DALQueryParser
 {
@@ -40,7 +39,6 @@ class DALAlterParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

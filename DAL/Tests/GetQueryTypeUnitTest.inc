@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
  * Unit tests for the getQueryType() method.
  *
  * getQueryType() returns the given queries type.
- *
  */
 class GetQueryTypeUnitTest extends AbstractMySourceUnitTest
 {

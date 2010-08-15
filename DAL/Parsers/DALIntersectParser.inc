@@ -30,7 +30,6 @@ require_once 'DAL/DALBaker.inc';
  * DALIntersectParser.
  *
  * INTERSECT query parser.
- *
  */
 class DALIntersectParser extends DALQueryParser
 {
@@ -41,7 +40,6 @@ class DALIntersectParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

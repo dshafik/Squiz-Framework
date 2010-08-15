@@ -28,7 +28,6 @@ require_once 'DAL/DAL.inc';
  * Query.
  *
  * Object that represents a query in the MySource 4 system.
- *
  */
 class Query
 {
@@ -36,21 +35,21 @@ class Query
     /**
      * The ID of this query.
      *
-     * @var   string $_queryid Full ID of the query.
+     * @var string $_queryid Full ID of the query.
      */
     private $_queryid = '';
 
     /**
      * Total number of bindings in this query.
      *
-     * @var   integer Number of bindings.
+     * @var integer Number of bindings.
      */
     private $_lastBindNum = 0;
 
     /**
      * The representation of this query as an array.
      *
-     * @var   array $_arrayRepresentation The multidimensional structure of the
+     * @var array $_arrayRepresentation The multidimensional structure of the
      *                                    array.
      */
     private $_arrayRepresentation = array();
@@ -61,14 +60,14 @@ class Query
      * This is the initial conversion. If a complex merge is required, then the
      * SQL string will need to be regenerated.
      *
-     * @var   string $_sqlString The SQL of the query.
+     * @var string $_sqlString The SQL of the query.
      */
     private $_sqlString = '';
 
     /**
      * List of bindings.
      *
-     * @var   array $_bindings Array of bind variables in this query.
+     * @var array $_bindings Array of bind variables in this query.
      */
     private $_bindings = array();
 
@@ -77,7 +76,7 @@ class Query
      *
      * Keywords will be replaced just before query prepare.
      *
-     * @var   array $_keywords Array of keywords in this query.
+     * @var array $_keywords Array of keywords in this query.
      */
     private $_keywords = array();
 
@@ -86,21 +85,21 @@ class Query
      *
      * Query will be executed using the given method (i.e. executeAll).
      *
-     * @var   string $_execMethod
+     * @var string $_execMethod
      */
     private $_execMethod = NULL;
 
     /**
      * Set to TRUE when the query array is converted to SQL string.
      *
-     * @var   boolean
+     * @var boolean
      */
     private $_converted = FALSE;
 
     /**
      * The list of hooks in the query that may need to be replaced during prepare.
      *
-     * @var   boolean
+     * @var boolean
      */
     private $_hookStrs = array();
 

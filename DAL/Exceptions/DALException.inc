@@ -26,7 +26,6 @@
  * DALException.
  *
  * Base Exception class for the Database Abstraction Layer.
- *
  */
 class DALException extends Exception
 {

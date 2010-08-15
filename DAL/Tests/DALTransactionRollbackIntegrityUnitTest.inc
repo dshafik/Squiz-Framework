@@ -24,7 +24,6 @@
 
 /**
  * Unit tests for permission cascade.
- *
  */
 class DALTransactionRollbackIntegrityUnitTest extends AbstractDataCleanUnitTest
 {
@@ -34,7 +33,7 @@ class DALTransactionRollbackIntegrityUnitTest extends AbstractDataCleanUnitTest
      *
      * Each element is the id of the asset that is created.
      *
-     * @var   array
+     * @var array
      */
     private static $_assets = array(
                                10000,

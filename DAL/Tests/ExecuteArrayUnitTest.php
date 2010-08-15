@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit Tests for the getArray() method of DAL.
- *
  */
 class ExecuteArrayUnitTest extends AbstractMySourceUnitTest
 {
@@ -35,7 +34,7 @@ class ExecuteArrayUnitTest extends AbstractMySourceUnitTest
     /**
      * Entries to use as test inserts into the database.
      *
-     * @var   $_testEntries The array of test entries.
+     * @var $_testEntries The array of test entries.
      */
     private $_testEntries = array(
                              array(

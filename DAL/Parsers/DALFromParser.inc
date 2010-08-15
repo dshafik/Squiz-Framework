@@ -32,7 +32,6 @@ require_once 'Libs/XML/XML.inc';
  * DALFromParser.
  *
  * From clause parser. Parses from SQL clause.
- *
  */
 class DALFromParser extends DALQueryParser
 {
@@ -43,7 +42,6 @@ class DALFromParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

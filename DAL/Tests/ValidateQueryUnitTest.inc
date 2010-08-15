@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  * Unit tests for the validateQuery method.
  *
  * validateQuery() method throws exception if there is an error in the query.
- *
  */
 class ValidateQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -37,7 +36,7 @@ class ValidateQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Queries xml string.
      *
-     * @var   string $_queries Queries xml.
+     * @var string $_queries Queries xml.
      */
     private $_queries = '<queries system="test">
                  <query id="test">

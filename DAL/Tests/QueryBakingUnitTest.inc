@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit Tests for the merging of queries.
- *
  */
 class QueryBakingUnitTest extends AbstractMySourceUnitTest
 {
@@ -35,7 +34,7 @@ class QueryBakingUnitTest extends AbstractMySourceUnitTest
     /**
      * Base Query XML.
      *
-     * @var   string $_baseQuery Base query XML.
+     * @var string $_baseQuery Base query XML.
      */
     private static $_baseQuery = '<query id="testone">
                                   <primary>
@@ -60,7 +59,7 @@ class QueryBakingUnitTest extends AbstractMySourceUnitTest
     /**
      * Fragment for use in the tests.
      *
-     * @var   string $_queryFragment The XML source of a test query.
+     * @var string $_queryFragment The XML source of a test query.
      */
     private static $_queryFragment = '<query id="testoneFragment" hookid="TestSys1.testone">
                                       <primary>

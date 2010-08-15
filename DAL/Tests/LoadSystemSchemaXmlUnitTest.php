@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the loadSystemSchemaXml() method.
  *
  * loadSystemSchemaXml() loads the System's schema XML file.
- *
  */
 class LoadSystemSchemaXmlUnitTest extends AbstractMySourceUnitTest
 {

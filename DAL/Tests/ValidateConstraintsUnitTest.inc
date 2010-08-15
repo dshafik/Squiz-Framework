@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  * Unit tests for the validateConstraints() method.
  *
  * validateConstraints() returns array of constraints from a parent node.
- *
  */
 class ValidateConstraintsUnitTest extends AbstractMySourceUnitTest
 {

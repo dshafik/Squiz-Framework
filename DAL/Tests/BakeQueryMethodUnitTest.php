@@ -26,7 +26,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the bakeQueryMethod() method.
- *
  */
 class BakeQueryMethodUnitTest extends AbstractMySourceUnitTest
 {
@@ -34,7 +33,7 @@ class BakeQueryMethodUnitTest extends AbstractMySourceUnitTest
     /**
      * Base query for testing the addSubQuery() method.
      *
-     * @var   string $_baseQuery The XML source of a test query.
+     * @var string $_baseQuery The XML source of a test query.
      */
     private static $_baseQuery = '<query id="testone">
                                   <primary>
@@ -73,7 +72,7 @@ class BakeQueryMethodUnitTest extends AbstractMySourceUnitTest
     /**
      * Test sub-query for testing the addSubQuery() method.
      *
-     * @var   string $_subQuery The XML source of a test query.
+     * @var string $_subQuery The XML source of a test query.
      */
     private static $_subQuery = '<query id="testoneFragment" hookid="TestSys1.testone.hook1">
                                      <primary>

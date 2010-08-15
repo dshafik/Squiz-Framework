@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the addQueryFragment method.
- *
  */
 class AddQueryFragmentUnitTest extends AbstractMySourceUnitTest
 {
@@ -35,7 +34,7 @@ class AddQueryFragmentUnitTest extends AbstractMySourceUnitTest
     /**
      * Base query for testing the addQueryFragment() method.
      *
-     * @var   string $_baseQuery The XML source of a test query.
+     * @var string $_baseQuery The XML source of a test query.
      */
     private static $_baseQuery = '<query id="testone">
                                   <primary>
@@ -71,7 +70,7 @@ class AddQueryFragmentUnitTest extends AbstractMySourceUnitTest
     /**
      * Fragment for use in the tests.
      *
-     * @var   string $_queryFragment The XML source of a test query.
+     * @var string $_queryFragment The XML source of a test query.
      */
     private static $_queryFragment = '<query id="testoneFragment" hookid="TestSys1.testone">
                                      <select>

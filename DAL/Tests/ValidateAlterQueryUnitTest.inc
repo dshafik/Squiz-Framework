@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  * Unit tests for the validateAlterQuery() method.
  *
  * validateAlterQuery() method validates specified alter query.
- *
  */
 class ValidateAlterQueryUnitTest extends AbstractMySourceUnitTest
 {

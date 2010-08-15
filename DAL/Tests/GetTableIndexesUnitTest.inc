@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the getTableIndexes() method.
  *
  * getTableIndexes() converts XML table indexes to php array.
- *
  */
 class GetTableIndexesUnitTest extends AbstractMySourceUnitTest
 {
@@ -37,7 +36,7 @@ class GetTableIndexesUnitTest extends AbstractMySourceUnitTest
     /**
      * Schema xml for this unit test.
      *
-     * @var   string $_schema Schema xml.
+     * @var string $_schema Schema xml.
      */
     private $_schema = '<schema system="asset">
                          <tables>

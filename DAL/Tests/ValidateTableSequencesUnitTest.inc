@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the validateTableSequences method.
  *
  * validateTableSequences method throws exception if there are any errors.
- *
  */
 class ValidateTableSequencesUnitTest extends AbstractMySourceUnitTest
 {

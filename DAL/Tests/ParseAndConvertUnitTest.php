@@ -32,7 +32,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * It will make sure that converted sql string is same as the original.
  * This test requires <queryType>Queries.xml and <queryType>ParsedResults.inc
  * files (i.e. selectQueries.xml and selectParsedResults.inc).
- *
  */
 class ParseAndConvertUnitTest extends AbstractMySourceUnitTest
 {

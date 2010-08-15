@@ -33,7 +33,6 @@ require_once 'DAL/Parsers/DALFromParser.inc';
  * DALSelectParser.
  *
  * Select query parser. Parses a select query.
- *
  */
 class DALSelectParser extends DALQueryParser
 {
@@ -44,7 +43,6 @@ class DALSelectParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

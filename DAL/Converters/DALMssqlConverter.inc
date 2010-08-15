@@ -31,7 +31,6 @@ require_once dirname(__FILE__).'/DALConverter.inc';
  * The methods to convert XML structures into SQL are defined in the parent
  * class "DALConverter", and if any conversions need to be altered for this
  * database the corresponding methods of DALConverter should be redefined here.
- *
  */
 class DALMssqlConverter extends DALConverter
 {
@@ -39,21 +38,21 @@ class DALMssqlConverter extends DALConverter
     /**
      * Name of the table that is being converted.
      *
-     * @var   string $name
+     * @var string $name
      */
     protected $tableName = '';
 
     /**
      * Name of the database.
      *
-     * @var   string $name Database name.
+     * @var string $name Database name.
      */
     protected $name = 'MSSQL';
 
     /**
      * List of data types for SQL Server.
      *
-     * @var   $dataTypes List of sql constructs.
+     * @var $dataTypes List of sql constructs.
      */
     protected $dataTypes = array(
                             'char'                => 'NCHAR',
@@ -76,7 +75,6 @@ class DALMssqlConverter extends DALConverter
 
     /**
      * Constructor.
-     *
      */
     public function __construct()
     {

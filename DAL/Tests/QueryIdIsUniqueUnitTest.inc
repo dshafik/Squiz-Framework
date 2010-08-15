@@ -30,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  *
  * queryIdIsUnique() returns FALSE if given query id already used by another
  * query.
- *
  */
 class QueryIdIsUniqueUnitTest extends AbstractMySourceUnitTest
 {

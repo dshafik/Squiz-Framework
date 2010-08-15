@@ -26,7 +26,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit Tests for the getSeperator() methods.
- *
  */
 class GetSeperatorUnitTest extends AbstractMySourceUnitTest
 {

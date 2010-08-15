@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit Tests for the addSystemQueries() method of DALBaker.
- *
  */
 class MergeQueriesUnitTest extends AbstractMySourceUnitTest
 {
@@ -35,7 +34,7 @@ class MergeQueriesUnitTest extends AbstractMySourceUnitTest
     /**
      * Simple Assertion node.
      *
-     * @var   string $_assertionNode
+     * @var string $_assertionNode
      */
     private static $_assertionNode = '<query id="getAttributesTextAttribute" hookid="MergeSys1.getLinks">
                                           <assert-true>

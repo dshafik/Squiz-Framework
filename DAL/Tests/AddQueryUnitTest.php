@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the addQuery method.
- *
  */
 class AddQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -36,7 +35,7 @@ class AddQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * Base Query XML.
      *
-     * @var   string $_baseQuery Base query XML.
+     * @var string $_baseQuery Base query XML.
      */
     private static $_baseQuery = '<query id="testone">
                                   <primary>

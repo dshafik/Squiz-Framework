@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the validSchemaColumnType() method.
  *
  * validSchemaColumnType() determines if the given type is a valid column type.
- *
  */
 class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
 {
@@ -37,7 +36,7 @@ class ValidSchemaColumnTypeUnitTest extends AbstractMySourceUnitTest
     /**
      * Schema xml for this unit test.
      *
-     * @var   string $_schema Schema xml.
+     * @var string $_schema Schema xml.
      */
     private $_schema = '<schema system="asset">
                          <udts>

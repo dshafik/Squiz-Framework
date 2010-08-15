@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the validateByClause method.
  *
  * validateByClause() method throws exception if there is an error in the query.
- *
  */
 class ValidateByClauseUnitTest extends AbstractMySourceUnitTest
 {

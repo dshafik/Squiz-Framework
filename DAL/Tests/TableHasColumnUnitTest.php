@@ -30,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  *
  * tableHasColumn() returns true if table has the specified column listed in
  * its columns tag.
- *
  */
 class TableHasColumnUnitTest extends AbstractMySourceUnitTest
 {

@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit Tests for the generation of HookIds.
- *
  */
 class HookIdGenerationUnitTest extends AbstractMySourceUnitTest
 {

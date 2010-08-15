@@ -36,7 +36,6 @@ require_once 'DAL/Query.inc';
  * DAL class can also validates schemas and quries.
  *
  * DAL class also handles database connection and access.
- *
  */
 class DAL
 {
@@ -46,7 +45,7 @@ class DAL
      *
      * Prepare statements will use this PDO object.
      *
-     * @var   object
+     * @var object
      */
     private static $_dbh = NULL;
 
@@ -56,7 +55,7 @@ class DAL
      * If a transaction is already started then another transaction will not
      * be started. Commit and rollBack will set this var to FALSE.
      *
-     * @var   boolean $_inTransaction Transaction handler.
+     * @var boolean $_inTransaction Transaction handler.
      */
     private static $_inTransaction = FALSE;
 
@@ -65,7 +64,7 @@ class DAL
      *
      * A database type must be specified in the DALConfig file.
      *
-     * @var   array
+     * @var array
      */
     private static $_dbNames = array(
                                 'db2'   => 'DB2',
@@ -78,35 +77,35 @@ class DAL
     /**
      * Name of the current database.
      *
-     * @var   string
+     * @var string
      */
     private static $_currentDbName = NULL;
 
     /**
      * Transaction counter.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_transactionCount = 0;
 
     /**
      * List of querys that were executed and their timings.
      *
-     * @var   array
+     * @var array
      */
     private static $_queryLog = array();
 
     /**
      * Log queries.
      *
-     * @var   boolean
+     * @var boolean
      */
     private static $_logQueries = FALSE;
 
     /**
      * Current query.
      *
-     * @var   array
+     * @var array
      */
     private static $_currentQueryLog = NULL;
 
@@ -115,7 +114,7 @@ class DAL
      *
      * When its
      *
-     * @var   string
+     * @var string
      */
     public static $confId = '';
 
@@ -125,7 +124,6 @@ class DAL
      *
      * Private to avoid instantiating the object.
      * All DAL methods should be called statically.
-     *
      */
     private function __construct()
     {

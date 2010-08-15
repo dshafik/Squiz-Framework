@@ -31,7 +31,6 @@ require_once 'DAL/Parsers/DALUnionParser.inc';
  * DALWithParser.
  *
  * WITH/CONNECT-BY query parser.
- *
  */
 class DALWithParser extends DALQueryParser
 {
@@ -41,7 +40,6 @@ class DALWithParser extends DALQueryParser
      * Constructor.
      *
      * Private to avoid instantiating the object.
-     *
      */
     private function __construct()
     {

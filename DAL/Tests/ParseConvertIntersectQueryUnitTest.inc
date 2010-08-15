@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Converters/DALConverter.inc';
 
 /**
  * Unit tests for the validateQuery method.
- *
  */
 class ParseConvertIntersectQueryUnitTest extends AbstractMySourceUnitTest
 {
@@ -37,7 +36,7 @@ class ParseConvertIntersectQueryUnitTest extends AbstractMySourceUnitTest
     /**
      * The converted Intersect sub query.
      *
-     * @var   $_subQuery The converted Intersect sub query
+     * @var $_subQuery The converted Intersect sub query
      */
     private $_subQuery = 'DELETE FROM role_permission
 WHERE(
@@ -68,7 +67,7 @@ WHERE(
     /**
      * The converted Intersect primary query.
      *
-     * @var   $_subQuery The converted Intersect primary query
+     * @var $_subQuery The converted Intersect primary query
      */
     private $_primaryQuery = 'SELECT
         asset_link.childid as assetid

@@ -30,7 +30,6 @@ require_once 'DAL/Parsers/DALWhereParser.inc';
  * DALInsertParser.
  *
  * INSERT query parser.
- *
  */
 class DALDeleteParser extends DALQueryParser
 {
@@ -41,7 +40,6 @@ class DALDeleteParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

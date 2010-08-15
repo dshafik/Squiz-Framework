@@ -24,7 +24,6 @@
 
 /**
  * GetGroupedAssoc UnitTest.
- *
  */
 class DALGetGroupedAssocUnitTest extends AbstractDataCleanUnitTest
 {

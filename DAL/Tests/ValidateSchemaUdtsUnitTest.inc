@@ -30,7 +30,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  *
  * validateSchemaUdts() method throws exception if there is a problem with the
  * definition of a system's User-Defined types (UDT's).
- *
  */
 class ValidateSchemaUdtsUnitTest extends AbstractMySourceUnitTest
 {

@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  * Unit tests for the getConstraintsFromParent() method.
  *
  * getConstraintsFromParent() returns array of constraints from a parent node.
- *
  */
 class GetConstraintsFromParentUnitTest extends AbstractMySourceUnitTest
 {

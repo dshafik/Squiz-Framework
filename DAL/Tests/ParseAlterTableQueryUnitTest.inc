@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the parsing and validation of ALTER TABLE queries.
- *
  */
 class ParseAlterTableQueryUnitTest extends AbstractMySourceUnitTest
 {

@@ -28,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the validateValuesTag and validateValueTag method.
  *
  * These methods throws exception if they do not have required children etc.
- *
  */
 class ValidateValueTagUnitTest extends AbstractMySourceUnitTest
 {

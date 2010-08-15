@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALDeleteParser.inc';
 
 /**
  * Unit tests for the validateQuery method.
- *
  */
 class ValidateIntersectQueryUnitTest extends AbstractMySourceUnitTest
 {

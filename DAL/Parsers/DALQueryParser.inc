@@ -45,7 +45,6 @@ require_once 'Libs/XML/XML.inc';
  * DALQueryParser.
  *
  * Base query parser. Contains common parsing functions like field parser etc.
- *
  */
 class DALQueryParser
 {
@@ -56,7 +55,6 @@ class DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

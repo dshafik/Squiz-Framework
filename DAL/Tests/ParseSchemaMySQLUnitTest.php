@@ -29,7 +29,6 @@ require_once 'DAL/Tests/ParseSchemaUnitTest.php';
  *
  * Unit test for testing that the SQL produced for MySQL is correct when
  * parsing the schema.xml.
- *
  */
 class ParseSchemaMySQLUnitTest extends ParseSchemaUnitTest
 {

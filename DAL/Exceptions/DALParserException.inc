@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/DALException.inc';
  * DALParserException.
  *
  * Exception type that is thrown during the parsing of XML queries.
- *
  */
 class DALParserException extends DALException
 {

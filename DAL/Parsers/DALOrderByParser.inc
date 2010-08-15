@@ -29,7 +29,6 @@ require_once 'Libs/XML/XML.inc';
  * DALOrderByParser.
  *
  * ORDER BY clause parser. Parses ORDER BY clause.
- *
  */
 class DALOrderByParser extends DALQueryParser
 {
@@ -40,7 +39,6 @@ class DALOrderByParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

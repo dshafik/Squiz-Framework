@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
 
 /**
  * Unit tests for the getDsn method.
- *
  */
 class GetDsnUnitTest extends AbstractMySourceUnitTest
 {

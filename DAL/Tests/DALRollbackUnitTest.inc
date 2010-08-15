@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/DALBaker.inc';
 
 /**
  * Unit tests for the rollback method.
- *
  */
 class DALRollbackUnitTest extends AbstractMySourceUnitTest
 {

@@ -29,7 +29,6 @@ require_once 'Libs/XML/XML.inc';
  * DALGroupBy.
  *
  * GROUP BY clause parser. Parses GROUP BY clause.
- *
  */
 class DALGroupByParser extends DALQueryParser
 {
@@ -40,7 +39,6 @@ class DALGroupByParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

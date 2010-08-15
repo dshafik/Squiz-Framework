@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/DALException.inc';
  * DALConverterException.
  *
  * Exception type that is thrown during the conversion process from XML to SQL.
- *
  */
 class DALConverterException extends DALException
 {

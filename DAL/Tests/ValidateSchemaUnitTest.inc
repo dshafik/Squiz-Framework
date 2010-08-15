@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  *
  * ValidateSchema() method throws exception if there is an error in the schema
  * definition.
- *
  */
 class ValidateSchemaUnitTest extends AbstractMySourceUnitTest
 {

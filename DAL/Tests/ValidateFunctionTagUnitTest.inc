@@ -27,7 +27,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for validateFunctionTag method.
- *
  */
 class ValidateFunctionTagUnitTest extends AbstractMySourceUnitTest
 {

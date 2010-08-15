@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  * Unit tests for the validateHook method.
  *
  * validateHook() method throws exception if hook does not have id attribute.
- *
  */
 class ValidateHookUnitTest extends AbstractMySourceUnitTest
 {

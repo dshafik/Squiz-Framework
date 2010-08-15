@@ -28,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the executeAssoc & getAssoc methods.
- *
  */
 class ExecuteAssocUnitTest extends AbstractMySourceUnitTest
 {

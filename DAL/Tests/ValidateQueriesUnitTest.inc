@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  * Unit tests for the validateQueries() method.
  *
  * validateQueries() Validates all the queries under the given queries node.
- *
  */
 class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
 {
@@ -37,7 +36,7 @@ class ValidateQueriesUnitTest extends AbstractMySourceUnitTest
     /**
      * Schema xml for this unit test.
      *
-     * @var   string $_schema Schema xml.
+     * @var string $_schema Schema xml.
      */
     private $_queries = '<queries system="system1">
                             <query id="test1"></query>

@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALQueryParser.inc';
  * Unit tests for the getTableColumnTypes() method.
  *
  * getTableColumnTypes() gets the column types of a specific table in a system.
- *
  */
 class GetTableColumnTypesUnitTest extends AbstractMySourceUnitTest
 {

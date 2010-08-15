@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the validateTableConstraints method.
  *
  * validateTableConstraints method throws exception if there are any errors.
- *
  */
 class ValidateTableConstraintsUnitTest extends AbstractMySourceUnitTest
 {

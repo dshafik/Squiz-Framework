@@ -30,7 +30,6 @@ require_once 'DAL/DALBaker.inc';
  * DALUnionParser.
  *
  * UNION/UNION-ALL query parser.
- *
  */
 class DALUnionParser extends DALQueryParser
 {
@@ -41,7 +40,6 @@ class DALUnionParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {

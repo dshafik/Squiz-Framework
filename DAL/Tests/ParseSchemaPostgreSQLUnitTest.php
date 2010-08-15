@@ -29,7 +29,6 @@ require_once 'DAL/Tests/ParseSchemaUnitTest.php';
  *
  * Unit test for testing that the sql produced for PostgreSQL is correct when
  * parsing the schema.xml.
- *
  */
 class ParseSchemaPostgreSQLUnitTest extends ParseSchemaUnitTest
 {

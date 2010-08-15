@@ -28,7 +28,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
 
 /**
  * Unit tests for the executeAll & getAll methods.
- *
  */
 class ExecuteAllUnitTest extends AbstractMySourceUnitTest
 {

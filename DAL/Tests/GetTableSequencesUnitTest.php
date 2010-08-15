@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)).'/Parsers/DALSchemaParser.inc';
  * Unit tests for the getTableSequences method.
  *
  * getTableSequences method returns correct values.
- *
  */
 class GetTableSequencesUnitTest extends AbstractMySourceUnitTest
 {

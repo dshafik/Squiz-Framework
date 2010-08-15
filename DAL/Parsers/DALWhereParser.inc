@@ -33,7 +33,6 @@ require_once 'Libs/XML/XML.inc';
  * DALWhereParser.
  *
  * Where clause parser. Parses a where clause.
- *
  */
 class DALWhereParser extends DALQueryParser
 {
@@ -44,7 +43,6 @@ class DALWhereParser extends DALQueryParser
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {
