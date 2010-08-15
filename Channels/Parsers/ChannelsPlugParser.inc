@@ -37,7 +37,6 @@ require_once 'Channels/ChannelsBaker.inc';
  * ChannelsPlugParser.
  *
  * Base query parser. Contains common parsing functions like field parser etc.
- *
  */
 class ChannelsPlugParser
 {
@@ -45,7 +44,7 @@ class ChannelsPlugParser
     /**
      * Cache for the required elements list.
      *
-     * @var   arary
+     * @var arary
      */
     private static $_requiredElementsCache = array();
 

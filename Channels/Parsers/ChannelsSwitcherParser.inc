@@ -28,7 +28,6 @@ require_once 'Channels/Parsers/ChannelsPlugParser.inc';
  * ChannelsSwitcherParser.
  *
  * Switcher plug.
- *
  */
 class ChannelsSwitcherParser extends ChannelsPlugParser
 {

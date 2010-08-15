@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/ChannelException.inc';
 
 /**
  * Exception thrown during the exceution of a plug within a channel.
- *
  */
 class ChannelPlugException extends ChannelException
 {

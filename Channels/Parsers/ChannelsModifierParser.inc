@@ -28,7 +28,6 @@ require_once 'Channels/Parsers/ChannelsPlugParser.inc';
  * ChannelsModifierParser.
  *
  * Modifier plug.
- *
  */
 class ChannelsModifierParser extends ChannelsPlugParser
 {

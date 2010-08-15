@@ -24,7 +24,6 @@
 
 /**
  * Exception received by calling code when exception thrown in executed channel.
- *
  */
 class ChannelException extends Exception
 {

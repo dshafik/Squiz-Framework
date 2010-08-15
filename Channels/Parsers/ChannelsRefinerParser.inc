@@ -28,7 +28,6 @@ require_once 'Channels/Parsers/ChannelsPlugParser.inc';
  * ChannelsRefinerParser.
  *
  * Refiner plug.
- *
  */
 class ChannelsRefinerParser extends ChannelsPlugParser
 {

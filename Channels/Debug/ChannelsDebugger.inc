@@ -26,7 +26,6 @@ require_once 'Channels/Channels.inc';
 
 /**
  * ChannelsDebugger.
- *
  */
 class ChannelsDebugger
 {

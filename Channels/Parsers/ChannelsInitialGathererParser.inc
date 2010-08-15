@@ -28,7 +28,6 @@ require_once 'Channels/Parsers/ChannelsPlugParser.inc';
  * ChannelsInitialGathererParser.
  *
  * Initial Gatherer plug.
- *
  */
 class ChannelsInitialGathererParser extends ChannelsPlugParser
 {

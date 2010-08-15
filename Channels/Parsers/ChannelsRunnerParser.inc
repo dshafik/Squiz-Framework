@@ -28,7 +28,6 @@ require_once 'Channels/Parsers/ChannelsPlugParser.inc';
  * ChannelsRunnerParser.
  *
  * Runner plug.
- *
  */
 class ChannelsRunnerParser extends ChannelsPlugParser
 {

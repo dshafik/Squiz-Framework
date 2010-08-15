@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/ChannelException.inc';
 
 /**
  * Exception thrown during the execution of an action.
- *
  */
 class ChannelActionException extends ChannelException
 {

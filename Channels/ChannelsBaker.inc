@@ -36,7 +36,6 @@ require_once dirname(__FILE__).'/Debug/ChannelsDebugger.inc';
  *
  * The files handled include both the XML channels definitions files, as well
  * as the PHP classes that are baked out to represent these channel definitions.
- *
  */
 class ChannelsBaker
 {
@@ -44,7 +43,7 @@ class ChannelsBaker
     /**
      * The channels that will be generated for the main MySource system.
      *
-     * @var   array
+     * @var array
      */
     private static $_mySourceChannels = array(
                                          'init'        => array(
@@ -121,7 +120,7 @@ class ChannelsBaker
     /**
      * Array of type locations.
      *
-     * @var   array
+     * @var array
      */
      private static $_typeLocs = array(
                                   'before' => array(
@@ -145,7 +144,7 @@ class ChannelsBaker
       * in the future (such as SQL bindings) that will require a new location
       * type, and this will facilitate adding those locations.
       *
-      * @var   array
+      * @var array
       */
      private static $_locTypes = array(
                                   'before',
@@ -155,42 +154,41 @@ class ChannelsBaker
     /**
      * Stores the current system being painted to be used by the debug output.
      *
-     * @var   array
+     * @var array
      */
     private static $_currentSystem = '';
 
     /**
      * List of the system to be installed.
      *
-     * @var   array
+     * @var array
      */
     private static $_systemsInfo = array();
 
     /**
      * List of the system names to be installed.
      *
-     * @var   array
+     * @var array
      */
     private static $_systemNames = array();
 
     /**
      * Turns on channel execution path report mode.
      *
-     * @var   array
+     * @var array
      */
     public static $addReportCode = FALSE;
 
     /**
      * System implementers cache.
      *
-     * @var   array
+     * @var array
      */
     private static $_systemImplementersCache = array();
 
 
     /**
      * ChannelsBaker constructor.
-     *
      */
     private function __construct()
     {

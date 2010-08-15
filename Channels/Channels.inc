@@ -34,7 +34,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Provides methods to retrieve information about channel data.
- *
  */
 class Channels
 {
@@ -44,7 +43,7 @@ class Channels
      *
      * Array is indexed by the event names.
      *
-     * @var   array
+     * @var array
      */
     private static $_eventBasket = array();
 
@@ -55,21 +54,21 @@ class Channels
      * is set, then name + 'Oven' directory will be created. e.g.) 'debug' will
      * create 'debugOven'.
      *
-     * @var   boolean
+     * @var boolean
      */
     public static $channelsMode = '';
 
     /**
      * List of included systems.
      *
-     * @var   array
+     * @var array
      */
     private static $_includedSystems = array();
 
     /**
      * If TRUE the system is currently being installed.
      *
-     * @var   boolean
+     * @var boolean
      */
     public static $installing = FALSE;
 
@@ -78,7 +77,7 @@ class Channels
      *
      * Introduced to be used during the testing.
      *
-     * @var   array
+     * @var array
      */
     private static $_runPlugList = array();
 
@@ -87,14 +86,13 @@ class Channels
      *
      * Introduced to be used during the testing.
      *
-     * @var   boolean
+     * @var boolean
      */
     public static $runAllPlugs = FALSE;
 
 
     /**
      * Channels constructor.
-     *
      */
     private function __construct()
     {

@@ -29,7 +29,6 @@ require_once 'Channels/ChannelsBaker.inc';
  * ChannelsBlockerParser.
  *
  * Blocker plug.
- *
  */
 class ChannelsBlockerParser extends ChannelsPlugParser
 {
