@@ -341,11 +341,10 @@ class GUIActions
         } else {
             // Replce the doc type for sub level templates.
             $htmlCont = str_replace(self::$_docType, '', $htmlCont);
-        }
+        }//end if
 
         // Do some cleanup.
         $htmlCont = trim(str_replace('<?xml version="1.0"?>', '', $htmlCont));
-
         $htmlCont = str_replace('&lt;?php', '<'.'?php', $htmlCont);
         $htmlCont = str_replace('?&gt;', '?'.'>', $htmlCont);
 
@@ -830,11 +829,39 @@ class GUIActions
                 $php .= self::_parseWidgetSettingsTag($node, $assignTo);
             break;
 
+            case 'content':
+                // Need to wrap content.
+                $domContent  = self::$_docType;
+                $domContent .= '<__tempContent></__tempContent>';
+
+                $temptpl = new DOMDocument('1.0');
+                $temptpl->loadXML($domContent);
+
+                $tempContentEl = $temptpl->getElementsByTagName('__tempContent')->item(0);
+
+                foreach ($node->childNodes as $contentChild) {
+                    $importedNode = $temptpl->importNode($contentChild, TRUE);
+                    $tempContentEl->appendChild($importedNode);
+                }
+
+                GUI::parseTemplate($tempContentEl);
+                $subTemplateStr = $temptpl->saveXML();
+
+                // Just get the content we want.
+                $subTemplateStr = str_replace(self::$_docType, '', $subTemplateStr);
+                $subTemplateStr = trim(str_replace('<?xml version="1.0"?>', '', $subTemplateStr));
+                $subTemplateStr = str_replace('<__tempContent>', '', $subTemplateStr);
+                $subTemplateStr = str_replace('</__tempContent>', '', $subTemplateStr);
+                $subTemplateStr = ' ?>'.$subTemplateStr.'<? ';
+
+                $php .= 'ob_start();'."\n";
+                $php .= $subTemplateStr;
+                $php .= $assignTo.' = ob_get_clean();'."\n";
+            break;
+
             default:
                 include_once 'Libs/XML/XML.inc';
-                if ($node->tagName === 'content') {
-                    $varName = $assignTo;
-                } else if ($node->tagName === 'value') {
+                if ($node->tagName === 'value') {
                     $varName = $assignTo.'['.XML::getIndex($node).']';
                 } else {
                     $varName = $assignTo.'["'.$node->tagName.'"]';
@@ -847,25 +874,10 @@ class GUIActions
                     $php .= 'array();'."\n";
                     foreach ($node->childNodes as $childTag) {
                         if ($childTag->nodeType !== XML_ELEMENT_NODE) {
-                            if ($node->tagName === 'content') {
-                                $val = self::_getPHPValue(trim($childTag->nodeValue));
-                                if (empty($val) === FALSE) {
-                                    $php .= $varName.'['.($counter++).'] = '.$val.";\n";
-                                }
-                            }
-
                             continue;
                         }
 
-                        if ($node->tagName === 'content') {
-                            $php .= self::_parseTag($childTag, $varName.'['.($counter++).']');
-                        } else {
-                            $php .= self::_parseTag($childTag, $varName);
-                        }
-                    }
-
-                    if ($node->tagName === 'content') {
-                         $php .= $varName.' = implode("", '.$varName.');'."\n";
+                        $php .= self::_parseTag($childTag, $varName);
                     }
                 } else {
                     $php .= self::_getPHPValue(trim($node->nodeValue)).";\n";
