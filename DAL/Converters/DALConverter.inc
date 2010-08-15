@@ -31,7 +31,6 @@ require_once dirname(dirname(__FILE__)).'/Exceptions/DALConverterException.inc';
  * representation. XQDs are parsed by DALBaker and converted to PHP arrays.
  * If new databases have different SQL constructs then they should extend this
  * class and override its functions & members.
- *
  */
 class DALConverter
 {
@@ -41,7 +40,7 @@ class DALConverter
      *
      * Sub classes will need to override this array and change the array values.
      *
-     * @var   $dataTypes List of SQL constructs.
+     * @var $dataTypes List of SQL constructs.
      */
     protected $dataTypes = array(
                             'char'             => 'CHAR',
@@ -66,7 +65,7 @@ class DALConverter
      *
      * Sub classes will need to override this array and change the array values.
      *
-     * @var   $sqlConstructs List of SQL constructs.
+     * @var $sqlConstructs List of SQL constructs.
      */
     protected $sqlConstructs = array(
                                 'select'     => 'SELECT',
@@ -94,7 +93,7 @@ class DALConverter
      * Values of this array will be used to separate fields/values from each
      * other. For example: ((table.col1 - table.col2) + value)
      *
-     * @var   array $mathOps List of available math operators.
+     * @var array $mathOps List of available math operators.
      */
     protected $mathOps = array(
                           'SUBTRACT' => '-',
@@ -106,21 +105,21 @@ class DALConverter
     /**
      * SQL query array that is being converted.
      *
-     * @var   array $_query SQL query array.
+     * @var array $_query SQL query array.
      */
     protected $query = array();
 
     /**
      * Name of the database.
      *
-     * @var   string $name Database name.
+     * @var string $name Database name.
      */
     protected $name = '';
 
     /**
      * List of where conditions and their signs.
      *
-     * @var   array $_whereConditions List of conditions that can be used in
+     * @var array $_whereConditions List of conditions that can be used in
      *                                where clause.
      */
     private $_whereConditions = array(
@@ -131,8 +130,11 @@ class DALConverter
                                  'greater'          => '>',
                                  'less'             => '<',
                                  'like'             => 'LIKE',
+                                 'not-like'         => 'NOT LIKE',
                                  'is-null'          => 'IS NULL',
                                  'not-null'         => 'NOT NULL',
+                                 'similar-to'       => 'SIMILAR TO',
+                                 'not-similar-to'   => 'NOT SIMILAR TO',
                                 );
 
     /**
@@ -141,7 +143,7 @@ class DALConverter
      * This array is used by the Query object when Query->prepare() is called.
      * Structure should be the [hookSqlCode] = value if not replaced.
      *
-     * @var   array
+     * @var array
      */
     private $_hookStrings = array();
 
@@ -520,7 +522,7 @@ class DALConverter
             } else {
                 $name = $field['value'];
             }
-        }//end if()
+        }//end if
 
         return $name;
 
@@ -913,6 +915,21 @@ class DALConverter
                 ) {
                     $sql .= $this->convertLikeCondition($condition);
                     $sql .= "\n";
+                } else if ((isset($condition['type']) === TRUE)
+                    && ($condition['type'] === 'not-like')
+                ) {
+                    $sql .= $this->convertNotLikeCondition($condition);
+                    $sql .= "\n";
+                } else if ((isset($condition['type']) === TRUE)
+                    && ($condition['type'] === 'similar-to')
+                ) {
+                    $sql .= $this->convertSimilarToCondition($condition);
+                    $sql .= "\n";
+                } else if ((isset($condition['type']) === TRUE)
+                    && ($condition['type'] === 'not-similar-to')
+                ) {
+                    $sql .= $this->convertNotSimilarToCondition($condition);
+                    $sql .= "\n";
                 } else if (isset($condition['compare']) === TRUE) {
                     // Basic condition block.
                     $sql .= $this->convertSingleField($condition['compare']);
@@ -1158,7 +1175,7 @@ class DALConverter
      */
     protected function convertNot(array $not)
     {
-        $sql = 'NOT ';
+        $sql  = 'NOT ';
         $sql .= $this->convertWhereClause($not['NOT'][0]);
 
         return $sql;
@@ -2400,6 +2417,60 @@ class DALConverter
         return $sql;
 
     }//end convertLikeCondition()
+
+
+    /**
+     * Handles NOT LIKE conditions.
+     *
+     * @param array $condition The condition information.
+     *
+     * @return string
+     */
+    protected function convertNotLikeCondition(array $condition)
+    {
+        $compare = $this->convertSingleField($condition['compare']);
+        $to      = $this->convertSingleField($condition['to']);
+        $sql     = $compare.' NOT LIKE '.$to;
+
+        return $sql;
+
+    }//end convertNotLikeCondition()
+
+
+    /**
+     * Handles SIMILAR TO conditions.
+     *
+     * @param array $condition The condition information.
+     *
+     * @return string
+     */
+    protected function convertSimilarToCondition(array $condition)
+    {
+        $compare = $this->convertSingleField($condition['compare']);
+        $to      = $this->convertSingleField($condition['to']);
+        $sql     = $compare.' SIMILAR TO '.$to;
+
+        return $sql;
+
+    }//end convertSimilarToCondition()
+
+
+    /**
+     * Handles NOT SIMILAR TO conditions.
+     *
+     * @param array $condition The condition information.
+     *
+     * @return string
+     */
+    protected function convertNotSimilarToCondition(array $condition)
+    {
+        $compare = $this->convertSingleField($condition['compare']);
+        $to      = $this->convertSingleField($condition['to']);
+        $sql     = $compare.' NOT SIMILAR TO '.$to;
+
+        return $sql;
+
+    }//end convertNotSimilarToCondition()
 
 
     /**

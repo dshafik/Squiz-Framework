@@ -36,7 +36,6 @@ require_once dirname(__FILE__).'/Query.inc';
  *
  * Baker class for the Database Abstraction Layer, containing methods for
  * converting XML queries into PHP code.
- *
  */
 class DALBaker
 {
@@ -44,7 +43,7 @@ class DALBaker
     /**
      * List of where conditions and their signs.
      *
-     * @var   array $_whereConditions List of conditions that can be used in
+     * @var array $_whereConditions List of conditions that can be used in
      *                                where clause.
      */
     private static $_whereConditions = array(
@@ -55,14 +54,17 @@ class DALBaker
                                         'greater'          => '>',
                                         'less'             => '<',
                                         'like'             => 'LIKE',
+                                        'not-like'         => 'NOT LIKE',
                                         'is-null'          => 'IS NULL',
                                         'not-null'         => 'NOT NULL',
+                                        'similar-to'       => 'SIMILAR TO',
+                                        'not-similar-to'   => 'NOT SIMILAR TO',
                                        );
 
     /**
      * The types of assertions that can be specified by systems.
      *
-     * @var   array $_assertionTypes Assertion Tag Names.
+     * @var array $_assertionTypes Assertion Tag Names.
      */
     private static $_assertionTypes = array(
                                        'assert-true',
@@ -81,7 +83,7 @@ class DALBaker
     /**
      * Characters that cannot be used in the generation of variable names.
      *
-     * @var   array $_forbiddenVariablecharacters Characters that should be
+     * @var array $_forbiddenVariablecharacters Characters that should be
      *                                            removed when generating
      *                                            variable names.
      */
@@ -103,8 +105,7 @@ class DALBaker
     /**
      * A cache of dynamic table column type diff per system.
      *
-     * @var   array $_dynamicTableColDiff Array of column with different type.
-     *
+     * @var array $_dynamicTableColDiff Array of column with different type.
      */
     private static $_dynamicTableColDiff = array();
 
@@ -114,7 +115,6 @@ class DALBaker
      *
      * Private to avoid instantiating the object.
      * All DALBaker methods should be called statically.
-     *
      */
     private function __construct()
     {
@@ -352,7 +352,7 @@ class DALBaker
                     self::addQuery($systemName, $child);
                 }
             }//end if
-        }//end foreach childnodes
+        }//end foreach
 
         return TRUE;
 
@@ -1587,8 +1587,9 @@ class DALBaker
      */
     public static function printSubQueries($systemName, $queryName)
     {
-        $hookIds = self::_generateHookArray($systemName, $queryName);
-        return self::_printHookCode($hookIds);
+        $hookIds  = self::_generateHookArray($systemName, $queryName);
+        $hookCode = self::_printHookCode($hookIds);
+        return $hookCode;
 
     }//end printSubQueries()
 
@@ -1738,7 +1739,7 @@ class DALBaker
                 if ($subQuery['assertion_var'] !== '') {
                     $contents .= "}\n";
                 }
-            }//end foreach
+            }//end for
 
             // Implode the data and add seperators.
             $contents .= "\$query->subQueries('".$id."', ".$arrayId.");\n";
@@ -1777,8 +1778,9 @@ class DALBaker
      */
     public static function getHookArrayId($hookId)
     {
-        $str = ucwords(str_replace('_', ' ', $hookId));
-        return '$'.str_replace(' ', '', $str).'Array';
+        $str  = ucwords(str_replace('_', ' ', $hookId));
+        $code = '$'.str_replace(' ', '', $str).'Array';
+        return $code;
 
     }//end getHookArrayId()
 
@@ -2088,9 +2090,9 @@ class DALBaker
                     $newBinding->setAttribute('system', $bindSystem);
                     $newBinding->setAttribute('name', $bindName);
                     $bindingsParent->appendChild($newBinding);
-                }//end if $bindMatches not empty
-            }//end if childNodes->length === 1
-        }//end foreach $allElements
+                }//end if
+            }//end if
+        }//end foreach
 
         return $query;
 
@@ -2245,8 +2247,8 @@ class DALBaker
                 $placeParent->appendChild($newPlaceHolder);
                 // Now replace the original node with the new var name.
                 $element->nodeValue = $varName;
-            }//end if childNodes->length === 1
-        }//end foreach $allElements
+            }//end if
+        }//end foreach
 
         return $query;
 
