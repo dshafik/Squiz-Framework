@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Box System Class.
- *
  */
 class GUIBoxSystem extends BaseSystem
 {

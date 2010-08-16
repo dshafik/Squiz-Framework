@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Pie Chart Widget System Class.
- *
  */
 class GUIGraphPieSystem extends BaseSystem
 {

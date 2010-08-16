@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Select GUI Widget System Class.
- *
  */
 class GUISelectSystem extends BaseSystem
 {

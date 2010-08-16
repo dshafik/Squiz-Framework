@@ -1078,7 +1078,7 @@ class CronActions
         } catch (DALException $e) {
             DAL::rollBack();
             $errors[] = $e->getMessage();
-        }
+        }//end try
 
         // Update frequent interval.
         $cronSettings = Util::getArrayIndex($data, 'cronSettings', array());

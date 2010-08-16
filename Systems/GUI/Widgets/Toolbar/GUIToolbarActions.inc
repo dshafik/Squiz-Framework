@@ -38,7 +38,7 @@ class GUIToolbarActions
     protected static $logo;
 
     /**
-     * Content of the toolbar
+     * Content of the toolbar.
      *
      * @var string
      */

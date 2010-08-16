@@ -26,7 +26,6 @@ require_once 'Systems/GUI/Widgets/ContentSwitcher/GUIContentSwitcherSystem.inc';
 
 /**
  * GUI Mode Switcher System Class.
- *
  */
 class GUIModeSwitcherSystem extends GUIContentSwitcherSystem
 {

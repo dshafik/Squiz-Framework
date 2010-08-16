@@ -26,7 +26,6 @@ require_once 'DAL/DAL.inc';
 
 /**
  * Attribute Actions Class.
- *
  */
 class AttributeActions
 {
@@ -43,7 +42,6 @@ class AttributeActions
      * Constructor.
      *
      * Private to prevent instantiation.
-     *
      */
     private function __construct()
     {

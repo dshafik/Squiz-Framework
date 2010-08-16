@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Button System Class.
- *
  */
 class GUITableSystem extends BaseSystem
 {

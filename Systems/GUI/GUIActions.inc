@@ -26,8 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI Actions Class.
- *
- * @since 4.0.0
  */
 class GUIActions
 {

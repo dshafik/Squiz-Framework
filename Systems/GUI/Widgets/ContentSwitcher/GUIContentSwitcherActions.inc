@@ -241,7 +241,7 @@ class GUIContentSwitcherActions
      *
      * @return string
      *
-     * @api    read
+     * @api read
      */
     public static function getDynamicItemContent($system, $modeid)
     {

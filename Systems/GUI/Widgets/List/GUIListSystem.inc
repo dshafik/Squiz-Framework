@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI List System Class.
- *
  */
 class GUIListSystem extends BaseSystem
 {

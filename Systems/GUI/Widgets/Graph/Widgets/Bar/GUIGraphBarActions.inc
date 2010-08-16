@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * Actions Class for the Bar Graph Widget (GUIGraphBar) System.
- *
  */
 class GUIGraphBarActions
 {
@@ -85,35 +84,35 @@ class GUIGraphBarActions
      *
      * Overridden using 'height' setting.
      *
-     * @var   string
+     * @var string
      */
     private static $_defaultGraphHeight = '500';
 
     /**
      * Default height of top-of-bar labels, in pixels.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_topLabelHeight = 13;
 
     /**
      * Default height of a flag.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_defaultFlagHeight = 8;
 
     /**
      * Height of an X-axis that contains at least one value.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_xAxisHeight = 15;
 
     /**
      * Height of spacing between flags.
      *
-     * @var   integer
+     * @var integer
      */
     private static $_flagSpacing = 2;
 
@@ -286,6 +285,10 @@ class GUIGraphBarActions
      * @param array   $groups Details of the data groups.
      * @param array   $flags  Details of the data flags.
      * @param integer $height Overall height of the graph (in pixels).
+     * @param float   $max    Maximum value of the graph (used only if it is not
+     *                        exceeded by any other data point).
+     * @param array   $tick   Configuration details for major and minor Y-axis tick
+     *                        lines.
      * @param string  $id     HTML ID of the overall widget.
      * @param string  $class  Class prefix to use for CSS elements.
      *
@@ -297,7 +300,7 @@ class GUIGraphBarActions
         array $flags,
         $height,
         $max,
-        $tick,
+        array $tick,
         $id,
         $class
     ) {
@@ -364,8 +367,8 @@ class GUIGraphBarActions
         if ($tick['major'] !== NULL) {
             if ($tick['major'] === 'auto') {
                 if ($tick['minor'] !== NULL) {
-                    $tickAmounts = ceil($maxValue / $tick['minor']);
-                    $tickAmounts = max(2, round($tickAmounts / 5));
+                    $tickAmounts   = ceil($maxValue / $tick['minor']);
+                    $tickAmounts   = max(2, round($tickAmounts / 5));
                     $tick['major'] = $tick['minor'] * $tickAmounts;
                 } else {
                     // Auto tick!
@@ -383,6 +386,7 @@ class GUIGraphBarActions
                     } else if ($maxExp <= 3) {
                         $tickExp *= 0.5;
                     }
+
                     $tick['major'] = $tickExp;
 
                     if ($tick['minor'] === NULL) {
@@ -423,6 +427,7 @@ class GUIGraphBarActions
             $listRight = 0;
             $listWidth = '100%';
         }
+
         echo '<ul class="'.$class.'-inner-list" style="position: absolute; ';
         echo 'display: block; width: '.$listWidth.'; top: 0; right: '.$listRight.';';
         echo ' height: '.$height.'px; vertical-align: bottom; z-index: 2">';
@@ -432,12 +437,13 @@ class GUIGraphBarActions
             $rowNumber++;
 
             // Calculate how high our bar is allowed to be in total.
-            $rowTotal    = array_sum($dataRow['data']);
+            $rowTotal = array_sum($dataRow['data']);
             if ((int) $maxValue === 0) {
                 $barHeight = 0;
             } else {
-                $barHeight   = round(($rowTotal / $maxValue * $maxBarHeight));
+                $barHeight = round(($rowTotal / $maxValue * $maxBarHeight));
             }
+
             $totalHeight = ($barHeight + $belowAxisHeight);
 
             // Make room for a label.
@@ -696,7 +702,7 @@ class GUIGraphBarActions
             echo $maxBarHeight.'px; width: 100%; position: absolute;"></div>';
 
             echo '</div>';
-        }
+        }//end if
 
     }//end paintGraph()
 

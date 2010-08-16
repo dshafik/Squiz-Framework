@@ -26,7 +26,6 @@ require_once 'Systems/GUI/Widgets/ContentSwitcher/GUIContentSwitcherActions.inc'
 
 /**
  * GUI Mode Switcher Widget Actions Class.
- *
  */
 class GUIModeSwitcherActions extends GUIContentSwitcherActions
 {

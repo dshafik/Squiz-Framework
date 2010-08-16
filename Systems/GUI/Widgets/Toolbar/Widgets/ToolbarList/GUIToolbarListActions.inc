@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * ToolbarList Actions Class.
- *
  */
 class GUIToolbarListActions
 {

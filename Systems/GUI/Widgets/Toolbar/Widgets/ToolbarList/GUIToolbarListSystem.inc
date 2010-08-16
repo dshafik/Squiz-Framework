@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUIToolbarList System Class.
- *
  */
 class GUIToolbarListSystem extends BaseSystem
 {

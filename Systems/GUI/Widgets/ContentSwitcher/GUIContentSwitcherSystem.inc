@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI Mode Switcher System Class.
- *
  */
 class GUIContentSwitcherSystem extends BaseSystem
 {

@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * GUI SaveButton System Class.
- *
  */
 class GUISaveButtonSystem extends BaseSystem
 {

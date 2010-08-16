@@ -26,7 +26,6 @@ require_once 'Systems/BaseSystem.inc';
 
 /**
  * TextBox System Class.
- *
  */
 class GUITextBoxSystem extends BaseSystem
 {
