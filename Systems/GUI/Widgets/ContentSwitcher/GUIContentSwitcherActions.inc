@@ -116,6 +116,8 @@ class GUIContentSwitcherActions
         $id        = $settings['widget']['id'];
         $className = $settings['widget']['type'];
 
+        $initItem = Util::getArrayIndex($settings, 'initialItem', NULL);
+
         echo '<div id="'.$id.'" class="'.$className.'">';
 
         if (isset($settings['items']) === FALSE || count($settings['items']) === 0) {
@@ -132,7 +134,16 @@ class GUIContentSwitcherActions
         foreach ($settings['items'] as $mode) {
             $modeSystem = Util::getArrayIndex($mode, 'system', '');
 
-            echo '<li id="'.$id.'-'.$mode['id'].'" class="'.$className.'-modeButton'.$extraClass.'">';
+            if ($initItem === NULL) {
+                $initItem = $mode['id'];
+            }
+
+            $selected = '';
+            if ($mode['id'] === $initItem) {
+                $selected = ' selected';
+            }
+
+            echo '<li id="'.$id.'-'.$mode['id'].'" class="'.$className.'-modeButton'.$extraClass.$selected.'">';
             echo '<a href="#" modeid="'.$mode['id'].'" system="'.$modeSystem.'">'.$mode['label'].'</a></li>';
 
             if (($total - 1) === $count) {

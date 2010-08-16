@@ -63,7 +63,17 @@ GUIContentSwitcher.prototype = {
     {
         var modeid = button.getAttribute('modeid');
         var system = button.getAttribute('system');
+
+        this._removeSelectedClass();
+        dfx.addClass(button.parentNode, 'selected');
+
         this.loadMode(system, modeid);
+
+    },
+
+     _removeSelectedClass: function()
+    {
+        dfx.removeClass(dfx.getTag('li', dfx.getId(this.id)), 'selected');
 
     },
 
