@@ -77,7 +77,7 @@ class DALWhereParser extends DALQueryParser
             $where[strtoupper($type)] = self::getWhereConditions($whereTag);
         }
 
-        $joins = self::_praseJoinsForSelect($parent);
+        $joins = self::_parseJoinsForSelect($parent);
         if (empty($joins) === FALSE) {
             $where = array_merge($where, $joins);
         }
@@ -170,17 +170,18 @@ class DALWhereParser extends DALQueryParser
      * array(
      *  'JOIN' => array(
      *             0 => array(
-     *                   'ARGS' => array( // must have 2 elements.
-     *                              0 => array(
-     *                                    'table'  => string,
-     *                                    'column' => string,
-     *                                   ),
-     *                              1 => array(
-     *                                    'table'  => string,
-     *                                    'column' => string,
-     *                                   ),
-     *                             ),
-     *                   'TYPE' => string,
+     *                   'ARGS'  => array( // must have 2 elements.
+     *                               0 => array(
+     *                                     'table'  => string,
+     *                                     'column' => string,
+     *                                    ),
+     *                               1 => array(
+     *                                     'table'  => string,
+     *                                     'column' => string,
+     *                                    ),
+     *                              ),
+     *                   'TYPE'  => string,
+     *                   'CROSS' => string,
      *                  ),
      *            ),
      * )
@@ -189,7 +190,7 @@ class DALWhereParser extends DALQueryParser
      *
      * @return array
      */
-    private static function _praseJoinsForSelect(DomElement $select)
+    private static function _parseJoinsForSelect(DomElement $select)
     {
         $joinList = array();
         $joinsTag = NULL;
@@ -207,16 +208,17 @@ class DALWhereParser extends DALQueryParser
 
             $joins = $joinsTag->getElementsByTagName('join');
             foreach ($joins as $join) {
-                $condition          = array();
-                $condition['ARGS']  = self::parseChildFields($join);
-                $condition['type']  = $join->getAttribute('type');
-                $joinList['JOIN'][] = $condition;
+                $condition           = array();
+                $condition['ARGS']   = self::parseChildFields($join);
+                $condition['type']   = $join->getAttribute('type');
+                $condition['cross']  = $join->getAttribute('cross');
+                $joinList['JOIN'][]  = $condition;
             }
         }
 
         return $joinList;
 
-    }//end _praseJoinsForSelect()
+    }//end _parseJoinsForSelect()
 
 
     /**

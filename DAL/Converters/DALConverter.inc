@@ -320,7 +320,7 @@ class DALConverter
             if (in_array('join', $ignore) === FALSE) {
                 $joins = '';
                 if (isset($sqlArray['JOIN']) === TRUE) {
-                    $joins = $this->convertJoins($sqlArray['JOIN']);
+                    $joins = $this->convertJoins($sqlArray['JOIN'], $sqlArray['FROM']);
                 }
 
                 if ($joins !== '') {
@@ -1425,20 +1425,21 @@ class DALConverter
      * Converts array of joins to their SQL form.
      *
      * @param array $joins Array of joins.
+     * @param array $from  The FROM clause in the original query.
      *
      * @return string
      */
-    protected function convertJoins(array $joins)
+    protected function convertJoins(array $joins, array $from)
     {
         $sql   = '';
         $list  = array();
-        $first = TRUE;
+        $count = 1;
         foreach ($joins as $join) {
-            $list[] = $this->convertSingleJoin($join, $first);
-            $first  = FALSE;
+            $list[] = $this->convertSingleJoin($join, $count, $from);
+            $count++;
         }
 
-        $sql = implode(",\n", $list);
+        $sql = implode("\n", $list);
 
         return $sql;
 
@@ -1449,16 +1450,37 @@ class DALConverter
      * Converts a single join.
      *
      * @param array   $join  Single join array.
-     * @param boolean $first TRUE if this join is the first join in the table.
+     * @param integer $count Count of the join in the table.
+     * @param array   $from  The FROM clause in the original query.
      *
      * @return string
      */
-    protected function convertSingleJoin(array $join, $first=FALSE)
+    protected function convertSingleJoin(array $join, $count=1, array $from=array())
     {
-        $sql = '';
+        $sql   = '';
+        $cross = FALSE;
+        $exist = FALSE;
+        $names = $this->getFromTableNames($from);
+
+        // Special Case, where multiple joins require a cross join to the original query.
+        // eg. 'SELECT * FROM table1 INNER JOIN table2 ON table1.id=table2.id, table3 INNER JOIN table4 ON table3.id=table4'.
+        if (isset($join['cross']) === TRUE && strtolower($join['cross']) === 'true') {
+            $cross = TRUE;
+        }
+
+        // Does the first table exist?
+        if (isset($join['ARGS'][0]['table']) === TRUE && in_array($join['ARGS'][0]['table'], $names) === TRUE) {
+            $exist = TRUE;
+        }
+
         if (isset($join['ARGS']) === TRUE) {
-            if ($first === FALSE) {
-                $sql .= $join['ARGS'][0]['table'].' ';
+            // Not the first time this has been called, we *possibly* need a table prefix.
+            if ($count > 1) {
+                if ($cross === TRUE && $exist === TRUE) {
+                    $sql .= $join['ARGS'][0]['table'].' AS '.$join['ARGS'][0]['table'].$count.' ';
+                } else if ($cross === TRUE && $exist === FALSE) {
+                    $sql .= $join['ARGS'][0]['table'].' ';
+                }
             }
 
             $joinType = strtoupper($join['type']);
@@ -1472,15 +1494,63 @@ class DALConverter
             // Do not write ON clause if this is a Natural or Cross join.
             if ($joinType !== 'NATURAL JOIN' || $joinType === 'CROSS JOIN') {
                 $sql .= ' ON ';
-                $sql .= $join['ARGS'][0]['table'].'.'.$join['ARGS'][0]['column'];
+                $sql .= $join['ARGS'][0]['table'];
+                if ($cross === TRUE && $exist === TRUE && $count > 1) {
+                    // This is a special case, that requires an alias.
+                    $sql .= $count;
+                }
+
+                $sql .= '.'.$join['ARGS'][0]['column'];
                 $sql .= ' = ';
                 $sql .= $join['ARGS'][1]['table'].'.'.$join['ARGS'][1]['column'];
+            }
+
+            // Special Case, where multiple joins require a cross join to the original query.
+            if ($cross === TRUE) {
+                $sql = 'CROSS JOIN ('.$sql.')';
             }
         }//end if
 
         return $sql;
 
     }//end convertSingleJoin()
+
+
+    /**
+     * Get a list of names from the FROM clause.
+     *
+     * @param array $from The array of the FROM clause.
+     *
+     * @return array
+     */
+    protected function getFromTableNames(array $from)
+    {
+        $names = array();
+        if (empty($from) === FALSE) {
+            foreach ($from as $table) {
+                if (is_array($table) === TRUE && isset($table['FROM']) === TRUE) {
+                    $subTables = $this->getFromTableNames($table['FROM']);
+                    if (empty($subTables) === FALSE) {
+                        $names = array_merge($names, $subTables);
+                    }
+                } else {
+                    if (is_array($table) === TRUE) {
+                        if (isset($table['name']) === TRUE) {
+                            $names[] = $table['name'];
+                            if (isset($table['alias']) === TRUE) {
+                                $names[] = $table['alias'];
+                            }
+                        }
+                    } else {
+                        $names[] = $table;
+                    }//end if
+                }//end if
+            }//end foreach
+        }//end if
+
+        return $names;
+
+    }//end getFromTableNames()
 
 
     /*
