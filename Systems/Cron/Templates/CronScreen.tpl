@@ -1,5 +1,4 @@
 <div id="CronScreen">
-    <text>Test</text>
     <div class="CronSettingsBoxContainer GUI-screen-left">
         <!-- Start Cront Screen settings box -->
         <widget type="GUI/ScreenSettings" id="cronSettings">
@@ -105,15 +104,26 @@
                         <value>
                             <content>
                                 <text>
-                                    <value>Runs ever day at %s</value>
+                                    <value>Runs ever day at %s : %s</value>
                                     <args>
                                         <arg>
-                                            <widget type="GUI/TextBox" id="dailyInterval">
+                                            <widget type="GUI/TextBox" id="dailyInterval-hour">
                                                 <setting name="inline">true</setting>
                                                 <setting name="size">2</setting>
                                                 <setting name="value">
                                                     <dataProvider action="Cron::getCronInterval">
-                                                        <arg>daily</arg>
+                                                        <arg>daily-hour</arg>
+                                                    </dataProvider>
+                                                </setting>
+                                            </widget>
+                                        </arg>
+                                        <arg>
+                                            <widget type="GUI/TextBox" id="dailyInterval-min">
+                                                <setting name="inline">true</setting>
+                                                <setting name="size">2</setting>
+                                                <setting name="value">
+                                                    <dataProvider action="Cron::getCronInterval">
+                                                        <arg>daily-min</arg>
                                                     </dataProvider>
                                                 </setting>
                                             </widget>

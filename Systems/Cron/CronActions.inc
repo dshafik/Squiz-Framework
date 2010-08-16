@@ -1005,8 +1005,34 @@ class CronActions
      */
     public static function getCronInterval($cronType)
     {
-        $typeData = DAL::getAssoc(Cron::getCronType($cronType), 2);
-        $interval = Cron::getCronTypeInterval($typeData['condition']);
+        $cronTypeParts = explode('-', $cronType);
+
+        $typeData = DAL::getAssoc(Cron::getCronType($cronTypeParts[0]), 2);
+        $parts    = explode(' ', $typeData['condition']);
+        $interval = 0;
+
+        switch ($cronType) {
+            case 'frequent':
+                $interval = Cron::getCronTypeInterval($typeData['condition']);
+                $interval = ($interval / 60);
+            break;
+
+            case 'hourly':
+                $interval = $parts[0];
+            break;
+
+            case 'daily-hour':
+                $interval = $parts[1];
+            break;
+
+            case 'daily-min':
+                $interval = $parts[0];
+            break;
+
+            default:
+                // Ignore.
+            break;
+        }//end switch
 
         return $interval;
 
@@ -1082,20 +1108,20 @@ class CronActions
 
         // Update frequent interval.
         $cronSettings = Util::getArrayIndex($data, 'cronSettings', array());
-        if (isset($cronSettings['frequentRunInterval']) === TRUE) {
-            $intervalStr = '*/'.$cronSettings['frequentRunInterval'].' *';
+        if (isset($cronSettings['frequentInterval']) === TRUE) {
+            $intervalStr = '*/'.$cronSettings['frequentInterval'].' *';
             self::_updateFrequencyInterval('frequent', $intervalStr);
         }
 
-        if (isset($cronSettings['hourlyRunInterval']) === TRUE) {
-            $intervalStr = $cronSettings['hourlyRunInterval'].' *';
+        if (isset($cronSettings['hourlyInterval']) === TRUE) {
+            $intervalStr = $cronSettings['hourlyInterval'].' *';
             self::_updateFrequencyInterval('hourly', $intervalStr);
         }
 
-        if (isset($cronSettings['dailyRunInterval-hour']) === TRUE
-            && isset($cronSettings['dailyRunInterval-min']) === TRUE
+        if (isset($cronSettings['dailyInterval-hour']) === TRUE
+            && isset($cronSettings['dailyInterval-min']) === TRUE
         ) {
-            $intervalStr = $cronSettings['dailyRunInterval-min'].' '.$cronSettings['dailyRunInterval-hour'];
+            $intervalStr = $cronSettings['dailyInterval-min'].' '.$cronSettings['dailyInterval-hour'];
             self::_updateFrequencyInterval('daily', $intervalStr);
         }
 
