@@ -25,6 +25,7 @@
 require_once 'Systems/BaseSystem.inc';
 require_once 'Libs/Util/Util.inc';
 require_once 'Libs/Web/Web.inc';
+require_once 'Libs/FileSystem/FileSystem.inc';
 
 /**
  * Actions Class for the Pie Graph Widget (GUIGraphPie) System.
@@ -33,35 +34,62 @@ class GUIGraphPieActions
 {
 
     /**
-     * Size.
+     * Physical size of the pie graph, in pixels.
+     *
+     * Size is presumed to be a square (equal height and width), since the pie graph
+     * is always a circle.
      *
      * @var string
      */
     protected static $size;
 
     /**
-     * Rings.
+     * Data ring configuration.
+     *
+     * Each ring is defined from inner ring to outer ring, with the following
+     * settings:
+     * - radius:  Size of the ring, in relative units. These do not have to add up
+     *            to the "size" setting, since these are in the logical units of the
+     *            SVG document, rather than physical.
+     * - opacity: Opacity of all the data points in this ring [0.0, 1.0] - default
+     *            1.0. If a data point has an opacity setting too, it will be
+     *            multiplied by the ring value.
      *
      * @var array
      */
     protected static $rings;
 
     /**
-     * DataPoints.
+     * Data point configuration.
+     *
+     * Each data point is defined in order of the first to be defined in the data
+     * provider result, with the following settings:
+     * - colour:  Predefined named colour, as defined in this widget's CSS file.
+     * - opacity: Opacity of this data point in all rings [0.0, 1.0] - default 1.0.
+     *            If a ring also has opacity set, it will be multiplied by this
+     *            value to get an overall opacity for that piece of data.
      *
      * @var array
      */
     protected static $dataPoints;
 
     /**
-     * DataProvider.
+     * Data provider action.
+     *
+     * The data provider should return values in a 2-D array ordered by ring, then
+     * data point - inner ring first.
      *
      * @var string
      */
     protected static $dataProvider;
 
     /**
-     * Border.
+     * Border configuration.
+     *
+     * Optionally set a border around the whole pie chart, using the following
+     * settings:
+     * - radius: Radius of the border, in the same relative units as the ring radii.
+     * - colour: Predefined named colour, as defined in this widget's CSS file.
      *
      * @var array
      */
@@ -77,29 +105,70 @@ class GUIGraphPieActions
      */
     public static function paint(array $settings)
     {
+        Channels::includeSystem('GUI');
+
         // Size of the graph on the page, in pixels. Height and width will be the
         // same size.
         $size = (int) Util::getArrayIndex($settings, 'size');
 
-        echo '<span>';
+        // Border settings.
+        $border = Util::getArrayIndex($settings, 'border');
+        if (is_array($border) === FALSE) {
+            $settings['border'] = array(
+                                   array(
+                                    'radius' => 0,
+                                   ),
+                                  );
+        }
+
+        // Generate a new random file name.
+        $fileDir   = BaseSystem::getDataDir('GUIGraphPie').'/svg-temp';
+        $hashValue = mt_rand().microtime();
+        $baseName  = $settings['template']['system'].'_'.$settings['template']['name'].'_'.$settings['widget']['id'];
+        $baseName .= '_'.sha1($hashValue);
+        $fileName  = $fileDir.'/'.$baseName.'.svg';
+
+        $radius = (int) Util::getArrayIndex($settings['border'][0], 'radius', 0);
+        foreach ($settings['rings'] as $ring) {
+            $radius += (int) Util::getArrayIndex($ring, 'radius', 0);
+        }
+
+        // Build the SVG file.
+        ob_start();
+            echo '<?xml version="1.0" encoding="utf-8" ?>';
+            echo '<?xml-stylesheet href="/__web/'.GUI::getSystemWebPath('GUIGraphPie').'/GUIGraphPie.css" type="text/css" ?>';
+
+            echo '<svg:svg xmlns:svg="http://www.w3.org/2000/svg" class="GUIGraphPie"';
+            echo ' viewBox="'.(-$radius).' '.(-$radius);
+            echo ' '.($radius * 2).' '.($radius * 2).'">'."\n";
+
+            GUIGraphPie::paintData($settings);
+
+            echo '</svg:svg>';
+
+            $fileContents = ob_get_contents();
+        ob_end_clean();
+
+        // Create the directory (if necessary) and the file.
+        if (is_dir($fileDir) === FALSE) {
+            mkdir($fileDir, 0755, TRUE);
+        }
+
+        FileSystem::filePutContents($fileName, $fileContents, 0644);
 
         include_once 'Libs/Web/Web.inc';
+
         $params = Web::getQueryStringParams();
         unset($params['_callback']);
         $url = '/__api/raw/GUIGraphPie/getSVGContents';
 
-        $params             = Web::getQueryStringParams();
-        $params['system']   = $settings['template']['system'];
-        $params['template'] = $settings['template']['name'];
-        $params['widgetId'] = $settings['widget']['id'];
-
+        $params['fileName'] = $baseName;
         $url = Web::appendQueryString($params, $url);
 
         echo '<object data="'.$url.'"';
         echo ' style="width: '.$size.'px; height: '.$size.'px;"';
         echo ' type="image/svg+xml">'."\n";
         echo '</object>'."\n";
-        echo '</span>';
 
     }//end paint()
 
@@ -116,14 +185,16 @@ class GUIGraphPieActions
      *
      * @return void
      */
-    public static function paintData(
-        array $data,
-        array $ringConf,
-        array $borderConf,
-        array $dataPointConf,
-        $id,
-        $class
-    ) {
+    public static function paintData(array $settings)
+    {
+        // Get our settings
+        $data          = $settings['dataProvider'];
+        $ringConf      = $settings['rings'];
+        $borderConf    = $settings['border'];
+        $dataPointConf = $settings['dataPoints'];
+        $id            = $settings['widget']['id'];
+        $class         = $settings['widget']['type'];
+
         $dataPct = array();
 
         // Calculate the total of the inner ring - this is the basis of all our
@@ -135,16 +206,16 @@ class GUIGraphPieActions
         }
 
         if (empty($borderConf) === FALSE) {
-            $radius = (int) Util::getArrayIndex($borderConf, 'radius', 0);
-
-            foreach ($ringConf as $ring) {
-                $radius += (int) $ring['radius'];
-            }
+            $radius = (int) Util::getArrayIndex($borderConf[0], 'radius', 0);
 
             if ($radius > 0) {
+                foreach ($ringConf as $ring) {
+                    $radius += (int) $ring['radius'];
+                }
+
                 echo '<svg:circle cx="0" cy="0" ';
                 echo 'r="'.($radius).'" ';
-                echo ' class="colour-'.$borderConf['colour'].'" />';
+                echo ' class="colour-'.$borderConf[0]['colour'].'" />';
             }
         }
 
@@ -282,129 +353,47 @@ class GUIGraphPieActions
 
 
     /**
-     * Get the contents of the SVG file.
+     * Get the contents of an SVG file.
      *
-     * @param string $system   The system that the template is a part of.
-     * @param string $template The template that contains the widget.
-     * @param string $widgetId The widget ID to draw the contents for.
+     * Returns an empty SVG document if it doesn't exist.
+     *
+     * @param string $fileName The base name of the SVG file to server.
      *
      * @return string
-     * @throws ChannelException If the widget settings are not well-formed.
      *
      * @api             read
      * @api-contentType image/svg+xml
      */
-    public static function getSVGContents($system, $template, $widgetId)
+    public static function getSVGContents($fileName)
     {
-        ob_start();
-            // Include the dependencies file of the template, and see if that widget
-            // exists.
-            $filename = BaseSystem::getDataDir().'/'.$system.'/Templates/'.$template.'.tpl.deps.php';
+        // Generate a new random file name.
+        $fileDir  = BaseSystem::getDataDir('GUIGraphPie').'/svg-temp';
+        $fileName = $fileDir.'/'.$fileName.'.svg';
 
-            if (file_exists($filename) === TRUE) {
-                include $filename;
-                if (array_key_exists('GUIGraphPie:GUIGraphPie', $dependentFiles['widgets']) === TRUE) {
-                    $found = FALSE;
-
-                    foreach ($dependentFiles['widgets']['GUIGraphPie:GUIGraphPie'] as $pieWidget) {
-                        if ($pieWidget['id'] === $widgetId) {
-                            $found    = TRUE;
-                            $settings = $pieWidget['settings'];
-
-                            // Data provider channel.
-                            $dataProvider = (string) Util::getArrayIndex($settings, 'dataProvider');
-                            if ($dataProvider === NULL) {
-                                $msg = 'Widget parse error: No data provider for pie chart.';
-                                throw new ChannelException($msg);
-                            } else {
-                                list($providerSystem, $method) = explode('::', $dataProvider);
-                            }
-
-                            Channels::includeSystem('GUI');
-                            Channels::includeSystem('GUIGraphPie');
-                            Channels::includeSystem($providerSystem);
-
-                            echo '<?xml version="1.0" encoding="utf-8" ?>';
-                            echo '<?xml-stylesheet href="/__web/'.GUI::getSystemWebPath('GUIGraphPie').'/GUIGraphPie.css" type="text/css" ?>';
-
-                            $data = eval('return '.$dataProvider.'();');
-
-                            $totalRadius = 0;
-
-                            /*
-                                Ring definitions:
-                                - radius:  Radius of the ring, in logical units.
-                                - opacity: Opacity of data points on this ring.
-                            */
-
-                            $rings = (array) Util::getArrayIndex($settings, 'rings', array());
-                            foreach ($rings as $ringIndex => &$ring) {
-                                if (array_key_exists('radius', $ring) === FALSE) {
-                                    $msg = 'Widget parse error: Pie chart ring '.($ringIndex + 1).' must have a radius set.';
-                                    throw new ChannelException($msg);
-                                }
-
-                                $totalRadius += ($ring['radius']);
-                            }
-
-                            // Unset by-ref foreach value.
-                            unset($ring);
-
-                            /*
-                                Border definitions:
-                                - radius:  Radius of the outer border.
-                                - colour:  Pre-defined colour.
-                            */
-
-                            $border = (array) Util::getArrayIndex($settings, 'border', array());
-
-                            if (count($border) > 0) {
-                                $border = $border[0];
-                            }
-
-                            if (array_key_exists('colour', $border) === FALSE) {
-                                $border = array();
-                            }
-
-                            $totalRadius += Util::getArrayIndex($border, 'radius', 0);
-
-                            // Unset by-ref foreach value.
-                            unset($ring);
-
-                            /*
-                                Data point definitions:
-                                - label:   Label to show when mousing over the
-                                           data point.
-                                - colour:  Pre-defined colour of the data point.
-                                - opacity: Opacity of this data point (in all rings).
-
-                                Where an opacity is specified on both ring and
-                                data point, they will be multiplied together.
-                            */
-
-                            $dpConf = (array) Util::getArrayIndex($settings, 'dataPoints', array());
-
-                            echo '<svg:svg xmlns:svg="http://www.w3.org/2000/svg"';
-                            echo ' class="GUIGraphPie"';
-                            echo ' viewBox="'.(-$totalRadius).' '.(-$totalRadius);
-                            echo ' '.($totalRadius * 2).' '.($totalRadius * 2).'">'."\n";
-
-                            GUIGraphPie::paintData($data, $rings, $border, $dpConf, $settings['id'], 'GUIGraphPie');
-
-                            echo '</svg:svg>';
-
-                            break;
-                        }//end if
-                    }//end foreach
-                }//end if
-            }//end if
-
-            $contents = ob_get_contents();
-        ob_end_clean();
+        if (file_exists($fileName) === TRUE) {
+            $contents = file_get_contents($fileName);
+        } else {
+            $contents  = '<svg:svg xmlns:svg="http://www.w3.org/2000/svg">';
+            $contents .= '</svg:svg>';
+        }
 
         return $contents;
 
     }//end getSVGContents()
+
+
+    /**
+     * Clean the SVG file temp folder.
+     *
+     * System maintenance script.
+     *
+     * @return void
+     */
+    public static function cleanSVGTempFiles()
+    {
+        $fileDir  = BaseSystem::getDataDir('GUIGraphPie').'/svg-temp';
+
+    }//end cleanSVGTempFiles()
 
 
 }//end class
