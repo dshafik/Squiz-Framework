@@ -30,6 +30,13 @@ require_once 'Systems/GUI/Widgets/ContentSwitcher/GUIContentSwitcherActions.inc'
 class GUIModeSwitcherActions extends GUIContentSwitcherActions
 {
 
+    /**
+     * Number of static buttons in mode switcher.
+     *
+     * @var integer
+     */
+    protected static $numberOfStaticButton = 1;
+
 
     /**
      * Prints the contents of the switcher buttons.
@@ -44,46 +51,96 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
         $class = $settings['widget']['type'];
 
         echo '<div id="'.$id.'" class="Switcher GUIContentSwitcher '.$class.' GUI-alignLeft">';
-        echo '<div class="'.$class.'-overflow GUI-alignLeft" style="width: 315px;">';
+        echo '  <div class="'.$class.'-overflow GUI-alignLeft">';
+        echo '      <div class="SwitcherList">';
 
-        $items = Util::getArrayIndex($settings, 'items', array());
-        if (count($items) === 0) {
-            echo '</div></div>';
-            return;
-        }
+        self::_paintStaticButtons($settings);
 
-        echo '<ul>';
+        $total    = count($settings['items']);
+        $count    = 1;
+        $items    = Util::getArrayIndex($settings, 'items', array());
+        $initItem = Util::getArrayIndex($settings, 'initialItem', NULL);
+        $selected = '';
 
-        $total      = count($settings['items']);
-        $count      = 1;
-        $extraClass = ' positionFirst';
-        $initItem   = Util::getArrayIndex($settings, 'initialItem', NULL);
+        $staticButtons = Util::getArrayIndex(
+            $settings,
+            'numberOfStaticButton',
+            self::$numberOfStaticButton
+        );
 
-        foreach ($settings['items'] as $mode) {
+        // Start 2nd list.
+        echo '<div class="SwitcherList-overflow">
+                <ul class="SwitcherList-mode modeList-2" style="left: -14px; width: 1000px;">';
+
+        for ($i = $staticButtons; $i < $total; $i++) {
+            $mode       = $items[$i];
             $modeSystem = Util::getArrayIndex($mode, 'system', '');
 
-            if ($initItem === NULL) {
-                $initItem = $mode['id'];
-            }
-
-            $selected = '';
-            if ($mode['id'] === $initItem) {
+            if ($initItem === $mode['id']) {
                 $selected = ' selected';
+            } else {
+                $selected = '';
             }
 
-            echo '<li id="'.$id.'-'.$mode['id'].'" class="'.$class.'-modeButton'.$extraClass.$selected.'">';
+            echo '<li id="'.$id.'-'.$mode['id'].'" class="'.$class.'-modeButton'.$selected.'">';
             echo '<a href="#" modeid="'.$mode['id'].'" system="'.$modeSystem.'">'.$mode['label'].'</a></li>';
 
-            $extraClass = '';
-            $count++;
+            $posClass = '';
         }
 
-        echo '</ul>';
-        echo '</div>
+        // End 2nd list.
+        echo '</ul></div>';
+
+        echo '</div></div>
             <div class="'.$class.'-expander GUI-alignLeft"><span></span></div>
         </div>';
 
     }//end printButtonsContent()
+
+
+    /**
+     * Prints the static buttons.
+     *
+     * @param array $settings List of settings for this widget.
+     *
+     * @return void
+     */
+    private static function _paintStaticButtons(array $settings)
+    {
+        echo '<ul class="SwitcherList-mode modeList-1">';
+        $staticButtons = Util::getArrayIndex(
+            $settings,
+            'numberOfStaticButton',
+            self::$numberOfStaticButton
+        );
+
+        $items    = Util::getArrayIndex($settings, 'items', array());
+        $posClass = 'positionFirst';
+        $selected = '';
+        $initItem = Util::getArrayIndex($settings, 'initialItem', NULL);
+        foreach ($items as $item) {
+            if ($initItem === NULL || $initItem === $item['id']) {
+                $selected = ' selected';
+            } else {
+                $selected = '';
+            }
+
+            $modeSystem = Util::getArrayIndex($item, 'system', '');
+
+            echo '<li class="'.$posClass.$selected.'">';
+            echo '<a href="#" modeid="'.$item['id'].'" system="'.$modeSystem.'">';
+            echo $item['label'].'</a></li>';
+
+            $posClass = '';
+
+            if (--$staticButtons <= 0) {
+                break;
+            }
+        }//end foreach
+
+        echo '</ul>';
+
+    }//end _paintStaticButtons()
 
 
 }//end class

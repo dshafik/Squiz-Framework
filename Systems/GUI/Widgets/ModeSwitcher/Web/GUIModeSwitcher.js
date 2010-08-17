@@ -26,15 +26,25 @@ function GUIModeSwitcher(id, settings)
     GUIContentSwitcher.call(this, id, settings);
     this.className = 'GUIModeSwitcher';
 
-    this.numberOfVisibleButtons = settings.numberOfButtons || 3;
+    this.numberOfStaticButtons = settings.numberOfStaticButtons || 2;
 
-    this._maxWidth        = 0;
-    this._minWidth        = 0;
-    this._listContainer   = null;
-    this._mouseOver       = false;
-    this._autoCollapseT   = null;
-    this._collapseTimeout = 1500;
-    this._slideTime       = 500;
+    var elem = dfx.getId(this.id);
+
+    this._staticBtnContainer     = dfx.getClass('modeList-1', elem)[0];
+    this._mouseOver              = false;
+    this._autoCollapseT          = null;
+    this._collapseTimeout        = 1500;
+    this._slideTime              = 300;
+    this._dynamicBtnContainer    = dfx.getClass('modeList-2', elem)[0];
+    this._sliderElement          = dfx.getClass('GUIModeSwitcher-overflow', elem)[0];
+    this._lastVisibleButtonIndex = null;
+    this._staticButtonsWidth     = 0;
+    this._dynamicButtonsWidth    = 0;
+    this._dynamicButtons         = null;
+    this._staticButtons          = null;
+    this._leftMargin             = 15;
+
+    this._initButtonWidths();
 
     // Initialise the width of the switcher so that only specified amount of
     // buttons are shown.
@@ -47,93 +57,188 @@ function GUIModeSwitcher(id, settings)
 
 GUIModeSwitcher.prototype = {
 
+    _initButtonWidths: function()
+    {
+        // Static buttons width.
+        var staticButtons = this._getStaticButtons();
+        var sln           = staticButtons.length;
+        for (var i = 0; i < sln; i++) {
+            this._staticButtonsWidth += dfx.getElementWidth(staticButtons[i]);
+        }
+
+        // The offset of the 2nd list is staticButton - 15px (due to margin on the left).
+        this._staticButtonsWidth = this._staticButtonsWidth;
+
+        // Dynamic buttons width.
+        var dynamicButtons = this._getDynamicButtons();
+        var dln            = dynamicButtons.length;
+        for (var i = 0; i < dln; i++) {
+            this._dynamicButtonsWidth += dfx.getElementWidth(dynamicButtons[i]);
+        }
+
+    },
+
     calculateSwitcherWidth: function(setWidth)
     {
         var elem     = dfx.getId(this.id);
         var minWidth = 0;
         var maxWidth = 0;
-        var buttons  = dfx.getTag('a', elem);
-        var bln      = buttons.length;
-        var visBtns  = this.numberOfVisibleButtons;
 
-        if (visBtns > bln) {
-            visBtns = bln;
+        var staticButtons  = this._getStaticButtons();
+        var dynamicButtons = this._getDynamicButtons();
+
+        // Get last button width.
+        var lastButtonIndex = this.getLastVisibleButtonIndex();
+        var lastButtonWidth = dfx.getElementWidth(dynamicButtons[lastButtonIndex]);
+
+        if (setWidth === true) {
+            dfx.setStyle(this._staticBtnContainer.parentNode.parentNode, 'width', this._staticButtonsWidth + lastButtonWidth + 'px');
+            dfx.setStyle(this._dynamicBtnContainer, 'left', this._getSlideOffset() + 'px');
         }
 
-        for (var i = 0; i < bln; i++) {
-            var elemWidth = dfx.getElementWidth(buttons[i]);
-            maxWidth     += elemWidth;
+    },
 
-            if (visBtns > 0 && dfx.getStyle(buttons[i].parentNode, 'display') !== 'none') {
-                visBtns--;
-                minWidth += elemWidth;
+    _getStaticButtons: function()
+    {
+        if (!this._staticButtons) {
+            this._staticButtons = dfx.getTag('a', this._staticBtnContainer);
+        }
+
+        return this._staticButtons;
+
+    },
+
+    _getDynamicButtons: function()
+    {
+        if (!this._dynamicButtons) {
+            this._dynamicButtons = dfx.getTag('a', this._dynamicBtnContainer)
+        }
+
+        return this._dynamicButtons;
+
+    },
+
+    _isStaticButton: function(button)
+    {
+        var btns = this._getStaticButtons();
+        var bln  = btns.length;
+
+        for (var i = 0; i < bln; i++) {
+            if (btns[i].parentNode === button) {
+                return true;
             }
         }
 
-        if (setWidth === true) {
-            this._maxWidth = maxWidth;
+        return false;
+
+    },
+
+    getLastVisibleButtonIndex: function()
+    {
+        // Check if a dynamic button is selected if it is then use that, else
+        // use the first dynamic button.
+        if (this._lastVisibleButtonIndex === null) {
+            var dynamicButtons = this._getDynamicButtons();
+            var index          = 0;
+            dfx.foreach(dynamicButtons, function(i) {
+                var btn = dynamicButtons[i].parentNode;
+                if (dfx.hasClass(btn, 'selected') === true) {
+                    index = i;
+                    // Break out of foreach.
+                    return false;
+                }
+            });
+
+            this._lastVisibleButtonIndex = index;
         }
 
-        this._minWidth = minWidth;
+        return this._lastVisibleButtonIndex;
 
-        if (setWidth === true) {
-            this._listContainer = dfx.getClass('GUIModeSwitcher-overflow', elem)[0];
-            dfx.setStyle(this._listContainer, 'width', minWidth + 'px');
+    },
+
+    _getSlideOffset: function()
+    {
+        var dynamicButtons = this._getDynamicButtons();
+        var lastIndex      = this.getLastVisibleButtonIndex();
+
+        var slideOffset = this._staticButtonsWidth;
+        for (var i = 0; i < lastIndex; i++) {
+           slideOffset -= dfx.getElementWidth(dynamicButtons[i]);
         }
+
+        return (slideOffset - this._leftMargin);
 
     },
 
     addExpandEvent: function()
     {
         var elem = dfx.getClass('GUIModeSwitcher-expander', dfx.getId(this.id))[0];
-
-        var self     = this;
-        var listCont = this._listContainer;
+        var self = this;
 
         dfx.addEvent(elem, 'click', function() {
             self.toggle();
         });
 
-        dfx.hover(this._listContainer, function(e) {
+        dfx.hover(dfx.getId(this.id), function(e) {
             clearTimeout(self._autoCollapseT);
             self._mouseOver = true;
         }, function(e) {
             self._mouseOver = false;
-            self.autoCollapse();
+            if (dfx.attr(self._staticBtnContainer, 'state') === '1') {
+                self.autoCollapse();
+            }
         });
 
     },
 
     toggle: function()
     {
-        var state = parseInt(dfx.attr(this._listContainer, 'state'));
+        var state = parseInt(dfx.attr(this._staticBtnContainer, 'state'));
         if (state === 1) {
             this.collapse();
         } else {
             this.expand();
         }
+
     },
 
     expand: function()
     {
         clearTimeout(this._autoCollapseT);
 
+        dfx.attr(this._staticBtnContainer, 'state', 1);
+
         var self = this;
-        dfx.attr(this._listContainer, 'state', 1);
-        dfx.setStyle(dfx.getTag('li', dfx.getId(this.id)), 'display', 'inline');
-        dfx.animate(this._listContainer, {
-            width: this._maxWidth
+        dfx.attr(this._sliderElement, 'state', 1);
+        dfx.animate(this._sliderElement, {
+            width: (this._staticButtonsWidth + this._dynamicButtonsWidth)
         }, this._slideTime, function() {
             self.autoCollapse();
         });
+
+        dfx.animate(this._dynamicBtnContainer, {
+            left: (this._staticButtonsWidth - this._leftMargin)
+        }, this._slideTime);
 
     },
 
     collapse: function()
     {
-        dfx.attr(this._listContainer, 'state', 0);
-        dfx.animate(this._listContainer, {
-            width: this._minWidth
+        clearTimeout(this._autoCollapseT);
+
+        // Get last button width.
+        var dynamicButtons  = this._getDynamicButtons();
+        var lastButtonIndex = this.getLastVisibleButtonIndex();
+        var lastButtonWidth = dfx.getElementWidth(dynamicButtons[lastButtonIndex]);
+
+        dfx.attr(this._staticBtnContainer, 'state', 0);
+
+        dfx.animate(this._sliderElement, {
+            width: (this._staticButtonsWidth + lastButtonWidth)
+        }, this._slideTime);
+
+        dfx.animate(this._dynamicBtnContainer, {
+            left: this._getSlideOffset()
         }, this._slideTime);
 
     },
@@ -145,6 +250,7 @@ GUIModeSwitcher.prototype = {
         }
 
         var self = this;
+        clearTimeout(this._autoCollapseT);
         this._autoCollapseT = setTimeout(function() {
             if (self._mouseOver === true) {
                 return;
@@ -157,46 +263,30 @@ GUIModeSwitcher.prototype = {
 
     addModeClickEvent: function()
     {
-        var self     = this;
-        var buttons  = dfx.getTag('a', dfx.getId(this.id));
+        var self           = this;
+        var buttons        = dfx.getTag('a', dfx.getId(this.id));
+        var dynamicButtons = this._getDynamicButtons();
         dfx.addEvent(buttons, 'click', function(e) {
             var btn = dfx.getMouseEventTarget(e);
             btn     = btn.parentNode;
-            self._hidePrevButtons(btn);
-        });
+            dfx.removeClass('selected', dynamicButtons);
+            dfx.addClass('selected', btn);
 
-    },
+            if (self._isStaticButton(btn) === false) {
+                var index = 0;
+                for (var node = btn.previousSibling; node; node = node.previousSibling) {
+                    if (dfx.isTag(node, 'li') === true) {
+                        index++;
+                    }
+                }
 
-    _hidePrevButtons: function(button)
-    {
-        var buttons  = dfx.getTag('a', dfx.getId(this.id));
-        var bln      = buttons.length;
-        var index    = this._getModeIndex(button);
-        for (var i = (this.numberOfVisibleButtons - 1); i < index; i++) {
-            dfx.setStyle(buttons[i].parentNode, 'display', 'none');
-        }
-
-        this.calculateSwitcherWidth(false);
-        this.collapse();
-
-    },
-
-    _getModeIndex: function(button)
-    {
-        var count = 0;
-        var elem  = button.previousSibling;
-        while (elem) {
-            if (dfx.isTag(elem, 'li') === true) {
-                count++;
+                self._lastVisibleButtonIndex = index;
             }
 
-            elem = elem.previousSibling;
-        }
+            self.collapse();
+        });
 
-        return count;
-
-    },
-
+    }
 
 };
 

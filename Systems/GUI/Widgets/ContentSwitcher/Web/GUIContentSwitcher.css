@@ -3,9 +3,11 @@
     position: relative;
 }
 
-.GUIContentSwitcher ul {
+.GUIContentSwitcher .SwitcherList {
+    position: relative;
     overflow: hidden;
     list-style: none;
+    white-space: nowrap;
     border: 1px solid;
     border-color: #c8c7c7 #c6c6c6 #f3f3f3;
     *border-left-color: #999; /* IE 7 Target */
@@ -18,6 +20,47 @@
     border-radius: 14px;
     -webkit-box-shadow: rgba(0,0,0,0.2) 0px 0px 2px inset;
     -moz-box-shadow: rgba(0,0,0,0.2) 0px 0px 2px inset;
+}
+
+.SwitcherList-mode.modeList-1 {
+    z-index: 9
+    position: relative;
+    overflow: hidden;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #2C2C2C), color-stop(50%, #000));
+    background-image: -moz-linear-gradient(top, #2C2C2C 15%, #000 50%);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#2C2C2C, endColorstr=#000);
+    -moz-border-radius-topright: 0;
+    -moz-border-radius-bottomright: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    -webkit-box-shadow: rgba(0,0,0,1) 0px 0px 3px inset;
+    -moz-box-shadow: rgba(0,0,0,1) 0px 0px 3px inset;
+    -moz-border-radius-topleft: 14px;
+    -moz-border-radius-bottomleft: 14px;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+
+.SwitcherList-mode {
+    position: absolute;
+    display: block;
+    top: 0;
+    height: 25px;
+}
+.SwitcherList-mode.modeList-1 {
+    z-index: 11;
+    left: 0;
+}
+
+.SwitcherList-overflow {
+    position: relative;
+    overflow: hidden;
+    height: 25px;
+    margin-left: 15px;
+}
+
+.SwitcherList-mode.modeList-2 {
+    z-index: 10;
 }
 
 .GUIContentSwitcher li {
@@ -33,6 +76,7 @@
     color: #808080;
     border-left: 1px solid #d5d4d4;
     padding: 0 1em;
+    outline: none;
 }
 
 .GUIContentSwitcher li a:hover {
@@ -63,10 +107,6 @@
     border-bottom-left-radius: 14px;
 }
 
-.GUIContentSwitcher li.positionFirst a {
-    padding-left: 1.8em;
-}
-
 .GUIContentSwitcher li.positionLast a {
     padding-right: 1.3em;
     *padding-right: 1em; /* IE 7 Target */
@@ -74,16 +114,4 @@
     -moz-border-radius-bottomright: 14px;
     border-top-right-radius: 14px;
     border-bottom-right-radius: 14px;
-}
-
-.GUIContentSwitcher li.positionLast a {
-    padding-right: 1.8em;
-}
-
-.GUIContentSwitcher-itemContent {
-    display: none;
-}
-
-.GUIContentSwitcher-itemContent.visible {
-    display: block;
 }
