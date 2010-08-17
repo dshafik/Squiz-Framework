@@ -115,3 +115,11 @@
     border-top-right-radius: 14px;
     border-bottom-right-radius: 14px;
 }
+
+.GUIContentSwitcher-itemContent {
+    display: none;
+}
+
+.GUIContentSwitcher-itemContent.visible {
+    display: block;
+}

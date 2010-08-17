@@ -125,7 +125,7 @@ class GUIContentSwitcherActions
             return;
         }
 
-        echo '<ul>';
+        echo '<ul class="SwitcherList">';
 
         $total      = count($settings['items']);
         $count      = 1;
@@ -153,7 +153,7 @@ class GUIContentSwitcherActions
             }
 
             $count++;
-        }
+        }//end foreach
 
         echo '</ul>';
         echo '</div>';
