@@ -62,6 +62,13 @@ class GUITableActions
      */
     protected static $rows = array();
 
+    /**
+     * TRUE hides headers.
+     *
+     * @var boolean
+     */
+    protected static $hideHeader = FALSE;
+
 
     /**
      * Prints widgets content.
@@ -101,7 +108,7 @@ class GUITableActions
         echo '<table class="'.$tableClass.'" id="'.$settings['widget']['id'].'" cellspacing="0" cellpadding="0">';
 
         if (isset($settings['hideHeader']) === FALSE
-            || $settings['hideHeader'] !== 'true'
+            || $settings['hideHeader'] !== TRUE
         ) {
             echo '<thead><tr>';
             $colids     = array_keys($columns);
