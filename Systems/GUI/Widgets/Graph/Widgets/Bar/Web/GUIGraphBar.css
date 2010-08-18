@@ -152,6 +152,11 @@ ul.GUIGraphBar-data-row ul {
     color: black;
 }
 
+.GUIGraphBar-bar-colour-grey {
+    background-color: #ADADAD;
+    color: black;
+}
+
 .GUIGraphBar-bar-style-plain {
     background-image: none;
 }

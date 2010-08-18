@@ -681,22 +681,22 @@ class GUIGraphBarActions
 
             if ($tick['minor'] !== NULL) {
                 for ($i = $maxValue; $i > 0; $i -= $tick['minor']) {
-                    echo '<div style="border-top: 1px solid #ddd; height: 0; top: ';
+                    echo '<div style="border-top: 1px solid #F3F3F3; height: 0; top: ';
                     echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
                     echo 'px; width: 100%; position: absolute;"></div>';
                 }
             }
 
             for ($i = $maxValue; $i > 0; $i -= $tick['major']) {
-                echo '<div style="border-top: 1px solid #bbb; height: 0; top: ';
+                echo '<div style="border-top: 1px solid #E1E1E1; height: 0; top: ';
                 echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
                 echo 'px; width: 100%; position: absolute;"></div>';
 
-                echo '<div style="color: #bbb; left: 0; top: ';
+                echo '<div style="color: #888; font-size: 11px; left: 0; top: ';
                 echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
                 echo 'px; position: absolute;">'.$i.'</div>';
 
-                echo '<div style="color: #bbb; right: 0; top: ';
+                echo '<div style="color: #888; font-size: 11px; right: 0; top: ';
                 echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
                 echo 'px; position: absolute;">'.$i.'</div>';
             }
