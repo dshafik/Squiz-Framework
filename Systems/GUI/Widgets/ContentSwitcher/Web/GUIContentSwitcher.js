@@ -31,6 +31,8 @@ function GUIContentSwitcher(id, settings)
 
     this.current = null;
 
+    GUI.addWidgetEvent(this, 'itemChanged');
+
     this.init();
 
 }
@@ -67,6 +69,7 @@ GUIContentSwitcher.prototype = {
         this._removeSelectedClass();
         dfx.addClass(button.parentNode, 'selected');
 
+        this.fireItemChangedCallbacks(modeid, system);
         this.loadMode(system, modeid);
 
     },

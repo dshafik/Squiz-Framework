@@ -117,7 +117,7 @@ class GUIBoxActions
 
         if (isset($settings['headerContent']) === TRUE) {
             echo '<div class="'.$class.'-headerContent">';
-            echo '<div class="'.$class.'-title">'.$settings['headerContent'].'</div>';
+            echo $settings['headerContent'];
             echo '</div>';
         }
 
