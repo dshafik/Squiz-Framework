@@ -264,7 +264,11 @@ class GUIGraphPieActions
                 $thisAngle = ($dataPoint * $circleAngle);
 
                 // Rationalise angle to a 0..2Pi range.
-                $thisAngle -= (floor(($thisAngle / $circleAngle)) * $circleAngle);
+                if ($dataPoint === 1) {
+                    $thisAngle = $circleAngle;
+                } else {
+                    $thisAngle -= (floor(($thisAngle / $circleAngle)) * $circleAngle);
+                }
 
                 $cumAngle = ($oldAngle - $thisAngle);
 
@@ -295,29 +299,45 @@ class GUIGraphPieActions
                     echo '<svg:path d="';
                     echo 'M'.$points[0]['x'].','.$points[0]['y'].' ';
 
-                    echo 'A'.$innerRadius.','.$innerRadius.' 0 ';
-
-                    // If greater than a semi-circle, we have to state we want the
-                    // "large" angle arc.
-                    if ($thisAngle > M_PI) {
-                        echo '1';
+                    // If this is 100% of the circle, drawing an arc from one point
+                    // to itself won't work - it draws a 0% angle instead. However,
+                    // drawing two semi-circle arcs does. So, do that.
+                    // If not 100%, just draw the arc.
+                    if ($thisAngle === $circleAngle) {
+                        echo 'A'.$innerRadius.','.$innerRadius.' 0 1,1 '.(-$points[1]['x']).','.$points[1]['y'].' ';
+                        echo 'A'.$innerRadius.','.$innerRadius.' 0 1,1 '.$points[1]['x'].','.$points[1]['y'].' ';
                     } else {
-                        echo '0';
-                    }
+                        echo 'A'.$innerRadius.','.$innerRadius.' 0 ';
 
-                    echo ',1 '.$points[1]['x'].','.$points[1]['y'].' ';
+                        // If greater than a semi-circle, we have to state we want the
+                        // "large" angle arc.
+                        if ($thisAngle > M_PI) {
+                            echo '1';
+                        } else {
+                            echo '0';
+                        }
+
+                        echo ',1 '.$points[1]['x'].','.$points[1]['y'].' ';
+                    }
 
                     echo 'L'.$points[2]['x'].','.$points[2]['y'].' ';
 
-                    echo 'A'.$outerRadius.','.$outerRadius.' 0 ';
-
-                    if ($thisAngle > M_PI) {
-                        echo '1';
+                    // Draw the outer arc - again, two semi-circle arcs if we are
+                    // drawing a full circle arc.
+                    if ($thisAngle === $circleAngle) {
+                        echo 'A'.$outerRadius.','.$outerRadius.' 0 1,0 '.(-$points[3]['x']).','.$points[3]['y'].' ';
+                        echo 'A'.$outerRadius.','.$outerRadius.' 0 1,0 '.$points[3]['x'].','.$points[3]['y'].' ';
                     } else {
-                        echo '0';
-                    }
+                        echo 'A'.$outerRadius.','.$outerRadius.' 0 ';
 
-                    echo ',0 '.$points[3]['x'].','.$points[3]['y'].' ';
+                        if ($thisAngle > M_PI) {
+                            echo '1';
+                        } else {
+                            echo '0';
+                        }
+
+                        echo ',0 '.$points[3]['x'].','.$points[3]['y'].' ';
+                    }
 
                     echo 'Z';
                     echo '" class="colour-'.$dataPointConf[$dataPointIndex]['colour'].'"';
