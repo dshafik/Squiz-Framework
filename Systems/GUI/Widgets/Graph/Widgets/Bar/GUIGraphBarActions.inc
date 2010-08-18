@@ -537,8 +537,8 @@ class GUIGraphBarActions
 
                 ob_start();
                     echo '<li class="'.$class.'-data-point'.$firstPointStyle;
-                    echo ' '.$class.'-bar-colour-'.$groups[$groupIndex]['colour'];
-                    echo ' '.$class.'-bar-style-'.$groups[$groupIndex]['style'];
+                    echo ' colour-'.$groups[$groupIndex]['colour'];
+                    echo ' style-'.$groups[$groupIndex]['style'];
                     echo '" title="'.$pointTitle.'"';
                     echo ' style="height: ';
                     echo max($dataPointHeight, 0).'px">';
@@ -630,7 +630,7 @@ class GUIGraphBarActions
                     ob_start();
                         echo '<li class="'.$class.'-data-flag';
                         if ($showFlag === TRUE) {
-                            echo ' '.$class.'-bar-colour-'.$flag['colour'];
+                            echo ' colour-'.$flag['colour'];
                         }
 
                         echo '"';

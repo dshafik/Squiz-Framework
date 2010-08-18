@@ -107,81 +107,81 @@ ul.GUIGraphBar-data-row ul {
     border-top: 1px solid #A0A0A0;
 }
 
-.GUIGraphBar-bar-colour-black {
+.GUIGraphBar .colour-black {
     background-color: #000;
     color: white;
 }
 
-.GUIGraphBar-bar-colour-blue {
+.GUIGraphBar .colour-blue {
     background-color: #4480CF;
     color: white;
 }
 
-.GUIGraphBar-bar-colour-gold {
+.GUIGraphBar .colour-gold {
     background-color: #EBE811;
     color: black;
 }
 
-.GUIGraphBar-bar-colour-red {
+.GUIGraphBar .colour-red {
     background-color: #C22;
     color: white;
 }
 
-.GUIGraphBar-bar-colour-green {
+.GUIGraphBar .colour-green {
     background-color: #292;
     color: white;
 }
 
-.GUIGraphBar-bar-colour-navy {
+.GUIGraphBar .colour-navy {
     background-color: #103264;
     color: white;
 }
 
-.GUIGraphBar-bar-colour-orange {
+.GUIGraphBar .colour-orange {
     background-color: #E09A2D;
     color: black;
 }
 
-.GUIGraphBar-bar-colour-purple {
+.GUIGraphBar .colour-purple {
     background-color: #1F1F37;
     color: white;
 }
 
-.GUIGraphBar-bar-colour-grass {
+.GUIGraphBar .colour-grass {
     background-color: #789312;
     color: black;
 }
 
-.GUIGraphBar-bar-colour-grey {
+.GUIGraphBar .colour-grey {
     background-color: #ADADAD;
     color: black;
 }
 
-.GUIGraphBar-bar-style-plain {
+.GUIGraphBar .style-plain {
     background-image: none;
 }
 
-.GUIGraphBar-bar-colour-gold.GUIGraphBar-bar-style-diagonal {
+.GUIGraphBar .colour-gold.style-diagonal, .GUIGraphBar .colour-grey.style-diagonal {
     background-image: url(dark-diagonal.png);
 }
 
-.GUIGraphBar-bar-colour-gold.GUIGraphBar-bar-style-reverse {
+.GUIGraphBar .colour-gold.style-reverse, .GUIGraphBar .colour-grey.style-reverse {
     background-image: url(dark-reverse-diagonal.png);
 }
 
-.GUIGraphBar-bar-colour-gold.GUIGraphBar-bar-style-fuzz {
+.GUIGraphBar .colour-gold.style-fuzz, .GUIGraphBar .colour-grey.style-fuzz {
     background-image: url(dark-fuzz.png);
 }
 
-.GUIGraphBar-bar-style-diagonal {
+.GUIGraphBar .style-diagonal {
     background-image: url(diagonal.png);
 }
 
-.GUIGraphBar-bar-style-reverse {
+.GUIGraphBar .style-reverse {
     background-image: url(reverse-diagonal.png);
 }
 
-.GUIGraphBar-bar-style-fuzz {
+.GUIGraphBar .style-fuzz {
     background-image: url(fuzz.png);
 }
 
