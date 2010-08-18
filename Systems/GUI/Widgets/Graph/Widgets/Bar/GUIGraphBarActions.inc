@@ -500,19 +500,22 @@ class GUIGraphBarActions
 
             echo '<ul style="display: block;">';
 
+            $rowLabels = Util::getArrayIndex($dataRow, 'pointLabel', array());
+
             // Start stacking the graph up.
             foreach (array_reverse($groups) as $groupIndex => $groupInfo) {
                 $dataPoint = Util::getArrayIndex($dataRow['data'], $groupIndex, 0);
+                $label = Util::getArrayIndex($rowLabels, $groupIndex);
+
                 if ($dataPoint === 0) continue;
 
-                $groupUnits = (string) Util::getArrayIndex(
-                    $groups[$groupIndex],
-                    'units',
-                    ''
-                );
+                $pointTitle  = $groups[$groupIndex]['name'].': ';
 
-                $pointTitle  = $groups[$groupIndex]['name'];
-                $pointTitle .= ': '.$dataPoint.$groupUnits;
+                if ($label !== NULL) {
+                    $pointTitle .= $label;
+                } else {
+                    $pointTitle .= $dataPoint;
+                }
 
                 $oldHeight = $cumHeight;
                 if ($rowTotal > 0) {
