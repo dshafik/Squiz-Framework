@@ -224,13 +224,22 @@ class XML
     /**
      * Returns the index of the specified node.
      *
-     * @param DOMNode $node A valid XML_ELEMENT_NODE.
+     * @param DOMNode $node       A valid XML_ELEMENT_NODE.
+     * @param DOMNode $parentNode If specified then the index of node will be relative
+     *                            to this parent node.
      *
      * @since  4.0.0
      * @return integer
      */
-    public static function getIndex(DOMNode $node)
+    public static function getIndex(DOMNode $node, DOMNode $parentNode=NULL)
     {
+        if ($parentNode !== NULL) {
+            // Find the parent node of $node that is the direct child of $parentNode.
+            while ($node->parentNode !== NULL && $node->parentNode !== $parentNode) {
+                $node = $node->parentNode;
+            }
+        }
+
         $count = 0;
         while ($node = $node->previousSibling) {
             if ($node->nodeType === XML_ELEMENT_NODE) {
