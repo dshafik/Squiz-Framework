@@ -24,6 +24,7 @@
 
 require_once 'DAL/Exceptions/DALParserException.inc';
 require_once 'DAL/Parsers/DALSelectParser.inc';
+require_once 'DAL/Parsers/DALCaseParser.inc';
 require_once 'DAL/Parsers/DALFromParser.inc';
 require_once 'DAL/Parsers/DALAlterParser.inc';
 require_once 'DAL/Parsers/DALSchemaParser.inc';
@@ -456,11 +457,9 @@ class DALQueryParser
             }
         } else if ($fieldXML->tagName === 'value') {
             $nodeValue = $fieldXML->nodeValue;
-            $caseList  = $fieldXML->getElementsByTagName('case');
-            if ($caseList->length > 0) {
-                // If there is caseList, there should be only one CASE statement.
-                $caseStatement = $caseList->item(0);
-                $nodeValue     = self::parseCaseStatement($caseStatement);
+            $caseList  = DALCaseParser::parse($fieldXML);
+            if (empty($caseList) === FALSE) {
+                $nodeValue = $caseList;
             }
 
             if ($fieldXML->getAttribute('type') === 'integer') {
@@ -483,7 +482,7 @@ class DALQueryParser
         } else if ($fieldXML->tagName === 'function') {
             $field = self::parseSqlFunction($fieldXML);
         } else if ($fieldXML->tagName === 'case') {
-            $field = self::parseCaseStatement($fieldXML);
+            $field = DALCaseParser::parse($fieldXML, TRUE);
         } else if ($fieldXML->tagName === 'hook') {
             $field = DALBaker::getHookPrefix().$fieldXML->getAttribute('id');
         } else if ($fieldXML->tagName === 'math-op') {
@@ -495,84 +494,6 @@ class DALQueryParser
         return $field;
 
     }//end parseSingleField()
-
-
-    /**
-     * Returns the array for a case statement block.
-     *
-     * @param DomElement $parent The math-op element.
-     *
-     * @return array
-     */
-    protected static function parseCaseStatement(DomElement $parent)
-    {
-        $query         = array();
-        $query['CASE'] = array();
-
-        if ($parent->getAttribute('alias') !== '') {
-            $query['CASE']['alias'] = $parent->getAttribute('alias');
-        }//end if
-
-        $query['CASE']['WHEN'] = array();
-        foreach ($parent->childNodes as $node) {
-            if ($node->nodeType !== XML_ELEMENT_NODE) {
-                continue;
-            }
-
-            switch ($node->tagName) {
-                case 'when':
-                    $whenNode  = $node;
-                    $condition = array();
-                    foreach ($whenNode->childNodes as $childNode) {
-                        if ($childNode->nodeType !== XML_ELEMENT_NODE
-                            || empty($childNode) === TRUE
-                        ) {
-                            continue;
-                        }
-
-                        switch ($childNode->tagName) {
-                            case 'condition':
-                                $conditionNode          = $childNode;
-                                $condition['CONDITION'] = DALWhereParser::getWhereConditions($conditionNode);
-                            break;
-
-                            case 'then':
-                                $thenNode = $childNode;
-                                // There should be only 1 value node in the THEN tag.
-                                foreach ($thenNode->childNodes as $valueNode) {
-                                    if ($valueNode->nodeType === XML_ELEMENT_NODE) {
-                                        $condition['THEN'] = self::parseSingleField(
-                                            $valueNode
-                                        );
-                                    }
-                                }
-                            break;
-
-                            default:
-                                // Ignore tag.
-                            break;
-                        }//end switch
-                    }//end foreach
-
-                    array_push($query['CASE']['WHEN'], $condition);
-                case 'else':
-                    $elseNode = $node;
-                    // There should be only one value node in the ELSE tag.
-                    foreach ($elseNode->childNodes as $valueNode) {
-                        if ($valueNode->nodeType === XML_ELEMENT_NODE) {
-                            $query['CASE']['ELSE'] = self::parseSingleField($valueNode);
-                        }
-                    }
-
-                default:
-                    // Ignore tag.
-                break;
-            }//end switch
-        }//end foreach
-
-        return $query;
-
-    }//end parseCaseStatement()
 
 
     /**

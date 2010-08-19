@@ -49,23 +49,28 @@ class DALCaseParser extends DALQueryParser
 
 
     /**
-     * Construct the INSERT query from XML element.
+     * Construct the CASE query from XML element.
      *
      * @param DomElement $xmlQuery The query element.
+     * @param boolean    $noParent If the query element is the start of the query.
      *
      * @return array
      * @throws Exception When parsing error occurs.
      */
-    public static function parse(DomElement $xmlQuery)
+    public static function parse(DomElement $xmlQuery, $noParent=FALSE)
     {
         $query   = array();
-        $caseTag = $xmlQuery->getElementsByTagName('case')->item(0);
+        if ($noParent === TRUE) {
+            $caseTag = $xmlQuery;
+        } else {
+            $caseTag = $xmlQuery->getElementsByTagName('case')->item(0);
+        }
 
         if ($caseTag !== NULL) {
             $alias = $xmlQuery->getAttribute('alias');
-            $query['ALIAS'] = $xmlQuery->getAttribute('alias');
             $query['CASE']  = array(
                                'CONDITIONS' => array(),
+                               'ALIAS'      => $xmlQuery->getAttribute('alias'),
                               );
 
             $index      = 0;
@@ -104,6 +109,8 @@ class DALCaseParser extends DALQueryParser
 
                         if ($innerNode->nodeName === 'select') {
                             $query['CASE']['CONDITIONS'][$index]['WHEN'] = DALSelectParser::parse($innerNode);
+                        } else if ($innerNode->nodeName === 'condition') {
+                            $query['CASE']['CONDITIONS'][$index]['WHEN'] = DALWhereParser::getWhereConditions($innerNode);
                         } else {
                             $query['CASE']['CONDITIONS'][$index]['WHEN'] = DALWhereParser::getWhereConditions($innerNode->parentNode);
                         }
@@ -115,18 +122,16 @@ class DALCaseParser extends DALQueryParser
                         if ($innerNode->nodeName === 'select') {
                             $query['CASE']['CONDITIONS'][$index]['THEN'] = DALSelectParser::parse($innerNode);
                         } else {
-                            $query['CASE']['CONDITIONS'][$index]['THEN'] = DALWhereParser::getWhereConditions($innerNode->parentNode);
+                            $query['CASE']['CONDITIONS'][$index]['THEN'] = DALQueryParser::parseSingleField($innerNode);
                         }
 
                         $index++;
                     } else if ($node->nodeName === 'else') {
-                        $query['ELSE'] = array();
+                        $query['CASE']['ELSE'] = array();
                         if ($innerNode->nodeName === 'select') {
-                            $query['ELSE'] = DALSelectParser::parse($innerNode);
+                            $query['CASE']['ELSE'] = DALSelectParser::parse($innerNode);
                         } else {
-                            $query['ELSE'] = DALWhereParser::getWhereConditions(
-                                $innerNode->parentNode
-                            );
+                            $query['CASE']['ELSE'] = DALQueryParser::parseSingleField($innerNode);
                         }
                     }//end if
                 }//end if

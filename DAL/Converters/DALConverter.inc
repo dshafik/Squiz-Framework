@@ -273,20 +273,7 @@ class DALConverter
         $sql .= $this->getConstructName('select');
 
         if (isset($sqlArray['CASE']) === TRUE) {
-            $sql .= ' '.$this->getConstructName('case');
-            foreach ($sqlArray['CASE']['CONDITIONS'] as $condition) {
-                $sql .= "\n".$this->getConstructName('when');
-                $sql .= "\n".$this->convertWhereClause($condition['WHEN'], $level);
-                $sql .= $this->getConstructName('then');
-                $sql .= "\n(".$this->convertToSql($condition['THEN']).")\n";
-            }
-
-            $sql .= "\n".$this->getConstructName('else');
-            $sql .= "\n(".$this->convertToSql($sqlArray['ELSE']).') END';
-
-            if (empty($sqlArray['ALIAS']) === FALSE) {
-                $sql .= ' AS '.$sqlArray['ALIAS'];
-            }
+            $sql .= $this->convertCaseStatement($sqlArray);
         } else {
             // Add Distinct clause?
             if (isset($sqlArray['SELECT']['distinct']) === TRUE) {
@@ -462,10 +449,10 @@ class DALConverter
     protected function convertCaseStatement(array $caseStatement)
     {
         $sql = ' CASE';
-        foreach ($caseStatement['CASE']['WHEN'] as $conditionResult) {
+        foreach ($caseStatement['CASE']['CONDITIONS'] as $conditionResult) {
             // If it is the condition then what are we going to do?
             $sql .= ' WHEN ';
-            $sql .= $this->convertWhereClause($conditionResult['CONDITION']);
+            $sql .= $this->convertWhereClause($conditionResult['WHEN']);
             $sql .= ' THEN ';
             $sql .= $this->convertSingleField($conditionResult['THEN']);
         }//end foreach
