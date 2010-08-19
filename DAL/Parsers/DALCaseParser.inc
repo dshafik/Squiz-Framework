@@ -60,10 +60,18 @@ class DALCaseParser extends DALQueryParser
     public static function parse(DomElement $xmlQuery, $noParent=FALSE)
     {
         $query   = array();
+        $caseTag = NULL;
         if ($noParent === TRUE) {
             $caseTag = $xmlQuery;
         } else {
-            $caseTag = $xmlQuery->getElementsByTagName('case')->item(0);
+            $cases = $xmlQuery->getElementsByTagName('case');
+            for ($i=0; $i<$cases->length; $i++) {
+                if ($cases->item($i)->parentNode->isSameNode($xmlQuery) === TRUE) {
+                    // We are looking for the first case directly underneath this query.
+                    $caseTag = $cases->item($i);
+                    break;
+                }
+            }
         }
 
         if ($caseTag !== NULL) {
