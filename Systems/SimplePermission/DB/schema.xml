@@ -1,0 +1,37 @@
+<schema system="SimplePermission">
+    <udts>
+        <udt type="VARCHAR" size="50">RESOURCE</udt>
+        <udt-import system="Asset">ASSETID</udt-import>
+        <udt-import system="Role">ROLEID</udt-import>
+    </udts>
+    <tables>
+        <table name="permission">
+            <columns>
+                <column type="RESOURCE" allow-null="false">resource</column>
+                <column type="ASSETID" allow-null="false">userid</column>
+                <column type="ROLEID" allow-null="false">roleid</column>
+            </columns>
+            <indexes>
+                <index name="permission_idx">
+                    <column>resource</column>
+                </index>
+                <index name="permission_idx2">
+                    <column>userid</column>
+                </index>
+                <index name="permission_idx3">
+                    <column>roleid</column>
+                </index>
+           </indexes>
+            <constraints>
+                <primary-key name="permission_pk">
+                    <column>resource</column>
+                    <column>userid</column>
+                    <column>roleid</column>
+                </primary-key>
+                <foreign-key name="permission_fk1" foreign-table="asset" on-delete="CASCADE">
+                    <column references="assetid">userid</column>
+                </foreign-key>
+            </constraints>
+        </table>
+    </tables>
+</schema>

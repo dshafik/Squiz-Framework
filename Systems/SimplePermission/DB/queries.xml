@@ -1,0 +1,71 @@
+<queries system="SimplePermission">
+
+    <query id="grantPermission">
+        <primary>
+            <insert>
+                <fields table="permission">
+                    <field>resource</field>
+                    <field>userid</field>
+                    <field>roleid</field>
+                </fields>
+                <values>
+                    <value column="resource">:resource</value>
+                    <value column="userid">:userid</value>
+                    <value column="roleid">:roleid</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <query id="denyPermission">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="permission" column="resource">:resource</equal>
+                    <equal table="permission" column="userid">:userid</equal>
+                    <equal table="permission" column="roleid">:roleid</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="hasPermission">
+        <primary>
+            <select>
+                <fields>
+                    <literal>1</literal>
+                </fields>
+                <from>
+                    <table>permission</table>
+                </from>
+                <where>
+                    <equal table="permission" column="resource">:resource</equal>
+                    <equal table="permission" column="userid">:userid</equal>
+                    <in table="permission" column="roleid">
+                        <select>
+                            <fields>
+                                <field table="role_privilege" column="roleid" />
+                            </fields>
+                            <from>
+                                <table>role_privilege</table>
+                            </from>
+                            <where>
+                                <or>
+                                    <equal table="role_privilege" column="privilege">:privilege</equal>
+                                    <like>
+                                        <field table="role_privilege" column="privilege"/>
+                                        <function function="concat">
+                                            <arg>:privilege</arg>
+                                            <arg>'.%'</arg>
+                                        </function>
+                                    </like>
+                                </or>
+                            </where>
+                        </select>
+                    </in>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+</queries>
