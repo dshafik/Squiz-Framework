@@ -9,7 +9,6 @@
             <columns>
                 <column type="ROLEID" allow-null="false">roleid</column>
                 <column type="VARCHAR" size="255" allow-null="false">name</column>
-                <column type="CLOB">description</column>
             </columns>
             <constraints>
                 <primary-key name="role_roleid_pk">
@@ -19,6 +18,19 @@
             <sequences>
                 <sequence name="seq_roleid" />
             </sequences>
+        </table>
+
+        <table name="privilege">
+            <columns>
+                <column type="PRIVILEGE" allow-null="false">privilege</column>
+                <column type="VARCHAR" size="255" allow-null="false">name</column>
+                <column type="TEXT" allow-null="false">description</column>
+            </columns>
+            <constraints>
+               <primary-key name="privilege_pk">
+                    <column>privilege</column>
+               </primary-key>
+            </constraints>
         </table>
 
         <table name="role_privilege">
@@ -34,9 +46,11 @@
                <foreign-key name="role_privilege_fk1" foreign-table="role">
                     <column references="roleid">roleid</column>
                </foreign-key>
+               <foreign-key name="role_privilege_fk2" foreign-table="privilege">
+                    <column references="privilege">privilege</column>
+               </foreign-key>
             </constraints>
         </table>
+
     </tables>
 </schema>
-
-

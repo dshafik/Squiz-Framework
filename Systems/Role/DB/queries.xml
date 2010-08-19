@@ -6,12 +6,10 @@
                 <fields table="role">
                     <field>roleid</field>
                     <field>name</field>
-                    <field>description</field>
                 </fields>
                 <values>
                     <value column="roleid">:roleid</value>
                     <value column="name">:name</value>
-                    <value column="description">:description</value>
                 </values>
             </insert>
         </primary>
@@ -31,13 +29,58 @@
         <primary>
             <update>
                 <fields table="role">
-                    <field>[attrName]</field>
+                    <field>name</field>
                 </fields>
                 <values>
-                    <value column="[attrName]">:attrValue</value>
+                    <value column="name">:name</value>
                 </values>
                 <where>
                     <equal table="role" column="roleid">:roleid</equal>
+                </where>
+            </update>
+        </primary>
+    </query>
+
+    <query id="addPrivilege">
+        <primary>
+            <insert>
+                <fields table="privilege">
+                    <field>privilege</field>
+                    <field>name</field>
+                    <field>description</field>
+                </fields>
+                <values>
+                    <value column="privilege">:privilege</value>
+                    <value column="name">:name</value>
+                    <value column="description">:description</value>
+                </values>
+            </insert>
+        </primary>
+    </query>
+
+    <query id="deletePrivilege">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="privilege" column="privilege">:privilege</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
+    <query id="updatePrivilege">
+        <primary>
+            <update>
+                <fields table="privilege">
+                    <field>name</field>
+                    <field>description</field>
+                </fields>
+                <values>
+                    <value column="name">:name</value>
+                    <value column="description">:description</value>
+                </values>
+                <where>
+                    <equal table="privilege" column="privilege">:privilege</equal>
                 </where>
             </update>
         </primary>
@@ -100,16 +143,6 @@
                     <equal table="role_privilege" column="privilege">:privilege</equal>
                 </where>
             </select>
-        </primary>
-    </query>
-
-    <query id="deletePrivilege">
-        <primary>
-            <delete>
-                <where>
-                    <equal table="role_privilege" column="privilege">:privilege</equal>
-                </where>
-            </delete>
         </primary>
     </query>
 

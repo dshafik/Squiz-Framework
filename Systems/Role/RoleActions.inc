@@ -50,12 +50,11 @@ class RoleActions
      *
      * Returns the roleid created.
      *
-     * @param string $name        Name of a new role.
-     * @param string $description Description of a new role.
+     * @param string $name Name of a new role.
      *
      * @return integer
      */
-    public static function createRole($name, $description)
+    public static function createRole($name)
     {
         $roleid = DAL::seqNextVal('seq_roleid');
         Channels::addToBasket('roleid', $roleid);
@@ -66,6 +65,25 @@ class RoleActions
         return $roleid;
 
     }//end createRole()
+
+
+    /**
+     * Update role details.
+     *
+     * Returns the number of rows updated.
+     *
+     * @param integer $roleid ID of a role.
+     * @param string  $name   New name for the role.
+     *
+     * @return integer
+     */
+    public static function updateRole($roleid, $name)
+    {
+        $query  = DAL::getQuery('Role', 'updateRole');
+        $result = DAL::executeQuery($query);
+        return $result;
+
+    }//end updateRole()
 
 
     /**
@@ -87,23 +105,57 @@ class RoleActions
 
 
     /**
-     * Update role details.
+     * Create a new privilege.
      *
-     * Returns the number of rows updated.
-     *
-     * @param integer $roleid    ID of a role.
-     * @param string  $attrName  Attribute name to update.
-     * @param string  $attrValue New value for the attribute.
+     * @param string $privilege   Privilege id.
+     * @param string $name        Name of the privilege.
+     * @param string $description Description of the privilege.
      *
      * @return integer
      */
-    public static function updateRole($roleid, $attrName, $attrValue)
+    public static function createPrivilege($privilege, $name, $description)
     {
-        $query  = DAL::getQuery('Role', 'updateRole');
+        $query  = DAL::getQuery('Role', 'addPrivilege');
         $result = DAL::executeQuery($query);
         return $result;
 
-    }//end updateRole()
+    }//end createPrivilege()
+
+
+    /**
+     * Update privilege details.
+     *
+     * Returns the number of rows updated.
+     *
+      * @param string $privilege   Privilege id.
+     * @param string $name        Name of the privilege.
+     * @param string $description Description of the privilege.
+     *
+     * @return integer
+     */
+    public static function updatePrivilege($roleid, $name, $description)
+    {
+        $query  = DAL::getQuery('Role', 'updatePrivilege');
+        $result = DAL::executeQuery($query);
+        return $result;
+
+    }//end updatePrivilege()
+
+
+    /**
+     * Remove privilege.
+     *
+     * @param string $privilege Privilege to remove.
+     *
+     * @return integer
+     */
+    public static function deletePrivilege($privilege)
+    {
+        $query  = DAL::getQuery('Role', 'deletePrivilege');
+        $result = DAL::executeQuery($query);
+        return $result;
+
+    }//end deletePrivilege()
 
 
     /**
@@ -116,13 +168,13 @@ class RoleActions
      *
      * @return integer
      */
-    public static function grantPrivilegeToRole($roleid, $privilege)
+    public static function grantPrivilege($roleid, $privilege)
     {
         $query  = DAL::getQuery('Role', 'grantPrivilegeToRole');
         $result = DAL::executeQuery($query);
         return $result;
 
-    }//end grantPrivilegeToRole()
+    }//end grantPrivilege()
 
 
     /**
@@ -135,13 +187,13 @@ class RoleActions
      *
      * @return integer
      */
-    public static function removePrivilegeFromRole($roleid, $privilege)
+    public static function revokePrivilege($roleid, $privilege)
     {
         $query  = DAL::getQuery('Role', 'removePrivilegeFromRole');
         $result = DAL::executeQuery($query);
         return $result;
 
-    }//end removePrivilegeFromRole()
+    }//end revokePrivilege()
 
 
     /**
@@ -174,24 +226,6 @@ class RoleActions
         return $result;
 
     }//end getRolesByPrivilege()
-
-
-    /**
-     * Remove the privilege.
-     *
-     * Returns the number rows been deleted.
-     *
-     * @param string $privilege Privilege to remove.
-     *
-     * @return integer
-     */
-    public static function deletePrivilege($privilege)
-    {
-        $query  = DAL::getQuery('Role', 'deletePrivilege');
-        $result = DAL::executeQuery($query);
-        return $result;
-
-    }//end deletePrivilege()
 
 
 }//end class
