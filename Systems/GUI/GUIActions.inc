@@ -736,6 +736,7 @@ class GUIActions
             return $php;
         }
 
+        $indexVarName = NULL;
         foreach ($setting->childNodes as $node) {
             if ($node->nodeType === XML_TEXT_NODE) {
                 continue;
@@ -758,12 +759,12 @@ class GUIActions
                         $php .= self::_parseWidgetSettingsTag($node, $varName);
                     break;
 
-                    default:
-                        if (XML::getIndex($node) === 0) {
-                            $php .= $varName.' = array();'."\n";
-                        }
+                    case 'condition':
+                        $php .= self::_parseConditionTag($node, $varName);
+                    break;
 
-                        $php .= self::_parseTag($node, $varName);
+                    default:
+                        $php .= self::_parseTag($node, $varName, $indexVarName);
                     break;
                 }//end switch
             }//end if
@@ -810,6 +811,10 @@ class GUIActions
     private static function _parseTag(DOMNode $node, $assignTo=NULL)
     {
         $php = '';
+        if (empty($node->tagName) === TRUE) {
+            return $php;
+        }
+
         switch ($node->tagName) {
             case 'text':
                 $php .= self::_parseTextTag($node, $assignTo);
@@ -860,7 +865,13 @@ class GUIActions
             default:
                 include_once 'Libs/XML/XML.inc';
                 if ($node->tagName === 'value') {
-                    $varName = $assignTo.'['.XML::getIndex($node).']';
+                    $tmpVarName = '$_idx_'.md5($assignTo);
+
+                    $php .= 'if (isset('.$tmpVarName.') === FALSE) {'."\n\t";
+                    $php .= $tmpVarName." = 0;\n} else {\n\t";
+                    $php .= $tmpVarName."++;\n}\n";
+
+                    $varName = $assignTo.'['.$tmpVarName.']';
                 } else {
                     $varName = $assignTo.'["'.$node->tagName.'"]';
                 }
@@ -1108,6 +1119,67 @@ class GUIActions
         return $tagInfo;
 
     }//end _getTextTagInfo()
+
+
+    /**
+     * Returns the PHP script of the given condition tag.
+     *
+     * @param DOMNode $node     The text node to convert.
+     * @param string  $assignTo The variable to assign to. This must be a valid PHP
+     *                          variable name (e.g. $example['value']).
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseConditionTag(DOMNode $node, $assignTo=NULL)
+    {
+        $tagTypes = array(
+                     'if'   => 'if',
+                     'else' => 'else',
+                    );
+
+        $php = '';
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType === XML_ELEMENT_NODE
+                && isset($tagTypes[$child->tagName]) === TRUE
+            ) {
+                $condition = $child->getAttribute('condition');
+
+                // Get the system name so we can include it.
+                list($systemName, $method) = explode('::', $condition);
+                $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
+
+                // Print the if, else block.
+                $php .= $tagTypes[$child->tagName];
+
+                if ($child->tagName !== 'else') {
+                    $php .= ' ('.$condition.' === TRUE) {'."\n";
+                }
+
+                $childNodes = array();
+                foreach ($child->childNodes as $condChild) {
+                    $childNodes[] = $condChild;
+                }
+
+                foreach ($childNodes as $condChild) {
+                    // Need to move children before the condition tag.
+                    $node->parentNode->insertBefore($condChild, $node);
+                }
+
+                // Remove the if/else tag.
+                $node->removeChild($child);
+
+                foreach ($childNodes as $condChild) {
+                    $php .= self::_parseTag($condChild, $assignTo);
+                }
+
+                $php .= "\n}\n";
+            }//end if
+        }//end foreach
+
+        return $php;
+
+    }//end _parseConditionTag()
 
 
     /**
