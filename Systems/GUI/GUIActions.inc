@@ -400,6 +400,7 @@ class GUIActions
                      'widget',
                      'text',
                      'dataProvider',
+                     'condition',
                     );
 
         foreach ($tagNames as $tagName) {
@@ -832,6 +833,10 @@ class GUIActions
                 $php .= self::_parseWidgetSettingsTag($node, $assignTo);
             break;
 
+            case 'condition':
+                $php .= self::_parseConditionTag($node, $varName);
+            break;
+
             case 'content':
                 // Need to wrap content.
                 $domContent  = self::$_docType;
@@ -1156,26 +1161,22 @@ class GUIActions
                     $php .= ' ('.$condition.' === TRUE) {'."\n";
                 }
 
-                $childNodes = array();
                 foreach ($child->childNodes as $condChild) {
-                    $childNodes[] = $condChild;
-                }
-
-                foreach ($childNodes as $condChild) {
-                    // Need to move children before the condition tag.
-                    $node->parentNode->insertBefore($condChild, $node);
-                }
-
-                // Remove the if/else tag.
-                $node->removeChild($child);
-
-                foreach ($childNodes as $condChild) {
                     $php .= self::_parseTag($condChild, $assignTo);
                 }
 
                 $php .= "\n}\n";
             }//end if
         }//end foreach
+
+        if ($assignTo === NULL) {
+            // Top level.
+            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
+            $newNode = $node->ownerDocument->importNode($tmpNode, TRUE);
+            $node->parentNode->insertBefore($newNode, $node);
+            $node->parentNode->removeChild($node);
+        }
 
         return $php;
 
