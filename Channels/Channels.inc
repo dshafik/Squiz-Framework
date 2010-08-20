@@ -275,7 +275,7 @@ class Channels
     public static function eventVarExists($var)
     {
         $basket = self::getCurrentEventBasketData();
-        if (isset($basket[$var]) === TRUE) {
+        if (array_key_exists($var, $basket) === TRUE) {
             return TRUE;
         }
 
@@ -300,7 +300,7 @@ class Channels
     public static function addToBasket($var, $value, $update=FALSE)
     {
         $data = self::getCurrentEventBasketData();
-        if ((isset($data[$var]) === TRUE) && ($update === FALSE)) {
+        if ((array_key_exists($var, $data) === TRUE) && ($update === FALSE)) {
             // Data already exists in the basket. Use modifyBasket() instead.
             return FALSE;
         }
@@ -324,7 +324,7 @@ class Channels
     public static function modifyBasket($var, $newValue)
     {
         $data = self::getCurrentEventBasketData();
-        if (isset($data[$var]) === FALSE) {
+        if (array_key_exists($var, $data) === FALSE) {
             return FALSE;
         }
 
@@ -346,7 +346,7 @@ class Channels
     public static function removeFromBasket($var)
     {
         $data = self::getCurrentEventBasketData();
-        if (isset($data[$var]) === FALSE) {
+        if (array_key_exists($var, $data) === FALSE) {
             return FALSE;
         }
 
