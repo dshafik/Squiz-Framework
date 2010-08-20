@@ -2,9 +2,7 @@
     <div class="CronSettingsBoxContainer GUI-screen-left">
         <!-- Start Cront Screen settings box -->
         <widget type="GUI/ScreenSettings" id="cronSettings">
-            <setting name="title">
-                <text>Cron Setting</text>
-            </setting>
+            <setting name="title"><text>Cron Settings</text></setting>
             <setting name="subTitle">
                 <content>
                     <text>
@@ -42,11 +40,7 @@
                         <value>
                             <content>
                                  <text>
-                                    <value>
-                                        <![CDATA[
-                                            Last run at <strong>%s</strong>
-                                        ]]>
-                                    </value>
+                                    <value>Last run on %s</value>
                                     <args>
                                         <arg>
                                             <dataProvider action="Cron::getLastRunTime">
@@ -65,7 +59,7 @@
                         <value>
                             <content>
                                 <text>
-                                    <value>Runs every %s minute(s) past the hour</value>
+                                    <value>Runs at %s minute(s) past the hour</value>
                                     <args>
                                         <arg>
                                             <widget type="GUI/TextBox" id="hourlyInterval">
@@ -85,7 +79,7 @@
                         <value>
                             <content>
                                  <text>
-                                    <value>Last run at %s</value>
+                                    <value>Last run on %s</value>
                                     <args>
                                         <arg>
                                             <dataProvider action="Cron::getLastRunTime">
@@ -104,7 +98,7 @@
                         <value>
                             <content>
                                 <text>
-                                    <value>Runs ever day at %s : %s</value>
+                                    <value>Runs every day at %s : %s</value>
                                     <args>
                                         <arg>
                                             <widget type="GUI/TextBox" id="dailyInterval-hour">
@@ -135,7 +129,7 @@
                         <value>
                             <content>
                                  <text>
-                                    <value>Last run at %s</value>
+                                    <value>Last run on %s</value>
                                     <args>
                                         <arg>
                                             <dataProvider action="Cron::getLastRunTime">
