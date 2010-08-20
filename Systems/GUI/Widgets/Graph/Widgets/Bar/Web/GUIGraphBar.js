@@ -26,8 +26,30 @@ function GUIGraphBar(id, settings)
     this.id       = id;
     this.settings = settings;
 
+    this.init();
 }
 
 GUIGraphBar.prototype = {
+
+    init: function()
+    {
+        var self = this;
+
+        var graph = dfx.getId(this.id);
+        var rows  = dfx.getClass('GUIGraphBar-data-row', graph);
+
+        dfx.foreach(rows, function(idx) {
+            dfx.addEvent(rows[idx], 'mouseover', function(evt) {
+                dfx.addClass(this, 'hover');
+            });
+
+            dfx.addEvent(rows[idx], 'mouseout', function(evt) {
+                dfx.removeClass(this, 'hover');
+            });
+
+            return true;
+        });
+
+    }
 
 };

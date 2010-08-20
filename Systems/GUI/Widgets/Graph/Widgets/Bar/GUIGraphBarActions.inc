@@ -476,6 +476,12 @@ class GUIGraphBarActions
             echo $totalHeight;
             echo 'px">';
 
+            echo '<li class="row-bg" style="top: ';
+            echo ($barHeight - $maxBarHeight);
+            echo 'px; height: ';
+            echo $maxBarHeight;
+            echo 'px"></li>';
+
             // Do we have a label for this data row?
             if (array_key_exists('label', $dataRow) === TRUE) {
                 echo '<li class="'.$class.'-data-label">';
@@ -500,7 +506,8 @@ class GUIGraphBarActions
 
             echo '<ul style="display: block;">';
 
-            $rowLabels = Util::getArrayIndex($dataRow, 'pointLabel', array());
+            $rowLabels   = Util::getArrayIndex($dataRow, 'pointLabel', array());
+            $tooltipRows = Util::getArrayIndex($dataRow, 'tooltipRows', array());
 
             // Start stacking the graph up.
             foreach (array_reverse($groups) as $groupIndex => $groupInfo) {
@@ -669,6 +676,50 @@ class GUIGraphBarActions
                 echo '</ul>';
             }//end if
 
+            if (array_key_exists('tooltipTitle', $dataRow)
+                || array_key_exists('tooltipFooter', $dataRow)
+                || (count($tooltipRows) > 0)) {
+
+                echo '<li class="tooltip">';
+                if (array_key_exists('tooltipTitle', $dataRow)) {
+                    echo '<div class="title">';
+                    echo $dataRow['tooltipTitle'];
+                    echo '</div>';
+                }
+
+                if (count($tooltipRows) > 0) {
+                    echo '<table>';
+
+                    foreach ($tooltipRows as $tooltipRow) {
+                        $rowLabel = array_shift($tooltipRow);
+                        echo '<tr>';
+                        // Row label.
+                        echo '<td class="label">';
+                        echo $rowLabel;
+                        echo '</td>';
+
+                        // Row data.
+                        foreach ($tooltipRow as $tooltipRowItem) {
+                            echo '<td class="data">';
+                            echo $tooltipRowItem;
+                            echo '</td>';
+                        }
+
+                        echo '</tr>';
+                    }//end foreach
+
+                    echo '</table>';
+                }//end if
+
+                if (array_key_exists('tooltipFooter', $dataRow)) {
+                    echo '<div class="footer">';
+                    echo $dataRow['tooltipFooter'];
+                    echo '</div>';
+                }
+
+                echo '</li>';
+            }
+
             echo '</ul>';
         }//end foreach
 
@@ -677,32 +728,32 @@ class GUIGraphBarActions
         // Draw the ticks.
         if ($tick['major'] !== NULL) {
             echo '<div style="z-index: 1; display: block; position: absolute; top: 0;';
-            echo 'right: 0; width: 100%; height: 100%;">';
+            echo 'right: 0; width: 100%; height: 100%; z-index: 1">';
 
             if ($tick['minor'] !== NULL) {
                 for ($i = $maxValue; $i > 0; $i -= $tick['minor']) {
                     echo '<div style="border-top: 1px solid #F3F3F3; height: 0; top: ';
                     echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
-                    echo 'px; width: 100%; position: absolute;"></div>';
+                    echo 'px; width: 100%; position: absolute; z-index: 1"></div>';
                 }
             }
 
             for ($i = $maxValue; $i > 0; $i -= $tick['major']) {
                 echo '<div style="border-top: 1px solid #E1E1E1; height: 0; top: ';
                 echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
-                echo 'px; width: 100%; position: absolute;"></div>';
+                echo 'px; width: 100%; position: absolute; z-index: 1"></div>';
 
                 echo '<div style="color: #888; font-size: 11px; left: 0; top: ';
                 echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
-                echo 'px; position: absolute;">'.$i.'</div>';
+                echo 'px; position: absolute; z-index: 1">'.$i.'</div>';
 
                 echo '<div style="color: #888; font-size: 11px; right: 0; top: ';
                 echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
-                echo 'px; position: absolute;">'.$i.'</div>';
+                echo 'px; position: absolute; z-index: 1">'.$i.'</div>';
             }
 
             echo '<div style="border-top: 1px solid #bbb; height: 0; top: ';
-            echo $maxBarHeight.'px; width: 100%; position: absolute;"></div>';
+            echo $maxBarHeight.'px; width: 100%; position: absolute; z-index: 3"></div>';
 
             echo '</div>';
         }//end if

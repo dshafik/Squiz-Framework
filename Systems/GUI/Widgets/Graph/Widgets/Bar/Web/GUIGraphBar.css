@@ -52,6 +52,9 @@ ul.GUIGraphBar-data-row ul {
     border: 1px solid #A0A0A0;
     border-top: none;
     border-bottom: none;
+    z-index: 2;
+    position: relative;
+    top: 0;
 }
 
 .GUIGraphBar-data-point.first-point {
@@ -187,4 +190,61 @@ ul.GUIGraphBar-data-row ul {
 
 .GUIGraphBar-data-point-alt-text {
     display: none;
+}
+
+.GUIGraphBar .tooltip {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    position: relative;
+    top: -15px;
+    width: 200px;
+    left: -85px;
+
+    visibility: hidden;
+    z-index: 1000;
+}
+
+.GUIGraphBar .row-bg {
+    background-color: #000;
+    opacity: 0.0;
+    z-index: 0;
+    position: absolute;
+    left: 0;
+    width: 100%;
+}
+
+.GUIGraphBar .GUIGraphBar-data-row.hover .tooltip {
+    visibility: visible;
+}
+
+.GUIGraphBar .GUIGraphBar-data-row.hover .row-bg {
+    opacity: 0.04;
+}
+
+.GUIGraphBar .tooltip .title, .GUIGraphBar .tooltip .footer  {
+    text-align: center;
+    padding: 2px 0;
+}
+
+.GUIGraphBar .tooltip table {
+    width: 100%;
+    font-size: 11px;
+}
+
+.GUIGraphBar .tooltip td.label {
+    text-align: left;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.GUIGraphBar .tooltip td.data {
+    text-align: right;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.GUIGraphBar .tooltip tr:last-child td {
+    border-bottom: none;
+    padding-bottom: 0;
 }
