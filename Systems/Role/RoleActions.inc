@@ -197,6 +197,49 @@ class RoleActions
 
 
     /**
+     * Returns all the roles in the system.
+     *
+     * @return array
+     */
+    public static function getRoles()
+    {
+        $query  = DAL::getQuery('Role', 'getRoles');
+        $result = DAL::getAssoc($query);
+
+        $roles = array();
+        foreach ($result as $roleInfo) {
+            $roles[$roleInfo['roleid']] = $roleInfo['name'];
+        }
+
+        return $roles;
+
+    }//end getRoles()
+
+
+    /**
+     * Returns all the roles in the system.
+     *
+     * @return array
+     */
+    public static function getPrivileges()
+    {
+        $query  = DAL::getQuery('Role', 'getPrivileges');
+        $result = DAL::getAssoc($query);
+
+        $privileges = array();
+        foreach ($result as $privInfo) {
+            $privileges[$privInfo['privilege']] = array(
+                                                   'name'        => $privInfo['name'],
+                                                   'description' => $privInfo['description'],
+                                                  );
+        }
+
+        return $privileges;
+
+    }//end getPrivileges()
+
+
+    /**
      * Returns all the privileges that role has.
      *
      * @param integer $roleid ID of role.
@@ -206,7 +249,7 @@ class RoleActions
     public static function getPrivilegesByRole($roleid)
     {
         $query  = DAL::getQuery('Role', 'getPrivilegesByRole');
-        $result = DAL::getAssoc($query);
+        $result = DAL::getAssoc($query, 0);
         return $result;
 
     }//end getPrivilegesByRole()
@@ -226,6 +269,109 @@ class RoleActions
         return $result;
 
     }//end getRolesByPrivilege()
+
+
+    public static function getPrivilegeListForRolesScreen()
+    {
+        $privileges = Role::getPrivileges();
+
+        ksort($privileges);
+
+        // Get the list of top level privileges.
+        $structured = array();
+        $prevTop    = NULL;
+        $previous   = NULL;
+        $prevLevel  = 0;
+        foreach ($privileges as $privilege => $info) {
+            $privParts = explode('.', $privilege);
+            if (strpos($privilege, $prevTop.'.') !== 0) {
+                $prevTop  = $privParts[0];
+                $structured[$prevTop] = array();
+            }
+
+            $level = count($privParts);
+            if ($prevLevel < $level && $previous !== NULL) {
+                $structured[$prevTop][$previous]['hasChildren'] = TRUE;
+            }
+
+            $structured[$prevTop][$privilege] = $info;
+
+            $prevLevel = $level;
+            $previous  = $privilege;
+        }
+
+        // Get the roles.
+        $roles = Role::getRoles();
+        foreach ($roles as $roleid => $name) {
+            //error_log(print_r(Role::getPrivilegesByRole($roleid), 1));
+        }
+
+        $items = array();
+        foreach ($structured as $topLevelName => $privs) {
+            $items[] = array(
+                        'id'          => $topLevelName,
+                        'label'       => _($topLevelName),
+                        'itemContent' => self::_getPrivilegeListItemContent($topLevelName, $privs),
+                       );
+        }
+
+        return $items;
+
+    }//end getPrivilegeListForRolesScreen()
+
+
+    private static function _getPrivilegeListItemContent($topLevelName, $privileges)
+    {
+        $id    = $topLevelName;
+        $class = 'RoleScreen';
+
+        $content  = '<div class="'.$class.'-privListContents">';
+
+        // Start unrestricted option box.
+        $content .= '<div class="'.$class.'-unrestrictedCont">';
+        $content .= '<span class="'.$class.'-unrestrictedText">';
+        $content .= sprintf(_('Grant unrestricted access to %s privileges'), $topLevelName);
+        $content .= '</span>';
+        $content .= '<div class="'.$class.'-unrestrictedToggle">';
+        $content .= GUI::createWidget($id.'-unrestricted', 'GUIToggleButton');
+        $content .= '</div>';
+        $content .= '</div>';
+
+        $content .= '<div class="'.$class.'-privilegeList">';
+
+        $class .= '-privListItem';
+        foreach ($privileges as $privid => $info) {
+            $content .= '<div id="'.$privid.'" class="'.$class;
+
+            // Check if it has child pivileges.
+            if (isset($info['hasChildren']) === TRUE) {
+                $content .= ' expand';
+            }
+
+            // Get the level.
+            $parts = explode('.', $privid);
+
+            $content .= ' level-'.(count($parts) - 1);
+
+            // End class attribute.
+            $content .= '">';
+
+            $content .= '<div class="'.$class.'-icon"></div>';
+
+            // Name of the privilege.
+            $content .= '<div class="'.$class.'-title">'._($info['name']).'</div>';
+
+            // Enable/Disable icon.
+            $content .= '<div class="'.$class.'-toggle"></div>';
+            $content .= '</div>';
+        }
+
+        $content .= '</div>';
+        $content .= '</div>';
+
+        return $content;
+
+    }//end _getPrivilegeListItemContent()
 
 
 }//end class

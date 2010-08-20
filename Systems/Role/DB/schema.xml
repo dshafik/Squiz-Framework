@@ -46,9 +46,6 @@
                <foreign-key name="role_privilege_fk1" foreign-table="role">
                     <column references="roleid">roleid</column>
                </foreign-key>
-               <foreign-key name="role_privilege_fk2" foreign-table="privilege">
-                    <column references="privilege">privilege</column>
-               </foreign-key>
             </constraints>
         </table>
 

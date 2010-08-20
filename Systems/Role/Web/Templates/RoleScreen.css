@@ -1,0 +1,102 @@
+.RoleScreen-roleNameSection {
+    width: 400px;
+}
+
+.RoleScreen-roleNameSection,
+.RoleScreen-unrestrictedCont {
+    padding: 5px;
+    line-height: 30px;
+}
+
+.RoleScreen-unrestrictedCont {
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #AAA;
+    margin-bottom: 5px;
+}
+
+.RoleScreen-privListContents {
+    width: 500px;
+}
+
+.RoleScreen-unrestrictedToggle {
+    float: right;
+}
+
+.RoleScreen-privListItem {
+    line-height: 30px;
+    border-bottom: 1px solid #EEE;
+    padding-left: 10px;
+    overflow: hidden;
+}
+
+.RoleScreen-privListItem.hover {
+    background-color: #EEE;
+}
+
+.RoleScreen-privListItem .RoleScreen-privListItem-title,
+.RoleScreen-privListItem .RoleScreen-privListItem-icon {
+    float: left;
+}
+
+.RoleScreen-privListItem-title {
+    margin-left: 10px;
+}
+
+.RoleScreen-privListItem .RoleScreen-privListItem-icon {
+    background: url(leafnode.png) no-repeat 0 0;
+    height: 14px;
+    width: 14px;
+    float: left;
+    margin-top: 8px;
+}
+
+.RoleScreen-privListItem.expand .RoleScreen-privListItem-icon {
+    background-image: url(expand-collapse.png);
+    background-position: 0 -14px;
+}
+
+.RoleScreen-privListItem.collapse .RoleScreen-privListItem-icon {
+    background-image: url(expand-collapse.png);
+}
+
+.RoleScreen-privListItem.level-2 {
+    padding-left: 30px;
+}
+
+.RoleScreen-privListItem.level-3 {
+    padding-left: 50px;
+}
+
+.RoleScreen-privListItem.level-4 {
+    padding-left: 70px;
+}
+
+.RoleScreen-privListItem-toggle {
+    height: 22px;
+    width: 22px;
+    float: right;
+    margin-right: 10px;
+    margin-top: 4px;
+}
+
+/* Sub tick */
+.RoleScreen-privListItem .RoleScreen-privListItem-toggle,
+.RoleScreen-privListItem .RoleScreen-privListItem-toggle {
+    background: url(status-leafnode.png) no-repeat 0 0;
+}
+
+.RoleScreen-privListItem.enabled .RoleScreen-privListItem-toggle,
+.RoleScreen-privListItem.enabled .RoleScreen-privListItem-toggle {
+    background: url(status-leafnode.png) no-repeat 0 -22px;
+}
+
+/* Parent tick */
+.RoleScreen-privListItem.collapse .RoleScreen-privListItem-toggle,
+.RoleScreen-privListItem.expand .RoleScreen-privListItem-toggle {
+    background: url(status-parent.png) no-repeat 0 0;
+}
+
+.RoleScreen-privListItem.collapse.enabled .RoleScreen-privListItem-toggle,
+.RoleScreen-privListItem.expand.enabled .RoleScreen-privListItem-toggle {
+    background: url(status-parent.png) no-repeat 0 -22px;
+}

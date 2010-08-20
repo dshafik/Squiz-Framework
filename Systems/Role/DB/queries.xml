@@ -112,19 +112,45 @@
         </primary>
     </query>
 
-    <query id="getPrivilegesByRole">
+    <query id="getRoles">
         <primary>
             <select>
-                <fields table="role_privilege">
-                    <field table="role_privilege" column="roleid" />
-                    <field table="role_privilege" column="privilege" />
+                <fields table="role">
+                    <field table="role" column="roleid" />
+                    <field table="role" column="name" />
                 </fields>
                 <from>
-                    <table>role_privilege</table>
+                    <table>role</table>
                 </from>
-                <where>
-                    <equal table="role_privilege" column="roleid">:roleid</equal>
-                </where>
+            </select>
+        </primary>
+    </query>
+
+     <query id="getRoles">
+        <primary>
+            <select>
+                <fields table="role">
+                    <field table="role" column="roleid" />
+                    <field table="role" column="name" />
+                </fields>
+                <from>
+                    <table>role</table>
+                </from>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getPrivileges">
+        <primary>
+            <select>
+                <fields table="privilege">
+                    <field table="privilege" column="privilege" />
+                    <field table="privilege" column="name" />
+                    <field table="privilege" column="description" />
+                </fields>
+                <from>
+                    <table>privilege</table>
+                </from>
             </select>
         </primary>
     </query>
@@ -141,6 +167,22 @@
                 </from>
                 <where>
                     <equal table="role_privilege" column="privilege">:privilege</equal>
+                </where>
+            </select>
+        </primary>
+    </query>
+
+    <query id="getPrivilegesByRole">
+        <primary>
+            <select>
+                <fields table="role_privilege">
+                    <field table="role_privilege" column="privilege" />
+                </fields>
+                <from>
+                    <table>role_privilege</table>
+                </from>
+                <where>
+                    <equal table="role_privilege" column="roleid">:roleid</equal>
                 </where>
             </select>
         </primary>
