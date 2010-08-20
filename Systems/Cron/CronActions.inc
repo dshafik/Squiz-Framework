@@ -536,29 +536,6 @@ class CronActions
         try {
             DAL::beginTransaction();
             Channels::includeSystem('Cron');
-            $cronJob = Cron::getCronJob($system, $scriptName);
-            if ($cronJob['interval'] !== $interval) {
-                $logMsg  = '<strong>'.$scriptName.'</strong> script';
-                $logMsg .= ' interval changed from <strong>';
-                $logMsg .= $cronJob['interval'].'</strong> to <strong>';
-                $logMsg .= $interval.'</strong>';
-
-                Channels::includeSystem('Log');
-                Log::addSystemLog('cron.updated', $logMsg);
-            }
-
-            if ($cronJob['enabled'] !== $enabled) {
-                $logMsg = '<strong>'.$scriptName.'</strong> script';
-                if ($enabled === TRUE) {
-                    $logMsg .= ' was enabled';
-                } else {
-                    $logMsg .= ' was disabled';
-                }
-
-                Channels::includeSystem('Log');
-                Log::addSystemLog('cron.updated', $logMsg);
-            }
-
             DAL::executeQuery('Cron', 'updateCron');
             DAL::commit();
         } catch (DALException $e) {
@@ -750,38 +727,6 @@ class CronActions
         try {
             Channels::includeSystem('Cron');
             DAL::beginTransaction();
-
-            $currCronInfo = Cron::getCronType($typeid);
-            if ($currCronInfo['condition'] !== $condition) {
-                Channels::includeSystem('Log');
-                $msg = '<strong>'.$typeTitle.' cron</strong> changed from running';
-
-                switch ($typeid) {
-                    case 'frequent':
-                        $msg .= ' every <strong>'.current(sscanf($currCronInfo['condition'], '*/%d *')).'</strong> minutes';
-                        $msg .= ' to every <strong>'.current(sscanf($condition, '*/%d *')).'</strong> minutes';
-                    break;
-
-                    case 'hourly':
-                        $msg .= ' at <strong>'.current(sscanf($currCronInfo['condition'], '%d *')).'</strong> minutes past the hour';
-                        $msg .= ' to <strong>'.current(sscanf($condition, '%d *')).'</strong> minutes past the hour';
-                    break;
-
-                    case 'daily':
-                        list($newMin, $newHour) = sscanf($condition, '%d %d');
-                        list($oldMin, $oldHour) = sscanf($currCronInfo['condition'], '%d %d');
-                        $msg .= ' at <strong>'.$oldHour.':'.$oldMin.'</strong>';
-                        $msg .= ' to <strong>'.$newHour.':'.$newMin.'</strong>';
-                    break;
-
-                    default:
-                        // Not Yet.
-                    break;
-                }//end switch
-
-                Log::addSystemLog('cron.updated', $msg);
-            }//end if
-
             DAL::executeQuery('Cron', 'updateCronType');
             DAL::commit();
         } catch (DALException $e) {
