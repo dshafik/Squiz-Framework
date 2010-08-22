@@ -203,6 +203,8 @@ ul.GUIGraphBar-data-row ul {
 
     visibility: hidden;
     z-index: 1000;
+    display: block;
+    white-space: normal;
 }
 
 .GUIGraphBar .row-bg {
@@ -222,9 +224,16 @@ ul.GUIGraphBar-data-row ul {
     opacity: 0.04;
 }
 
-.GUIGraphBar .tooltip .title, .GUIGraphBar .tooltip .footer  {
+.GUIGraphBar .tooltip .title  {
     text-align: center;
-    padding: 2px 0;
+    padding: 2px 5px;
+}
+
+.GUIGraphBar .tooltip .footer  {
+    text-align: center;
+    padding: 10px 5px 2px;
+    font-size: 10px;
+    font-style: italic;
 }
 
 .GUIGraphBar .tooltip table {

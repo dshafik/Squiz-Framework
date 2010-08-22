@@ -52,11 +52,11 @@ class GUIGraphBarActions
     protected static $flags = array();
 
     /**
-     * Major tick.
+     * Ticks.
      *
      * @var string
      */
-    protected static $majorTick = '';
+    protected static $ticks = '';
 
     /**
      * DataProvider.
@@ -66,18 +66,11 @@ class GUIGraphBarActions
     protected static $dataProvider = '';
 
     /**
-     * Max.
+     * Maximum value of the graph.
      *
      * @var string
      */
     protected static $max = '';
-
-    /**
-     * Minor tick.
-     *
-     * @var string
-     */
-    protected static $minorTick = '';
 
     /**
      * Default height of the graph.
@@ -252,10 +245,26 @@ class GUIGraphBarActions
 
         $flags = Util::getArrayIndex($settings, 'flags', array());
         $max   = Util::getArrayIndex($settings, 'max', NULL);
-        $tick  = array(
-                  'major' => Util::getArrayIndex($settings, 'majorTick', NULL),
-                  'minor' => Util::getArrayIndex($settings, 'minorTick', NULL),
-                 );
+
+        // Grab the ticks setting, if specified.
+        $tick = Util::getArrayIndex($settings, 'ticks', NULL);
+
+        if ($tick !== NULL) {
+            // Fill unfilled values.
+            $tick['major']  = Util::getArrayIndex($tick, 'major', 'auto');
+            $tick['minor']  = Util::getArrayIndex($tick, 'minor', 'auto');
+            $tick['format'] = Util::getArrayIndex($tick, 'format', '%s');
+
+            // If the major is zero or less, make it automatic.
+            if ((is_numeric($tick['major']) === TRUE) && ($tick['major'] <= 0)) {
+                $tick['major'] = 'auto';
+            }
+
+            // If the minor is set to zero or less, make it empty.
+            if ((is_numeric($tick['minor']) === TRUE) && ($tick['minor'] <= 0)) {
+                $tick['minor'] = 'none';
+            }
+        }
 
         echo '<div id="'.$id.'" class="'.$class.'">';
         echo '<div class="'.$class.'-outer-list" style="height: ';
@@ -364,14 +373,18 @@ class GUIGraphBarActions
             }
         }//end foreach
 
-        if ($tick['major'] !== NULL) {
+        if ($tick !== NULL) {
             if ($tick['major'] === 'auto') {
-                if ($tick['minor'] !== NULL) {
+                if (is_numeric($tick['minor']) === TRUE) {
+                    // If we specified an explicit minor tick value, calculate a
+                    // suitable major value based on there being about 5 major
+                    // ticks.
                     $tickAmounts   = ceil($maxValue / $tick['minor']);
                     $tickAmounts   = max(2, round($tickAmounts / 5));
                     $tick['major'] = $tick['minor'] * $tickAmounts;
                 } else {
-                    // Auto tick!
+                    // Calculate the size of the major tick from our maximum graph
+                    // value.
                     $tickExp = pow(10, floor(log($maxValue, 10)));
 
                     if ((int) $tickExp === 0) {
@@ -389,12 +402,15 @@ class GUIGraphBarActions
 
                     $tick['major'] = $tickExp;
 
-                    if ($tick['minor'] === NULL) {
+                    // If the minor tick setting is 'auto', then make the minor tick
+                    // half the major one.
+                    if ($tick['minor'] === 'auto') {
                         $tick['minor'] = $tick['major'] / 2;
                     }
                 }//end if
             }//end if
 
+            // Adjust the size of the graph so the top is a major tick.
             $maxValue = ceil($maxValue / $tick['major']) * $tick['major'];
         }//end if
 
@@ -420,7 +436,7 @@ class GUIGraphBarActions
         }//end if
 
         // Now paint it.
-        if ($tick['minor'] !== NULL) {
+        if ($tick !== NULL) {
             $listRight = '2.5%';
             $listWidth = '95%';
         } else {
@@ -726,11 +742,11 @@ class GUIGraphBarActions
         echo '</ul>';
 
         // Draw the ticks.
-        if ($tick['major'] !== NULL) {
+        if ($tick !== NULL) {
             echo '<div style="z-index: 1; display: block; position: absolute; top: 0;';
             echo 'right: 0; width: 100%; height: 100%; z-index: 1">';
 
-            if ($tick['minor'] !== NULL) {
+            if ($tick['minor'] !== 'none') {
                 for ($i = $maxValue; $i > 0; $i -= $tick['minor']) {
                     echo '<div style="border-top: 1px solid #F3F3F3; height: 0; top: ';
                     echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
@@ -739,17 +755,19 @@ class GUIGraphBarActions
             }
 
             for ($i = $maxValue; $i > 0; $i -= $tick['major']) {
+                $valueStr = sprintf($tick['format'], $i);
+
                 echo '<div style="border-top: 1px solid #E1E1E1; height: 0; top: ';
                 echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
                 echo 'px; width: 100%; position: absolute; z-index: 1"></div>';
 
                 echo '<div style="color: #888; font-size: 11px; left: 0; top: ';
                 echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
-                echo 'px; position: absolute; z-index: 1">'.$i.'</div>';
+                echo 'px; position: absolute; z-index: 1">'.$valueStr.'</div>';
 
                 echo '<div style="color: #888; font-size: 11px; right: 0; top: ';
                 echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
-                echo 'px; position: absolute; z-index: 1">'.$i.'</div>';
+                echo 'px; position: absolute; z-index: 1">'.$valueStr.'</div>';
             }
 
             echo '<div style="border-top: 1px solid #bbb; height: 0; top: ';
