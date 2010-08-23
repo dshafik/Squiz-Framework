@@ -69,6 +69,9 @@ class GUIButtonActions
             $onClick .= ' onclick="';
             if ($function !== NULL) {
                 $funcArguments = Util::getArrayIndex($click, 'arguments', array());
+                if (is_array($funcArguments) === FALSE) {
+                    $funcArguments = array();
+                }
 
                 $args = '\''.implode('\', \'', $funcArguments).'\'';
 
