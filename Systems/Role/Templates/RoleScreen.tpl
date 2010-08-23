@@ -54,5 +54,7 @@
             </setting>
        </widget>
     </div>
-    <script>RoleScreen.initScreen();</script>
+    <dataProvider action="Role::getRolesScreenInitCode">
+        <arg></arg>
+    </dataProvider>
 </div>

@@ -77,17 +77,22 @@
     float: right;
     margin-right: 10px;
     margin-top: 4px;
+    background: url(status-parent.png) no-repeat 0 0;
 }
 
 /* Sub tick */
-.RoleScreen-privListItem .RoleScreen-privListItem-toggle,
 .RoleScreen-privListItem .RoleScreen-privListItem-toggle {
-    background: url(status-leafnode.png) no-repeat 0 0;
+    background: url(status-leafnode.png) no-repeat 0 -44px;
 }
 
-.RoleScreen-privListItem.enabled .RoleScreen-privListItem-toggle,
 .RoleScreen-privListItem.enabled .RoleScreen-privListItem-toggle {
-    background: url(status-leafnode.png) no-repeat 0 -22px;
+    background: url(status-parent.png) no-repeat 0 -22px;
+}
+
+.RoleScreen-privListItem.enabledByParent.collapse .RoleScreen-privListItem-toggle,
+.RoleScreen-privListItem.enabledByParent.expand .RoleScreen-privListItem-toggle,
+.RoleScreen-privListItem.enabledByParent .RoleScreen-privListItem-toggle {
+    background: url(status-leafnode.png) no-repeat 0 0;
 }
 
 /* Parent tick */
@@ -96,7 +101,7 @@
     background: url(status-parent.png) no-repeat 0 0;
 }
 
-.RoleScreen-privListItem.collapse.enabled .RoleScreen-privListItem-toggle,
-.RoleScreen-privListItem.expand.enabled .RoleScreen-privListItem-toggle {
+.RoleScreen-privListItem.enabled.collapse .RoleScreen-privListItem-toggle,
+.RoleScreen-privListItem.enabled.expand .RoleScreen-privListItem-toggle {
     background: url(status-parent.png) no-repeat 0 -22px;
 }

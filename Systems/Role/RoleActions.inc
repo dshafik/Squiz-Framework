@@ -127,13 +127,13 @@ class RoleActions
      *
      * Returns the number of rows updated.
      *
-      * @param string $privilege   Privilege id.
+     * @param string $privilege   Privilege id.
      * @param string $name        Name of the privilege.
      * @param string $description Description of the privilege.
      *
      * @return integer
      */
-    public static function updatePrivilege($roleid, $name, $description)
+    public static function updatePrivilege($privilege, $name, $description)
     {
         $query  = DAL::getQuery('Role', 'updatePrivilege');
         $result = DAL::executeQuery($query);
@@ -271,11 +271,22 @@ class RoleActions
     }//end getRolesByPrivilege()
 
 
+    /**
+     * Returns content for the privilege list in Roles screen.
+     *
+     * @return array
+     */
     public static function getPrivilegeListForRolesScreen()
     {
         $privileges = Role::getPrivileges();
-
         ksort($privileges);
+
+        // Get the roles privileges for the first role.
+        $roles = Role::getRoles();
+        ksort($roles);
+
+        $grantedPrivs = Role::getPrivilegesByRole(key($roles));
+        sort($grantedPrivs);
 
         // Get the list of top level privileges.
         $structured = array();
@@ -285,7 +296,7 @@ class RoleActions
         foreach ($privileges as $privilege => $info) {
             $privParts = explode('.', $privilege);
             if (strpos($privilege, $prevTop.'.') !== 0) {
-                $prevTop  = $privParts[0];
+                $prevTop              = $privParts[0];
                 $structured[$prevTop] = array();
             }
 
@@ -296,15 +307,22 @@ class RoleActions
 
             $structured[$prevTop][$privilege] = $info;
 
+            $selected = FALSE;
+            foreach ($grantedPrivs as $grantedPriv) {
+                if ($privilege === $grantedPriv || $privilege.'.%' === $grantedPriv) {
+                    $selected = TRUE;
+                    break;
+                } else if (strpos($privilege, str_replace('%', '', $grantedPriv)) === 0) {
+                    $selected = 'sel-inherit';
+                    break;
+                }
+            }
+
+            $structured[$prevTop][$privilege]['selected'] = $selected;
+
             $prevLevel = $level;
             $previous  = $privilege;
-        }
-
-        // Get the roles.
-        $roles = Role::getRoles();
-        foreach ($roles as $roleid => $name) {
-            //error_log(print_r(Role::getPrivilegesByRole($roleid), 1));
-        }
+        }//end foreach
 
         $items = array();
         foreach ($structured as $topLevelName => $privs) {
@@ -320,12 +338,22 @@ class RoleActions
     }//end getPrivilegeListForRolesScreen()
 
 
-    private static function _getPrivilegeListItemContent($topLevelName, $privileges)
+    /**
+     * Returns content for the privilege list in Roles screen.
+     *
+     * @param string $topLevelName Name of the top level privilege.
+     * @param array  $privileges   List of privileges in the system.
+     *
+     * @return string
+     */
+    private static function _getPrivilegeListItemContent($topLevelName, array $privileges)
     {
+        Channels::includeSystem('GUI');
+
         $id    = $topLevelName;
         $class = 'RoleScreen';
 
-        $content  = '<div class="'.$class.'-privListContents">';
+        $content = '<div class="'.$class.'-privListContents">';
 
         // Start unrestricted option box.
         $content .= '<div class="'.$class.'-unrestrictedCont">';
@@ -353,6 +381,12 @@ class RoleActions
 
             $content .= ' level-'.(count($parts) - 1);
 
+            if ($info['selected'] === TRUE) {
+                $content .= ' enabled';
+            } else if ($info['selected'] === 'sel-inherit') {
+                $content .= ' enabledByParent';
+            }
+
             // End class attribute.
             $content .= '">';
 
@@ -364,7 +398,7 @@ class RoleActions
             // Enable/Disable icon.
             $content .= '<div class="'.$class.'-toggle"></div>';
             $content .= '</div>';
-        }
+        }//end foreach
 
         $content .= '</div>';
         $content .= '</div>';
@@ -372,6 +406,104 @@ class RoleActions
         return $content;
 
     }//end _getPrivilegeListItemContent()
+
+
+    /**
+     * Returns the JS code to initialise the Roles Screen.
+     *
+     * @return string
+     */
+    public static function getRolesScreenInitCode()
+    {
+        $data  = array();
+        $roles = Role::getRoles();
+
+        $grantedPrivs = array();
+        foreach ($roles as $roleid => $roleName) {
+            $grantedPrivs = Role::getPrivilegesByRole($roleid);
+            sort($grantedPrivs);
+
+            $data[$roleid] = array(
+                              'name'    => $roleName,
+                              'granted' => $grantedPrivs,
+                             );
+        }
+
+        $data = json_encode($data);
+        return '<script>RoleScreen.initScreen('.$data.');</script>';
+
+    }//end getRolesScreenInitCode()
+
+
+    /**
+     * Save the role screen changes.
+     *
+     * @param array $data The new settings.
+     *
+     * @return array
+     */
+    public static function saveRoleScreen(array $data)
+    {
+        $errors = array();
+        $data   = Util::getArrayIndex($data, 'templateData', NULL);
+        if ($data === NULL) {
+            $errors[] = _('Empty template data');
+        } else {
+            $roles        = Util::getArrayIndex($data, 'roles', array());
+            $currentRoles = Role::getRoles();
+
+            foreach ($roles as $roleid => $info) {
+                if (isset($currentRoles[$roleid]) === TRUE) {
+                    // Existing role.
+                    // Check if name nees updating.
+                    if ($currentRoles[$roleid] !== $info['name']) {
+                        Role::updateRole($roleid, $info['name']);
+                    }
+
+                    $currentPrivs = Role::getPrivilegesByRole($roleid);
+                    $removedPrivs = array_diff($currentPrivs, $info['granted']);
+                    foreach ($removedPrivs as $privilege) {
+                        Role::revokePrivilege($roleid, $privilege);
+                    }
+
+                    $newPrivs = array_diff(self::_filterPrivileges($info['granted']), $currentPrivs);
+
+                    foreach ($newPrivs as $privilege) {
+                        Role::grantPrivilege($roleid, $privilege);
+                    }
+                }//end if
+            }//end foreach
+        }//end if
+
+        $retVal = TRUE;
+        if (empty($errors) === FALSE) {
+            $retVal = array('errors' => $errors);
+        }
+
+        return $retVal;
+
+    }//end saveRoleScreen()
+
+
+    private static function _filterPrivileges($privileges)
+    {
+        $filtered   = array();
+        $prevParent = NULL;
+        foreach ($privileges as $privilege) {
+            if (strpos($privilege, $prevParent) !== FALSE) {
+                continue;
+            }
+
+            if (strpos($privilege, '.%') !== FALSE) {
+                $prevParent = str_replace('%', '', $privilege);
+            }
+
+            $filtered[] = $privilege;
+        }
+
+        return $filtered;
+
+    }//end _filterPrivileges()
 
 
 }//end class
