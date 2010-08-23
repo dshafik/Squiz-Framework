@@ -172,6 +172,8 @@ class GUIGraphPieActions
         echo '</object>'."\n";
         echo '</span>'."\n";
 
+        return $settings;
+
     }//end paint()
 
 

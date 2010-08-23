@@ -135,6 +135,8 @@ class GUITableActions
 
         echo '</tbody></table>';
 
+        return $settings;
+
     }//end paint()
 
 

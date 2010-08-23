@@ -529,7 +529,7 @@ class GUIActions
         }
 
         // Add the widget paint() call.
-        $php .= $widgetSystemName.'::paint('.$settingsVar.');'."\n";
+        $php .= $settingsVar.' = '.$widgetSystemName.'::paint('.$settingsVar.');'."\n";
 
         // If this widget has a JS file then add it its JS init code.
         // Note that there is no need to include the JS file here since it should
@@ -1225,7 +1225,7 @@ class GUIActions
         $jsFilePath .= $type.'.js';
 
         ob_start();
-            call_user_func(array($type, 'paint'), $settings);
+            $settings = call_user_func(array($type, 'paint'), $settings);
 
             // Add its JS code.
             if (file_exists($jsFilePath) === TRUE) {

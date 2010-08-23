@@ -83,7 +83,8 @@ class GUIContentSwitcherActions
     public static function paint(array $settings)
     {
         Channels::includeSystem('GUI');
-        if (isset($settings['initialItem']) === FALSE) {
+        $initialItem = Util::getArrayIndex($settings, 'initialItem', NULL);
+        if (empty($initialItem) === TRUE) {
             // Use the first item.
             if (empty($settings['items']) === FALSE) {
                 $settings['initialItem'] = $settings['items'][0]['id'];
@@ -100,6 +101,8 @@ class GUIContentSwitcherActions
         } else {
             echo '<span />';
         }
+
+        return $settings;
 
     }//end paint()
 

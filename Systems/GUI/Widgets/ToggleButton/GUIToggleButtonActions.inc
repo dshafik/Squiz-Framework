@@ -104,6 +104,8 @@ class GUIToggleButtonActions
         echo '<div class="'.$class.' right">&nbsp;</div>';
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

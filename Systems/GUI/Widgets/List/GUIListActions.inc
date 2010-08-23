@@ -56,6 +56,8 @@ class GUIListActions
         echo '</div>';
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

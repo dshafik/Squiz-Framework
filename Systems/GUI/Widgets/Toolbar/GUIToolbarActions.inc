@@ -72,6 +72,8 @@ class GUIToolbarActions
         echo '</div>
             </div>'."\n";
 
+        return $settings;
+
     }//end paint()
 
 

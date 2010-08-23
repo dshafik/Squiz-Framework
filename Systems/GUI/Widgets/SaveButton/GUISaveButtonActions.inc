@@ -48,6 +48,8 @@ class GUISaveButtonActions
         echo '<button id="'.$id.'-revert" disabled="true" class="GUIButton buttonSaveRevert GUI-alignleft"><span class="GUIButtonLabel">'._('Revert').'</span><span class="GUIButtonIcon"></span></button>';
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

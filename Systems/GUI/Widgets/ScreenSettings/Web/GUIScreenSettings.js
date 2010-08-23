@@ -63,10 +63,25 @@ GUIScreenSettings.prototype = {
     selectItem: function(itemElement)
     {
         // Remove selected class from previous selected item.
-        var prevSelected = dfx.getClass('GUIScreenSettings-item selected', dfx.getId(this.id))[0];
-        dfx.removeClass(prevSelected, 'selected');
-        dfx.addClass(itemElement, 'selected');
-        this.fireItemSelectedCallbacks(itemElement, prevSelected);
+        var prevSelected = dfx.getClass('GUIScreenSettings-item selected', dfx.getId(this.id));
+        if (prevSelected.length > 0) {
+            prevSelected = prevSelected[0];
+        } else {
+            prevSelected = null;
+        }
+
+        if (prevSelected !== itemElement) {
+            dfx.removeClass(prevSelected, 'selected');
+            dfx.addClass(itemElement, 'selected');
+            this.fireItemSelectedCallbacks(dfx.attr(itemElement, 'itemid'), itemElement, prevSelected);
+        }
+
+    },
+
+    getSelectedItemId: function()
+    {
+        var selectedItem = dfx.getClass('GUIScreenSettings-item selected', dfx.getId(this.id));
+        return dfx.attr(selectedItem, 'itemid');
 
     },
 

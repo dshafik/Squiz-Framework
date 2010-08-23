@@ -101,6 +101,8 @@ class GUITextBoxActions
 
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

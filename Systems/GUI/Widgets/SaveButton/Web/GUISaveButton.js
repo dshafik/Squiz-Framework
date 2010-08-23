@@ -50,7 +50,7 @@ GUISaveButton.prototype = {
             GUI.revert();
         });
 
-        GUI.addModifiedCallback(function(widgetid, modified) {console.info(modified);
+        GUI.addModifiedCallback(function(widgetid, modified) {
             if (modified === true) {
                 self.enable();
             } else {

@@ -284,6 +284,8 @@ class GUIGraphBarActions
         echo '</div>';
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

@@ -92,6 +92,8 @@ class GUIButtonActions
         echo '<span>'.$value.'</span>';
         echo '</button>';
 
+        return $settings;
+
     }//end paint()
 
 

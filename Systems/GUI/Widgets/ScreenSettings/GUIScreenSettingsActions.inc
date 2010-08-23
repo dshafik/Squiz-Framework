@@ -114,6 +114,8 @@ class GUIScreenSettingsActions
         echo '</div>';
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

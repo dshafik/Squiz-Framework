@@ -87,6 +87,8 @@ class GUIInfoBoxActions
 
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

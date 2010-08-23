@@ -178,6 +178,15 @@ var GUI = new function()
             var template     = this.templateLineage[i];
             var isEmpty      = true;
             values[template] = {};
+
+            // Template it self may have a getValue function.
+            // The templateData variable is a reserved var.
+            var tplClassName = template.split(':')[1];
+            if (window[tplClassName] && window[tplClassName].getValue) {
+                values[template].templateData = window[tplClassName].getValue();
+                isEmpty = false;
+            }
+
             dfx.foreach(self.widgetTemplates[template], function(widgetid) {
                 var widget = self.getWidget(widgetid);
                 if (!widget || !widget.getValue) {
@@ -195,13 +204,12 @@ var GUI = new function()
             }
         }//end for
 
-        console.info(values);
         var params = {
             templateData: dfx.jsonEncode(values)
         };
 
         GUI.sendRequest('GUI', 'saveTemplateData', params, function() {
-            console.info(arguments);
+            // TODO: Show save success/error message.
         });
 
         return values;

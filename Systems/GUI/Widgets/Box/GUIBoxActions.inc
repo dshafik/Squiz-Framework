@@ -131,6 +131,8 @@ class GUIBoxActions
         echo '</div><!--end box content-->';
         echo '</div>';
 
+        return $settings;
+
     }//end paint()
 
 

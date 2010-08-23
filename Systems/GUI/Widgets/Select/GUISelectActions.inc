@@ -76,6 +76,8 @@ class GUISelectActions
 
         echo '</select>';
 
+        return $settings;
+
     }//end paint()
 
 
