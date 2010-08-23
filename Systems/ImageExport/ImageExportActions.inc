@@ -46,7 +46,7 @@ class ImageExportActions
         $command = dirname(__FILE__).'/Scripts/url.sh png '.$dest.'.tmp '.$url;
 
         ImageExport::startServer();
-        $success = self::_generateScreenshot($command, $dest.'.tmp');
+        $success = ImageExport::generateScreenshot($command, $dest.'.tmp');
         ImageExport::stopServer();
 
         if ($success === FALSE) {
@@ -95,7 +95,7 @@ class ImageExportActions
     public static function generateFromPDF($source, $dest, $width, $height)
     {
         $command = dirname(__FILE__).'/Scripts/pdf.sh "'.$source.'" "'.$dest.'" '.$width.' '.$height;
-        if (self::_generateScreenshot($command, $dest) === FALSE) {
+        if (ImageExport::generateScreenshot($command, $dest) === FALSE) {
             return FALSE;
         }
 
