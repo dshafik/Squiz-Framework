@@ -603,7 +603,7 @@ class CronActions
                     NULL,
                     $interval,
                     FALSE,
-                    FALSE
+                    TRUE
                 );
             }//end foreach
         }//end if
