@@ -165,10 +165,12 @@ class GUIGraphPieActions
         $params['fileName'] = $baseName;
         $url = Web::appendQueryString($params, $url);
 
+        echo '<span class="GUIGraphPie-container"  style="width: '.$size.'px; height: '.$size.'px;">';
         echo '<object data="'.$url.'"';
         echo ' style="width: '.$size.'px; height: '.$size.'px;"';
         echo ' type="image/svg+xml">'."\n";
         echo '</object>'."\n";
+        echo '</span>'."\n";
 
     }//end paint()
 

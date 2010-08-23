@@ -1,3 +1,7 @@
+.GUIGraphPie-container {
+    display: inline-block;
+}
+
 .GUIGraphPie .colour-black {
     fill: #000;
 }
