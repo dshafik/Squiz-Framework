@@ -29,8 +29,9 @@
 
 .GUIInfoBox-mid {
     background: url(infobox_thumb_stripes.png);
-    height: 140px;
+    height: 150px;
     padding: 10px;
+    text-align: center;
 }
 
 .GUIInfoBox-bottom {
