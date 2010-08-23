@@ -46,7 +46,7 @@ class CronActions
             $content = file_get_contents($tplFile);
         }
 
-        return $content;
+        return $settings;
 
     }//end paint()
 
