@@ -48,8 +48,33 @@ class GUIScreenSettingsActions
      * List of sections.
      *
      * @var array
+     * @internal
      */
     protected static $sections;
+
+    /**
+     * List of items.
+     *
+     * When this setting is specified sections setting will be ignored.
+     *
+     * @var array
+     * @internal
+     */
+    protected static $items = NULL;
+
+    /**
+     * If TRUE then the list items can be selected by clicking on them.
+     *
+     * @var boolean
+     */
+    protected static $selectable = FALSE;
+
+    /**
+     * If TRUE then the list items can be removed by clicking the remove icon.
+     *
+     * @var boolean
+     */
+    protected static $removable = FALSE;
 
 
     /**
@@ -78,7 +103,12 @@ class GUIScreenSettingsActions
         // Mid section.
         echo '<div class="'.$class.'-mid">';
 
-        echo self::_printSectionsContent($settings);
+        $items = Util::getArrayIndex($settings, 'items', NULL);
+        if ($items !== NULL) {
+            GUIScreenSettings::printItems($items, $settings);
+        } else {
+            self::_printSectionsContent($settings);
+        }
 
         // End mid section.
         echo '</div>';
@@ -107,7 +137,7 @@ class GUIScreenSettingsActions
 
             // Items for this section.
             $items = Util::getArrayIndex($section, 'items', array());
-            GUIScreenSettings::printItems($items);
+            GUIScreenSettings::printItems($items, $settings);
         }
 
     }//end _printSectionsContent()
@@ -116,15 +146,17 @@ class GUIScreenSettingsActions
     /**
      * Prints the items of a section.
      *
-     * @param array $items List of items for a section.
+     * @param array $items    List of items for a section.
+     * @param array $settings List of widget settings.
      *
      * @since  4.0.0
      * @return void
      */
-    public static function printItems(array $items)
+    public static function printItems(array $items, array $settings)
     {
-        foreach ($items as $item) {
-            GUIScreenSettings::printItem($item);
+        $index = 0;
+        foreach ($items as $itemid => $item) {
+            GUIScreenSettings::printItem($itemid, $item, $settings, $index++);
         }
 
     }//end printItems()
@@ -133,16 +165,33 @@ class GUIScreenSettingsActions
     /**
      * Print a single item.
      *
-     * @param string $itemContent Content of the item.
+     * @param string  $itemid      Id of the list item.
+     * @param string  $itemContent Content of the item.
+     * @param array   $settings    List of widget settings.
+     * @param integer $index       The index of the item.
      *
      * @since  4.0.0
      * @return void
      */
-    public static function printItem($itemContent)
+    public static function printItem($itemid, $itemContent, array $settings, $index)
     {
-        $class = 'GUIScreenSettings';
-        echo '<div class="'.$class.'-item">';
+        $class = $settings['widget']['type'];
+        echo '<div itemid="'.$itemid.'"  class="'.$class.'-item';
+
+        if ($index === 0
+            && Util::getArrayIndex($settings, 'selectable', FALSE) === TRUE
+        ) {
+            echo ' selected';
+        }
+
+        echo '">';
+
         echo $itemContent;
+
+        if (Util::getArrayIndex($settings, 'removable', self::$removable) === TRUE) {
+            echo '<div class="GUI-delete"><span class="GUI-deleteIcon" /></div>';
+        }
+
         echo '</div>';
 
     }//end printItem()

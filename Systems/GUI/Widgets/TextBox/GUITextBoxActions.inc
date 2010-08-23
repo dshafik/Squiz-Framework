@@ -97,7 +97,7 @@ class GUITextBoxActions
         }
 
         // The input field.
-        echo '<input class="'.$class.' input"'.$name.' type="text" value="'.$value.'" size="'.$size.'"'.$maxlength.' />';
+        echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="text" value="'.$value.'" size="'.$size.'"'.$maxlength.' />';
 
         echo '</div>';
 

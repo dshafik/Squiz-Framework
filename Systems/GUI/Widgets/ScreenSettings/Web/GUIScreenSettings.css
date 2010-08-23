@@ -18,6 +18,7 @@
 .GUIScreenSettings-title-subTitle {
     margin-top: 5px;
     color: #444;
+    overflow: hidden;
 }
 
 .GUIScreenSettings-section-title {
@@ -29,7 +30,12 @@
 .GUIScreenSettings-item {
     border-bottom: 1px solid #CCC;
     padding: 7px 10px;
-    font-size: 10px;
+    font-size: 11px;
+    position: relative;
 }
 
-
+.GUIScreenSettings-item.selected {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#8EB6F7), to(#5386CA));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #8EB6F7, #5386CA);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#8EB6F7, endColorstr=#5386CA);
+}

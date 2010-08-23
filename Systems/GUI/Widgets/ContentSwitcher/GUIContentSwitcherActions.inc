@@ -131,20 +131,20 @@ class GUIContentSwitcherActions
         $count      = 1;
         $extraClass = ' positionFirst';
 
-        foreach ($settings['items'] as $mode) {
-            $modeSystem = Util::getArrayIndex($mode, 'system', '');
+        foreach ($settings['items'] as $item) {
+            $itemSystem = Util::getArrayIndex($item, 'system', '');
 
             if ($initItem === NULL) {
-                $initItem = $mode['id'];
+                $initItem = $item['id'];
             }
 
             $selected = '';
-            if ($mode['id'] === $initItem) {
+            if ($item['id'] === $initItem) {
                 $selected = ' selected';
             }
 
-            echo '<li id="'.$id.'-'.$mode['id'].'" class="'.$className.'-modeButton'.$extraClass.$selected.'">';
-            echo '<a href="#" modeid="'.$mode['id'].'" system="'.$modeSystem.'">'.$mode['label'].'</a></li>';
+            echo '<li id="'.$id.'-'.$item['id'].'" class="'.$className.'-modeButton'.$extraClass.$selected.'">';
+            echo '<a href="#" modeid="'.$item['id'].'" system="'.$itemSystem.'">'.$item['label'].'</a></li>';
 
             if (($total - 1) === $count) {
                 $extraClass = ' positionLast';

@@ -84,7 +84,7 @@ dfx.getClass = function(className, startElement, tagName)
         startElement = document.body;
     }
 
-    className = '.' + className;
+    className = '.' + className.split(' ').join('.');
 
     if (tagName) {
         className = tagName + className;

@@ -40,3 +40,32 @@ body {
 .GUI-alignRight {
     float: right;
 }
+
+/* Delete overlay */
+.GUI-delete {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.GUI-delete .GUI-deleteIcon {
+    width: 16px;
+    height: 16px;
+    float: right;
+    cursor: pointer;
+    background: url(delete.png) no-repeat 0 0;
+    margin-top: 5px;
+    margin-right: 10px;
+}
+
+.GUI-delete.deleted {
+    width: 100%;
+    background: url(delete_overlay.png);
+    height: 100%;
+}
+
+.GUI-delete.deleted .GUI-deleteIcon {
+    background-position: 0 -16px;
+}

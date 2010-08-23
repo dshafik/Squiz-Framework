@@ -28,9 +28,52 @@ function GUIScreenSettings(id, settings)
 
     this.className = 'GUIScreenSettings';
 
+    GUI.addWidgetEvent(this, 'itemSelected');
+
+    this.init();
+
 }
 
 GUIScreenSettings.prototype = {
+
+    init: function()
+    {
+        if (this.settings.selectable === true
+            || this.settings.removable === true
+        ) {
+            var self = this;
+            dfx.addEvent(dfx.getId(this.id), 'click', function(e) {
+                self._handleClickEvent(e)
+            });
+        }
+
+    },
+
+    _handleClickEvent: function(e)
+    {
+        var target = dfx.getMouseEventTarget(e);
+        if (dfx.hasClass(target, 'GUI-deleteIcon') === true) {
+            this.itemToggle(target.parentNode);
+        } else if (dfx.hasClass(target, 'GUIScreenSettings-item') === true) {
+            this.selectItem(target);
+        }
+
+    },
+
+    selectItem: function(itemElement)
+    {
+        // Remove selected class from previous selected item.
+        var prevSelected = dfx.getClass('GUIScreenSettings-item selected', dfx.getId(this.id))[0];
+        dfx.removeClass(prevSelected, 'selected');
+        dfx.addClass(itemElement, 'selected');
+        this.fireItemSelectedCallbacks(itemElement, prevSelected);
+
+    },
+
+    itemToggle: function(itemElement)
+    {
+        dfx.toggleClass(itemElement, 'deleted');
+    },
 
     getValue: function()
     {

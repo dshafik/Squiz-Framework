@@ -63,23 +63,26 @@ class GUIButtonActions
 
         // Handle click setting.
         $onClick = '';
-        if (isset($settings['click']) === TRUE) {
-            if (isset($settings['click']['function']) === TRUE) {
-                $onClick .= ' onclick="';
+        $click = Util::getArrayIndex($settings, 'click', NULL);
+        if ($click !== NULL) {
+            $function = Util::getArrayIndex($click, 'function', NULL);
+            $onClick .= ' onclick="';
+            if ($function !== NULL) {
+                $funcArguments = Util::getArrayIndex($click, 'arguments', array());
 
-                $args = '';
-                if (isset($settings['click']['arguments']) === TRUE
-                    && empty($settings['click']['arguments']) === FALSE
-                ) {
-                    $args .= '\''.implode('\', \'', $settings['click']['arguments']).'\'';
-                }
+                $args = '\''.implode('\', \'', $funcArguments).'\'';
 
-                if (isset($settings['click']['targetWidget']) === TRUE) {
+                $targetWidget = Util::getArrayIndex($click, 'targetWidget', NULL);
+                if ($targetWidget !== NULL) {
                     $onClick .= 'GUI.getWidget(\''.$settings['click']['targetWidget'].'\').';
                 }
 
-                $onClick .= $settings['click']['function'].'('.$args.');"';
+                $onClick .= $function.'('.$args.')';
+            } else {
+                $onClick .= $click;
             }
+
+            $onClick .= ';"';
         }
 
         echo '<button class="'.$settings['widget']['type'].' button'.$color.'" type="button"'.$onClick.'>';
