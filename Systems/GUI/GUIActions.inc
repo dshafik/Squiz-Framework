@@ -923,7 +923,7 @@ class GUIActions
         } else if (is_int($value) === TRUE) {
             $value = (int) $value;
         } else {
-            $value = '"'.addslashes((string) $value).'"';
+            $value = '"'.addcslashes((string) $value, "\"\\\0").'"';
         }
 
         return $value;
@@ -1106,10 +1106,10 @@ class GUIActions
             if ($node->nodeType === XML_TEXT_NODE
                 || $node->nodeType === XML_CDATA_SECTION_NODE
             ) {
-                $tagInfo['value'] .= addslashes($node->nodeValue);
+                $tagInfo['value'] .= addcslashes($node->nodeValue, "\"\\\0");
             } else if ($node->nodeType === XML_ELEMENT_NODE) {
                 if ($node->tagName === 'value') {
-                    $tagInfo['value'] = addslashes($node->nodeValue);
+                    $tagInfo['value'] .= addcslashes($node->nodeValue, "\"\\\0");
                 } else if ($node->tagName === 'args') {
                     $tagInfo['argsCode'] = self::_getArgumentListCodes($node);
 
