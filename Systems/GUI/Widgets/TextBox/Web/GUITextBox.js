@@ -45,6 +45,14 @@ GUITextBox.prototype = {
             dfx.addClass(textBox, 'selected');
         });
 
+        dfx.addEvent(textBox, 'keyPress', function() {
+            if (value !== this.value) {
+                // If the value of the box has changed, set it modified.
+                value = this.value;
+                GUI.setModified(self, true);
+            }
+        });
+
     },
 
     getValue: function() {
@@ -61,6 +69,7 @@ GUITextBox.prototype = {
         if (value !== textBox.value) {
             // Only do something if the value is different from the current value
             textBox.value = value;
+            GUI.setModified(self, true);
         }
     }
 }
