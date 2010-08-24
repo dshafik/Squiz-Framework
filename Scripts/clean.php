@@ -1,7 +1,6 @@
 <?php
-// @codingStandardsIgnoreStart
 /**
- * MySource 4 clean.php.
+ * Squiz Framework script to resinstall a product.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
@@ -24,24 +23,11 @@
  */
 
 if ((php_sapi_name() !== 'cli')) {
-    echo "This script can only be run from the command line.\n";
+    echo "This script must be run from the command line.\n";
     exit();
 }
 
-if (isset($argv[1]) === FALSE) {
-    echo "Please specify the root directory.\n";
-    exit();
-}
-
-$rootdir = $argv[1];
-if (is_dir($rootdir) === FALSE) {
-    echo "The specified root directory does not exist.\n";
-    exit();
-}
-
-$rootdir = realpath($rootdir);
-
-// Change to mysource mini root directory.
+$rootdir = dirname(dirname(__FILE__));
 chdir($rootdir);
 
 echo '1. Removing files from the data directory';
@@ -70,10 +56,10 @@ system($rootdir.'/Scripts/fix_perms.sh');
 echoDone();
 
 echo '7. Re-creating database';
-include_once 'DAL/DALConf.inc';
+require_once 'DAL/DALConf.inc';
 
 $dbName     = $conf['DSN'];
-$dbName     = substr($dbName, strpos($dbName, 'dbname=') + 7);
+$dbName     = substr($dbName, (strpos($dbName, 'dbname=') + 7));
 $dbUserName = $conf['user'];
 system('dropdb -U postgres '.$dbName);
 system('createdb -U postgres '.$dbName.' -O '.$dbUserName.' -E SQL_ASCII');
@@ -144,6 +130,7 @@ echo '17. Fix file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
 echoDone();
 
+
 /**
  * Returns an array of system names passed from the rebake script.
  *
@@ -151,6 +138,7 @@ echoDone();
  * (e.g. LocalCache, CacheAdminScreenWidget).
  *
  * @param string $rootDir The root path.
+ * @param string $system  A space-seperated list of systems.
  *
  * @return array
  */
@@ -193,5 +181,5 @@ function echoDone()
 
 }//end echoDone()
 
-// @codingStandardsIgnoreEnd
+
 ?>
