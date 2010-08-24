@@ -26,14 +26,52 @@ function GUISelect(id, settings)
     this.id       = id;
     this.settings = settings;
 
+    this.currentValue = [];
+
+    this.init();
 }
 
 GUISelect.prototype = {
+    init: function()
+    {
+        var self = this;
+        var selectBox = dfx.getId(this.id);
+
+        selectBox.getSelectedItems = function() {
+            var selected = [];
+
+            for (var i = 0; i < this.options.length; i++) {
+                var option = this.options[i];
+
+                if (option.selected === true) {
+                    selected.push(option.value);
+                }
+            }
+            return selected;
+        }
+
+        self.currentValue = selectBox.getSelectedItems();
+
+        dfx.addEvent(selectBox, 'change', function() {
+            var newValue = this.getSelectedItems();
+            self.setValue(newValue);
+        });
+    },
 
     getValue: function()
     {
-        return dfx.getId(this.id).value;
+        return this.currentValue;
 
+    },
+
+    setValue: function(newValue)
+    {
+        var self = this;
+
+        if (self.currentValue !== newValue) {
+            self.currentValue = newValue;
+            GUI.setModified(self, true);
+        }
     }
 
 };
