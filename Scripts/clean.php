@@ -118,7 +118,7 @@ require_once $rootdir.'/data/init.inc';
 require_once $rootdir.'/Channels/Channels.inc';
 require_once $rootdir.'/Systems/BaseSystem.inc';
 
-echo '16. Give error_log 777 permission for developers';
+echo '16. Giving error_log 777 permission for developers';
 if (file_exists($rootdir.'/error_log') === FALSE) {
     file_put_contents($rootdir.'/error_log', '');
 }//end if
@@ -126,7 +126,7 @@ if (file_exists($rootdir.'/error_log') === FALSE) {
 system('chmod 777 '.$rootdir.'/error_log');
 echoDone();
 
-echo '17. Fix file system permissions';
+echo '17. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
 echoDone();
 

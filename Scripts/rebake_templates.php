@@ -1,6 +1,6 @@
 <?php
 /**
- * Rebake all GUI templates.
+ * Squiz Framework script to rebake GUI templates.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
@@ -23,35 +23,45 @@
  */
 
 if ((php_sapi_name() !== 'cli')) {
-    echo "This script can only be run from the command line.\n";
+    echo "This script must be run from the command line.\n";
     exit();
 }
 
-$rootdir = $argv[1];
-if (is_dir($rootdir) === FALSE) {
-    echo "Please specify the root directory.\n";
-    exit();
-}
-
-
-// Change to Product Root directory.
+$rootdir = dirname(dirname(__FILE__));
 chdir($rootdir);
 
-include_once 'Libs/FileSystem/FileSystem.inc';
-include_once 'data/init.inc';
+require_once 'Channels/Channels.inc';
+require_once 'Libs/FileSystem/FileSystem.inc';
+require_once 'data/init.inc';
 
-// Clean up existing templates.
+echo '1. Cleaning existing template cache';
 $templateDirs = FileSystem::findDirectories($rootdir.'/data', 'Templates');
 foreach ($templateDirs as $templateDirPath) {
     FileSystem::clearDirectory($templateDirPath);
 }
 
-// Re-run GUI installation function.
-include_once 'Channels/Channels.inc';
+echoDone();
+
+echo '2. Baking templates';
 Channels::includeSystem('GUI');
 GUI::bakeTemplates();
+echoDone();
 
-// Fix perms.
+echo '3. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
+echoDone();
+
+
+/**
+ * Echo done function.
+ *
+ * @return void
+ */
+function echoDone()
+{
+    echo exec('echo -en "\033[54G"; echo -n "[ " ; echo -en "\033[0;32mDone" ; tput sgr0 ; echo " ]"')."\n";
+
+}//end echoDone()
+
 
 ?>
