@@ -149,7 +149,7 @@ class APIActions
                 exit;
             }
 
-            $userTokens = Session::getSessionData('API', 'userToken:'.$userid);
+            $userTokens = API::getUserToken();
             if ($userTokens === NULL) {
                 // What is this token?
                 self::_sendHeader(503);
@@ -1135,6 +1135,41 @@ class APIActions
         return $token;
 
     }//end getUniqueToken()
+
+
+    /**
+     * Get user token.
+     *
+     * @return string
+     */
+    public static function getUserToken()
+    {
+        Channels::includeSystem('Session');
+        Channels::includeSystem('User');
+
+        $userid = User::getCurrentUserid();
+        $userToken = Session::getSessionData('API', 'userToken:'.$userid);
+        return $userToken;
+
+    }//end getUserToken()
+
+
+    /**
+     * Set user token to a new token.
+     *
+     * @param string $token The new token.
+     *
+     * @return string
+     */
+    public static function setUserToken($token)
+    {
+        Channels::includeSystem('Session');
+        Channels::includeSystem('User');
+
+        $userid = User::getCurrentUserid();
+        $userToken = Session::setSessionData('API', 'userToken:'.$userid, $token);
+
+    }//end setUserToken()
 
 
 }//end class
