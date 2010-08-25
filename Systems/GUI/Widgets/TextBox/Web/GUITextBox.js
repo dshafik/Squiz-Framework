@@ -45,7 +45,7 @@ GUITextBox.prototype = {
             dfx.addClass(textBox, 'selected');
         });
 
-        dfx.addEvent(textBox, 'keyPress', function() {
+        dfx.addEvent(textBox, 'keypress', function() {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
