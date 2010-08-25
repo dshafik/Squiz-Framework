@@ -32,6 +32,25 @@ class GUIListActions
 
 
     /**
+     * List of initial items to be painted.
+     *
+     * @var array
+     */
+    protected static $items = array();
+
+
+    /**
+     * Controls the appearance of sorting handles next to items.
+     *
+     * If TRUE, sorting handles will appear next to the items, which can be dragged
+     * up and down into new positions, and saved.
+     *
+     * @var boolean
+     */
+    protected static $sortable = FALSE;
+
+
+    /**
      * Returns this widgets content.
      *
      * @param array $settings The list of settings for this widget.
@@ -46,7 +65,7 @@ class GUIListActions
 
         // Print the list items.
         GUIList::paintItems(
-            $settings['dataProvider'],
+            $settings['items'],
             (bool) $settings['sortable'],
             $settings['widget']['id'],
             $settings['widget']['type']
