@@ -162,7 +162,11 @@ class GUIGraphPieActions
         unset($params['_callback']);
         $url = '/__api/raw/GUIGraphPie/getSVGContents';
 
-        $params['fileName'] = $baseName;
+        Channels::includeSystem('API');
+        $userToken = API::getUserToken();
+
+        $params['fileName']    = $baseName;
+        $params['_api_token'] = $userToken;
         $url = Web::appendQueryString($params, $url);
 
         echo '<span class="GUIGraphPie-container"  style="width: '.$size.'px; height: '.$size.'px;">';
