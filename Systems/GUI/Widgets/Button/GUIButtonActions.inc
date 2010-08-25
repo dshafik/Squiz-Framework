@@ -44,6 +44,12 @@ class GUIButtonActions
      */
     protected static $click = '';
 
+    /**
+     * The type of the button (e.g. submit).
+     *
+     * @var string
+     */
+    protected static $type = 'button';
 
     /**
      * Prints widgets content.
@@ -88,8 +94,13 @@ class GUIButtonActions
             $onClick .= ';"';
         }
 
-        echo '<button class="'.$settings['widget']['type'].' button'.$color.'" type="button"'.$onClick.'>';
-        echo '<span>'.$value.'</span>';
+        echo '<button id="'.$settings['widget']['id'].'"';
+
+        echo ' type="'.Util::getArrayIndex($settings, 'type', self::$type).'"';
+
+        echo ' class="'.$settings['widget']['type'].' button'.$color.'"'.$onClick.'>';
+
+        echo '<span class="'.$settings['widget']['type'].'Label">'.$value.'</span>';
         echo '</button>';
 
         return $settings;

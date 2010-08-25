@@ -52,13 +52,20 @@ class GUITextBoxActions
      */
     protected static $inline = FALSE;
 
+    /**
+     * The type of the text box (e.g. text, password).
+     *
+     * @var string
+     */
+    protected static $type = 'text';
+
 
     /**
      * Prints this widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return void
+     * @return array
      */
     public static function paint(array $settings=array())
     {
@@ -96,8 +103,10 @@ class GUITextBoxActions
             $maxlength = ' maxlength="'.$maxLengthProp.'"';
         }
 
+        $type = Util::getArrayIndex($settings, 'type', self::$type);
+
         // The input field.
-        echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="text" value="'.$value.'" size="'.$size.'"'.$maxlength.' />';
+        echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength.' />';
 
         echo '</div>';
 
