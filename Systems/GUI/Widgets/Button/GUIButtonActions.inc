@@ -52,24 +52,28 @@ class GUIButtonActions
     protected static $type = 'button';
 
     /**
+     * The colour of the button.
+     *
+     * @var string
+     */
+    protected static $colour = 'Default';
+
+
+    /**
      * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return void
+     * @return array
      */
     public static function paint(array $settings)
     {
-        $value = Util::getArrayIndex($settings, 'value', '');
-        $color = Util::getArrayIndex($settings, 'color');
-
-        if (empty($color) === TRUE) {
-            $color = 'Default';
-        }
+        $value  = Util::getArrayIndex($settings, 'value', '');
+        $colour = Util::getArrayIndex($settings, 'colour', self::$colour);
 
         // Handle click setting.
         $onClick = '';
-        $click = Util::getArrayIndex($settings, 'click', NULL);
+        $click   = Util::getArrayIndex($settings, 'click', NULL);
         if ($click !== NULL) {
             $function = Util::getArrayIndex($click, 'function', NULL);
             $onClick .= ' onclick="';
@@ -92,13 +96,13 @@ class GUIButtonActions
             }
 
             $onClick .= ';"';
-        }
+        }//end if
 
         echo '<button id="'.$settings['widget']['id'].'"';
 
         echo ' type="'.Util::getArrayIndex($settings, 'type', self::$type).'"';
 
-        echo ' class="'.$settings['widget']['type'].' button'.$color.'"'.$onClick.'>';
+        echo ' class="'.$settings['widget']['type'].' button'.$colour.'"'.$onClick.'>';
 
         echo '<span class="'.$settings['widget']['type'].'Label">'.$value.'</span>';
         echo '</button>';
