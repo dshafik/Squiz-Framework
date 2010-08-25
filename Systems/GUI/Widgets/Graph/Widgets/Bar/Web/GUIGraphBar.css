@@ -193,18 +193,20 @@ ul.GUIGraphBar-data-row ul {
 }
 
 .GUIGraphBar .tooltip {
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 5px;
+    background-color: #FFF;
+    padding: 8px;
     position: relative;
     top: -15px;
     width: 200px;
     left: -85px;
-
     visibility: hidden;
     z-index: 1000;
     display: block;
     white-space: normal;
+    border-radius: 11px;
+    -moz-border-radius: 11px;
+    -webkit-box-shadow: 0 2px 12px #666;
+    -moz-box-shadow: 0 2px 12px #666;
 }
 
 .GUIGraphBar .row-bg {
