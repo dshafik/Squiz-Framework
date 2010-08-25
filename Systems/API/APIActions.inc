@@ -56,6 +56,7 @@ class APIActions
                                      401 => 'Unauthorized',
                                      403 => 'Forbidden',
                                      404 => 'Not Found',
+                                     405 => 'Method Not Allowed',
                                      406 => 'Not Acceptable',
                                      420 => 'Enhance Your Calm',
                                      500 => 'Internal Server Error',
@@ -163,9 +164,12 @@ class APIActions
         }//end if
 
         // Only support GET and POST method.
+        // We must send the Allow header to be compliant with the requirements
+        // of the 405 definition.
         $requestMethod = strtolower($_SERVER['REQUEST_METHOD']);
         if ($requestMethod !== 'get' && $requestMethod !== 'post') {
-            self::_sendHeader(503);
+            self::_sendHeader(405);
+            header('Allow: GET, POST');
             $responseContent['exception'] = 'The request method is not supported.';
             self::_sendResponse($responseContent);
             exit;
