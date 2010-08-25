@@ -110,7 +110,14 @@ echo '14. Running system install methods';
 Install::runSystemInstallMethods($systemNames);
 echoDone();
 
-echo '15. Copying web files';
+echo '15. Initialising Product';
+$initProductScript = $rootdir.'/initialise_product.php';
+if (file_exists($initProductScript) === TRUE) {
+    include_once $initProductScript;
+}
+echoDone();
+
+echo '16. Copying web files';
 Install::copyWebFiles();
 echoDone();
 
@@ -118,7 +125,7 @@ require_once $rootdir.'/data/init.inc';
 require_once $rootdir.'/Channels/Channels.inc';
 require_once $rootdir.'/Systems/BaseSystem.inc';
 
-echo '16. Giving error_log 777 permission for developers';
+echo '17. Giving error_log 777 permission for developers';
 if (file_exists($rootdir.'/error_log') === FALSE) {
     file_put_contents($rootdir.'/error_log', '');
 }//end if
@@ -126,7 +133,7 @@ if (file_exists($rootdir.'/error_log') === FALSE) {
 system('chmod 777 '.$rootdir.'/error_log');
 echoDone();
 
-echo '17. Fixing file system permissions';
+echo '18. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
 echoDone();
 
