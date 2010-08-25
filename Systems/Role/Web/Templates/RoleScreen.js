@@ -1,10 +1,35 @@
+/**
+ * JS Class for the Text Box Widget.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Role
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
+ */
+
 var RoleScreen = new function()
 {
     var _data             = null;
     var _prevSelectedRole = null;
+    var _removedRoles     = {};
 
     this.initScreen = function(data) {
-        _data = data;
+        _data        = data;
+        removedRoles = {};
 
         // Add the mouse hover event for list items.
         var elems = dfx.getClass('RoleScreen-privListItem');
@@ -30,6 +55,16 @@ var RoleScreen = new function()
         GUI.getWidget('rolesList').addItemSelectedCallback(function(selectedRoleid) {
             // When the item is clicked show that role on the right side.
             self.showRoleSettings(selectedRoleid);
+        });
+
+        // Add role item delete toggle event.
+        GUI.getWidget('rolesList').addItemToggledCallback(function(itemid, deleted, itemElement) {
+            // Item was deleted or re-added.
+            if (deleted === true) {
+                removedRoles[itemid] = true;
+            } else if (removedRoles[itemid]) {
+                delete removedRoles[itemid];
+            }
         });
 
         // Unrestricted access toggle button change event.
@@ -244,16 +279,27 @@ var RoleScreen = new function()
     };
 
     this.createNewRole = function() {
-        GUI.getWidget('role-switcher').createNewItem(function() {
-            console.info(1);
-        });
+        var itemid = 'new_' + dfx.getUniqueId();
+        var title  = 'New Role';
+
+        // Init the item info.
+        _data[itemid] = {
+            granted: {},
+            name: title
+        };
+
+        GUI.getWidget('rolesList').addItem(itemid, title, true);
+
+        // Focus textbox so that user can type in the new name.
+        GUI.getWidget('role-name').select();
     };
 
     this.getValue = function() {
         // Before we return value need to get the current selected items updated values.
         _saveRoleSettings(GUI.getWidget('rolesList').getSelectedItemId());
         var data = {
-            roles: _data
+            roles: _data,
+            removedRoles: removedRoles
         };
 
         return data;

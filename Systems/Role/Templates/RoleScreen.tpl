@@ -8,7 +8,7 @@
             <setting name="subTitle">
                 <content>
                     <div style="float:right;">
-                        <widget type="GUI/Button">
+                        <widget type="GUI/Button" id="addNewRole">
                             <setting name="value"><text>Add New</text></setting>
                             <setting name="click">
                                 <function>RoleScreen.createNewRole</function>

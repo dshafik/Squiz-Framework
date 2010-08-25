@@ -99,6 +99,7 @@ class RoleActions
     {
         $query  = DAL::getQuery('Role', 'deleteRole');
         $result = DAL::executeQuery($query);
+
         return $result;
 
     }//end deleteRole()
@@ -463,36 +464,62 @@ class RoleActions
      */
     public static function saveRoleScreen(array $data)
     {
-        $errors = array();
-        $data   = Util::getArrayIndex($data, 'templateData', NULL);
-        if ($data === NULL) {
-            $errors[] = _('Empty template data');
-        } else {
-            $roles        = Util::getArrayIndex($data, 'roles', array());
-            $currentRoles = Role::getRoles();
+        try {
+            DAL::beginTransaction();
+            $errors       = array();
+            $templateData = Util::getArrayIndex($data, 'templateData', NULL);
+            if ($templateData === NULL) {
+                $errors[] = _('Empty template data');
+            } else {
+                $roles        = Util::getArrayIndex($templateData, 'roles', array());
+                $currentRoles = Role::getRoles();
 
-            foreach ($roles as $roleid => $info) {
-                if (isset($currentRoles[$roleid]) === TRUE) {
-                    // Existing role.
-                    // Check if name nees updating.
-                    if ($currentRoles[$roleid] !== $info['name']) {
-                        Role::updateRole($roleid, $info['name']);
+                // Delete roles.
+                $removedRoles = Util::getArrayIndex($templateData, 'removedRoles', array());
+                foreach ($removedRoles as $roleid => $state) {
+                    if (strpos($roleid, 'new_') === FALSE) {
+                        // Not a new role so delete it.
+                        Role::deleteRole($roleid);
                     }
+                }
 
-                    $currentPrivs = Role::getPrivilegesByRole($roleid);
-                    $removedPrivs = array_diff($currentPrivs, $info['granted']);
-                    foreach ($removedPrivs as $privilege) {
-                        Role::revokePrivilege($roleid, $privilege);
-                    }
+                // Add or update roles.
+                foreach ($roles as $roleid => $info) {
+                    if (isset($removedRoles[$roleid]) === TRUE) {
+                        // Role was removed so do not update or add it.
+                        continue;
+                    } else if (isset($currentRoles[$roleid]) === TRUE) {
+                        // Existing role.
+                        // Check if name nees updating.
+                        if ($currentRoles[$roleid] !== $info['name']) {
+                            Role::updateRole($roleid, $info['name']);
+                        }
 
-                    $newPrivs = array_diff(self::_filterPrivileges($info['granted']), $currentPrivs);
+                        $currentPrivs = Role::getPrivilegesByRole($roleid);
+                        $removedPrivs = array_diff($currentPrivs, $info['granted']);
+                        foreach ($removedPrivs as $privilege) {
+                            Role::revokePrivilege($roleid, $privilege);
+                        }
 
-                    foreach ($newPrivs as $privilege) {
-                        Role::grantPrivilege($roleid, $privilege);
-                    }
-                }//end if
-            }//end foreach
-        }//end if
+                        $newPrivs = array_diff(self::_filterPrivileges($info['granted']), $currentPrivs);
+
+                        foreach ($newPrivs as $privilege) {
+                            Role::grantPrivilege($roleid, $privilege);
+                        }
+                    } else if (strpos($roleid, 'new_') === 0) {
+                        // New role.
+                        $newRoleid  = Role::createRole($info['name']);
+                        $privileges = self::_filterPrivileges($info['granted']);
+                        Role::batchGrantPrivileges(array($newRoleid), $privileges);
+                    }//end if
+                }//end foreach
+            }//end if
+
+            DAL::commit();
+        } catch (ChannelException $e) {
+            DAL::rollBack();
+            $errors[] = $e->getMessage();
+        }//end try
 
         $retVal = TRUE;
         if (empty($errors) === FALSE) {

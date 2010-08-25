@@ -43,7 +43,7 @@
                     <column>roleid</column>
                     <column>privilege</column>
                </primary-key>
-               <foreign-key name="role_privilege_fk1" foreign-table="role">
+               <foreign-key name="role_privilege_fk1" foreign-table="role" on-delete="CASCADE">
                     <column references="roleid">roleid</column>
                </foreign-key>
             </constraints>
