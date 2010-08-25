@@ -644,7 +644,10 @@ class GUIActions
      */
     private static function _isValidWidgetSetting($widgetName, $settingName, $jsOnly=FALSE)
     {
-        if ($settingName === 'widget' || $settingName === 'template') {
+        if ($settingName === 'widget'
+            || $settingName === 'template'
+            || strpos($settingName, '_') === 0
+        ) {
             return TRUE;
         }
 

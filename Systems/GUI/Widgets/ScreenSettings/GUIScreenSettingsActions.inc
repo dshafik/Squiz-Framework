@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
  *
  * @package    Framework
- * @subpackage Cron
+ * @subpackage GUI
  * @author     Squiz Pty Ltd <products@squiz.net>
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
@@ -82,7 +82,7 @@ class GUIScreenSettingsActions
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return void
+     * @return array
      */
     public static function paint(array $settings)
     {
@@ -113,6 +113,12 @@ class GUIScreenSettingsActions
         // End mid section.
         echo '</div>';
         echo '</div>';
+
+        // Add item template to settings array.
+        ob_start();
+            GUIScreenSettings::printItem('%itemid%', '%title%', $settings, -1);
+            $settings['_templates'] = array('item' => ob_get_contents());
+        ob_end_clean();
 
         return $settings;
 

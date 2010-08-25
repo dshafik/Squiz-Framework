@@ -74,6 +74,18 @@ GUIContentSwitcher.prototype = {
 
     },
 
+    getVisibleContentElement: function()
+    {
+        var visibleElements = dfx.getClass(this.className + '-itemContent visible', dfx.getId(this.id + '-itemContents'));
+
+        if (visibleElements.length > 0) {
+            return visibleElements[0];
+        }
+
+        return null;
+
+    },
+
      _removeSelectedClass: function()
     {
         dfx.removeClass(dfx.getTag('li', dfx.getId(this.id)), 'selected');

@@ -21,21 +21,23 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-function GUITextBox(id, settings) {
-    this.id = id;
-    this.settings = settings;
+function GUITextBox(id, settings)
+{
+    this.id           = id;
+    this.settings     = settings;
     var widgetElement = dfx.getId(self.id);
-    var textBox = dfx.getClass('input', widgetElement)[0];
+    this.textBox      = dfx.getClass('input', widgetElement)[0];
 
     this.init();
+
 }
 
 GUITextBox.prototype = {
-    init: function() {
-
-        var self = this;
+    init: function()
+    {
+        var self          = this;
         var widgetElement = dfx.getId(self.id);
-        var textBox = dfx.getClass('input', widgetElement)[0];
+        var textBox       = dfx.getClass('input', widgetElement)[0];
 
         dfx.addEvent(textBox, 'blur', function() {
             dfx.removeClass(textBox, 'selected');
@@ -55,21 +57,36 @@ GUITextBox.prototype = {
 
     },
 
-    getValue: function() {
-        var self = this;
-        var widgetElement = dfx.getId(self.id);
-        var textBox = dfx.getClass('input', widgetElement)[0];
+    getValue: function()
+    {
+        var widgetElement = dfx.getId(this.id);
+        var textBox       = dfx.getClass('input', widgetElement)[0];
         return textBox.value;
+
     },
 
-    setValue: function(value) {
-        var self = this;
-        var widgetElement = dfx.getId(self.id);
-        var textBox = dfx.getClass('input', widgetElement)[0];
+    setValue: function(value)
+    {
+        var widgetElement = dfx.getId(this.id);
+        var textBox       = dfx.getClass('input', widgetElement)[0];
         if (value !== textBox.value) {
-            // Only do something if the value is different from the current value
+            // Only do something if the value is different from the current value.
             textBox.value = value;
-            GUI.setModified(self, true);
+            GUI.setModified(this, true);
         }
+
+    },
+
+    focus: function()
+    {
+        this.textBox.focus();
+
+    },
+
+    select: function()
+    {
+        this.textBox.select();
+
     }
+
 }

@@ -29,6 +29,7 @@ function GUIScreenSettings(id, settings)
     this.className = 'GUIScreenSettings';
 
     GUI.addWidgetEvent(this, 'itemSelected');
+    GUI.addWidgetEvent(this, 'itemToggled');
 
     this.init();
 
@@ -85,9 +86,37 @@ GUIScreenSettings.prototype = {
 
     },
 
+    addItem: function(itemid, title, selected)
+    {
+        var template = this.settings._templates.item;
+
+        template = template.replace('%title%', title);
+        template = template.replace('%itemid%', itemid);
+
+        var tmpEl = document.createElement('div');
+        dfx.setHtml(tmpEl, template);
+        var newElem = tmpEl.firstChild;
+
+        var listCont = dfx.getClass('GUIScreenSettings-mid', dfx.getId(this.id))[0];
+        listCont.appendChild(newElem);
+
+        if (selected === true) {
+            this.selectItem(newElem);
+        }
+
+        return newElem;
+
+    },
+
     itemToggle: function(itemElement)
     {
         dfx.toggleClass(itemElement, 'deleted');
+        this.fireItemToggledCallbacks(
+            dfx.attr(itemElement.parentNode, 'itemid'),
+            dfx.hasClass(itemElement, 'deleted'),
+            itemElement.parentNode
+        );
+
     },
 
     getValue: function()
@@ -110,9 +139,9 @@ GUIScreenSettings.prototype = {
     getWidgetValues: function(itemElem)
     {
         // Find all the elements with ids.
-        var elems   = dfx.find(itemElem, '[id]');
-        var ln      = elems.length;
-        var values  = {};
+        var elems  = dfx.find(itemElem, '[id]');
+        var ln     = elems.length;
+        var values = {};
 
         if (ln === 0) {
             return null;
@@ -131,7 +160,6 @@ GUIScreenSettings.prototype = {
                 continue;
             }
 
-            // TODO: Should we only return top level widgets?
             values[id] = widget.getValue();
         }//end for
 
