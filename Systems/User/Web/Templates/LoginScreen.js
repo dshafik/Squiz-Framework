@@ -8,6 +8,7 @@ var LoginScreen = new function()
 
     this.submit = function() {
         var url = (new String(document.location)).valueOf();
+        url     = url.replace('#', '');
 
         // Clear error message.
         dfx.setHtml(dfx.getId('LoginError'), '&nbsp;');
@@ -31,7 +32,7 @@ var LoginScreen = new function()
                 self.displayError(data.error);
                 return false;
             } else {
-                window.location = window.location;
+                window.location = window.location.replace('#', '');
                 return true;
             }
         };
