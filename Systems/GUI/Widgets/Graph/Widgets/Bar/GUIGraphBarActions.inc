@@ -564,11 +564,9 @@ class GUIGraphBarActions
                     echo '<li class="'.$class.'-data-point'.$firstPointStyle;
                     echo ' colour-'.$groups[$groupIndex]['colour'];
                     echo ' style-'.$groups[$groupIndex]['style'];
-                    echo '" title="'.$pointTitle.'"';
-                    echo ' style="height: ';
+                    echo '" style="height: ';
                     echo max($dataPointHeight, 0).'px">';
                     echo '<span class="'.$class.'-data-point-alt-text">';
-                    echo $pointTitle;
                     echo '</span>';
                     echo '</li>';
                     $liTexts[] = ob_get_contents();
