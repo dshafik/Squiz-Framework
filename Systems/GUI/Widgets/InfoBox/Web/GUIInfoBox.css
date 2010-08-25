@@ -1,8 +1,9 @@
 .GUIInfoBox {
     position: relative;
     overflow: hidden;
-    border: 1px solid;
-    border-color: #DCDCDC #DCDCDC #BBB;
+    margin-bottom: 12px;
+/*     border: 1px solid; */
+/*     border-color: #3F71B8 #3F71B8 #113262; */
     border-radius: 9px;
     -moz-border-radius: 9px;
     background-color: #162C63;
@@ -12,19 +13,23 @@
     padding: 20px 10px 15px;
     border-radius: 9px;
     -moz-border-radius: 9px;
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4473CE), to(#162C63));
-    background-image: -moz-linear-gradient(0% 0% -90deg, #4473CE, #162C63);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#4473CE, endColorstr=#162C63);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#3E7CCE), to(#113262));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #3E7CCE, #113262);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#3E7CCE, endColorstr=#113262);
 }
 
 .GUIInfoBox-title {
-    border: 1px solid #162C63;
+    overflow: hidden;
+    border: 1px solid;
+    border-color: #275697 #275697 #265494;
     font-size: 18px;
     color: #FFF;
-    line-height: 25px;
-    padding: 5px;
-    border-radius: 9px;
-    -moz-border-radius: 9px;
+    padding: 8px 12px;
+    border-radius: 11px;
+    -moz-border-radius: 11px;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#3066AD), to(#113262));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #3066AD, #113262);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#3066AD, endColorstr=#113262);
 }
 
 .GUIInfoBox-mid {
@@ -36,4 +41,9 @@
 
 .GUIInfoBox-bottom {
     padding: 10px;
+}
+
+.GUIInfoBox-title-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
