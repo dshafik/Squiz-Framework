@@ -178,6 +178,25 @@ class RoleActions
 
 
     /**
+     * Grant privileges to a set of roles.
+     *
+     * @param array $roleids    Array of role ids.
+     * @param array $privileges Array of privileges.
+     *
+     * @return void
+     */
+    public static function batchGrantPrivileges(array $roleids, array $privileges)
+    {
+        foreach ($roleids as $roleid) {
+            foreach ($privileges as $privilege) {
+                Role::grantPrivilege($roleid, $privilege);
+            }
+        }
+
+    }//end batchGrantPrivileges()
+
+
+    /**
      * Remove a privilege from a role.
      *
      * Returns the number of rows updated.
@@ -485,7 +504,16 @@ class RoleActions
     }//end saveRoleScreen()
 
 
-    private static function _filterPrivileges($privileges)
+    /**
+     * Filters list of privileges.
+     *
+     * Filtering will remove child privileges from the list.
+     *
+     * @param array $privileges List of privileges.
+     *
+     * @return array
+     */
+    private static function _filterPrivileges(array $privileges)
     {
         $filtered   = array();
         $prevParent = NULL;

@@ -2,9 +2,11 @@ var RoleScreen = new function()
 {
     var _data             = null;
     var _prevSelectedRole = null;
-    this.initScreen = function(data)
-    {
-        _data  = data;
+
+    this.initScreen = function(data) {
+        _data = data;
+
+        // Add the mouse hover event for list items.
         var elems = dfx.getClass('RoleScreen-privListItem');
         dfx.hover(elems, function (e) {
             dfx.addClass(e.currentTarget, 'hover');
@@ -12,25 +14,44 @@ var RoleScreen = new function()
             dfx.removeClass(e.currentTarget, 'hover');
         });
 
-        // Add Click event.
+        // Add Click event for the list items. Click handler will determine the
+        // clicked element.
         var topElem = dfx.getClass('RoleScreen-privilegeList', dfx.getId('RolesScreen'));
         dfx.addEvent(topElem, 'click', function(e) {
             _handleClick(e, topElem);
         });
 
+        // Set the initial selected role's name.
         _prevSelectedRole = GUI.getWidget('rolesList').getSelectedItemId();
         GUI.getWidget('role-name').setValue(_data[_prevSelectedRole].name);
 
-        // Add event call back for Settings box item selection.
+        // Add event call back for SettingsBox item selection.
         var self = this;
         GUI.getWidget('rolesList').addItemSelectedCallback(function(selectedRoleid) {
+            // When the item is clicked show that role on the right side.
             self.showRoleSettings(selectedRoleid);
         });
 
+        // Unrestricted access toggle button change event.
+        var toggleButtons = dfx.getClass('GUIToggleButton', dfx.getClass('RoleScreen-unrestrictedToggle'));
+        dfx.foreach(toggleButtons, function(idx) {
+            var buttonElement = toggleButtons[idx];
+            var toggleWidget  = GUI.getWidget(buttonElement.id);
+            if (!toggleWidget) {
+                return;
+            }
+
+            toggleWidget.addToggleOnCallback(function() {
+                self.setAllPrivilegesState(true);
+            });
+
+            toggleWidget.addToggleOffCallback(function() {
+                self.setAllPrivilegesState(false);
+            });
+        });
     };
 
-    this.showRoleSettings = function(roleid)
-    {
+    this.showRoleSettings = function(roleid) {
         if (!roleid || !_data[roleid]) {
             return;
         }
@@ -47,15 +68,13 @@ var RoleScreen = new function()
         _updatePrivilegeStates(role.granted);
 
         _prevSelectedRole = roleid;
-
     };
 
-    var _saveRoleSettings = function(roleid)
-    {
+    var _saveRoleSettings = function(roleid) {
         // Get the role name.
         _data[roleid].name = GUI.getWidget('role-name').getValue(name);
 
-        // get the granted settings.
+        // Get the granted settings.
         var items = dfx.getClass('RoleScreen-privListItem', dfx.getId('RolesScreen'));
         var iln   = items.length;
 
@@ -76,11 +95,9 @@ var RoleScreen = new function()
         }//end for
 
         _data[roleid].granted = granted;
-
     };
 
-    var _updatePrivilegeStates = function(granted)
-    {
+    var _updatePrivilegeStates = function(granted) {
         var items = dfx.getClass('RoleScreen-privListItem', dfx.getId('RolesScreen'));
         var iln   = items.length;
         var gln   = granted.length;
@@ -106,13 +123,10 @@ var RoleScreen = new function()
             } else if (selected === 'sel-inherit') {
                 dfx.addClass(items[i], 'enabledByParent');
             }
-        }
-
-
+        }//end for
     };
 
-    var _handleClick = function(e, topElem)
-    {
+    var _handleClick = function(e, topElem) {
         var target = dfx.getMouseEventTarget(e);
         if (dfx.hasClass(target, 'RoleScreen-privListItem-toggle') === true) {
             if (changeToggleState(target.parentNode) === true) {
@@ -123,11 +137,9 @@ var RoleScreen = new function()
                 return;
             }
         }
-
     };
 
-    var toggleExpandCollapse = function(target, topElem)
-    {
+    var toggleExpandCollapse = function(target, topElem) {
         var elem = target;
         if (dfx.hasClass(target, 'RoleScreen-privListItem') === false) {
             var parents = dfx.getParents(target, 'div.RoleScreen-privListItem', topElem);
@@ -147,11 +159,9 @@ var RoleScreen = new function()
         }
 
         return false;
-
     };
 
-    var toggleChildPrivileges = function(elem, state)
-    {
+    var toggleChildPrivileges = function(elem, state) {
         var parentid = elem.id + '.';
         for (var node = elem.nextSibling; node; node = node.nextSibling) {
             if (node.nodeType !== 1) {
@@ -166,12 +176,10 @@ var RoleScreen = new function()
                 break;
             }
         }
-
     };
 
-    var changeToggleState = function(toggle)
-    {
-        if (dfx.hasClass(toggle, 'enabledByParent') === true) {
+    var changeToggleState = function(toggle, forceState) {
+        if (dfx.isset(forceState) === false && dfx.hasClass(toggle, 'enabledByParent') === true) {
             return;
         }
 
@@ -179,26 +187,32 @@ var RoleScreen = new function()
         if (dfx.hasClass(toggle, 'expand') === true
                 || dfx.hasClass(toggle, 'collapse') === true
             ) {
-            // A parent so update its children.
-            if (dfx.hasClass(toggle, 'enabled') === true) {
+            if (forceState === true) {
+                dfx.addClass(toggle, 'enabled');
+                changeChildPrivilegeStates(toggle, true);
+            } else if (forceState === false) {
                 dfx.removeClass(toggle, 'enabled');
                 changeChildPrivilegeStates(toggle, false);
             } else {
-                dfx.addClass(toggle, 'enabled');
-                changeChildPrivilegeStates(toggle, true);
+                // A parent so update it self and its children.
+                if (dfx.hasClass(toggle, 'enabled') === true) {
+                    dfx.removeClass(toggle, 'enabled');
+                    changeChildPrivilegeStates(toggle, false);
+                } else {
+                    dfx.addClass(toggle, 'enabled');
+                    changeChildPrivilegeStates(toggle, true);
+                }
             }
         } else {
-            if (dfx.hasClass(toggle, 'enabled') === true) {
+            if (forceState === false || dfx.hasClass(toggle, 'enabled') === true) {
                 dfx.removeClass(toggle, 'enabled');
             } else {
                 dfx.addClass(toggle, 'enabled');
             }
-        }
-
+        }//end if
     };
 
-    var changeChildPrivilegeStates = function(elem, state)
-    {
+    var changeChildPrivilegeStates = function(elem, state) {
         var parentid = elem.id + '.';
         for (var node = elem.nextSibling; node; node = node.nextSibling) {
             if (node.nodeType !== 1) {
@@ -214,18 +228,28 @@ var RoleScreen = new function()
                 break;
             }
         }
-
     };
 
+    this.setAllPrivilegesState = function(state) {
+        // Get the first element of the currently selected privilege type (e.g. asset).
+        var visibleElement = GUI.getWidget('role-switcher').getVisibleContentElement();
+        if (!visibleElement) {
+            return;
+        }
 
-    this.createNewRole = function()
-    {
-        console.info('add new');
-
+        var privListElements = dfx.getClass('RoleScreen-privListItem level-1', visibleElement);
+        dfx.foreach(privListElements, function(i) {
+            changeToggleState(privListElements[i], state);
+        });
     };
 
-    this.getValue = function()
-    {
+    this.createNewRole = function() {
+        GUI.getWidget('role-switcher').createNewItem(function() {
+            console.info(1);
+        });
+    };
+
+    this.getValue = function() {
         // Before we return value need to get the current selected items updated values.
         _saveRoleSettings(GUI.getWidget('rolesList').getSelectedItemId());
         var data = {
@@ -233,8 +257,6 @@ var RoleScreen = new function()
         };
 
         return data;
-
     };
-
 
 };
