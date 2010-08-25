@@ -343,6 +343,8 @@ class GUIActions
 
         // Do some cleanup.
         $htmlCont = trim(str_replace('<?xml version="1.0"?>', '', $htmlCont));
+        $htmlCont = str_replace('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>', '', $htmlCont);
+
         $htmlCont = str_replace('&lt;?php', '<'.'?php', $htmlCont);
         $htmlCont = str_replace('?&gt;', '?'.'>', $htmlCont);
 
