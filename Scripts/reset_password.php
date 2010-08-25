@@ -24,11 +24,8 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-if ($argv[0] !== 'Scripts/'.basename(__FILE__)) {
-    echo 'You need to run this script from '.dirname(dirname(__FILE__))."\n";
-    echo 'Then call it like: php Scripts/'.basename(__FILE__)."\n";
-    exit(1);
-}
+$rootdir = dirname(dirname(__FILE__));
+chdir($rootdir);
 
 if (isset($argv[1]) === FALSE || isset($argv[2]) === FALSE) {
     echo 'You need to supply the username to reset, ';
@@ -40,7 +37,7 @@ if (isset($argv[1]) === FALSE || isset($argv[2]) === FALSE) {
 $username = $argv[1];
 $password = $argv[2];
 
-require dirname(dirname(__FILE__)).'/Channels/Channels.inc';
+require 'Channels/Channels.inc';
 Channels::includeSystem('User');
 
 $userid = User::getUserIdByUsername($username);
