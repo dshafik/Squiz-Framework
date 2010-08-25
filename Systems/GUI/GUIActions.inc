@@ -324,11 +324,10 @@ class GUIActions
             $replacement .= 'Channels::includeSystem(\'API\');'."\n";
             $replacement .= '$currUserid = User::getCurrentUserid();'."\n";
             $replacement .= 'if ($currUserid !== NULL) {'."\n";
-            $replacement .= '   Channels::includeSystem(\'Session\');'."\n";
-            $replacement .= '   $currToken = Session::getSessionData(\'API\', \'userToken:\'.$currUserid);'."\n";
+            $replacement .= '   $currToken = API::getUserToken();'."\n";
             $replacement .= '   if ($currToken === NULL) {'."\n";
             $replacement .= '       $currToken = API::getUniqueToken();'."\n";
-            $replacement .= '       Session::setSessionData(\'API\', \'userToken:\'.$currUserid, $currToken);'."\n";
+            $replacement .= '       API::setUserToken($currToken);'."\n";
             $replacement .= '   }'."\n";
             $replacement .= '   echo \'<input id="__api_token" type="hidden" value="\'.$currToken.\'" />\';'."\n";
             $replacement .= '}'."\n";
