@@ -19,8 +19,9 @@
     line-height: 32px;
     margin: 0 10px;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 13px;
     color: #646464;
+    text-shadow: 0 1px #FFF;
 }
 
 .GUIBox-headerContent {
