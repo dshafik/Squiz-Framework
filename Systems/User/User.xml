@@ -1,4 +1,12 @@
 <?xml version="1.0"?>
 <system>
-  <plugs />
+  <plugs>
+    <runner>
+      <required>yes</required>
+      <method>processAuthentication</method>
+      <action listen="before">MySource::main</action>
+      <fatal>no</fatal>
+      <parameters/>
+    </runner>
+  </plugs>
 </system>

@@ -273,18 +273,24 @@ class UserActions
 
         // Password Matched.
         include_once 'Libs/Security/Security.inc';
-        if ($currPassword !== Security::hashUserPassword($password)) {
-            return FALSE;
+        Channels::includeSystem('Session');
+        $challenge       = Session::getSessionData('User', $username);
+        $passwordMatched = FALSE;
+
+        if (Security::validateUserPassword($password, $currPassword, $challenge) === TRUE) {
+            $passwordMatched = TRUE;
         }
 
-        Channels::includeSystem('Session');
-        Session::setSessionData(
-            'User',
-            'CurrentUserid',
-            $userid
-        );
+        if ($passwordMatched === TRUE) {
+            Channels::includeSystem('Session');
+            Session::setSessionData(
+                'User',
+                'CurrentUserid',
+                $userid
+            );
+        }
 
-        return TRUE;
+        return $passwordMatched;
 
     }//end loginUser()
 
@@ -325,6 +331,104 @@ class UserActions
         return $userid;
 
     }//end getCurrentUserid()
+
+
+    /**
+     * Process authentication requests.
+     *
+     * @return string
+     *
+     * @api read
+     */
+    public static function processAuthentication()
+    {
+        include_once 'Libs/Security/Security.inc';
+        $authAction = Security::getRequestData('auth_action', NULL, FALSE);
+        if ($authAction !== NULL) {
+            return self::_handleLoginFormRequest($authAction);
+        }
+
+        $userid = User::getCurrentUserid();
+        if ($userid === NULL) {
+            // Print login screen and exit.
+            Channels::includeSystem('GUI');
+            GUI::printTemplate('User', 'LoginScreen.tpl');
+            exit;
+        }
+
+    }//end processAuthentication()
+
+
+    /**
+     * Handles the login form requests.
+     *
+     * @param string $action The request action.
+     *
+     * @return string
+     */
+    private static function _handleLoginFormRequest($action)
+    {
+        $response = array();
+
+        include_once 'Libs/Security/Security.inc';
+        switch ($action) {
+            case 'logout':
+                $res = User::logoutUser();
+                exit;
+            break;
+
+            case 'login':
+                $step = Security::getRequestData('step', NULL, FALSE);
+                if ($step === NULL) {
+                    return FALSE;
+                }
+
+                $username = Security::getRequestData('username', NULL, FALSE);
+                $username = html_entity_decode($username);
+                switch (strtolower($step)) {
+                    case 'req_chal':
+                        try {
+                            Channels::includeSystem('Session');
+                            $challenge = Security::createChallengeString();
+                            Session::setSessionData('User', $username, $challenge);
+                        } catch (Exception $e) {
+                            $challenge = array();
+                        }
+
+                        if (empty($challenge) === TRUE) {
+                            // Cannot find this user from the database.
+                            $response['challenge'] = 0;
+                            $response['error']     = _('Incorrect username/password combination');
+                        } else {
+                            $response['challenge'] = $challenge;
+                        }
+                    break;
+
+                    case 'req_auth':
+                        $password = Security::getRequestData('password', NULL, FALSE);
+                        $password = html_entity_decode($password);
+                        if (User::loginUser($username, $password) === FALSE) {
+                            $response['login'] = 0;
+                            $response['error'] = _('Incorrect username/password combination');
+                        } else {
+                            $response['login'] = 1;
+                        }
+                    break;
+
+                    default:
+                        // Unknown step. Return error.
+                    break;
+                }//end switch
+            break;
+
+            default:
+                // Don't know what to do.
+            break;
+        }//end switch
+
+        return json_encode($response);
+
+    }//end _handleLoginFormRequest()
 
 
 }//end class

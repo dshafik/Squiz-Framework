@@ -1,0 +1,81 @@
+body.LoginScreen {
+    font-family: arial, helvetica, sans-serif;
+    margin: 40px 0 0 0;
+    padding: 0;
+    background: #8FB7DB url(diag_lines_bg.gif) top left;
+}
+
+#LoginScreen-content {
+    width: 450px;
+    top: 50%;
+    left: 50%;
+    margin-left: -225px;
+    margin-top: -161px;
+    position: absolute;
+}
+
+.LoginScreen-titlebar {
+    background-color: #333;
+    padding: 10px;
+    border-bottom: 1px dotted #CCC;
+}
+
+.LoginScreen-main {
+    background: url(transparent_white_20pc.png);
+    padding: 20px 47px;
+    margin: 0 auto;
+}
+
+.LoginScreen-main p {
+    margin: 0.5em 0;
+    padding: 0 0 0 6px;
+    font-weight: bold;
+    width: 326px;
+    overflow: hidden;
+}
+
+.LoginScreen-main .form-top {
+    background: url(login_form_top.png);
+    height: 13px;
+    width: 356px;
+}
+
+.LoginScreen-main .form-bottom {
+    background: url(login_form_bottom.png);
+    height: 13px;
+    width: 356px;
+}
+
+.LoginScreen-main form {
+    background: url(login_form_bg.png);
+    width: 356px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.LoginScreen-main form label {
+    float: left;
+    width: 100px;
+    padding-left: 10px;
+    line-height: 20px;
+}
+
+.LoginScreen-main form input, .LoginScreen-main form label {
+    margin: 10px 0 0 10px;
+}
+
+.LoginScreen-main form input {
+    width: 198px;
+}
+
+.LoginScreen-main .error {
+    color: #F00;
+    font-weight: bold;
+    padding-left: 20px;
+    font-size: 0.9em;
+}
+
+.LoginScreen-main .GUIButton {
+    float: right;
+    margin-top: 15px;
+}
