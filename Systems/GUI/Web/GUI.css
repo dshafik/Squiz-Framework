@@ -10,19 +10,6 @@
     -moz-border-radius: 5px;
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: arial;
-    font-size: 12px;
-    color: #000;
-}
-
-* {
-    margin:0;
-    padding:0;
-}
-
 .GUI-screen-left {
     width: 250px;
     float: left;
@@ -68,4 +55,15 @@ body {
 
 .GUI-delete.deleted .GUI-deleteIcon {
     background-position: 0 -16px;
+}
+.GUI-textOverflow {
+    position: relative;
+    height: 1.4em;
+}
+.GUI-textOverflow-text {
+    position: absolute;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
