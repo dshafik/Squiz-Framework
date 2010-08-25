@@ -2,11 +2,9 @@
     position: relative;
     overflow: hidden;
     margin-bottom: 12px;
-/*     border: 1px solid; */
-/*     border-color: #3F71B8 #3F71B8 #113262; */
     border-radius: 9px;
     -moz-border-radius: 9px;
-    background-color: #162C63;
+    background-color: #123363;
 }
 
 .GUIInfoBox-top {
