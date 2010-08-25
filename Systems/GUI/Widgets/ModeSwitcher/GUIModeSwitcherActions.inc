@@ -83,7 +83,7 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
             }
 
             echo '<li id="'.$id.'-'.$mode['id'].'" class="'.$class.'-modeButton'.$selected.'">';
-            echo '<a href="#" modeid="'.$mode['id'].'" system="'.$modeSystem.'">'.$mode['label'].'</a></li>';
+            echo '<a href="javascript:" modeid="'.$mode['id'].'" system="'.$modeSystem.'">'.$mode['label'].'</a></li>';
 
             $posClass = '';
         }
@@ -128,7 +128,7 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
             $modeSystem = Util::getArrayIndex($item, 'system', '');
 
             echo '<li class="'.$posClass.$selected.'">';
-            echo '<a href="#" modeid="'.$item['id'].'" system="'.$modeSystem.'">';
+            echo '<a href="javascript:" modeid="'.$item['id'].'" system="'.$modeSystem.'">';
             echo $item['label'].'</a></li>';
 
             $posClass = '';
