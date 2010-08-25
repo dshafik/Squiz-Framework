@@ -32,7 +32,7 @@ var LoginScreen = new function()
                 self.displayError(data.error);
                 return false;
             } else {
-                window.location = window.location.replace('#', '');
+                window.location = url;
                 return true;
             }
         };
