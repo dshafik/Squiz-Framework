@@ -110,6 +110,13 @@ class DAL
     private static $_currentQueryLog = NULL;
 
     /**
+     * PDO prepared statements cache.
+     *
+     * @var array
+     */
+    private static $_queryCache = array();
+
+    /**
      * ID for different DALConf files.
      *
      * When its
@@ -210,7 +217,7 @@ class DAL
             }//end if
         } else if ($dalQuery instanceof Query) {
             self::_startQueryTimer($dalQuery->getQueryid());
-            $query = $dalQuery->prepare();
+            $query = self::_prepareQuery($dalQuery);
             self::execPdoQuery($query);
             if ($col !== NULL) {
                 $result = $query->fetchAll(PDO::FETCH_COLUMN, $col);
@@ -237,7 +244,7 @@ class DAL
     {
         self::_startQueryTimer($dalQuery->getQueryid());
         $result = array();
-        $query  = $dalQuery->prepare();
+        $query  = self::_prepareQuery($dalQuery);
         self::execPdoQuery($query);
         $result = $query->fetchAll();
         self::_endQueryTimer();
@@ -281,9 +288,9 @@ class DAL
                     return $item;
                 }
             }//end foreach
-        } else if (DAL::isDalQuery($dalQuery) === TRUE) {
+        } else if (self::isDALQuery($dalQuery) === TRUE) {
             self::_startQueryTimer($dalQuery->getQueryid());
-            $query = $dalQuery->prepare();
+            $query = self::_prepareQuery($dalQuery);
             self::execPdoQuery($query);
 
             $res = $query->fetchColumn($columnIndex);
@@ -364,7 +371,7 @@ class DAL
 
             $result = $ret;
         } else if ($dalQuery instanceof Query) {
-            $query = $dalQuery->prepare();
+            $query = self::_prepareQuery($dalQuery);
             try {
                 self::execPdoQuery($query);
             } catch (PDOException $e) {
@@ -458,7 +465,7 @@ class DAL
 
             $result = $ret;
         } else if ($query instanceof Query) {
-            $query = $query->prepare();
+            $query = self::_prepareQuery($query);
             try {
                 self::execPdoQuery($query);
             } catch (PDOException $e) {
@@ -604,7 +611,7 @@ class DAL
         if (($systemid instanceof Query) === TRUE) {
             self::_startQueryTimer($systemid->getQueryid());
             $query = $systemid;
-            $query = $query->prepare();
+            $query = self::_prepareQuery($query);
         } else if ($queryid === NULL) {
             throw new DALException('No queryid provided for executeQuery.');
         } else {
@@ -856,6 +863,59 @@ class DAL
         return $res;
 
     }//end lastInsertId()
+
+
+    /**
+     * Prepares the given DAL Query.
+     *
+     * Stores the prepared query in a cache array so that PDO prepare statement
+     * is not called for same query multiple times.
+     *
+     * @param Query $query A DAL Query object.
+     *
+     * @return PDOStatement
+     */
+    private static function _prepareQuery(Query $query)
+    {
+        $pdoQuery = NULL;
+        $pdoQuery = $query->prepare();
+
+        return $pdoQuery;
+
+    }//end _prepareQuery()
+
+
+    /**
+     * Adds PDOStatement object to cache.
+     *
+     * @param string $queryHash    Hash of a prepared query.
+     * @param object $pdoStatement The PDOStatement object to cache.
+     *
+     * @return mixed
+     */
+    public static function addQueryCache($queryHash, $pdoStatement)
+    {
+         self::$_queryCache[$queryHash] = $pdoStatement;
+
+    }//end addQueryCache()
+
+
+    /**
+     * Returns PDOStatement object for specified query hash or NULL if not cached.
+     *
+     * @param string $queryHash Hash of a prepared query.
+     *
+     * @return mixed
+     */
+    public static function getQueryCache($queryHash)
+    {
+        if (isset(self::$_queryCache[$queryHash]) === TRUE) {
+            return self::$_queryCache[$queryHash];
+        }
+
+        return NULL;
+
+    }//end getQueryCache()
 
 
     /*

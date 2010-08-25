@@ -375,9 +375,15 @@ class Query
         // Update sqlString..
         $this->_sqlString = $sql;
 
-        // Prepare PDO statement.
-        $dbh   = DAL::getDb();
-        $query = $dbh->prepare($sql);
+        $queryHash = hash('md5', $sql);
+        $query     = DAL::getQueryCache($queryHash);
+        if ($query === NULL) {
+            // Prepare PDO statement.
+            $dbh   = DAL::getDb();
+            $query = $dbh->prepare($sql);
+            DAL::addQueryCache($queryHash, $query);
+        }
+
         // Add bindings to PDO.
         foreach ($this->_bindings as $binding) {
             $query->bindValue($binding['name'], $binding['value'], $binding['type']);
