@@ -51,6 +51,48 @@ class GUIListActions
 
 
     /**
+     * Controls whether the items should be editable.
+     *
+     * @var boolean
+     */
+    protected static $editable = FALSE;
+
+
+    /**
+     * Controls whether addition of new items to the list is allowed.
+     *
+     * Ignored when a list is not editable.
+     *
+     * @var boolean
+     */
+    protected static $allowAdd = FALSE;
+
+
+    /**
+     * Controls whether marking items for deletion is allowed.
+     *
+     * Ignored when a list is not editable.
+     *
+     * This widget never deletes any rows from the interface. This setting provides
+     * a "delete" icon to the right of the item, which marks the option as deleted.
+     * This will be sent to the saving function with data marking it as deleted.
+     *
+     * @var boolean
+     */
+    protected static $allowDelete = FALSE;
+
+
+    /**
+     * Sets the default, greyed text to appear on the "add new item" text box.
+     *
+     * Ignored when a list is not editable, or if adding is prohibited.
+     *
+     * @var boolean
+     */
+    protected static $addText = _('Add new item...');
+
+
+    /**
      * Returns this widgets content.
      *
      * @param array $settings The list of settings for this widget.
@@ -59,17 +101,32 @@ class GUIListActions
      */
     public static function paint(array $settings=array())
     {
-        echo '<div class="%class%-left" id="%id%-left">';
-        echo '<div class="%class%-right" id="%id%-right">';
-        echo '<ul class="%class%" id="%id%">';
+        $id       = $settings['widget']['id'];
+        $class    = $settings['widget']['type'];
+        $sortable = Util::getArrayIndex($settings, 'sortable', self::$sortable);
+        $editable = Util::getArrayIndex($settings, 'editable', self::$editable);
 
-        // Print the list items.
-        GUIList::paintItems(
-            $settings['items'],
-            (bool) $settings['sortable'],
-            $settings['widget']['id'],
-            $settings['widget']['type']
-        );
+        echo '<div class="'.$class.'-left" id="'.$id.'-left">';
+        echo '<div class="'.$class.'-right" id="'.$id.'-right">';
+        echo '<ul class="'.$class.'" id="'.$id.'">';
+
+        $title = _('Click and drag to change order');
+
+        foreach ($settings['items'] as $itemIndex => $item) {
+            echo '<li>';
+            if ($sortable === TRUE) {
+                echo '<span class="'.$class.'-dragHandle" title="'.$title.'"></span>';
+            }
+
+            if ($editable === TRUE) {
+                $fieldName = $id.'-list-item-'.$itemIndex;
+                echo '<div class="editableItem">';
+                echo '<input type="text" id="'.$fieldName.'" value="'.htmlentities($item).'" />';
+                echo '</div>';
+            } else {
+                echo htmlentities($item);
+            }
+        }
 
         echo '</ul>';
         echo '</div>';
@@ -78,33 +135,6 @@ class GUIListActions
         return $settings;
 
     }//end paint()
-
-
-    /**
-     * Paint the items of the list.
-     *
-     * @param array   $items    An array of items to print.
-     * @param integer $sortable Should drag-handles be printed.
-     * @param string  $id       The ID used by the list.
-     * @param string  $class    The class used by the list.
-     *
-     * @return void
-     */
-    public static function paintItems(array $items, $sortable, $id, $class)
-    {
-        $sortable = (int) $sortable;
-        $title    = _('Click and drag to change order');
-
-        foreach ($items as $item) {
-            echo '<li>';
-            if ($sortable === 1) {
-                echo '<span class="'.$class.'-dragHandle" title="'.$title.'"></span>';
-            }
-
-            echo $item.'</li>';
-        }
-
-    }//end paintItems()
 
 
 }//end class

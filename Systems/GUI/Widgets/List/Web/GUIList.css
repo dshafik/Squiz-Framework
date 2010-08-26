@@ -35,3 +35,17 @@
     margin: 5px 10px 0px 2px;
     cursor: move;
 }
+
+.GUIList .editableItem {
+    border: 1px solid #CECECE;
+    position: relative;
+    margin: 5px 0pt 5px 31px;
+    padding: 0 2px;
+}
+
+.GUIList .editableItem input {
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    padding: 2px 0;
+}
