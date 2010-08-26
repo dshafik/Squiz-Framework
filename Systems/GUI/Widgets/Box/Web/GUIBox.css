@@ -31,6 +31,7 @@
 }
 
 .GUIBox-content {
+    position: relative;
     border: 1px solid #dcdcdc;
     border-top: none;
     border-bottom-left-radius: 9px;
@@ -38,6 +39,26 @@
     -moz-border-radius-bottomleft: 9px;
     -moz-border-radius-bottomright: 9px;
     padding-bottom: 5px;
+}
+.GUIBox-contentFooter {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5px;
+}
+.GUIBox-contentFooter span {
+    display: block;
+    height: 5px;
+    margin: 0 1px;
+    background-color: #EDEDED;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#EEE));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #FFF, #EEE);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#FFF, endColorstr=#EEE);
+    border-bottom-left-radius: 9px;
+    border-bottom-right-radius: 9px;
+    -moz-border-radius-bottomleft: 9px;
+    -moz-border-radius-bottomright: 9px;
 }
 
 .GUIBox.noLeftBorder .GUIBox-header {

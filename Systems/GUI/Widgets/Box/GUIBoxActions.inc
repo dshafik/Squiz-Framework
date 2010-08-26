@@ -128,6 +128,7 @@ class GUIBoxActions
             echo $settings['content'];
         }
 
+        echo '<div class="'.$class.'-contentFooter"><span></span></div>';
         echo '</div><!--end box content-->';
         echo '</div>';
 
