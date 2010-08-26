@@ -1,0 +1,82 @@
+.GUIColumnBrowser {
+    height: 100%;
+    width: 100%;
+    background-color: #FFF;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.GUIColumnBrowser-columnWrapper {
+    height: 100%;
+}
+
+.GUIColumnBrowser-column {
+    background: url(col_bg.png) repeat-y 100% 0;
+    float: left;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+    display: none;
+}
+
+.GUIColumnBrowser-column-card {
+    display: none;
+    width: 200px;
+}
+
+.GUIColumnBrowser-item {
+    line-height: 27px;
+    position: relative;
+}
+
+.GUIColumnBrowser-item-childCount {
+    position: absolute;
+    right: 0;
+    width: 34px;
+    height: 27px;
+    background: url(child_arrow.png) no-repeat;
+    margin-top: -14px;
+    top: 50%;
+}
+
+.GUIColumnBrowser-item-childCount span {
+    float: left;
+    width: 27px;
+    text-align: center;
+}
+
+.GUIColumnBrowser-item-content {
+    border-bottom: 1px solid #CCC;
+    background-color: #FFF;
+    margin-right: 14px;
+}
+
+.GUIColumnBrowser-column.level-0,
+.GUIColumnBrowser-column.level-0 .GUIColumnBrowser-column-card {
+    display: block;
+}
+
+.GUIColumnBrowser-column-card.visible,
+.GUIColumnBrowser-column.visible {
+    display: block;
+}
+
+.GUIColumnBrowser-column .GUIColumnBrowser-item.selected .GUIColumnBrowser-item-content {
+    background-color: #C5DCFE;
+}
+
+.GUIColumnBrowser-column.active .GUIColumnBrowser-item.selected .GUIColumnBrowser-item-content {
+    color: #FFF;
+    background-color: #90B1F8;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#90B1F8), to(#5681CC));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #90B1F8, #5681CC);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#90B1F8, endColorstr=#5681CC);
+}
+
+.GUIColumnBrowser-column .GUIColumnBrowser-item.selected .GUIColumnBrowser-item-childCount {
+    background-image: url(child_arrow_inact.png);
+}
+
+.GUIColumnBrowser-column.active .GUIColumnBrowser-item.selected .GUIColumnBrowser-item-childCount {
+    background-image: url(child_arrow_act.png);
+}

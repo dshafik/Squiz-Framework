@@ -1,0 +1,20 @@
+.GUILineage ul {
+    list-style: none;
+    background: url(lineage_bg.png) repeat-x;
+    line-height: 22px;
+    overflow: hidden;
+}
+
+.GUILineage li {
+    display: inline;
+}
+
+.GUILineage li a {
+    display: block;
+    float: left;
+    line-height: 22px;
+    padding-right: 15px;
+    padding-left: 5px;
+    background: url(lineage_arrow.png) no-repeat 100% 0;
+    font-size: 11px;
+}

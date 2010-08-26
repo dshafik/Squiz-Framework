@@ -5,7 +5,7 @@ table.GUITable {
 .GUITable th, .GUITable td {
     font-family: arial;
     font-weight: normal;
-    font-size: 11px;
+    font-size: 12px;
     padding: 4px 15px;
 }
 
@@ -60,3 +60,14 @@ table.GUITable {
 .GUITable.selectable tr {
     cursor: pointer;
 }
+
+/* Delete button override */
+.GUITable-lastCol .GUI-delete {
+    position: relative;
+    float: right;
+}
+
+.GUITable-lastCol .GUI-delete .GUI-deleteIcon {
+    margin: 0;
+}
+
