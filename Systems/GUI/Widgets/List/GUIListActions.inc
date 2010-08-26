@@ -89,7 +89,7 @@ class GUIListActions
      *
      * @var boolean
      */
-    protected static $addText = _('Add new item...');
+    protected static $addText = '';
 
 
     /**
@@ -101,21 +101,29 @@ class GUIListActions
      */
     public static function paint(array $settings=array())
     {
-        $id       = $settings['widget']['id'];
-        $class    = $settings['widget']['type'];
-        $sortable = Util::getArrayIndex($settings, 'sortable', self::$sortable);
-        $editable = Util::getArrayIndex($settings, 'editable', self::$editable);
+        $id          = $settings['widget']['id'];
+        $class       = $settings['widget']['type'];
+        $sortable    = Util::getArrayIndex($settings, 'sortable', self::$sortable);
+        $editable    = Util::getArrayIndex($settings, 'editable', self::$editable);
+        $allowAdd    = Util::getArrayIndex($settings, 'allowAdd', self::$allowAdd);
+        $allowDelete = Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete);
+        $addText     = Util::getArrayIndex($settings, 'addText', _('Add new row...'));
 
         echo '<div class="'.$class.'-left" id="'.$id.'-left">';
         echo '<div class="'.$class.'-right" id="'.$id.'-right">';
         echo '<ul class="'.$class.'" id="'.$id.'">';
 
-        $title = _('Click and drag to change order');
+        $sortTitle   = _('Click and drag to change order');
+        $deleteTitle = _('Click to mark item as deleted. Click again to unmark.');
 
         foreach ($settings['items'] as $itemIndex => $item) {
             echo '<li>';
             if ($sortable === TRUE) {
-                echo '<span class="'.$class.'-dragHandle" title="'.$title.'"></span>';
+                echo '<span class="'.$class.' dragHandle" title="'.$sortTitle.'"></span>';
+            }
+
+            if ($allowDelete === TRUE) {
+                echo '<span class="'.$class.' deleteIcon" title="'.$deleteTitle.'"></span>';
             }
 
             if ($editable === TRUE) {
@@ -125,7 +133,28 @@ class GUIListActions
                 echo '</div>';
             } else {
                 echo htmlentities($item);
+            }//end if
+
+            echo '</li>';
+
+        }//end foreach
+
+        if (($editable === TRUE) && ($allowAdd === TRUE)) {
+            echo '<li class="newRow">';
+            if ($sortable === TRUE) {
+                echo '<span class="'.$class.' dragHandle" title="'.$sortTitle.'"></span>';
             }
+
+            if ($allowDelete === TRUE) {
+                echo '<span class="'.$class.' deleteIcon" title="'.$deleteTitle.'"></span>';
+            }
+
+            $fieldName = $id.'-list-item-'.$itemIndex;
+            echo '<div class="editableItem">';
+            echo '<input type="text" id="'.$fieldName.'" value="'.htmlentities($addText).'" />';
+            echo '</div>';
+
+            echo '</li>';
         }
 
         echo '</ul>';

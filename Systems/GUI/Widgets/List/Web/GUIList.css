@@ -27,7 +27,7 @@
     background: transparent url(listShadowRight.png) 100% 0 repeat-y;
 }
 
-.GUIList-dragHandle {
+.GUIList .dragHandle {
     float: left;
     height: 18px;
     width: 19px;
@@ -36,16 +36,42 @@
     cursor: move;
 }
 
+.GUIList .deleteIcon {
+    float: right;
+    height: 16px;
+    width: 16px;
+    background: url(delete_recover.png) left top no-repeat;
+    margin: 6px 2px 0px 10px;
+    cursor: pointer;
+}
+
+.GUIList li.deleted {
+    background: url(delete_overlay.png) center bottom white;
+}
+
+.GUIList li.deleted .deleteIcon {
+    background-position: left bottom;
+}
+
+.GUIList li.newRow .deleteIcon, .GUIList li.newRow .dragHandle {
+    visibility: hidden;
+}
+
 .GUIList .editableItem {
-    border: 1px solid #CECECE;
+    border: 1px solid #C2C3C5;
+    background-color: white;
     position: relative;
-    margin: 5px 0pt 5px 31px;
-    padding: 0 2px;
+    margin: 5px 28px 5px 31px;
+    padding: 2px;
 }
 
 .GUIList .editableItem input {
     border: none;
-    background-color: transparent;
     width: 100%;
-    padding: 2px 0;
+    padding: 0;
+}
+
+.GUIList li.newRow .editableItem input {
+    color: #AAA;
+    font-style: italic;
 }
