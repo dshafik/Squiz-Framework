@@ -30,11 +30,11 @@ if ((php_sapi_name() !== 'cli')) {
 $rootdir = dirname(dirname(__FILE__));
 chdir($rootdir);
 
-echo '1. Removing files from the data directory';
+echo '1. Cleaning the data directory';
 system('rm -rf '.$rootdir.'/data/* >> /dev/null 2>&1');
 echoDone();
 
-echo '2. Cleaning out the web directory';
+echo '2. Cleaning the web directory';
 system('rm -rf '.$rootdir.'/web/* >> /dev/null 2>&1');
 echoDone();
 
@@ -47,11 +47,11 @@ echo '4. Cleaning Channels Oven directory';
 system('rm -rf '.$rootdir.'/Channels/Oven/* >> /dev/null 2>&1');
 echoDone();
 
-echo '5. Clean up ._ files from OS X';
+echo '5. Cleaning ._ files from OS X';
 system('find '.$rootdir.' -name "._*" -exec rm {} \; >> /dev/null 2>&1');
 echoDone();
 
-echo '6. Fix file system permissions for broken systems';
+echo '6. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
 echoDone();
 
@@ -83,7 +83,7 @@ require_once $rootdir.'/Libs/FileSystem/FileSystem.inc';
 $systemNames = Install::getInstallOptions(FALSE, FALSE);
 
 // Clean up data and oven dir before full install.
-echo '9. Clean data & oven dir';
+echo '9. Cleaning data & oven directories';
 system('rm -rf ./data/* >> /dev/null 2>&1');
 system('rm -rf '.$rootdir.'/DAL/QueryStore/* >> /dev/null 2>&1');
 system('rm -rf '.$rootdir.'/DAL/Oven/* >> /dev/null 2>&1');
@@ -94,7 +94,7 @@ echo '10. Preparing data directories';
 Install::prepareDataDir($rootdir, $url);
 echoDone();
 
-echo '11. Rebaking Oven';
+echo '11. Rebaking oven';
 Install::rebakeOven($rootdir, $url);
 echoDone();
 
@@ -110,14 +110,24 @@ echo '14. Running system install methods';
 Install::runSystemInstallMethods($systemNames);
 echoDone();
 
-echo '15. Initialising Product';
+echo '15. Initialising product';
 $initProductScript = $rootdir.'/initialise_product.php';
 if (file_exists($initProductScript) === TRUE) {
     include_once $initProductScript;
+    echoDone();
+} else {
+    echoSkip();
 }
-echoDone();
 
-echo '16. Copying web files';
+echo '16. Generating help docs';
+if (file_exists($rootdir.'/Systems/Help/Scripts/generate_docs.php') === TRUE) {
+    system('/usr/bin/php '.$rootdir.'/Systems/Help/Scripts/generate_docs.php >> /dev/null 2>&1');
+    echoDone();
+} else {
+    echoSkip();
+}
+
+echo '17. Copying web files';
 Install::copyWebFiles();
 echoDone();
 
@@ -125,7 +135,7 @@ require_once $rootdir.'/data/init.inc';
 require_once $rootdir.'/Channels/Channels.inc';
 require_once $rootdir.'/Systems/BaseSystem.inc';
 
-echo '17. Giving error_log 777 permission for developers';
+echo '18. Giving error_log 777 permission for developers';
 if (file_exists($rootdir.'/error_log') === FALSE) {
     file_put_contents($rootdir.'/error_log', '');
 }//end if
@@ -133,7 +143,7 @@ if (file_exists($rootdir.'/error_log') === FALSE) {
 system('chmod 777 '.$rootdir.'/error_log');
 echoDone();
 
-echo '18. Fixing file system permissions';
+echo '19. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
 echoDone();
 
@@ -187,6 +197,18 @@ function echoDone()
     echo exec('echo -en "\033[54G"; echo -n "[ " ; echo -en "\033[0;32mDone" ; tput sgr0 ; echo " ]"')."\n";
 
 }//end echoDone()
+
+
+/**
+ * Echo skip function.
+ *
+ * @return void
+ */
+function echoSkip()
+{
+    echo exec('echo -en "\033[54G"; echo -n "[ " ; echo -en "\033[0;33mSkip" ; tput sgr0 ; echo " ]"')."\n";
+
+}//end echoSkip()
 
 
 ?>
