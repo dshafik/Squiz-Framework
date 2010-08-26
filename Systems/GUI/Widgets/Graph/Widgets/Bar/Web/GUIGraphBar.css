@@ -237,6 +237,7 @@ ul.GUIGraphBar-data-row ul {
 .GUIGraphBar .row-bg {
     background-color: #000;
     opacity: 0.0;
+    filter: alpha(opacity = 0);
     z-index: 0;
     position: absolute;
     left: 0;
@@ -249,6 +250,7 @@ ul.GUIGraphBar-data-row ul {
 
 .GUIGraphBar .GUIGraphBar-data-row.hover .row-bg {
     opacity: 0.04;
+    filter: alpha(opacity = 4);
 }
 
 .GUIGraphBar .tooltip .title  {
