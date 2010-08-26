@@ -696,7 +696,11 @@ class GUIGraphBarActions
                 || array_key_exists('tooltipFooter', $dataRow)
                 || (count($tooltipRows) > 0)) {
 
-                echo '<li class="tooltip">';
+                // The class arrowPosition-topMid is set by default on the tooltip LI
+                // Override class with arrowPosition-topRight at run-time where needed
+                // This will automatically position both the tooltip and the arrow
+                echo '<li class="tooltip  arrowPosition-topMid">'; 
+                echo '<div class="tooltipArrow"></div>';
                 if (array_key_exists('tooltipTitle', $dataRow)) {
                     echo '<div class="title">';
                     echo $dataRow['tooltipTitle'];

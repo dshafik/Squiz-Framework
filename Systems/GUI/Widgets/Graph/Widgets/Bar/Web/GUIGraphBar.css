@@ -196,9 +196,8 @@ ul.GUIGraphBar-data-row ul {
     background-color: #FFF;
     padding: 8px;
     position: relative;
-    top: -15px;
+    top: 4px;
     width: 200px;
-    left: -85px;
     visibility: hidden;
     z-index: 1000;
     display: block;
@@ -207,6 +206,32 @@ ul.GUIGraphBar-data-row ul {
     -moz-border-radius: 11px;
     -webkit-box-shadow: 0 2px 12px #666;
     -moz-box-shadow: 0 2px 12px #666;
+    border: 4px solid #EFEFEF;
+}
+
+.GUIGraphBar .tooltip.arrowPosition-topMid {
+    left: 50%;
+    margin-left: -112px;
+}
+.GUIGraphBar .tooltip.arrowPosition-topRight {
+    left: 50%;
+    margin-left: -184px;
+}
+.GUIGraphBar .tooltipArrow {
+    position: absolute;
+    width: 42px;
+    height: 31px;
+    top: -31px;
+    background-image: url(arrow-top.png);
+}
+.GUIGraphBar .tooltip.arrowPosition-topMid .tooltipArrow {
+    left: 50%;
+    margin-left: -21px;
+    background-position: 0 0;
+}
+.GUIGraphBar .tooltip.arrowPosition-topRight .tooltipArrow {
+    right: 15px;
+    background-position: 0 0;
 }
 
 .GUIGraphBar .row-bg {
