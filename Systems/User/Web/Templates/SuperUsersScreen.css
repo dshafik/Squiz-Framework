@@ -1,0 +1,9 @@
+#SuperUsersScreen {
+    width: 1000px;
+    margin: 0 auto;
+}
+
+.addNewButtonContainer {
+    float: right;
+    margin: 5px 10px 0 0;
+}

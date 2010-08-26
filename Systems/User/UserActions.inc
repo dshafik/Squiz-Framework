@@ -431,6 +431,21 @@ class UserActions
     }//end _handleLoginFormRequest()
 
 
+    public static function getSuperUsersList()
+    {
+        $users = array();
+        $users[123] = array(
+                        'user' => 'Admin User',
+                        'email' => 'blah@blah.com',
+                        'lastLogin' => 'Yesterday',
+                        'remove' => '<div class="GUI-delete"><span class="GUI-deleteIcon"></div>',
+                       );
+
+        return $users;
+
+    }//end
+
+
 }//end class
 
 ?>
