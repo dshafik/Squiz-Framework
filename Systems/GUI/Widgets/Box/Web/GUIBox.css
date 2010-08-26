@@ -54,7 +54,7 @@
     background-color: #EDEDED;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#EEE));
     background-image: -moz-linear-gradient(0% 0% -90deg, #FFF, #EEE);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#FFF, endColorstr=#EEE);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#FFFFFF, endColorstr=#EEEEEE);
     border-bottom-left-radius: 9px;
     border-bottom-right-radius: 9px;
     -moz-border-radius-bottomleft: 9px;
