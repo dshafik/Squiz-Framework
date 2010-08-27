@@ -155,6 +155,55 @@ class FileSystem
 
 
     /**
+     * Return the size of the directory in file system.
+     *
+     * It uses 'du' system command to get the directory size.
+     * On success, it returns the string of the size of a diretory.
+     * It also returns FLASE on failure.
+     *
+     * @param string  $dirpath        Directory to get the size of.
+     * @param boolean $humanReadable  By default, it's TRUE. If FALSE
+     *                                the command won't have 'h' option.
+     * @param string  $excludePattern Optional excluding pattern to skip
+     *                                sub folders that are matched.
+     *
+     * @return string|boolean
+     */
+    public static function getDirectorySize(
+        $dirpath,
+        $humanReadable=TRUE,
+        $excludePattern=''
+    ) {
+        $commandPath = '/usr/bin/du';
+        if (is_executable($commandPath) === FALSE) {
+            return FALSE;
+        }
+
+        if (file_exists($dirpath) === FALSE) {
+            return FALSE;
+        }
+
+        $options = '-s';
+        if ($humanReadable === TRUE) {
+            $options .= 'h';
+        }
+
+        if (empty($excludePattern) === FALSE) {
+            $options .= ' --exclude='.$excludePattern;
+        }
+
+        $output  = array();
+        $command = $commandPath.' '.$options.' '.$dirpath;
+        exec($command, $output);
+
+        $result = implode($output, '');
+        $result = trim(str_replace($dirpath, '', $result));
+        return $result;
+
+    }//end getDirectorySize()
+
+
+    /**
      * Serves file.
      *
      * @param string $filePath Path to the file.
