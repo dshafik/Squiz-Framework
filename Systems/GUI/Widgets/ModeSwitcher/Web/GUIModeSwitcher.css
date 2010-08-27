@@ -95,6 +95,7 @@
 
 .GUIContentSwitcher.GUIModeSwitcher li.positionFirst a {
     padding-left: 1.8em;
+    border: none;
 }
 
 .GUIModeSwitcher-overflow {
