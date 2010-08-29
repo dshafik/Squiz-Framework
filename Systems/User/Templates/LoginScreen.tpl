@@ -13,7 +13,9 @@
             <form id="loginForm" action="" method="post" onsubmit="return LoginScreen.submit();">
                 <p id="LoginError" class="error"> </p>
                 <label for="loginName-input"><text>Username</text></label>
-                <widget type="GUI/TextBox" id="loginName"></widget>
+                <widget type="GUI/TextBox" id="loginName">
+                    <setting name="focus">true</setting>
+                </widget>
                 <br />
                 <label for="loginPassword-input"><text>Password</text></label>
                 <widget type="GUI/TextBox" id="loginPassword">
