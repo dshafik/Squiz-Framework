@@ -59,6 +59,17 @@ class GUITextBoxActions
      */
     protected static $type = 'text';
 
+    /**
+     * If TRUE then the input box will have the focus.
+     *
+     * It is possible that this input box may not have the focus if there are
+     * elements on the screen that also have focus set to TRUE.
+     *
+     * @var boolean
+     * @internal
+     */
+    protected static $focus = FALSE;
+
 
     /**
      * Prints this widgets content.
@@ -109,6 +120,11 @@ class GUITextBoxActions
         echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength.' />';
 
         echo '</div>';
+
+        // If focus set to true then add JS code.
+        if (Util::getArrayIndex($settings, 'focus', self::$focus) === TRUE) {
+             echo '<script>dfx.addLoadEvent(function() {document.getElementById("'.$id.'-input").focus();});</script>';
+        }
 
         return $settings;
 
