@@ -406,6 +406,28 @@ class Web
     }//end header()
 
 
+    /**
+     * Turns a string into a valid web path.
+     *
+     * @param string $path String to fix.
+     *
+     * @return string
+     */
+    public static function makeValidWebPathString($path)
+    {
+        $path = strtolower(trim($path));
+        $path = ltrim($path, '_');
+        $path = str_replace('&', '_and_', $path);
+        $path = preg_replace('/\\s+/', '-', $path);
+        $path = preg_replace('/[\(\)\[\]]/', '', $path);
+        $path = preg_replace('/[^a-zA-Z0-9\-$_@.!*~(),]/', '', $path);
+        $path = preg_replace('/\-+/', '-', $path);
+
+        return $path;
+
+    }//end makeValidWebPathString()
+
+
 }//end class
 
 ?>
