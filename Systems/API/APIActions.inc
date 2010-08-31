@@ -136,7 +136,6 @@ class APIActions
 
         // Token validation for every request.
         Channels::includeSystem('User');
-        Channels::includeSystem('Session');
         $userid = User::getCurrentUserid();
 
         if ($userid !== NULL && $userid !== 0) {
@@ -243,7 +242,17 @@ class APIActions
 
         Channels::includeSystem($system);
         try {
-            $responseContent['result'] = self::_getActionResult($system, $action, $params);
+            ob_start();
+                $returnValue = self::_getActionResult($system, $action, $params);
+                $output      = ob_get_contents();
+            ob_end_clean();
+
+            if ($returnValue === NULL) {
+                $responseContent['result'] = $output;
+            } else {
+                $responseContent['result'] = $returnValue;
+            }
+
             $response = 200;
         } catch (Exception $e) {
             $responseContent['exception'] = $e->getMessage();
@@ -924,7 +933,7 @@ class APIActions
         $result = '';
         if (is_scalar($content) === TRUE) {
             $result = json_encode($content);
-        } else if (is_null($content) === TRUE) {
+        } else if ($content === NULL) {
             $result = 'null';
         } else if (is_array($content) === TRUE) {
             $type = 'array';
@@ -1129,7 +1138,7 @@ class APIActions
     /**
      * Get a new unique token for API call.
      *
-     * @return void
+     * @return string
      */
     public static function getUniqueToken()
     {
@@ -1151,7 +1160,7 @@ class APIActions
         Channels::includeSystem('Session');
         Channels::includeSystem('User');
 
-        $userid = User::getCurrentUserid();
+        $userid    = User::getCurrentUserid();
         $userToken = Session::getSessionData('API', 'userToken:'.$userid);
         return $userToken;
 
@@ -1163,14 +1172,14 @@ class APIActions
      *
      * @param string $token The new token.
      *
-     * @return string
+     * @return void
      */
     public static function setUserToken($token)
     {
         Channels::includeSystem('Session');
         Channels::includeSystem('User');
 
-        $userid = User::getCurrentUserid();
+        $userid    = User::getCurrentUserid();
         $userToken = Session::setSessionData('API', 'userToken:'.$userid, $token);
 
     }//end setUserToken()
