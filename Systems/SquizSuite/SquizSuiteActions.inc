@@ -75,6 +75,17 @@ class SquizSuiteActions
     {
         $query  = DAL::getDALQuery('SquizSuite', 'getAllProducts');
         $result = DAL::getAssoc($query);
+        foreach ($result as &$p) {
+            $p['connection'] = unserialize($p['connection']);
+        }
+
+        foreach ($result as $product) {
+            $systemid = $product['systemid'];
+            if (array_key_exists($systemid, self::$_productCache) === FALSE) {
+                self::$_productCache[$systemid] = $product;
+            }
+        }
+
         return $result;
 
     }//end getAllProducts()
@@ -110,6 +121,23 @@ class SquizSuiteActions
         return $product;
 
     }//end getProduct()
+
+
+    /**
+     * Return the current product details.
+     *
+     * @return array
+     */
+    public static function getCurrentProduct()
+    {
+        $products = SquizSuite::getAllProducts();
+        foreach ($products as $product) {
+            if ($product['current'] === TRUE) {
+                return $product;
+            }
+        }
+
+    }//end getCurrentProduct()
 
 
     /**
@@ -253,24 +281,29 @@ class SquizSuiteActions
     /**
      * Send suite specific message to other system.
      *
-     * @param string $systemid ID of the destined system.
+     * @param string $targetid System ID to send the message to OR
+     *                         the API URL when sendConnect message is being
+     *                         sent.
      * @param string $msgType  Type of message to send.
      *
-     * @return void
+     * @return mixed
      * @throws ChannelException Error occurred.
      */
-    public static function sendMessage($systemid, $msgType)
+    public static function sendMessage($targetid, $msgType)
     {
-        $productInfo = SquizSuite::getProduct($systemid);
-        if (empty($productInfo) === TRUE) {
-            $errMsg = $systemid.' is not known. Cannot send '.$msgType.' to it.';
-            throw new ChannelException($errMsg);
+        if ($msgType !== 'suiteConnect') {
+            $productInfo = SquizSuite::getProduct($targetid);
+            if (empty($productInfo) === TRUE) {
+                $errMsg = $targetid.' is not known. Cannot send '.$msgType.' to it.';
+                throw new ChannelException($errMsg);
+            }
         }
 
         $dom = self::_createSuiteMessageDOMTemplate();
         self::_createSuiteMessageDOM($dom, $msgType);
         $xml = $dom->saveXML();
 
+        $apiURL         = '';
         $msg            = array();
         $msg['_format'] = 'xml';
         $msg['_system'] = 'SquizSuite';
@@ -281,17 +314,19 @@ class SquizSuiteActions
         if ($msgType === 'suiteConnect') {
             $msg['xml']         = $xml;
             $msg['con_request'] = 1;
+            $apiURL             = $targetid;
         } else {
             $msg['_enc']            = $xml;
-            $msg['_pubKeySystemid'] = $systemid;
+            $msg['_pubKeySystemid'] = $targetid;
+            $apiURL                 = $productInfo['connection']['url'];
         }
 
         $currProductInfo = SquizSuite::getProduct();
         $userAgentStr    = self::$_userAgentPrefix.$currProductInfo['type'].'/4.0';
         Channels::includeSystem('API');
-        self::_logSentMessage($systemid, $msgType);
+        self::_logSentMessage($targetid, $msgType);
         $result = API::sendCURLAPIRequest(
-            $productInfo['connection']['url'],
+            $apiURL,
             $msg,
             $userAgentStr
         );
@@ -301,6 +336,8 @@ class SquizSuiteActions
             $errMsg .= var_export($result, 1)."\n";
             self::_logErrorMessage($errMsg);
         }
+
+        return $result;
 
     }//end sendMessage()
 
@@ -327,13 +364,16 @@ class SquizSuiteActions
         $sysidEl   = $dom->createElement('system_id');
         $systypeEl = $dom->createElement('system_type');
         $sysurlEl  = $dom->createElement('system_url');
+        $sysNameEl = $dom->createElement('system_name');
 
         API::buildResponseXMLDom($sysidEl, $productInfo['systemid']);
         API::buildResponseXMLDom($systypeEl, $productInfo['type']);
         API::buildResponseXMLDom($sysurlEl, $productInfo['connection']['url']);
+        API::buildResponseXMLDom($sysNameEl, $productInfo['connection']['name']);
         $msgElem->appendChild($sysidEl);
         $msgElem->appendChild($systypeEl);
         $msgElem->appendChild($sysurlEl);
+        $msgElem->appendChild($sysNameEl);
 
         return $dom;
 
@@ -389,7 +429,7 @@ class SquizSuiteActions
      * The submitter's key certificate will be registered together and
      * it will send suiteConnectAck message back as a response.
      *
-     * @return void
+     * @return array
      * @throws ChannelException Error occurred.
      *
      * @api read
@@ -414,6 +454,7 @@ class SquizSuiteActions
             $required = array(
                          'system_id',
                          'system_url',
+                         'system_name',
                          'cert',
                         );
             foreach ($required as $field) {
@@ -426,6 +467,7 @@ class SquizSuiteActions
             // TODO: Maximum daily request exceeded?
             $systemid    = $message['system_id'];
             $systemUrl   = $message['system_url'];
+            $systemName  = $message['system_name'];
             $certificate = $message['cert'];
 
             self::_logReceivedMessage($systemid, 'suiteConnect');
@@ -459,15 +501,23 @@ class SquizSuiteActions
                 $connection         = array();
                 $connection['url']  = $systemUrl;
                 $connection['cert'] = $certificate;
+                $connection['name'] = $systemName;
                 SquizSuite::registerProduct($systemid, $systemType, $connection);
             }//end if
 
             // Now we are all good. Register the system and set the status
             // as pending. Then send acknowlegement message back.
-            SquizSuite::updateProduct($systemid, 'status', 'pending');
-            DAL::commit();
+            SquizSuite::updateProduct($systemid, 'status', 'pending approval');
 
-            $success = SquizSuite::sendMessage($systemid, 'suiteConnectAck');
+            DAL::commit();
+            $currProduct = SquizSuite::getCurrentProduct();
+            $response    = array(
+                            'systemid' => $currProduct['systemid'],
+                            'name'     => $currProduct['connection']['name'],
+                            'type'     => $currProduct['type'],
+                           );
+
+            return $response;
         } catch (Exception $e) {
             $errMsg  = 'suiteConnect failed'."\n";
             $errMsg .= $e->getMessage()."\n";
@@ -476,7 +526,7 @@ class SquizSuiteActions
 
             // Re-throw exception here so that API system can send
             // the proper error HTTP header.
-            throw $e;
+            throw new ChannelException($e->getMessage());
         }//end try
 
     }//end suiteConnect()
@@ -515,6 +565,7 @@ class SquizSuiteActions
             $required = array(
                          'system_id',
                          'system_url',
+                         'system_name',
                          'cert',
                         );
             foreach ($required as $field) {
@@ -526,6 +577,7 @@ class SquizSuiteActions
 
             $systemid    = $message['system_id'];
             $systemUrl   = $message['system_url'];
+            $systemName  = $message['system_name'];
             $certificate = $message['cert'];
 
             $productInfo = SquizSuite::getProduct($systemid);
@@ -553,7 +605,7 @@ class SquizSuiteActions
 
             // Re-throw exception here so that API system can send
             // the proper error HTTP header.
-            throw $e;
+            throw new ChannelException($e->getMessage());
         }//end try
 
     }//end suiteConnectAck()
@@ -641,6 +693,7 @@ class SquizSuiteActions
         $fields = array(
                    'system_id',
                    'system_url',
+                   'system_name',
                    'cert',
                   );
         foreach ($fields as $field) {
@@ -838,8 +891,10 @@ class SquizSuiteActions
             return;
         }
 
+        // @codingStandardsIgnoreStart
         $encrypted     = SquizSuite::decryptData($encrypted, $password);
         $_POST['_enc'] = json_decode($encrypted, TRUE);
+        // @codingStandardsIgnoreEnd
 
     }//end decryptAPIData()
 
