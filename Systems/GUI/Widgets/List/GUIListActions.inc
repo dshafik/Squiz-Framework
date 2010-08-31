@@ -116,8 +116,18 @@ class GUIListActions
         $sortTitle   = _('Click and drag to change order');
         $deleteTitle = _('Click to mark item as deleted. Click again to unmark.');
 
+        $extraClasses = '';
+
+        if ($sortable === FALSE) {
+            $extraClasses .= ' noSort';
+        }
+
+        if ($allowDelete === FALSE) {
+            $extraClasses .= ' noDelete';
+        }
+
         foreach ($settings['items'] as $itemIndex => $item) {
-            echo '<li>';
+            echo '<li class="existingRow'.$extraClasses.'" id="'.$id.'-'.$itemIndex.'">';
             if ($sortable === TRUE) {
                 echo '<span class="'.$class.' dragHandle" title="'.$sortTitle.'"></span>';
             }
@@ -127,7 +137,7 @@ class GUIListActions
             }
 
             if ($editable === TRUE) {
-                $fieldName = $id.'-list-item-'.$itemIndex;
+                $fieldName = $id.'-'.$itemIndex.'-value';
                 echo '<div class="editableItem">';
                 echo '<input type="text" id="'.$fieldName.'" value="'.htmlentities($item).'" />';
                 echo '</div>';
@@ -139,8 +149,11 @@ class GUIListActions
 
         }//end foreach
 
+        echo '</ul>';
+
+        // If we're allowed to add a row, give an extra row.
         if (($editable === TRUE) && ($allowAdd === TRUE)) {
-            echo '<li class="newRow">';
+            echo '<div class="'.$class.'-newRow'.$extraClasses.'">';
             if ($sortable === TRUE) {
                 echo '<span class="'.$class.' dragHandle" title="'.$sortTitle.'"></span>';
             }
@@ -149,15 +162,15 @@ class GUIListActions
                 echo '<span class="'.$class.' deleteIcon" title="'.$deleteTitle.'"></span>';
             }
 
-            $fieldName = $id.'-list-item-'.$itemIndex;
+            $fieldName = $id.'-list-item-add';
             echo '<div class="editableItem">';
-            echo '<input type="text" id="'.$fieldName.'" value="'.htmlentities($addText).'" />';
+            echo '<input type="text" id="'.$fieldName.'" value="" />';
+            echo '<div class="newRowName">'.htmlentities($addText).'</div>';
             echo '</div>';
 
-            echo '</li>';
-        }
+            echo '</div>';
+        }//end if
 
-        echo '</ul>';
         echo '</div>';
         echo '</div>';
 

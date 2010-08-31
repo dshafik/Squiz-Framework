@@ -6,7 +6,7 @@
     padding: 0;
 }
 
-.GUIList li {
+.GUIList li, .GUIList-newRow {
     background-color: #FFF;
     border-bottom: 1px dotted #C9C9C9;
     font-family: arial;
@@ -27,7 +27,7 @@
     background: transparent url(listShadowRight.png) 100% 0 repeat-y;
 }
 
-.GUIList .dragHandle {
+.GUIList-right .dragHandle {
     float: left;
     height: 18px;
     width: 19px;
@@ -36,7 +36,7 @@
     cursor: move;
 }
 
-.GUIList .deleteIcon {
+.GUIList-right .deleteIcon {
     float: right;
     height: 16px;
     width: 16px;
@@ -45,19 +45,19 @@
     cursor: pointer;
 }
 
-.GUIList li.deleted {
+.GUIList-right li.deleted {
     background: url(delete_overlay.png) center bottom white;
 }
 
-.GUIList li.deleted .deleteIcon {
+.GUIList-right li.deleted .deleteIcon {
     background-position: left bottom;
 }
 
-.GUIList li.newRow .deleteIcon, .GUIList li.newRow .dragHandle {
+.GUIList-newRow .deleteIcon, .GUIList-newRow .dragHandle {
     visibility: hidden;
 }
 
-.GUIList .editableItem {
+.GUIList-right .editableItem {
     border: 1px solid #C2C3C5;
     background-color: white;
     position: relative;
@@ -65,13 +65,30 @@
     padding: 2px;
 }
 
-.GUIList .editableItem input {
+.GUIList-right .editableItem input {
+    position: relative;
     border: none;
     width: 100%;
     padding: 0;
+    background-color: transparent;
+    z-index: 2;
 }
 
-.GUIList li.newRow .editableItem input {
+.GUIList-newRow .newRowName {
+    position: absolute;
+    left: 0px;
+    top: 0px;
     color: #AAA;
     font-style: italic;
+    z-index: 1;
+    line-height: 1em;
+    padding: 3px;
+}
+
+.GUIList-right .noSort .editableItem {
+    margin-left: 0px;
+}
+
+.GUIList-right .noDelete .editableItem {
+    margin-right: 0px;
 }
