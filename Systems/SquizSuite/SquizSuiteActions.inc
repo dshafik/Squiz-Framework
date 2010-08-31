@@ -67,6 +67,25 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the summary of this product.
+     *
+     * Other systems need to plug in this channel
+     * to provide their own data to send out to
+     * other systems.
+     *
+     * @return array
+     *
+     * @api read
+     */
+    public static function getProductSummary()
+    {
+        $summary = array();
+        return $summary;
+
+    }//end getProductSummary()
+
+
+    /**
      * Get the list of all suite products.
      *
      * @return array
