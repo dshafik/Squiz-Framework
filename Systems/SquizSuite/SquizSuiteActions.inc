@@ -529,13 +529,8 @@ class SquizSuiteActions
             SquizSuite::updateProduct($systemid, 'status', 'pending approval');
 
             DAL::commit();
-            $currProduct = SquizSuite::getCurrentProduct();
-            $response    = array(
-                            'systemid' => $currProduct['systemid'],
-                            'name'     => $currProduct['connection']['name'],
-                            'type'     => $currProduct['type'],
-                           );
 
+            $response = 'ok';
             return $response;
         } catch (Exception $e) {
             $errMsg  = 'suiteConnect failed'."\n";
