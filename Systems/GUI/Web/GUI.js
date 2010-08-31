@@ -39,6 +39,7 @@ var GUI = new function()
     this.addWidget = function(id, obj) {
         if (!obj.id || !obj.settings || !obj.settings.template) {
             // Invalid widget.
+            GUI.message('developer', 'Could not find "settings" array for widget #' + id, 'warning');
             return;
         }
 
@@ -65,6 +66,54 @@ var GUI = new function()
         }
 
         return false;
+    };
+
+    this.createWidget = function(type, id, settings, creator) {
+        var tplInfo = null;
+
+        if (typeof creator === 'string') {
+            // Creator could be a template.
+            var parts = creator.split(':');
+            if (parts.length === 2) {
+                tplInfo = {
+                    system: parts[0],
+                    name: parts[1]
+                };
+            }
+        } if (creator && creator.settings && creator.settings.template) {
+            tplInfo = creator.settings.template;
+        }
+
+        if (!window[type]) {
+            GUI.message('developer', 'Widget type "' + type + '" class not loaded!');
+            return;
+        } else if (!tplInfo || !tplInfo.system || !tplInfo.name) {
+            GUI.message('developer', 'Invalid argument: creator must be a valid widget object or a template identifier.');
+            return;
+        }
+
+        if (!settings) {
+            settings = {};
+        }
+
+        settings.widget = {
+            id: id,
+            type: type
+        };
+
+        settings.template = tplInfo;
+
+        // Create the widget object and then add it to widget store.
+        var widgetObject = null;
+        eval('widgetObject = new ' + type + '(id, settings);');
+
+        if (!widgetObject) {
+            GUI.message('developer', 'Failed to create widget object of type ' + type + ' and id ' + id);
+            return;
+        }
+
+        this.addWidget(id, widgetObject);
+        return widgetObject;
     };
 
     this.getWidgetWebPath = function(widgetPath) {
@@ -168,6 +217,54 @@ var GUI = new function()
         });
     };
 
+    /**
+     * Loads specified template in to an element.
+     *
+     * Once the contents are loaded the element that was created will be passed to
+     * the callback function where it can be modified before displayed on the screen.
+     *
+     * Available options:
+     * - [modal] (true|false): If true then the template contents will be shown as
+     * modal dialog. False by default.
+     *
+     * @param string   system       The system that has the template.
+     * @param string   templateName Name of the template (with the extension).
+     * @param function callback     The function to call after the contents are loaded.
+     * @param object   options      List of options.
+     *
+     * @return void
+     */
+    this.loadTemplate = function(system, templateName, templateOptions, callback, options) {
+        var params = {
+            systemName: system,
+            template: templateName,
+            templateOptions: dfx.jsonEncode(templateOptions)
+        };
+
+        if (options && options.modal === true) {
+            GUI.showOverlay();
+        }
+
+        GUI.sendRequest('GUI', 'printTemplate', params, function(data) {
+            if (!data.result) {
+                GUI.message('developer', 'Failed to load template content', 'error');
+                return;
+            }
+
+            // Create the element where the content will be set.
+            var main = document.createElement('div');
+
+            // Hide the element and add it to body so that events and DOM operations
+            // can work.
+            document.body.appendChild(main);
+            dfx.setHtml(main, data.result);
+
+            if (callback) {
+                callback.call(this, main);
+            }
+        });
+    };
+
     this.save = function() {
         var self   = this;
         var values = {};
@@ -225,8 +322,7 @@ var GUI = new function()
         });
 
         _modifiedWidgets = {};
-        _reverting = false;
-
+        _reverting       = false;
     };
 
     this.setModified = function(widget, state) {
@@ -243,6 +339,61 @@ var GUI = new function()
         this.fireModifiedCallbacks(widget.id, state);
     };
 
+    /**
+     * Displays an overlay on top of every element on the screen or elements inside specified element.
+     *
+     *
+     */
+    this.showOverlay = function(target) {
+        if (!target) {
+            target = document.body;
+        }
+
+        var overlay = document.createElement('div');
+        overlay.id  = 'GUI-overlay';
+        dfx.addClass(overlay, 'GUI-overlay');
+
+        target.appendChild(overlay);
+    };
+
+    this.hideOverlay = function() {
+        var elem = dfx.getId('GUI-overlay');
+        if (elem) {
+            dfx.remove(elem);
+        }
+    };
+
+    /**
+     * Displays the specified message to user or developer.
+     *
+     * @param string type    The type of the message. Valid values are "user", "developer".
+     * @param string message The message to display.
+     * @param string level   The message level. Valid valus are "warning", "error".
+     *
+     * @return void
+     */
+    this.message = function(type, message, level) {
+        switch (type) {
+            case 'developer':
+                if (window.console) {
+                    if (level === 'warning' && window.console.warn) {
+                        console.warn(message);
+                    } else if (window.console.error) {
+                        console.error(message);
+                    }
+                }
+            break;
+
+            case 'user':
+                // TODO: Show the message box to user.
+                alert(message);
+            break;
+
+            default:
+                // Ignore.
+            break;
+        }
+    };
 
     this.addWidgetEvent(this, 'modified');
 

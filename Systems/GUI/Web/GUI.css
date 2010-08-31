@@ -56,14 +56,27 @@
 .GUI-delete.deleted .GUI-deleteIcon {
     background-position: 0 -16px;
 }
+
 .GUI-textOverflow {
     position: relative;
     height: 1.4em;
 }
+
 .GUI-textOverflow-text {
     position: absolute;
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.GUI-overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1000;
+    background-color: #000;
+    opacity: 0.85;
 }

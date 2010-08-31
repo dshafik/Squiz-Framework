@@ -95,6 +95,14 @@ class GUIActions
      */
     private static $_widgetSettings = array();
 
+    /**
+     * Template widget settings that can be accessed during run time.
+     *
+     * @var array
+     * @see GUI::getWidgetSettings()
+     */
+    private static $_templateSettings = array();
+
 
     /**
      * Includes the template PHP file.
@@ -104,6 +112,8 @@ class GUIActions
      *
      * @since  4.0.0
      * @return void
+     *
+     * @api read
      */
     public static function printTemplate($systemName, $template)
     {
@@ -384,6 +394,43 @@ class GUIActions
         self::$_currentTemplateKey = $tplKey;
 
     }//end setCurrentTemplateKey()
+
+
+    /**
+     * Sets the template settings var.
+     *
+     * This method is used by baked out template code.
+     *
+     * @param array $settings The template settings array.
+     *
+     * @return void
+     */
+    public static function setTemplateSettingsVar(array $settings)
+    {
+        self::$_templateSettings = &$settings;
+
+    }//end setTemplateSettingsVar()
+
+
+    /**
+     * Returns the settings for a specified widget in active template scope.
+     *
+     * @param string $widgetid Id of a widget in current template scope.
+     *
+     * @return array
+     */
+    public static function getWidgetSettings($widgetid)
+    {
+        $key = GUI::getCurrentTemplateKey();
+        if (isset(self::$_settings[$key]) === TRUE
+            && self::$_settings[$key]['widget'][$widgetid] === TRUE
+        ) {
+            return self::$_settings[$key]['widget'][$widgetid];
+        }
+
+        return NULL;
+
+    }//end getWidgetSettings()
 
 
     /**
@@ -1328,8 +1375,20 @@ class GUIActions
      */
     public static function getSystemNameFromTemplate($tplFilePath)
     {
-        $name = basename(dirname(dirname($tplFilePath)));
-        return $name;
+        $parts = explode('/', $tplFilePath);
+        array_pop($parts);
+        $parts = array_reverse($parts);
+
+        $systemName = '';
+        foreach ($parts as $name) {
+            if ($name === 'Systems') {
+                break;
+            } else if ($name !== 'Widgets' && $name !== 'Templates') {
+                $systemName = $name.$systemName;
+            }
+        }
+
+        return $systemName;
 
     }//end getSystemNameFromTemplate()
 
