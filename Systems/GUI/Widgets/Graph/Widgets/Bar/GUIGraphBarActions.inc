@@ -528,19 +528,11 @@ class GUIGraphBarActions
             $tooltipRows = Util::getArrayIndex($dataRow, 'tooltipRows', array());
 
             // Start stacking the graph up.
-            foreach (array_reverse($groups) as $groupIndex => $groupInfo) {
+            foreach ($groups as $groupIndex => $groupInfo) {
                 $dataPoint = Util::getArrayIndex($dataRow['data'], $groupIndex, 0);
                 $label = Util::getArrayIndex($rowLabels, $groupIndex);
 
                 if ($dataPoint === 0) continue;
-
-                $pointTitle  = $groups[$groupIndex]['name'].': ';
-
-                if ($label !== NULL) {
-                    $pointTitle .= $label;
-                } else {
-                    $pointTitle .= $dataPoint;
-                }
 
                 $oldHeight = $cumHeight;
                 if ($rowTotal > 0) {
@@ -566,8 +558,6 @@ class GUIGraphBarActions
                     echo ' style-'.$groups[$groupIndex]['style'];
                     echo '" style="height: ';
                     echo max($dataPointHeight, 0).'px">';
-                    echo '<span class="'.$class.'-data-point-alt-text">';
-                    echo '</span>';
                     echo '</li>';
                     $liTexts[] = ob_get_contents();
                 ob_end_clean();
@@ -699,7 +689,7 @@ class GUIGraphBarActions
                 // The class arrowPosition-topMid is set by default on the tooltip LI
                 // Override class with arrowPosition-topRight at run-time where needed
                 // This will automatically position both the tooltip and the arrow
-                echo '<li class="tooltip  arrowPosition-topMid">'; 
+                echo '<li class="tooltip  arrowPosition-topMid">';
                 echo '<div class="tooltipArrow"></div>';
                 if (array_key_exists('tooltipTitle', $dataRow)) {
                     echo '<div class="title">';
