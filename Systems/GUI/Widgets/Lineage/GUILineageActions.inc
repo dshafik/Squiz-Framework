@@ -61,6 +61,11 @@ class GUILineageActions
         echo '</ul>';
         echo '</div>';
 
+        // Set the item template.
+        $settings['_templates'] = array(
+                                   'itemTemplate' => '<li itemid="%itemid%"><a>%title%</a></li>',
+                                  );
+
         return $settings;
 
     }//end paint()

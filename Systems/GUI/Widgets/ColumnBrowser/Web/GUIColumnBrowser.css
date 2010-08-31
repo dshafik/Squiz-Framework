@@ -10,6 +10,7 @@
     height: 100%;
 }
 
+.GUIColumnBrowser-column-loader,
 .GUIColumnBrowser-column {
     background: url(col_bg.png) repeat-y 100% 0;
     float: left;
@@ -19,9 +20,24 @@
     display: none;
 }
 
+.GUIColumnBrowser-column-loader,
 .GUIColumnBrowser-column-card {
     display: none;
     width: 200px;
+}
+
+.GUIColumnBrowser-column-loader {
+    display: block;
+    background-color: #EEE;
+    position: relative;
+}
+
+.GUIColumnBrowser-column-loader img {
+    left: 50%;
+    margin-left: -34px;
+    margin-top: -24px;
+    position: absolute;
+    top: 50%;
 }
 
 .GUIColumnBrowser-item {

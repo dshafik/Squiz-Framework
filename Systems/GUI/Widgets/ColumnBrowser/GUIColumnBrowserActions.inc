@@ -68,6 +68,35 @@ class GUIColumnBrowserActions
     protected static $lineageWidgetId = NULL;
 
     /**
+     * If specified then the item children will be retrieved from specified action.
+     *
+     * The value must be an array with 'system' and 'method' names.
+     *
+     * Note that the array returned must be in following format:
+     * array(
+     *  0 => array(
+     *        'id'          => 'itemid',
+     *        'title'       => 'title of the item for lineage widgets',
+     *        'itemContent' => 'The item content',
+     *        'childCount'  => 123
+     *       ),
+     * ).
+     *
+     * @var array
+     */
+    protected static $dynamicDataProvider = NULL;
+
+    /**
+     * If TRUE then data can be loaded dynamically using the dynamicDataProvider.
+     *
+     * Note that dynamicDataProvider setting must be specified if this setting is set
+     * to TRUE.
+     *
+     * @var boolean
+     */
+    protected static $dynamicLoading = FALSE;
+
+    /**
      * List of columns.
      *
      * @var array
@@ -81,11 +110,18 @@ class GUIColumnBrowserActions
      * @param array $settings The list of settings for this widget.
      *
      * @return array
+     * @throws ChannelException If there are invalid settings.
      */
     public static function paint(array $settings)
     {
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
+
+        if (Util::getArrayIndex($settings, 'dynamicLoading', self::$dynamicLoading) === TRUE
+            && Util::getArrayIndex($settings, 'dynamicDataProvider', NULL) === NULL
+        ) {
+            throw new ChannelException(_('dynamicLoading is set to TRUE but dynamicDataProvider setting is not set'));
+        }
 
         self::$_columns = array();
 
@@ -99,9 +135,9 @@ class GUIColumnBrowserActions
         foreach (self::$_columns as $level => $colCards) {
             // Print the column div which will contain multiple "cards".
             echo '<div class="'.$class.'-column level-'.$level.'">';
-            foreach ($colCards as $cardid => $cardContent) {
-                echo '<div class="'.$class.'-column-card" parentid="'.$cardid.'">';
-                echo $cardContent;
+            foreach ($colCards as $cardid => $cardInfo) {
+                echo '<div class="'.$class.'-column-card" parentid="'.$cardid.'" parentTitle="'.$cardInfo['title'].'">';
+                echo $cardInfo['content'];
                 echo '</div>';
             }
 
@@ -118,14 +154,15 @@ class GUIColumnBrowserActions
     /**
      * Adds the contents of columns in to columns array with a proper structure.
      *
-     * @param array   $settings Widget settings.
-     * @param array   $items    List of items to print for specifid level.
-     * @param integer $level    The current level being printed.
-     * @param string  $parentid The parent item id.
+     * @param array   $settings    Widget settings.
+     * @param array   $items       List of items to print for specifid level.
+     * @param integer $level       The current level being printed.
+     * @param string  $parentid    The parent item id.
+     * @param string  $parentTitle Title of the parent element, used by Lineage widgets.
      *
      * @return void
      */
-    public static function paintColumns(array $settings, array $items=array(), $level=0, $parentid='')
+    public static function paintColumns(array $settings, array $items=array(), $level=0, $parentid='', $parentTitle='')
     {
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
@@ -134,7 +171,10 @@ class GUIColumnBrowserActions
         }
 
         if (isset(self::$_columns[$level][$parentid]) === FALSE) {
-            self::$_columns[$level][$parentid] = '';
+            self::$_columns[$level][$parentid] = array(
+                                                  'title'   => $parentTitle,
+                                                  'content' => '',
+                                                 );
         }
 
         foreach ($items as $itemInfo) {
@@ -142,10 +182,11 @@ class GUIColumnBrowserActions
                 GUIColumnBrowser::paintItem($itemInfo, $settings);
 
                 if (empty($itemInfo['children']) === FALSE) {
-                    GUIColumnBrowser::paintColumns($settings, $itemInfo['children'], ($level + 1), $itemInfo['id']);
+                    // Paint children in a new column.
+                    GUIColumnBrowser::paintColumns($settings, $itemInfo['children'], ($level + 1), $itemInfo['id'], $itemInfo['title']);
                 }
 
-                self::$_columns[$level][$parentid] .= ob_get_contents();
+                self::$_columns[$level][$parentid]['content'] .= ob_get_contents();
             ob_end_clean();
         }
 
@@ -165,16 +206,20 @@ class GUIColumnBrowserActions
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'].'-item';
 
-        $itemid   = Util::getArrayIndex($itemInfo, 'id', '');
-        $content  = Util::getArrayIndex($itemInfo, 'itemContent', '');
-        $children = Util::getArrayIndex($itemInfo, 'children', array());
+        $itemid     = Util::getArrayIndex($itemInfo, 'id', '');
+        $content    = Util::getArrayIndex($itemInfo, 'itemContent', '');
+        $children   = Util::getArrayIndex($itemInfo, 'children', array());
+        $childCount = Util::getArrayIndex($itemInfo, 'childCount', NULL);
 
-        echo '<div itemid="'.$itemid.'" class="'.$class.'">';
+        if ($childCount === NULL && empty($children) === TRUE) {
+            $childCount = count($children);
+        }
+
+        echo '<div itemid="'.$itemid.'" class="'.$class.'" childcount="'.$childCount.'">';
         echo '<div class="'.$class.'-content">';
         echo $content;
         echo '</div>';
 
-        $childCount = count($children);
         if ($childCount > 0) {
             echo '<div class="'.$class.'-childCount"><span>'.$childCount.'</span></div>';
         }
@@ -185,17 +230,43 @@ class GUIColumnBrowserActions
 
 
     /**
-     * Returns the selection lineage.
+     * Returns the contents of the items requested.
      *
-     * @param array $settings Widget settings.
+     * @param array  $settings Settings of the widget.
+     * @param string $parentid The id of the parent.
      *
-     * @return array
+     * @return string
+     *
+     * @api read
      */
-    public static function getLineage(array $settings)
+    public static function getChildredContents(array $settings, $parentid)
     {
-        return array();
+        $actionInfo = Util::getArrayIndex($settings, 'dynamicDataProvider', NULL);
+        if ($actionInfo === NULL) {
+            return NULL;
+        }
 
-    }//end getLineage()
+        // Get system and method.
+        $system = Util::getArrayIndex($actionInfo, 'system', NULL);
+        $method = Util::getArrayIndex($actionInfo, 'method', NULL);
+        if ($system === NULL || $method === NULL) {
+            return NULL;
+        }
+
+        Channels::includeSystem($system);
+        $items = call_user_func(array($system, $method), $parentid);
+
+        ob_start();
+            foreach ($items as $item) {
+                GUIColumnBrowser::paintItem($item, $settings);
+            }
+
+            $contents = ob_get_contents();
+        ob_end_clean();
+
+        return $contents;
+
+    }//end getChildredContents()
 
 
 }//end class

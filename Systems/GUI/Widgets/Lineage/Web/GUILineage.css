@@ -3,6 +3,7 @@
     background: url(lineage_bg.png) repeat-x;
     line-height: 22px;
     overflow: hidden;
+    min-height: 22px;
 }
 
 .GUILineage li {
@@ -17,4 +18,5 @@
     padding-left: 5px;
     background: url(lineage_arrow.png) no-repeat 100% 0;
     font-size: 11px;
+    cursor: pointer;
 }
