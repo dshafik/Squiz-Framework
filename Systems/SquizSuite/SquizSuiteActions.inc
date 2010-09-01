@@ -51,6 +51,13 @@ class SquizSuiteActions
      */
     private static $_productCache = array();
 
+    /**
+     * Flag used for indicating that the system is running as system administrator.
+     *
+     * @var boolean
+     */
+    private static $_suiteSystemUser = FALSE;
+
 
     /**
      * Prepare for baking.
@@ -79,10 +86,35 @@ class SquizSuiteActions
      */
     public static function getProductSummary()
     {
-        $summary = array();
+        Channels::includeSystem('User');
+        $summary    = array();
+        $currUserid = User::getCurrentUserid();
+        if (User::isSystemAdministrator($currUserid) === FALSE) {
+            // If it's not a system administrator,
+            // die!
+            exit;
+        }
+
         return $summary;
 
     }//end getProductSummary()
+
+
+    /**
+     * Return TRUE if suite system user mode is on.
+     *
+     * When it is TRUE, the system runs as a system administrator.
+     * This can ONLY be turned on when the encrypted API request is
+     * received from the connected live suite system. Check
+     * decryptAPIData() action.
+     *
+     * @return boolean
+     */
+    public static function isSuiteSystemUser()
+    {
+        return self::$_suiteSystemUser;
+
+    }//end isSuiteSystemUser()
 
 
     /**
@@ -947,10 +979,36 @@ class SquizSuiteActions
             return;
         }
 
-        // @codingStandardsIgnoreStart
-        $encrypted     = SquizSuite::decryptData($encrypted, $password);
-        $_POST['_enc'] = json_decode($encrypted, TRUE);
-        // @codingStandardsIgnoreEnd
+        $encrypted = SquizSuite::decryptData($encrypted, $password);
+        if ($encrypted !== FALSE) {
+            // @codingStandardsIgnoreStart
+            $encrypted     = json_decode($encrypted, TRUE);
+            $_POST['_enc'] = $encrypted;
+            // @codingStandardsIgnoreEnd
+
+            $systemid = NULL;
+            if (is_array($encrypted) === TRUE) {
+                $systemid = $encrypted['_systemid'];
+            } else if (strpos($encrypted, '<?xml') === 0) {
+                Channels::includeSystem('API');
+                $dom = new DomDocument();
+                $dom->loadXML($encrypted);
+                $systemidDom = $dom->getElementsByTagName('system_id')->item(0);
+                $systemid    = API::getResponseFromXMLDom($systemidDom);
+            }
+
+            if ($systemid !== NULL) {
+                $systemid = $encrypted['_systemid'];
+                $product  = SquizSuite::getProduct($systemid);
+                if (empty($product) === FALSE && $product['status'] === 'live') {
+                    // This is the API request from the connected
+                    // SquizSuite system.
+                    // Setting suite system user TRUE will make this
+                    // API call run as system administrator.
+                    self::$_suiteSystemUser = TRUE;
+                }
+            }
+        }//end if
 
     }//end decryptAPIData()
 
