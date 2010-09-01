@@ -26,6 +26,8 @@
     this.id       = id;
     this.settings = settings;
 
+    this._selectedAssetsCallback = null;
+
     this.init();
 
 }
@@ -36,7 +38,7 @@ GUIAssetPicker.prototype = {
         var linHeight   = parseInt(dfx.getElementHeight(dfx.getId(this.id + '-lineage')));
         var browserElem = dfx.getId(this.id + '-assetBrowser');
 
-        var midElem    = dfx.getClass('GUIDialog-middle', dfx.getId(this.id + '-dialog'))[0]
+        var midElem    = dfx.getClass('GUIDialog-middle', dfx.getId(this.id + '-dialog'))[0];
         var initHeight = parseInt(dfx.getElementHeight(midElem));
 
         dfx.setStyle(browserElem, 'height', (initHeight - linHeight - 2) + 'px');
@@ -47,9 +49,23 @@ GUIAssetPicker.prototype = {
 
     },
 
+    setSelectAssetsCallback: function(callback)
+    {
+        this._selectedAssetsCallback = callback;
+
+    },
+
     selectAssets: function()
     {
         var selection = GUI.getWidget(this.id + '-dialog').getSelection();
+        if (this._selectedAssetsCallback) {
+            // If the callback method returns false then do not close the picker.
+            if (this._selectedAssetsCallback.call(this, selection) === false) {
+                return;
+            }
+        }
+
+        this.close();
 
     },
 

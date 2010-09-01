@@ -41,6 +41,7 @@ class GUIAssetPickerActions
      * Content of the asset picker.
      *
      * @var string
+     * @internal
      */
     protected static $content = '';
 
