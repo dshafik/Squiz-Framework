@@ -10,7 +10,7 @@ table.GUITable {
 }
 
 .GUITable th {
-    background-color: #aaa;
+    background-color: #AAA;
     color: #FFF;
     font-size: 10px;
     font-weight: bold;
@@ -45,7 +45,7 @@ table.GUITable {
     border-left: none;
 }
 
-.GUITable.alternateRows tr.rowOdd {
+.GUITable.alternateRows tr.rowEven {
     background-color: #DDD;
 }
 
@@ -71,3 +71,8 @@ table.GUITable {
     margin: 0;
 }
 
+.GUITable tr.loadingRow td {
+    background-color: #EEE;
+    vertical-align: top;
+    text-align: center;
+}

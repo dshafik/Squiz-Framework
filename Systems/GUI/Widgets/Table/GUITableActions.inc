@@ -69,13 +69,35 @@ class GUITableActions
      */
     protected static $hideHeader = FALSE;
 
+    /**
+     * Alternate row or column colours.
+     *
+     * Valid values are: rows, cols.
+     *
+     * @var boolean
+     */
+    protected static $alternate;
+
+    /**
+     * Channel to call to generate new row for the table.
+     *
+     * Array must specify a valid API method:
+     * array(
+     *  'system' => 'System',
+     *  'action' => 'action',
+     * ).
+     *
+     * @var array
+     */
+    protected static $rowGenerator = NULL;
+
 
     /**
      * Prints widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return void
+     * @return array
      * @throws ChannelException If no table columns specified.
      */
     public static function paint(array $settings)
@@ -205,6 +227,46 @@ class GUITableActions
         }//end foreach
 
     }//end paintRows()
+
+
+    /**
+     * Generated a new table row using specified data and channel.
+     *
+     * @param array $rowsData The row data to send to the specified channel function.
+     * @param array $channel  The channel to call which generates the column contents
+     *                        using the given rowData.
+     * @param array $settings The widget settings.
+     *
+     * @return void
+     * @throws ChannelException If invalid API channel is specified.
+     *
+     * @api read
+     */
+    public static function generateRows(array $rowsData, array $channel, array $settings)
+    {
+        // Check if channel is callable.
+        Channels::includeSystem('API');
+        if (API::getAPI($channel['system'], $channel['action']) === FALSE) {
+            throw new ChannelException(_('Specified channel is invalid.'));
+        }
+
+        // This is an API request therefore we need to set the current template, it
+        // should be the same as the table's template.
+        Channels::includeSystem('GUI');
+        $template = Util::getArrayIndex($settings, 'template', array());
+        GUI::setCurrentTemplateKey(implode('::', $template));
+
+        Channels::includeSystem($channel['system']);
+        $columnNames = Util::getArrayIndex($settings, 'columns', array());
+
+        $rows = array();
+        foreach ($rowsData as $rowid => $columns) {
+            $rows[$rowid] = call_user_func(array_values($channel), $rowsData[$rowid]);
+        }
+
+        GUITable::paintRows($rows, $columnNames, $settings);
+
+    }//end generateRows()
 
 
 }//end class
