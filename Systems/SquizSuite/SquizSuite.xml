@@ -4,12 +4,9 @@
     <runner>
       <required>no</required>
       <method>decryptAPIData</method>
-      <action listen="before">API::getActionParameters</action>
+      <action listen="before">API::getRequestedAction</action>
       <fatal>no</fatal>
-      <parameters>
-        <parameter>system</parameter>
-        <parameter>action</parameter>
-      </parameters>
+      <parameters />
     </runner>
     <modifier>
       <required>yes</required>

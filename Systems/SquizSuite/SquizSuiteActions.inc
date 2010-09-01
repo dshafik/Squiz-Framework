@@ -936,12 +936,9 @@ class SquizSuiteActions
      * provided, decrypt the value of _enc with the current system's
      * private key and put it back to POST var.
      *
-     * @param string $system System name where action resides.
-     * @param string $action Action name to call.
-     *
      * @return void
      */
-    public static function decryptAPIData($system, $action)
+    public static function decryptAPIData()
     {
         include_once 'Libs/Security/Security.inc';
         $encrypted = Security::getRequestData('_enc', NULL, FALSE, 'post');
