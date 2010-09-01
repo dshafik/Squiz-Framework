@@ -57,13 +57,21 @@ class GUIScreenSwitcherActions extends GUIContentSwitcherActions
             $screens = $settings['items'];
         }
 
+        // Populate the initial item with NULL if not set.
+        $settings['initialItem'] = Util::getArrayIndex($settings, 'initialItem');
+
         foreach ($screens as $screen) {
-            $screenid = $id.'-'.$screen['id'];
+            $screenid     = $id.'-'.$screen['id'];
+            $extraClasses = '';
             if (strtolower(Util::getArrayIndex($screen, 'disabled')) === 'true') {
-                echo '<div id="'.$screenid.'" class="'.$class.'-button disabled">';
+                $extraClasses .= ' disabled';
+            } else if ($screen['id'] === $settings['initialItem']) {
+                $extraClasses .= ' selected';
             } else {
-                echo '<div id="'.$screenid.'" class="'.$class.'-button inactive">';
+                $extraClasses .= ' inactive';
             }
+
+            echo '<div id="'.$screenid.'" class="'.$class.'-button'.$extraClasses.'">';
 
             // Work out the name of the template and web icon we expect from the
             // system we are referencing.
