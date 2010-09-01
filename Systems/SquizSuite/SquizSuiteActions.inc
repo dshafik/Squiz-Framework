@@ -580,6 +580,7 @@ class SquizSuiteActions
                          'system_id',
                          'system_url',
                          'system_name',
+                         'system_type',
                          'cert',
                         );
             foreach ($required as $field) {
@@ -592,11 +593,28 @@ class SquizSuiteActions
             $systemid    = $message['system_id'];
             $systemUrl   = $message['system_url'];
             $systemName  = $message['system_name'];
+            $systemType  = $message['system_type'];
             $certificate = $message['cert'];
 
-            $productInfo = SquizSuite::getProduct($systemid);
+            $allProducts = SquizSuite::getAllProducts();
+            $productInfo = array();
+            foreach ($allProducts as $product) {
+                if ($product['status'] === 'pending'
+                    && $product['connection']['url'] === $systemUrl
+                ) {
+                    $productInfo = $product;
+                    break;
+                }
+            }
+
             if (empty($productInfo) === TRUE) {
-                $errMsg = 'Unknown system has been requested.';
+                $errMsg = 'Unknown system has sent suiteConnectAck message.';
+                throw new ChannelException($errMsg);
+            }
+
+            $duplicated = SquizSuite::getProduct($systemid);
+            if (empty($duplicated) === FALSE) {
+                $errMsg = 'The requested system already exists.';
                 throw new ChannelException($errMsg);
             }
 
@@ -604,13 +622,36 @@ class SquizSuiteActions
 
             DAL::beginTransaction();
             // Connection Request accepted by the other system.
-            // Set the system live and send the final acknowledgement.
-            $productInfo['connection']['cert'] = $certificate;
-            SquizSuite::updateProduct($systemid, 'connection', $productInfo['connection']);
-            SquizSuite::updateProduct($systemid, 'status', 'live');
-            DAL::commit();
+            // Remove the temporary product entry first.
+            SquizSuite::removeProduct($productInfo['systemid']);
 
-            $success = SquizSuite::sendMessage($systemid, 'suiteConnectAckAck');
+            $connection = array(
+                           'url'  => $systemUrl,
+                           'cert' => $certificate,
+                           'name' => $systemName,
+                          );
+            SquizSuite::registerProduct($systemid, $systemType, $connection);
+            SquizSuite::updateProduct($systemid, 'status', 'live');
+
+            $response = SquizSuite::sendMessage($systemid, 'suiteConnectAckAck');
+            $response = $response['result'];
+            if (strpos($response, '<?xml') !== 0) {
+                $errMsg = 'suiteConnectAckAck message did not reach to '.$systemUrl;
+                throw new ChannelException($errMsg);
+            } else {
+                Channels::includeSystem('API');
+                $dom = new DomDocument();
+                $dom->loadXML($response);
+
+                $responseDom = $dom->getElementsByTagName('result')->item(0);
+                $response    = API::getResponseFromXMLDom($responseDom);
+                if ($response !== 'ok') {
+                    $errMsg = 'suiteConnectAckAck message did not reach to '.$systemUrl;
+                    throw new ChannelException($errMsg);
+                }
+            }
+
+            DAL::commit();
         } catch (Exception $e) {
             $errMsg  = 'suiteConnectAck failed.'."\n";
             $errMsg .= $e->getMessage()."\n";
@@ -630,7 +671,7 @@ class SquizSuiteActions
      *
      * The final acknowlegement for suite connection request.
      *
-     * @return void
+     * @return string
      * @throws ChannelException Error occurred.
      *
      * @api read
@@ -677,6 +718,9 @@ class SquizSuiteActions
             self::_logReceivedMessage($systemid, 'suiteConnectAckAck');
 
             SquizSuite::updateProduct($systemid, 'status', 'live');
+
+            $response = 'ok';
+            return $response;
         } catch (Exception $e) {
             $errMsg  = 'suiteConnectAckAck failed.'."\n";
             $errMsg .= $e->getMessage()."\n";
@@ -708,6 +752,7 @@ class SquizSuiteActions
                    'system_id',
                    'system_url',
                    'system_name',
+                   'system_type',
                    'cert',
                   );
         foreach ($fields as $field) {
