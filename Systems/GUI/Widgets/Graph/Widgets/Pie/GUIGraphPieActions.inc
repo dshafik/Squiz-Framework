@@ -115,9 +115,7 @@ class GUIGraphPieActions
         $border = Util::getArrayIndex($settings, 'border');
         if (is_array($border) === FALSE) {
             $settings['border'] = array(
-                                   array(
-                                    'radius' => 0,
-                                   ),
+                                   'radius' => 0,
                                   );
         }
 
@@ -128,7 +126,7 @@ class GUIGraphPieActions
         $baseName .= '_'.sha1($hashValue);
         $fileName  = $fileDir.'/'.$baseName.'.svg';
 
-        $radius = (int) Util::getArrayIndex($settings['border'][0], 'radius', 0);
+        $radius = (int) Util::getArrayIndex($settings['border'], 'radius', 0);
         foreach ($settings['rings'] as $ring) {
             $radius += (int) Util::getArrayIndex($ring, 'radius', 0);
         }
@@ -203,18 +201,19 @@ class GUIGraphPieActions
         $id            = $settings['widget']['id'];
         $class         = $settings['widget']['type'];
 
-        $dataPct = array();
-
+        $dataPct  = array();
         // Calculate the total of the inner ring - this is the basis of all our
         // proportions.
-        $total = array_sum($data[0]);
+
+        $firstRow = reset($data);
+        $total    = array_sum($firstRow);
 
         if ($total <= 0) {
             return;
         }
 
         if (empty($borderConf) === FALSE) {
-            $radius = (int) Util::getArrayIndex($borderConf[0], 'radius', 0);
+            $radius = (int) Util::getArrayIndex($borderConf, 'radius', 0);
 
             if ($radius > 0) {
                 foreach ($ringConf as $ring) {
@@ -223,20 +222,24 @@ class GUIGraphPieActions
 
                 echo '<svg:circle cx="0" cy="0" ';
                 echo 'r="'.($radius).'" ';
-                echo ' class="colour-'.$borderConf[0]['colour'].'" />';
+                echo ' class="colour-'.$borderConf['colour'].'" />';
             }
         }
 
         // Then normalise the data points to a [0..1] value.
-        foreach ($data as $dataRingIndex => $dataRing) {
-            $dataPct[$dataRingIndex] = array();
+        foreach ($ringConf as $ringIndex => $ring) {
+            $dataPct[$ringIndex] = array();
+            $dataRing = Util::getArrayIndex($data, $ringIndex, array());
 
-            foreach ($dataRing as $dataPointIndex => $dataPoint) {
-                if ($dataPoint > $data[0][$dataPointIndex]) {
-                    $dataPoint = $data[0][$dataPointIndex];
+            foreach ($dataPointConf as $pointIndex => $point) {
+                $dataPoint  = Util::getArrayIndex($dataRing, $pointIndex, 0);
+                $firstPoint = Util::getArrayIndex($firstRow, $pointIndex, 0);
+
+                if ($dataPoint > $firstPoint) {
+                    $dataPoint = $firstPoint;
                 }
 
-                $dataPct[$dataRingIndex][$dataPointIndex] = ($dataPoint / $total);
+                $dataPct[$ringIndex][$pointIndex] = ($dataPoint / $total);
             }//end foreach
         }//end foreach
 
@@ -250,19 +253,19 @@ class GUIGraphPieActions
 
         // Work on a ring-by-ring basis.
         foreach ($dataPct as $dataRingIndex => $dataRing) {
-            if ($dataRingIndex >= count($ringConf)) {
-                break;
+            if (array_key_exists($dataRingIndex, $ringConf) === FALSE) {
+                continue;
             }
 
             $innerRadius = $outerRadius;
             $outerRadius = ($innerRadius + $ringConf[$dataRingIndex]['radius']);
 
             foreach ($dataRing as $dataPointIndex => $dataPoint) {
-                if ($dataPointIndex >= count($dataPointConf)) {
-                    break;
+                if (array_key_exists($dataPointIndex, $dataPointConf) === FALSE) {
+                    continue;
                 }
 
-                if ($dataRingIndex > 0) {
+                if (array_key_exists($dataPointIndex, $startAngles) === TRUE) {
                     $oldAngle = $startAngles[$dataPointIndex];
                 } else {
                     $startAngles[$dataPointIndex] = $cumAngle;
@@ -270,15 +273,7 @@ class GUIGraphPieActions
                 }
 
                 $thisAngle = ($dataPoint * $circleAngle);
-
-                // Rationalise angle to a 0..2Pi range.
-                if ($dataPoint === 1) {
-                    $thisAngle = $circleAngle;
-                } else {
-                    $thisAngle -= (floor(($thisAngle / $circleAngle)) * $circleAngle);
-                }
-
-                $cumAngle = ($oldAngle - $thisAngle);
+                $cumAngle  = ($oldAngle - $thisAngle);
 
                 if ($thisAngle > 0) {
                     // We need to negate the Y points... normally when converting
