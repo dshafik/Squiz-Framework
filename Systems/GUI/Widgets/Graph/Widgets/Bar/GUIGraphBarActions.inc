@@ -400,6 +400,7 @@ class GUIGraphBarActions
                         $tickExp *= 2;
                     } else if ($maxExp <= 3) {
                         $tickExp *= 0.5;
+                        $tickExp  = ceil($tickExp);
                     }
 
                     $tick['major'] = $tickExp;
