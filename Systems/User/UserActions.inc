@@ -445,6 +445,19 @@ class UserActions
 
     }//end
 
+    /**
+     * Returns TRUE if the user is a system administrator.
+     *
+     * @param integer $userid The id for user.
+     *
+     * @return integer
+     */
+    public static function isSystemAdministrator($userid=NULL)
+    {
+        return TRUE;
+
+    }//end isSystemAdministrator()
+
 
 }//end class
 
