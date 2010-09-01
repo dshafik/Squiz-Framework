@@ -85,9 +85,18 @@ class APIActions
                            '_format',
                           );
         foreach ($requiredFields as $field) {
-            if (isset($msg[$field]) === FALSE) {
-                $errMsg = 'The required field '.$field.' is missing.';
-                throw new ChannelException($errMsg);
+            if (array_key_exists('_enc', $msg) === TRUE) {
+                if (isset($msg[$field]) === FALSE
+                    && isset($msg['_enc'][$field]) === FALSE
+                ) {
+                    $errMsg = 'The required field '.$field.' is missing.';
+                    throw new ChannelException($errMsg);
+                }
+            } else {
+                if (isset($msg[$field]) === FALSE) {
+                    $errMsg = 'The required field '.$field.' is missing.';
+                    throw new ChannelException($errMsg);
+                }
             }
         }
 
@@ -175,7 +184,7 @@ class APIActions
         }
 
         // Get the requested service details from GET or POST request.
-        $request = self::_getRequestedAction($requestMethod);
+        $request = API::getRequestedAction($requestMethod);
         if ($request === FALSE) {
             self::_sendHeader(400);
             $responseContent['exception'] = 'Failed to get system and action from the request';
@@ -325,7 +334,7 @@ class APIActions
      *
      * @return array|boolean
      */
-    private static function _getRequestedAction($requestMethod)
+    public static function getRequestedAction($requestMethod)
     {
         include_once 'Libs/Web/Web.inc';
         $url = Web::getCurrentURL();
@@ -392,9 +401,17 @@ class APIActions
 
             $default    = NULL;
             $jsonDecode = FALSE;
+            $encrypted  = Security::getRequestData('_enc', $default, FALSE, 'post');
             $system     = Security::getRequestData('_system', $default, $jsonDecode, $requestMethod);
             $action     = Security::getRequestData('_action', $default, $jsonDecode, $requestMethod);
             $format     = Security::getRequestData('_format', self::$_outputFormat, $jsonDecode, $requestMethod);
+            if ($system === $default && $encrypted !== NULL) {
+                // When the message is encrypted, look for the variables in _enc field.
+                include_once 'Libs/Util/Util.inc';
+                $system = Util::getArrayIndex($encrypted, '_system', $default);
+                $action = Util::getArrayIndex($encrypted, '_action', $default);
+                $format = Util::getArrayIndex($encrypted, '_format', self::$_outputFormat);
+            }
         }//end if
 
         $result['system']       = strtolower($system);
@@ -402,7 +419,7 @@ class APIActions
         $result['outputFormat'] = $format;
         return $result;
 
-    }//end _getRequestedAction()
+    }//end getRequestedAction()
 
 
     /**
