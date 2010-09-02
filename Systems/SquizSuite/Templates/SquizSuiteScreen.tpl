@@ -28,4 +28,33 @@
             </widget>
         </setting>
     </widget>
+    <widget type="GUI/Box" id="squizSuite-connectedProduct-box">
+        <setting name="title"><text>Connected Products</text></setting>
+        <setting name="content">
+            <widget type="GUI/Table" id="squizSuiteList">
+                <setting name="columns">
+                    <currTypeIcon>
+                        <name><text>Type</text></name>
+                        <align>left</align>
+                    </currTypeIcon>
+                    <currName>
+                        <name><text>Name</text></name>
+                        <align>left</align>
+                    </currName>
+                    <currStatusIcon>
+                        <name><text>Status</text></name>
+                        <align>left</align>
+                    </currStatusIcon>
+                    <currSummary>
+                        <name>Summary</name>
+                        <align>left</align>
+                    </currSummary>
+                </setting>
+                <setting name="allowDelete">true</setting>
+                <setting name="rows">
+                    <dataProvider action="SquizSuite::getConnectedProductRows" />
+                </setting>
+            </widget>
+        </setting>
+    </widget>
 </div>

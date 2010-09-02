@@ -3,33 +3,91 @@
     width: 965px;
 }
 
-/* Current product table. */
-#squizSuiteList tr.rowOdd {
+#squizSuite-currentProduct-box .GUITable-colWrapper {
+    padding: 0px;
+}
+
+#squizSuite-connectedProduct-box .GUITable-colWrapper {
+    padding: 0px;
+}
+
+#squizSuite-currentProduct-box tr.rowOdd {
     height: 76px;
 }
 
-#squizSuiteList td.currTypeIcon {
+#squizSuite-connectedProduct-box {
+    margin-top: 25px;
+}
+
+#squizSuite-connectedProduct-box tr {
+    height: 39px;
+}
+
+#squizSuite-connectedProduct-box thead tr {
+    height: 24px;
+}
+
+#squizSuite-connectedProduct-box th.th-currTypeIcon {
+    color: #000;
+    background-color: #E7F1FF;
+    border-bottom: 1px solid #DFDEDE;
+}
+
+#squizSuite-connectedProduct-box th.th-currName {
+    color: #5F5F5F;
+    background-color: #FFF;
+    border-bottom: 1px solid #DFDEDE;
+}
+
+#squizSuite-connectedProduct-box th.th-currStatusIcon {
+    color: #000;
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #DFDEDE;
+}
+
+#squizSuite-connectedProduct-box th.th-currSummary {
+    color: #5F5F5F;
+    background-color: #FFF;
+    border-bottom: 1px solid #DFDEDE;
+}
+
+#squizSuite-connectedProduct-box th.th-_remove {
+    color: #5F5F5F;
+    background-color: #F7F7F7;
+    border-bottom: 1px solid #DFDEDE;
+}
+
+#squizSuite-connectedProduct-box td.col-_remove {
+    background-color: #F7F7F7;
+}
+
+#squizSuiteList td.col-currTypeIcon {
     background-color: #E7F1FF;
     width: 47px;
 }
 
-#squizSuiteList td.currName {
+#squizSuiteList td.col-currName {
     padding-left: 15px;
     width: 378px;
 }
 
-#squizSuiteList td.currStatusIcon {
+#squizSuiteList td.col-currStatusIcon {
     background-color: #F5F5F5;
     width: 67px;
 }
 
-#squizSuiteList td.currSummary {
+#squizSuiteList td.col-currSummary {
     padding-left: 15px;
     width: 406px;
 }
 
 #squizSuite-currProductName {
     margin-top: 6px;
+}
+
+span.SquizSuiteScreen-currentPrductNameDesc {
+    color: #9C9B9B;
+    font-style: italic;
 }
 
 div.SquizSuiteScreen-summaryWrap {
@@ -44,6 +102,8 @@ span.SquizSuiteScreen-summaryValue {
     font-weight: bold;
     margin: 0 10px 0 5px;
 }
+
+/* Product Type Icon */
 
 div.SquizSuiteScreen-productIconWrap {
     background: url(squizsuite-icons.png);
@@ -70,4 +130,44 @@ div.SquizSuiteScreen-productIconWrap.SquizAnalytics {
 
 div.SquizSuiteScreen-productIconWrap.unknown {
     background-position: 0 30px;
+}
+
+/* Product Status Icon */
+
+div.SquizSuiteScreen-statusWrap {
+    width: 20px;
+    height: 20px;
+    margin-left: 24px;
+}
+
+div.SquizSuiteScreen-statusWrap.live {
+    background: url(status-icons.png) repeat scroll 0 0;
+}
+
+div.SquizSuiteScreen-statusWrap.pending {
+    background: url(status-icons.png) repeat scroll 0 20px;
+}
+
+div.SquizSuiteScreen-statusWrap.error {
+    background: url(status-icons.png) repeat scroll 0 40px;
+}
+
+div.SquizSuiteScreen-statusWrap.loading {
+    background: url(status-loading.gif) no-repeat scroll 50% 50%;
+}
+
+/* Row Expander */
+
+span.SquizSuiteScreen-productExpander {
+    background: url(expander.png) no-repeat scroll 0 0px transparent;
+    cursor: pointer;
+    display: block;
+    float: right;
+    height: 14px;
+    margin-right: 10px;
+    width: 16px;
+}
+
+span.SquizSuiteScreen-productExpander.expanded {
+    background-position: 0 -14px;
 }

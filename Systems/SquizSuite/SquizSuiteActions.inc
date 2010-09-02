@@ -1216,7 +1216,7 @@ class SquizSuiteActions
         $typeIcon = '<div class="SquizSuiteScreen-productIconWrap '.$typeC.'">&nbsp;</div>';
 
         $name  = '<strong>'._('Name').'</strong>&nbsp;&nbsp;';
-        $name .= '<span>('._('this name will appear in all connected products').')</span><br />';
+        $name .= '<span class="SquizSuiteScreen-currentPrductNameDesc">('._('this name will appear in all connected products').')</span><br />';
         $name .= GUI::createWidget(
             'squizSuite-currProductName',
             'GUITextBox',
@@ -1250,12 +1250,59 @@ class SquizSuiteActions
      *
      * @return array
      */
-    public static function getProductRows()
+    public static function getConnectedProductRows()
     {
         $rows = array();
+
+        $allProducts = SquizSuite::getAllProducts();
+        foreach ($allProducts as $product) {
+            // Skip the current product.
+            if ($product['current'] === TRUE) {
+                continue;
+            }
+
+            $typeC    = str_replace(' ', '', $product['type']);
+            $typeIcon = '<div class="SquizSuiteScreen-productIconWrap '.$typeC.'">&nbsp;</div>';
+
+            $name  = $product['connection']['name'];
+            $name .= '<span class="SquizSuiteScreen-productExpander">&nbsp;</span>';
+
+            $statucC = 'live';
+            $summary = '<strong>'._('Summary').'</strong><br /><div class="SquizSuiteScreen-summaryWrap">';
+
+            switch ($product['status']) {
+                case 'live':
+                    $statusC = 'live';
+                default;
+
+                case 'pending':
+                    $statusC = 'pending';
+                default;
+
+                case 'pending approval':
+                    $statusC = 'pending';
+                default;
+
+                default:
+                    // No default status.
+                break;
+            }//end switch
+
+            $statusIcon = '<div class="SquizSuiteScreen-statusWrap '.$statusC.'">&nbsp;</div>';
+
+            $summary .= '</div>';
+
+            $rows[] = array(
+                       'currTypeIcon'   => $typeIcon,
+                       'currName'       => $name,
+                       'currStatusIcon' => $statusIcon,
+                       'currSummary'    => $summary,
+                      );
+        }//end foreach
+
         return $rows;
 
-    }//end getProductRows()
+    }//end getConnectedProductRows()
 
 
 }//end class
