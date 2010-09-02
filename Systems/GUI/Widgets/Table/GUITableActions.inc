@@ -241,11 +241,9 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.'">';
-                echo '<div class="'.$class.'-colWrapper">';
+                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.' '.$colid.'">';
                 echo $col;
-                echo '<div class="'.$class.'-colRemovedOverlay"></div>';
-                echo '</div></td>';
+                echo '</td>';
 
                 $colIdx++;
             }//end foreach
