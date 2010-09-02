@@ -241,10 +241,10 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.' '.$colid.'">';
+                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'">';
                 echo '<div class="'.$class.'-colWrapper">';
                 echo $col;
-                if (self::$allowDelete === TRUE) {
+                if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
                     echo '<div class="'.$class.'-colRemovedOverlay"></div>';
                 }
 
