@@ -225,7 +225,9 @@ class GUITableActions
             }
 
             $colIdx = 1;
-            foreach ($row as $colid => $col) {
+            foreach ($colids as $colid) {
+                $col = Util::getArrayIndex($row, $colid, '');
+
                 $colClass = 'middleCol';
                 if ($colid === $firstColid) {
                     $colClass = 'firstCol';
