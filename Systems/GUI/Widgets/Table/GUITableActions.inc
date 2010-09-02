@@ -102,6 +102,7 @@ class GUITableActions
      */
     public static function paint(array $settings)
     {
+        $settings['rows'] = Util::getArrayIndex($settings, 'rows', array());
         $tableClass = $settings['widget']['type'];
 
         include_once 'Libs/Util/Util.inc';
