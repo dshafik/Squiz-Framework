@@ -1,0 +1,73 @@
+#SquizSuiteScreen {
+    margin-left: 70px;
+    width: 965px;
+}
+
+/* Current product table. */
+#squizSuiteList tr.rowOdd {
+    height: 76px;
+}
+
+#squizSuiteList td.currTypeIcon {
+    background-color: #E7F1FF;
+    width: 47px;
+}
+
+#squizSuiteList td.currName {
+    padding-left: 15px;
+    width: 378px;
+}
+
+#squizSuiteList td.currStatusIcon {
+    background-color: #F5F5F5;
+    width: 67px;
+}
+
+#squizSuiteList td.currSummary {
+    padding-left: 15px;
+    width: 406px;
+}
+
+#squizSuite-currProductName {
+    margin-top: 6px;
+}
+
+div.SquizSuiteScreen-summaryWrap {
+    margin-top: 6px;
+}
+
+span.SquizSuiteScreen-summaryLabel {
+    color: #9C9B9B;
+}
+
+span.SquizSuiteScreen-summaryValue {
+    font-weight: bold;
+    margin: 0 10px 0 5px;
+}
+
+div.SquizSuiteScreen-productIconWrap {
+    background: url(squizsuite-icons.png);
+    height: 29px;
+    margin-left: 8px;
+    width: 30px;
+}
+
+div.SquizSuiteScreen-productIconWrap.SquizCMS {
+    background-position: 0 0px;
+}
+
+div.SquizSuiteScreen-productIconWrap.SquizMatrix {
+    background-position: 0 60px;
+}
+
+div.SquizSuiteScreen-productIconWrap.SquizSearch {
+    background-position: 0 90px;
+}
+
+div.SquizSuiteScreen-productIconWrap.SquizAnalytics {
+    background-position: 0 120px;
+}
+
+div.SquizSuiteScreen-productIconWrap.unknown {
+    background-position: 0 30px;
+}

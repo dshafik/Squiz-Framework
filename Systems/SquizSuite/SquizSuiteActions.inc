@@ -101,6 +101,38 @@ class SquizSuiteActions
 
 
     /**
+     * Returns TRUE if the user doesnt have permission to get product summary.
+     *
+     * @return boolean
+     */
+    public static function hideProductSummary()
+    {
+        Channels::includeSystem('User');
+        $summary    = array();
+        $currUserid = User::getCurrentUserid();
+        if (User::isSystemAdministrator($currUserid) === FALSE) {
+            return TRUE;
+        }
+
+        return FALSE;
+
+    }//end hideProductSummary()
+
+
+    /**
+     * Returns an empty array for product summary.
+     *
+     * @return array
+     */
+    public static function getNoProductSummary()
+    {
+        $summary = array();
+        return $summary;
+
+    }//end getNoProductSummary()
+
+
+    /**
      * Return TRUE if suite system user mode is on.
      *
      * When it is TRUE, the system runs as a system administrator.
@@ -1168,6 +1200,62 @@ class SquizSuiteActions
         return FALSE;
 
     }//end _opensslDecrypt()
+
+
+    /**
+     * Returns the current product column array for SquizSuite screen.
+     *
+     * @return array
+     */
+    public static function getCurrentProductRow()
+    {
+        Channels::includeSystem('GUI');
+        $currProduct = SquizSuite::getProduct();
+
+        $typeC    = str_replace(' ', '', $currProduct['type']);
+        $typeIcon = '<div class="SquizSuiteScreen-productIconWrap '.$typeC.'">&nbsp;</div>';
+
+        $name  = '<strong>'._('Name').'</strong>&nbsp;&nbsp;';
+        $name .= '<span>('._('this name will appear in all connected products').')</span><br />';
+        $name .= GUI::createWidget(
+            'squizSuite-currProductName',
+            'GUITextBox',
+            array('value' => $currProduct['connection']['name'])
+        );
+
+        $summary        = '<strong>'._('Summary').'</strong><br /><div class="SquizSuiteScreen-summaryWrap">';
+        $productSummary = SquizSuite::getProductSummary();
+        foreach ($productSummary as $key => $value) {
+            $summary .= '<span class="SquizSuiteScreen-summaryLabel">'._($key).'</span>';
+            $summary .= '<span class="SquizSuiteScreen-summaryValue">'._($value).'</span>';
+        }
+
+        $summary .= '</div>';
+
+        $rows   = array();
+        $rows[] = array(
+                   'currTypeIcon'   => $typeIcon,
+                   'currName'       => $name,
+                   'currStatusIcon' => '&nbsp;',
+                   'currSummary'    => $summary,
+                  );
+
+        return $rows;
+
+    }//end getCurrentProductRow()
+
+
+    /**
+     * Returns the connected products rows array for SquizSuite screen.
+     *
+     * @return array
+     */
+    public static function getProductRows()
+    {
+        $rows = array();
+        return $rows;
+
+    }//end getProductRows()
 
 
 }//end class

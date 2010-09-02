@@ -22,5 +22,13 @@
         <parameter>userAgent</parameter>
       </parameters>
     </modifier>
+    <switcher>
+      <required>no</required>
+      <method>hideProductSummary</method>
+      <parameters></parameters>
+      <switch_event>SquizSuite::getNoProductSummary</switch_event>
+      <action>SquizSuite::getProductSummary</action>
+      <fatal>no</fatal>
+    </switcher>
   </plugs>
 </system>
