@@ -35,7 +35,7 @@
                     <action>getSuperUserTableColumns</action>
                 </setting>
                 <setting name="alternate">rows</setting>
-                <setting name="showRemoveIcon">true</setting>
+                <setting name="allowDelete">true</setting>
             </widget>
         </setting>
     </widget>
