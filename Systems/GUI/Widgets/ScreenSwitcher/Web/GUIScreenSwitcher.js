@@ -30,18 +30,11 @@ function GUIScreenSwitcher(id, settings)
     this.targetid   = this.settings.target;
     this.targetElem = dfx.getId(this.targetid);
 
-    this.currScreen = {
-        system: null,
-        id: null
-    };
-
     this.includedFiles = {};
     this.loadedWidgets = [];
 
     GUI.addWidgetEvent(this, 'screenLoadStarts');
     GUI.addWidgetEvent(this, 'screenLoadFinished');
-
-    this.init();
 
 }
 
@@ -52,43 +45,51 @@ GUIScreenSwitcher.prototype = {
         var self = this;
 
         dfx.foreach(this.settings.items, function(idx) {
-            var screenid = self.id + '-' + self.settings.items[idx].id;
-            dfx.addEvent(dfx.getId(screenid), 'click', function(evt) {
-                if (self.currScreen.id !== self.settings.items[idx].id) {
-                    if (self.settings.items[idx].disabled !== 'true') {
-                        var oldScreenid = self.id + '-' + self.currScreen.id;
+            var itemId     = self.settings.items[idx].id;
+            var itemSystem = self.settings.items[idx].system;
+            var domId      = self.id + '-' + itemId;
 
-                        self.currScreen = {
-                            system: self.settings.items[idx].system,
-                            id: self.settings.items[idx].id
-                        },
+            dfx.addEvent(dfx.getId(domId), 'click', function(evt) {
+                if (self.current !== null) {
+                    var oldDomId = self.id + '-' + self.current.modeid;
 
-                        dfx.removeClass(dfx.getId(oldScreenid), 'hover');
-                        dfx.addClass(dfx.getId(oldScreenid), 'inactive');
-                        dfx.removeClass(dfx.getId(oldScreenid), 'selected');
-
-                        dfx.addClass(this, 'selected');
-                        dfx.removeClass(this, 'inactive');
-                        dfx.removeClass(this, 'hover');
-
-                        self.loadDynamic(
-                            self.settings.items[idx].system,
-                            self.settings.items[idx].id
-                        );
-                    }//end if
+                    dfx.removeClass(dfx.getId(oldDomId), 'hover');
+                    dfx.addClass(dfx.getId(oldDomId), 'inactive');
+                    dfx.removeClass(dfx.getId(oldDomId), 'selected');
                 }//end if
+
+                dfx.addClass(this, 'selected');
+                dfx.removeClass(this, 'inactive');
+                dfx.removeClass(this, 'hover');
+
+                self.fireItemChangedCallbacks(itemId, itemSystem);
+                self.loadMode(itemSystem, itemId);
             });
 
-            dfx.addEvent(dfx.getId(screenid), 'mouseover', function(evt) {
-                if (self.currScreen.id !== self.settings.items[idx].id) {
+            dfx.addEvent(dfx.getId(domId), 'mouseover', function(evt) {
+                var doEvent = true;
+                if (self.current !== null) {
+                    if (self.current.modeid === self.settings.items[idx].id) {
+                        doEvent = false;
+                    }
+                }
+
+                if (doEvent === true) {
                     if (self.settings.items[idx].disabled !== 'true') {
                         dfx.addClass(this, 'hover');
                     }
                 }
             });
 
-            dfx.addEvent(dfx.getId(screenid), 'mouseout', function(evt) {
-                if (self.currScreen.id !== self.settings.items[idx].id) {
+            dfx.addEvent(dfx.getId(domId), 'mouseout', function(evt) {
+                var doEvent = true;
+                if (self.current !== null) {
+                    if (self.current.modeid === self.settings.items[idx].id) {
+                        doEvent = false;
+                    }
+                }
+
+                if (doEvent === true) {
                     if (self.settings.items[idx].disabled !== 'true') {
                         dfx.removeClass(this, 'hover');
                     }

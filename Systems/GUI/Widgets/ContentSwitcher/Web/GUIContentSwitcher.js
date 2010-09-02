@@ -31,6 +31,21 @@ function GUIContentSwitcher(id, settings)
 
     this.current = null;
 
+    if (settings.initialItem) {
+        var self = this;
+
+        dfx.foreach(settings.items, function(idx) {
+            var item = settings.items[idx];
+
+            if (item.id === settings.initialItem) {
+                self.current = {
+                    system: item.system,
+                    modeid: item.id
+                };
+            }
+        });
+    }
+
     GUI.addWidgetEvent(this, 'itemChanged');
 
     this.init();
