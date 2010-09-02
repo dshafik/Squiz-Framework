@@ -45,24 +45,28 @@ GUITable.prototype = {
         var self      = this;
         var tableElem = dfx.getId(this.id);
 
-        if (this.settings.selectable === 'true') {
-            // Rows are selectable add the click event.
-            dfx.addEvent(tableElem, 'click', function(e) {
-                var target = dfx.getMouseEventTarget(e);
-                while (target && dfx.isTag(target, 'table') === false) {
-                    if (dfx.isTag(target, 'td') === true) {
-                        self._columnClicked(target);
-                        // Note that we do not break here so that rowClicked event is
-                        // also fired.
-                    } else if (dfx.isTag(target, 'tr') === true) {
-                        self._rowClicked(target);
-                        break;
-                    }
-
-                    target = target.parentNode;
+        // Rows are selectable add the click event.
+        dfx.addEvent(tableElem, 'click', function(e) {
+            var target = dfx.getMouseEventTarget(e);
+            while (target && dfx.isTag(target, 'table') === false) {
+                if (dfx.isTag(target, 'td') === true) {
+                    self._columnClicked(target);
+                    // Note that we do not break here so that rowClicked event is
+                    // also fired.
+                } else if (dfx.isTag(target, 'tr') === true) {
+                    self._rowClicked(target);
+                    break;
+                } else if (dfx.isTag(target, 'div') === true && dfx.hasClass(target, 'GUI-delete') === true) {
+                    self.toggleRow(target.parentNode.parentNode.parentNode);
+                    break;
+                } else if (dfx.hasClass(target, 'GUITable-colRemovedOverlay') === true) {
+                    // Delete overlay was clicked, do nothing.
+                    break;
                 }
-            });
-        }
+
+                target = target.parentNode;
+            }
+        });
 
     },
 
@@ -74,12 +78,14 @@ GUITable.prototype = {
             return;
         }
 
-        var parent = row.parentNode;
-        for (var node = parent.firstChild; node; node = node.nextSibling) {
-            dfx.removeClass(node, 'selected');
-        }
+        if (this.settings.selectable === 'true') {
+            var parent = row.parentNode;
+            for (var node = parent.firstChild; node; node = node.nextSibling) {
+                dfx.removeClass(node, 'selected');
+            }
 
-        dfx.addClass(row, 'selected');
+            dfx.addClass(row, 'selected');
+        }
 
     },
 
@@ -166,11 +172,31 @@ GUITable.prototype = {
             }
 
             dfx.remove(tmp);
+            GUI.setModified(self, true);
 
             if (callback) {
                 callback.call(self, rows);
             }
         });
+
+    },
+
+    /**
+     * Toggles removed row state.
+     *
+     * @param {DOMNode} rowElement The row element that needs to be removed/added.
+     *
+     * @returns {void}
+     */
+    toggleRow: function(rowElement)
+    {
+        if (dfx.hasClass(rowElement, 'deleted') === false) {
+            dfx.addClass(rowElement, 'deleted');
+        } else {
+            dfx.removeClass(rowElement, 'deleted');
+        }
+
+        GUI.setModified(this, true);
 
     },
 
@@ -184,7 +210,8 @@ GUITable.prototype = {
         var tds = dfx.getTag('td', elem);
         var ln  = tds.length;
 
-        var value = {};
+        var value   = {};
+        var removed = {};
 
         for (var i = 0; i < ln; i++) {
             var td    = tds[i];
@@ -193,24 +220,35 @@ GUITable.prototype = {
                 continue;
             }
 
-            var colWidget = GUI.getWidget(colid);
-            if (!colWidget) {
+            var rowid = td.parentNode.getAttribute('rowid');
+
+            if (dfx.hasClass(td.parentNode, 'deleted') === true) {
+                removed[rowid] = true;
                 continue;
             }
 
+            var colIndex    = colid.replace(this.id + '-' + rowid + '-', '');
+            var widgetValue = null;
+
             // Get column rowid.
-            var rowid = td.parentNode.getAttribute('rowid');
             if (!value[rowid]) {
                 value[rowid] = {}
             }
 
-            var colIndex = colid.replace(this.id + '-' + rowid + '-', '');
+            var colWidget = GUI.getWidget(colid);
+            if (colWidget) {
+                widgetValue = colWidget.getValue();
+            }
 
-            var widgetValue        = colWidget.getValue();
             value[rowid][colIndex] = widgetValue;
         }//end for
 
-        return value;
+        var retValue = {
+            items: value,
+            removed: removed
+        };
+
+        return retValue;
 
     },
 

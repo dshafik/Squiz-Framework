@@ -2,11 +2,16 @@ table.GUITable {
     width: 100%;
 }
 
-.GUITable th, .GUITable td {
+.GUITable th,
+.GUITable .GUITable-colWrapper {
+    padding: 4px 15px;
     font-family: arial;
     font-weight: normal;
     font-size: 12px;
-    padding: 4px 15px;
+}
+
+.GUITable .GUITable-colWrapper {
+    position: relative;
 }
 
 .GUITable th {
@@ -62,17 +67,31 @@ table.GUITable {
 }
 
 /* Delete button override */
-.GUITable-lastCol .GUI-delete {
-    position: relative;
-    float: right;
+.GUITable .GUI-delete {
+    z-index: 1;
+    margin: 0;
 }
 
-.GUITable-lastCol .GUI-delete .GUI-deleteIcon {
-    margin: 0;
+.GUITable tr.deleted .GUI-deleteIcon {
+    background-position: 0 -16px;
 }
 
 .GUITable tr.loadingRow td {
     background-color: #EEE;
     vertical-align: top;
     text-align: center;
+}
+
+.GUITable-colRemovedOverlay {
+    display: none;
+}
+
+.GUITable tr.deleted .GUITable-colRemovedOverlay {
+    background: transparent url(/__web/Systems/GUI/Web/delete_overlay.png);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
 }

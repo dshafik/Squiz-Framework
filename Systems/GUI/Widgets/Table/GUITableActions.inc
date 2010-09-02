@@ -70,6 +70,13 @@ class GUITableActions
     protected static $hideHeader = FALSE;
 
     /**
+     * If TRUE then the remove row icon will be shown at the end of the row.
+     *
+     * @var boolean
+     */
+    protected static $showRemoveIcon = FALSE;
+
+    /**
      * Alternate row or column colours.
      *
      * Valid values are: rows, cols.
@@ -103,12 +110,22 @@ class GUITableActions
     public static function paint(array $settings)
     {
         $settings['rows'] = Util::getArrayIndex($settings, 'rows', array());
-        $tableClass = $settings['widget']['type'];
+        $tableClass       = $settings['widget']['type'];
 
         include_once 'Libs/Util/Util.inc';
         $columns = Util::getArrayIndex($settings, 'columns', array());
         if (empty($columns) === TRUE) {
             throw new ChannelException(_('Table widget must have at least one column'));
+        }
+
+        if (Util::getArrayIndex($settings, 'showRemoveIcon', self::$showRemoveIcon) === TRUE) {
+            $columns['_remove'] = array(
+                                   'name'  => '',
+                                   'align' => 'right',
+                                  );
+
+            // Update the settings array.
+            $settings['columns'] = $columns;
         }
 
         $showTableBorders = Util::getArrayIndex($settings, 'showBorders', 'false');
@@ -137,6 +154,7 @@ class GUITableActions
             $colids     = array_keys($columns);
             $lastColid  = $colids[(count($colids) - 1)];
             $firstColid = $colids[0];
+
             foreach ($columns as $colid => $column) {
                 if ($colid === $firstColid) {
                     $colClass = 'first';
@@ -200,6 +218,12 @@ class GUITableActions
 
             echo '">';
 
+            if (Util::getArrayIndex($settings, 'showRemoveIcon', self::$showRemoveIcon) === TRUE) {
+                if (isset($row['_remove']) === FALSE) {
+                    $row['_remove'] = '&nbsp;<div class="GUI-delete"><span class="GUI-deleteIcon"/></div>';
+                }
+            }
+
             $colIdx = 1;
             foreach ($row as $colid => $col) {
                 $colClass = 'middleCol';
@@ -216,8 +240,10 @@ class GUITableActions
                 }
 
                 echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.'">';
+                echo '<div class="'.$class.'-colWrapper">';
                 echo $col;
-                echo '</td>';
+                echo '<div class="'.$class.'-colRemovedOverlay"></div>';
+                echo '</div></td>';
 
                 $colIdx++;
             }//end foreach
