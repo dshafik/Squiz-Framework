@@ -1,2 +1,63 @@
 <queries system="User">
+    <query id="getSuperUsers">
+        <primary>
+            <select>
+                <fields>
+                    <field table="super_user" column="userid" />
+                    <field table="super_user" column="added_by" />
+                    <field table="super_user" column="added_date" />
+                </fields>
+                <from>
+                    <table>super_user</table>
+                </from>
+                <order-by>
+                    <field table="super_user" column="added_date" />
+                </order-by>
+            </select>
+        </primary>
+        <alternate>
+            <assert-not-null data="userid">
+                <select>
+                    <fields>
+                        <field table="super_user" column="userid" />
+                        <field table="super_user" column="added_by" />
+                        <field table="super_user" column="added_date" />
+                    </fields>
+                    <from>
+                        <table>super_user</table>
+                    </from>
+                    <where>
+                        <equal table="super_user" column="userid">:userid</equal>
+                    </where>
+                </select>
+            </assert-not-null>
+        </alternate>
+    </query>
+
+    <query id="addSuperUser">
+        <primary>
+            <insert>
+                <fields table="super_user">
+                  <field>userid</field>
+                  <field>added_by</field>
+                  <field>added_date</field>
+                </fields>
+                <values>
+                  <value column="userid">:userid</value>
+                  <value column="added_by">:addedBy</value>
+                  <value column="added_date">:addedDate</value>
+                </values>
+              </insert>
+        </primary>
+    </query>
+
+    <query id="removeSuperUser">
+        <primary>
+           <delete>
+                <where>
+                    <equal table="super_user" column="userid">:userid</equal>
+                </where>
+            </delete>
+        </primary>
+    </query>
 </queries>

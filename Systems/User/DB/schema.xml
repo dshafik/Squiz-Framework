@@ -1,2 +1,22 @@
 <schema system="User">
+    <udts>
+        <udt-import system="Asset">ASSETID</udt-import>
+    </udts>
+    <tables>
+        <table name="super_user">
+            <columns>
+                <column type="ASSETID" allow-null="false">userid</column>
+                <column type="ASSETID" allow-null="true">added_by</column>
+                <column type="TIMESTAMP WITH TIME ZONE" allow-null="false">added_date</column>
+            </columns>
+            <constraints>
+                <primary-key name="super_user_pk">
+                    <column>userid</column>
+                </primary-key>
+                <foreign-key name="super_user_fk1" foreign-table="asset" on-delete="CASCADE">
+                    <column references="assetid">userid</column>
+                </foreign-key>
+            </constraints>
+        </table>
+     </tables>
 </schema>

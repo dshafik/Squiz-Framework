@@ -26,14 +26,16 @@
                         <name><text>Last Login</text></name>
                         <align>left</align>
                     </lastLogin>
-                    <remove>
-                        <name> </name>
-                        <align>left</align>
-                    </remove>
                 </setting>
                 <setting name="rows">
                     <dataProvider action="User::getSuperUsersList" />
                 </setting>
+                <setting name="rowGenerator">
+                    <system>User</system>
+                    <action>getSuperUserTableColumns</action>
+                </setting>
+                <setting name="alternate">rows</setting>
+                <setting name="showRemoveIcon">true</setting>
             </widget>
         </setting>
     </widget>

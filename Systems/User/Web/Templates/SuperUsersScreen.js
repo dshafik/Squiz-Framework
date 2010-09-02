@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
- var SuperUsersScreen = new function()
+var SuperUsersScreen = new function()
 {
     this.addUser = function() {
         var options = {
@@ -33,7 +33,23 @@
             rootNode: 2
         };
 
-        GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, null, options);
-    }
+        var self = this;
+        GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, function() {
+            GUI.getWidget('AssetPicker').setSelectAssetsCallback(function(selection) {
+                self.addSelectedUsers(selection);
+            });
+        }, options);
+    },
+
+    this.addSelectedUsers = function(userids) {
+        var rowsData = {};
+        dfx.foreach(userids, function(i) {
+            var rowid       = userids[i];
+            rowsData[rowid] = userids[i];
+        });
+
+        // Get the Table widget and add a new row.
+        GUI.getWidget('superUsersList').generateRows(rowsData, function() {});
+    };
 
 };

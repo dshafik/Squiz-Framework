@@ -153,6 +153,32 @@ class UserActions
 
 
     /**
+     * Returns information about the specified users.
+     *
+     * @param array $userids Array of userids.
+     *
+     * @return array
+     *
+     * @api read
+     */
+    public static function getUsers(array $userids)
+    {
+        $info = array();
+        foreach ($userids as $userid) {
+            $user = User::getUserById($userid);
+
+            // Remove the password.
+            unset($user['password']);
+
+            $info[$userid] = $user;
+        }
+
+        return $info;
+
+    }//end getUsers()
+
+
+    /**
      * Get the user details by username.
      *
      * Returns the information of the user.
@@ -431,19 +457,90 @@ class UserActions
     }//end _handleLoginFormRequest()
 
 
-    public static function getSuperUsersList()
+    /**
+     * Returns array of super users in the system.
+     *
+     * @param string  $userid  Id of the super user.
+     * @param boolean $idsOnly If TRUE then only the userids returned.
+     *
+     * @return array
+     */
+    public static function getSuperUsers($userid=NULL, $idsOnly=FALSE)
     {
+        $query = DAL::getQuery('User', 'getSuperUsers');
         $users = array();
-        $users[123] = array(
-                        'user' => 'Admin User',
-                        'email' => 'blah@blah.com',
-                        'lastLogin' => 'Yesterday',
-                        'remove' => '<div class="GUI-delete"><span class="GUI-deleteIcon"></div>',
-                       );
+
+        if ($idsOnly === TRUE) {
+            $users = DAL::getAssoc($query, 'userid', 0);
+        } else {
+            $users = DAL::getAssoc($query, 'userid');
+        }
 
         return $users;
 
-    }//end
+    }//end getSuperUsers()
+
+
+    /**
+     * Returns array of super users in the system.
+     *
+     * @param string $userid  Asset id of a user.
+     * @param string $addedBy Asset id of the user whos adding the new super user.
+     *
+     * @return void
+     * @throws ChannelException If the user cannot be added.
+     */
+    public static function addSuperUser($userid, $addedBy=NULL)
+    {
+        if ($addedBy === NULL) {
+            $addedBy = User::getCurrentUserid();
+            Channels::modifyBasket('addedBy', $addedBy);
+        }
+
+        include_once 'Libs/String/String.inc';
+        $addedDate = String::tsIso8601(time());
+        Channels::addToBasket('addedDate', $addedDate);
+
+        try {
+            DAL::beginTransaction();
+            $query = DAL::getQuery('User', 'addSuperUser');
+            DAL::executeQuery($query);
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollBack();
+            throw new ChannelException($e->getMessage());
+        }
+
+    }//end addSuperUser()
+
+
+    /**
+     * Returns array of super users in the system.
+     *
+     * @param string $userid Asset id of a user.
+     *
+     * @return void
+     * @throws ChannelException If user cannot be removed.
+     */
+    public static function removeSuperUser($userid)
+    {
+        $currentUserid = User::getCurrentUserid();
+        if ($currentUserid === $userid) {
+            throw new ChannelException(_('You cannot remove your self from super users list'));
+        }
+
+        try {
+            DAL::beginTransaction();
+            $query = DAL::getQuery('User', 'removeSuperUser');
+            DAL::executeQuery($query);
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollBack();
+            throw new ChannelException($e->getMessage());
+        }
+
+    }//end removeSuperUser()
+
 
     /**
      * Returns TRUE if the user is a system administrator.
@@ -454,9 +551,131 @@ class UserActions
      */
     public static function isSystemAdministrator($userid=NULL)
     {
+        if ($userid === NULL) {
+            $userid = User::getCurrentUserid();
+        }
+
+        $users = User::getSuperUsers($userid);
+        if (empty($users) === TRUE) {
+            return FALSE;
+        }
+
         return TRUE;
 
     }//end isSystemAdministrator()
+
+
+    /**
+     * Returns the list of rows for the Super Users table.
+     *
+     * @return array
+     */
+    public static function getSuperUsersList()
+    {
+        $list  = array();
+        $users = User::getSuperUsers();
+
+        foreach ($users as $user) {
+            $list[$user['userid']] = User::getSuperUserTableColumns($user['userid']);
+        }
+
+        // If there is only 1 user then they cannot be removed so do not show remove icon.
+        if (count($list) === 1) {
+            $userid = key($list);
+            $list[$userid]['_remove'] = '';
+        }
+
+        return $list;
+
+    }//end getSuperUsersList()
+
+
+    /**
+     * Returns the contents for a new super users table row.
+     *
+     * @param string $userid Column data for the new row.
+     *
+     * @return array
+     *
+     * @api read
+     */
+    public static function getSuperUserTableColumns($userid)
+    {
+        $currentUser = User::getCurrentUserid();
+        $user        = User::getUserById($userid);
+
+        $columns = array();
+        $columns['user']      = $user['username'];
+        $columns['email']     = $user['email'];
+        $columns['lastLogin'] = $user['last_login'];
+
+        if ((string) $currentUser === (string) $userid) {
+            // Do not show the remove icon for this row.
+            $columns['_remove'] = '';
+        }
+
+        if (empty($columns['lastLogin']) === TRUE) {
+            $columns['lastLogin'] = _('Never');
+        }
+
+        return $columns;
+
+    }//end getSuperUserTableColumns()
+
+
+    /**
+     * Save the SuperUsers screen settings.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function saveSuperUsersScreen(array $data)
+    {
+        $errors = array();
+
+        $superUsersList = Util::getArrayIndex($data, 'superUsersList', NULL);
+        if ($superUsersList === NULL) {
+            // Nothing to do.
+            $errors[] = _('Could not save super users');
+            return $errors;
+        }
+
+        $superUsers   = Util::getArrayIndex($superUsersList, 'items', array());
+        $removedUsers = Util::getArrayIndex($superUsersList, 'removed', array());
+        $removedUsers = array_keys($removedUsers);
+
+        // Get the current super users.
+        $currentUsers = User::getSuperUsers();
+
+        try {
+            DAL::beginTransaction();
+            foreach ($superUsers as $newUserid => $info) {
+                if (in_array($newUserid, $currentUsers) === FALSE) {
+                    User::addSuperUser($newUserid);
+                }
+            }
+
+            // Remove users.
+            foreach ($removedUsers as $removedUserid) {
+                User::removeSuperUser($removedUserid);
+            }
+
+            DAL::commit();
+        } catch (ChannelException $e) {
+            DAL::rollBack();
+            $erros[] = _('Failed to add super users');
+        }
+
+        $retVal = TRUE;
+        if (empty($errors) === FALSE) {
+            $retVal = array('errors' => $errors);
+        }
+
+        return $retVal;
+
+    }//end saveSuperUsersScreen()
 
 
 }//end class
