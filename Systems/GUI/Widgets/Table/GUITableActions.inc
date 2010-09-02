@@ -74,7 +74,7 @@ class GUITableActions
      *
      * @var boolean
      */
-    protected static $showRemoveIcon = FALSE;
+    protected static $allowDelete = FALSE;
 
     /**
      * Alternate row or column colours.
@@ -118,7 +118,7 @@ class GUITableActions
             throw new ChannelException(_('Table widget must have at least one column'));
         }
 
-        if (Util::getArrayIndex($settings, 'showRemoveIcon', self::$showRemoveIcon) === TRUE) {
+        if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
             $columns['_remove'] = array(
                                    'name'  => '',
                                    'align' => 'right',
@@ -218,7 +218,7 @@ class GUITableActions
 
             echo '">';
 
-            if (Util::getArrayIndex($settings, 'showRemoveIcon', self::$showRemoveIcon) === TRUE) {
+            if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
                 if (isset($row['_remove']) === FALSE) {
                     $row['_remove'] = '&nbsp;<div class="GUI-delete"><span class="GUI-deleteIcon"/></div>';
                 }
