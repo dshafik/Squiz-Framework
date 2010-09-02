@@ -164,7 +164,7 @@ class GUITableActions
                     $colClass = 'middle';
                 }
 
-                echo '<th align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col">'.$column['name'].'</th>';
+                echo '<th align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col th-'.$colid.'">'.$column['name'].'</th>';
             }
 
             echo '</tr></thead>';
