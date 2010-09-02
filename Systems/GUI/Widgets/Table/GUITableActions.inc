@@ -242,8 +242,13 @@ class GUITableActions
                 }
 
                 echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.' '.$colid.'">';
+                echo '<div class="'.$class.'-colWrapper">';
                 echo $col;
-                echo '</td>';
+                if (self::$allowDelete === TRUE) {
+                    echo '<div class="'.$class.'-colRemovedOverlay"></div>';
+                }
+
+                echo '</div></td>';
 
                 $colIdx++;
             }//end foreach
