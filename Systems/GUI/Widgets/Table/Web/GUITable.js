@@ -252,6 +252,24 @@ GUITable.prototype = {
 
     },
 
+    saved: function()
+    {
+        // Table widget was saved so do some processing.
+        // Remove the elements that were marked as deleted.
+        var tbody    = dfx.getTag('tbody', this.elem)[0];
+        var toRemove = [];
+        for (var node = tbody.firstChild; node; node = node.nextSibling) {
+            if (dfx.hasClass(node, 'deleted') === true) {
+                toRemove.push(node);
+            }
+        }
+
+        if (toRemove.length > 0) {
+            dfx.remove(toRemove);
+        }
+
+    },
+
     removeWidget: function()
     {
         // Remove all the widgets in each column.

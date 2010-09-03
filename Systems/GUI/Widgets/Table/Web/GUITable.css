@@ -51,11 +51,11 @@ table.GUITable {
 }
 
 .GUITable.alternateRows tr.rowEven {
-    background-color: #DDD;
+    background-color: #F6F6F6;
 }
 
 .GUITable.alternateCols td.colOdd {
-    background-color: #CCC;
+    background-color: #F6F6F6;
 }
 
 .GUITable tr.selected {

@@ -164,7 +164,12 @@ class GUITableActions
                     $colClass = 'middle';
                 }
 
-                echo '<th align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col th-'.$colid.'">'.$column['name'].'</th>';
+                $colWidth = Util::getArrayIndex($column, 'width', '');
+                if (empty($colWidth) === FALSE) {
+                    $colWidth = ' width="'.$colWidth.'"';
+                }
+
+                echo '<th'.$colWidth.' align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col th-'.$colid.'">'.$column['name'].'</th>';
             }
 
             echo '</tr></thead>';
