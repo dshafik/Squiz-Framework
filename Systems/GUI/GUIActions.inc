@@ -354,8 +354,8 @@ class GUIActions
         $htmlCont = trim(str_replace('<?xml version="1.0"?>', '', $htmlCont));
         $htmlCont = str_replace('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>', '', $htmlCont);
 
-        $htmlCont = str_replace('&lt;?php', '<'.'?php', $htmlCont);
-        $htmlCont = str_replace('?&gt;', '?'.'>', $htmlCont);
+        $htmlCont = str_replace('&lt;?php', '<?php', $htmlCont);
+        $htmlCont = str_replace('?&gt;', '?>', $htmlCont);
 
         include_once 'Libs/FileSystem/FileSystem.inc';
         $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
@@ -916,6 +916,27 @@ class GUIActions
                 $php .= 'ob_start();'."\n";
                 $php .= $subTemplateStr;
                 $php .= $assignTo.' = ob_get_clean();'."\n";
+            break;
+
+            case 'colspan':
+                $php .= $assignTo.'["colspan"] = ';
+                $php .= self::_getPHPValue(trim($node->nodeValue)).";\n";
+            break;
+
+            case 'colContent':
+                include_once 'Libs/XML/XML.inc';
+                $varName = $assignTo.'["colContent"]';
+                if (XML::hasChildElements($node) === TRUE) {
+                    foreach ($node->childNodes as $childTag) {
+                        if ($childTag->nodeType !== XML_ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        $php .= self::_parseTag($childTag, $varName);
+                    }
+                } else {
+                    $php .= self::_getPHPValue(trim($node->nodeValue)).";\n";
+                }//end if
             break;
 
             default:
@@ -1700,15 +1721,16 @@ class GUIActions
             || $filename === 'styles_ie8.css'
         ) {
             ob_start('ob_gzhandler');
-                header('Content-type: text/css; charset: UTF-8');
-                header('Cache-Control: must-revalidate');
 
-                $now     = time();
-                $expires = date('D, j M Y 00:00:00', ($now + 86400));
-                header('Expires: '.$expires);
-                header('Last-Modified: '.$modified);
+            header('Content-type: text/css; charset: UTF-8');
+            header('Cache-Control: must-revalidate');
 
-                echo file_get_contents(dirname(__FILE__).'/web/'.$filename);
+            $now     = time();
+            $expires = date('D, j M Y 00:00:00', ($now + 86400));
+            header('Expires: '.$expires);
+            header('Last-Modified: '.$modified);
+
+            echo file_get_contents(dirname(__FILE__).'/web/'.$filename);
         } else {
             header('X-Sendfile: '.$path);
             if ($filename === 'mysource.jgz' || $filename === 'dfx.jgz') {

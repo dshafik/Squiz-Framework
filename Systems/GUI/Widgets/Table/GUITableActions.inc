@@ -56,7 +56,26 @@ class GUITableActions
     /**
      * List of rows.
      *
-     * Expected array structure is array('rowid' => array('colid' => 'value')).
+     * Expected array structure is:
+     * array(
+     *  'rowid1' => array(
+     *               'colid1' => 'value',
+     *               'colid2' => 'value',
+     *               'colid3' => 'value',
+     *              ),
+     *  'rowid2' => array(
+     *               'colid1' => 'value',
+     *               'colid2' => array(
+     *                            'colspan'    => 2,
+     *                            'conContent' => 'value',
+     *                           ),
+     *              ),
+     *  'rowid3' => array(
+     *               'colid1' => 'value',
+     *               'colid2' => 'value',
+     *               'colid3' => 'value',
+     *              ),
+     * ).
      *
      * @var array
      */
@@ -164,12 +183,7 @@ class GUITableActions
                     $colClass = 'middle';
                 }
 
-                $colWidth = Util::getArrayIndex($column, 'width', '');
-                if (empty($colWidth) === FALSE) {
-                    $colWidth = ' width="'.$colWidth.'"';
-                }
-
-                echo '<th'.$colWidth.' align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col th-'.$colid.'">'.$column['name'].'</th>';
+                echo '<th align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col th-'.$colid.'">'.$column['name'].'</th>';
             }
 
             echo '</tr></thead>';
@@ -221,7 +235,6 @@ class GUITableActions
                 echo 'rowOdd';
             }
 
-            echo ' row-'.$rowid;
             echo '">';
 
             if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
@@ -230,9 +243,27 @@ class GUITableActions
                 }
             }
 
-            $colIdx = 1;
+            $colIdx      = 1;
+            $colspanSkip = 0;
             foreach ($colids as $colid) {
+                if ($colspanSkip > 0) {
+                    $colspanSkip--;
+                    $colIdx++;
+                    continue;
+                }
+
                 $col = Util::getArrayIndex($row, $colid, '');
+
+                $colspan = '';
+                if (is_array($col) === TRUE) {
+                    if (array_key_exists('colspan', $col) === TRUE
+                        && array_key_exists('colContent', $col) === TRUE
+                    ) {
+                        $colspan     = ' colspan="'.$col['colspan'].'"';
+                        $colspanSkip = (((int) $col['colspan']) - 1);
+                        $col         = $col['colContent'];
+                    }
+                }
 
                 $colClass = 'middleCol';
                 if ($colid === $firstColid) {
@@ -247,7 +278,7 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'">';
+                echo '<td'.$colspan.' colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'">';
                 echo '<div class="'.$class.'-colWrapper">';
                 echo $col;
                 if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
