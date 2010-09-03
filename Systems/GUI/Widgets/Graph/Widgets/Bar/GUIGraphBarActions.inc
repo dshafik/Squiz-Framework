@@ -701,20 +701,24 @@ class GUIGraphBarActions
                 if (count($tooltipRows) > 0) {
                     echo '<table>';
 
-                    foreach ($tooltipRows as $tooltipRow) {
-                        $rowLabel = array_shift($tooltipRow);
-                        echo '<tr>';
-                        // Row label.
-                        echo '<td class="label">';
-                        echo $rowLabel;
-                        echo '</td>';
+                    foreach ($tooltipRows as $rowid => $tooltipRow) {
+                        echo '<tr class="row-'.$rowid.'">';
 
-                        // Row data.
-                        foreach ($tooltipRow as $tooltipRowItem) {
-                            echo '<td class="data">';
+                        $colIndex = 0;
+                        foreach ($tooltipRow as $colid => $tooltipRowItem) {
+                            $colClass = 'col-'.$colid;
+                            if ($colIndex === 0) {
+                                $colClass .= ' label';
+                            } else {
+                                $colClass .= ' data';
+                            }
+
+                            echo '<td class="'.$colClass.'">';
                             echo $tooltipRowItem;
                             echo '</td>';
-                        }
+
+                            $colIndex++;
+                        }//end foreach
 
                         echo '</tr>';
                     }//end foreach
