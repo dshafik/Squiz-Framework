@@ -58,7 +58,6 @@ class APIActions
                                      404 => 'Not Found',
                                      405 => 'Method Not Allowed',
                                      406 => 'Not Acceptable',
-                                     420 => 'Enhance Your Calm',
                                      500 => 'Internal Server Error',
                                      502 => 'Bad Gateway',
                                      503 => 'Service Unavailable',
@@ -265,8 +264,14 @@ class APIActions
             $response = 200;
         } catch (Exception $e) {
             $responseContent['exception'] = $e->getMessage();
-            $response = 500;
-        }
+            $apiToken = Security::getRequestData('_api_token', NULL, TRUE);
+            if ($apiToken === NULL) {
+                $response = 500;
+            } else {
+                // For JS send 200 otherwise callback function won't be executed.
+                $response = 200;
+            }
+        }//end try
 
         self::_sendHeader($response);
         self::_sendResponse($responseContent, $outputFormat);
