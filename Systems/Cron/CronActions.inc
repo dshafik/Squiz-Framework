@@ -535,7 +535,6 @@ class CronActions
     ) {
         try {
             DAL::beginTransaction();
-            Channels::includeSystem('Cron');
             DAL::executeQuery('Cron', 'updateCron');
             DAL::commit();
         } catch (DALException $e) {
@@ -725,7 +724,6 @@ class CronActions
         $runTime
     ) {
         try {
-            Channels::includeSystem('Cron');
             DAL::beginTransaction();
             DAL::executeQuery('Cron', 'updateCronType');
             DAL::commit();
@@ -1032,6 +1030,7 @@ class CronActions
             DAL::beginTransaction();
             // Save Cron Job changes.
             $jobList = Util::getArrayIndex($data, 'cronJobsList', array());
+            $jobList = Util::getArrayIndex($jobList, 'items', array());
             foreach ($jobList as $systemScript => $info) {
                 list($system, $scriptName) = explode('_', $systemScript);
 
