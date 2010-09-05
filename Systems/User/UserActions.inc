@@ -605,7 +605,7 @@ class UserActions
         $user        = User::getUserById($userid);
 
         $columns = array();
-        $columns['user']      = $user['username'];
+        $columns['user']      = $user['first_name'].' '.$user['last_name'].' ('.$user['username'].')';
         $columns['email']     = $user['email'];
         $columns['lastLogin'] = $user['last_login'];
 
@@ -665,12 +665,14 @@ class UserActions
             DAL::commit();
         } catch (ChannelException $e) {
             DAL::rollBack();
-            $erros[] = _('Failed to add super users');
+            $errors[] = _('Failed to add super users');
         }
 
         $retVal = TRUE;
         if (empty($errors) === FALSE) {
             $retVal = array('errors' => $errors);
+        } else {
+            $retVal = array('success' => TRUE);
         }
 
         return $retVal;

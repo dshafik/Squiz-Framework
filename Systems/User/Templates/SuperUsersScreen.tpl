@@ -17,14 +17,17 @@
                     <user>
                         <name><text>User</text></name>
                         <align>left</align>
+                        <width>250px</width>
                     </user>
                     <email>
                         <name><text>Email</text></name>
                         <align>left</align>
+                        <width>250px</width>
                     </email>
                     <lastLogin>
                         <name><text>Last Login</text></name>
                         <align>left</align>
+                        <width>250px</width>
                     </lastLogin>
                 </setting>
                 <setting name="rows">
@@ -34,7 +37,7 @@
                     <system>User</system>
                     <action>getSuperUserTableColumns</action>
                 </setting>
-                <setting name="alternate">rows</setting>
+                <setting name="alternate">cols</setting>
                 <setting name="allowDelete">true</setting>
             </widget>
         </setting>
