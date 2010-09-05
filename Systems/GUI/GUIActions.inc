@@ -918,27 +918,6 @@ class GUIActions
                 $php .= $assignTo.' = ob_get_clean();'."\n";
             break;
 
-            case 'colspan':
-                $php .= $assignTo.'["colspan"] = ';
-                $php .= self::_getPHPValue(trim($node->nodeValue)).";\n";
-            break;
-
-            case 'colContent':
-                include_once 'Libs/XML/XML.inc';
-                $varName = $assignTo.'["colContent"]';
-                if (XML::hasChildElements($node) === TRUE) {
-                    foreach ($node->childNodes as $childTag) {
-                        if ($childTag->nodeType !== XML_ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        $php .= self::_parseTag($childTag, $varName);
-                    }
-                } else {
-                    $php .= self::_getPHPValue(trim($node->nodeValue)).";\n";
-                }//end if
-            break;
-
             default:
                 include_once 'Libs/XML/XML.inc';
                 if ($node->tagName === 'value') {
