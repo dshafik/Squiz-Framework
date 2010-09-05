@@ -1505,42 +1505,98 @@ class GUIActions
      */
     public static function saveTemplateData(array $templateData)
     {
-        $errors = array();
-        foreach ($templateData as $key => $data) {
-            list($system, $templateName) = explode(':', $key);
-            Channels::includeSystem($system);
-            $templateName = 'save'.$templateName;
+        $success = array();
+        $errors  = array();
 
-            if (is_callable($system.'::'.$templateName) === FALSE) {
-                // No save method for this template.
-                continue;
-            }
+        try {
+            foreach ($templateData as $key => $data) {
+                list($system, $templateName) = explode(':', $key);
+                Channels::includeSystem($system);
+                $templateName = 'save'.$templateName;
 
-            $callback = array(
-                         $system,
-                         $templateName,
-                        );
-            $retVal   = call_user_func($callback, $data);
-
-            if ($retVal === TRUE) {
-                // Data saved with no problems.
-                continue;
-            } else if (is_array($retVal) === TRUE) {
-                if (isset($retVal['errors']) === TRUE) {
-                    $errors[] = implode("\n", $retVal['errors']);
+                if (is_callable($system.'::'.$templateName) === FALSE) {
+                    // No save method for this template.
+                    continue;
                 }
-            } else {
-                throw new ChannelException('Invalid return type. ('.$system.'::'.$templateName.')');
-            }
-        }//end foreach
 
+                $callback = array(
+                             $system,
+                             $templateName,
+                            );
+                $retVal   = call_user_func($callback, $data);
+
+                if (is_array($retVal) === TRUE) {
+                    if (isset($retVal['errors']) === TRUE) {
+                        $errors[$key] = $retVal['errors'];
+
+                        // Do not continue and rollback changes.
+                        DAL::rollBack();
+                        break;
+                    } else if (isset($retVal['success']) === TRUE) {
+                        $success[$key] = $retVal['success'];
+                        continue;
+                    }
+                } else if ($retVal === TRUE) {
+                    $success[$key] = TRUE;
+                    continue;
+                }
+
+                throw new ChannelException('Invalid return type. ('.$system.'::'.$templateName.')');
+            }//end foreach
+        } catch (ChannelException $e) {
+            DAL::rollBack();
+            throw new ChannelException($e->getMessage());
+        }//end try
+
+        $retVal = NULL;
         if (empty($errors) === TRUE) {
-            return 'success';
+            if (empty($success) === FALSE) {
+                // Commit all the changes.
+                DAL::commit();
+                $retVal = array('success' => $success);
+            }
+        } else {
+            $retVal = array(
+                       'errors'    => $errors,
+                       'errorList' => self::_getSaveErrorList($errors),
+                      );
         }
 
-        return 'Errors: '.implode("\n", $errors);
+        return $retVal;
 
     }//end saveTemplateData()
+
+
+    /**
+     * Returns the content for the error list.
+     *
+     * @param array $errors The list of errors to print.
+     *
+     * @return string
+     */
+    private static function _getSaveErrorList(array $errors)
+    {
+        $content  = '<div class="GUI-overlay-errorList">';
+        $content .= '<ul>';
+
+        foreach ($errors as $error) {
+            $content .= '<li>'.$error.'</li>';
+        }
+
+        $content .= '</ul>';
+
+        $buttonOpts = array(
+                       'value'  => _('Return to screen'),
+                       'colour' => 'Dark',
+                       'click'  => 'GUI.hideOverlay()',
+                      );
+
+        $content .= GUI::createWidget('GUI-save-returnButton', 'GUIButton', $buttonOpts);
+        $content .= '</div>';
+
+        return $content;
+
+    }//end _getSaveErrorList()
 
 
     /**

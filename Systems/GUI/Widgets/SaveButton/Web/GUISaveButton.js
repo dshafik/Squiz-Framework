@@ -21,6 +21,14 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
+/**
+ * GUISaveButton.
+ *
+ * @param {string} id       The id of the widget.
+ * @param {Array}  settings Settings of the widget.
+ *
+ * @return void
+ */
 function GUISaveButton(id, settings)
 {
     this.id        = id;
@@ -36,6 +44,13 @@ function GUISaveButton(id, settings)
 
 GUISaveButton.prototype = {
 
+    /**
+     * Initialise the save button.
+     *
+     * Adds save button click events.
+     *
+     * @returns {void}
+     */
     init: function()
     {
         var self           = this;
@@ -60,6 +75,11 @@ GUISaveButton.prototype = {
 
     },
 
+    /**
+     * Enable the save button.
+     *
+     * @returns {void}
+     */
     enable: function()
     {
         dfx.attr(this._saveButton, 'disabled', false);
@@ -69,6 +89,11 @@ GUISaveButton.prototype = {
 
     },
 
+    /**
+     * Disable the save button.
+     *
+     * @returns {void}
+     */
     disable: function()
     {
         dfx.attr(this._saveButton, 'disabled', true);

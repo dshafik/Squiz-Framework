@@ -197,7 +197,17 @@ var GUI = new function()
     };
 
     this.sendRequest = function(system, action, params, callback) {
-        sfapi.get(system, action, params, callback);
+        sfapi.get(system, action, params, function(data) {
+            if (!data || data.exception) {
+                // Show error message.
+                GUI.showOverlay({
+                    icon: 'error',
+                    content: '<p>' + data.exception + '</p><br /><a href="javascript:GUI.hideOverlay();">Close</a>'
+                });
+            } else if (callback) {
+                callback.call(this, data);
+            }
+        });
     };
 
     /**
@@ -266,6 +276,12 @@ var GUI = new function()
     };
 
     this.save = function() {
+        // Show loader.
+        GUI.showOverlay({
+            icon: 'loading',
+            content: 'Saving...'
+        });
+
         var self   = this;
         var values = {};
         var ln     = this.templateLineage.length;
@@ -305,8 +321,49 @@ var GUI = new function()
             templateData: dfx.jsonEncode(values)
         };
 
-        GUI.sendRequest('GUI', 'saveTemplateData', params, function() {
-            // TODO: Show save success/error message.
+        GUI.sendRequest('GUI', 'saveTemplateData', params, function(data) {
+            if (!data.result) {
+                // TODO: Failed to save. Invalid result, most likely a PHP error.
+            } else if (data.result.errors ){
+                // Send the errors to template.
+                self.showOverlay({
+                    icon: 'warning',
+                    content: data.result.errorList
+                });
+            } else if (data.result.success) {
+                dfx.foreach(data.result.success, function(templateKey) {
+                    var retVal = data.result.success[templateKey];
+                    // For each template that returned a success call their "saved"
+                    // method to perform extra actions.
+                    var tplClassName = templateKey.split(':')[1];
+                    var saveChildren = true;
+                    if (window[tplClassName] && window[tplClassName].saved) {
+                        saveChildren = window[tplClassName].saved(retVal);
+                    }
+
+                    if (saveChildren !== false) {
+                        // The saved method of a template class can return false
+                        // to prevent saved method of child widget being called.
+                        dfx.foreach(self.widgetTemplates[templateKey], function(widgetid) {
+                            var widget = self.widgetTemplates[templateKey][widgetid];
+                            if (widget && widget.saved) {
+                                widget.saved();
+                            }
+                        });
+                    }
+
+                    // Show saved icon for a second.
+                    self.showOverlay({
+                        icon: 'saved',
+                        content: 'Save Complete'
+                    });
+                    setTimeout(function() {
+                        self.hideOverlay();
+                    }, 1000);
+                });
+            } else {
+                // TODO: Unknown return type.
+            }//end if
         });
 
         return values;
@@ -342,16 +399,52 @@ var GUI = new function()
     /**
      * Displays an overlay on top of every element on the screen or elements inside specified element.
      *
+     * @param {object}  [options] List of options for the overlay. Options:
+     *                            - icon: loading|saved|warning|error.
+     *                            - content: HTML string to show in the overlay.
      *
+     * @param {DOMNode} [target=document.body] The element that will have the overlay.
+     *
+     * @returns {void}
      */
-    this.showOverlay = function(target) {
+    this.showOverlay = function(options, target) {
         if (!target) {
             target = document.body;
         }
 
-        var overlay = document.createElement('div');
-        overlay.id  = 'GUI-overlay';
-        dfx.addClass(overlay, 'GUI-overlay');
+        options = options || {};
+
+        var overlayid = 'GUI-overlay';
+        var overlay   = dfx.getId(overlayid);
+        if (!overlay) {
+            overlay    = document.createElement('div');
+            overlay.id = overlayid;
+            dfx.addClass(overlay, 'GUI-overlay');
+        }
+
+        var content = '<div class="GUI-overlayOpacity"></div>';
+
+        if (options.icon) {
+            dfx.addClass(overlay, 'GUI-overlay-icon');
+
+            switch (options.icon) {
+                case 'loading':
+                    content += '<img src="/__web/Systems/GUI/Web/loading_black.gif" class="GUI-overlay-icon" id="GUI-overlay-loading" />';
+                break;
+
+                default:
+                    content += '<img src="/__web/Systems/GUI/Web/' + options.icon + '.png" class="GUI-overlay-icon" id="GUI-overlay-' + options.icon + '" />';
+                break;
+            }
+        }//end if
+
+        if (options.content) {
+            content += '<div id="GUI-overlay-content">';
+            content += options.content;
+            content += '</div>';
+        }
+
+        dfx.setHtml(overlay, content);
 
         target.appendChild(overlay);
     };

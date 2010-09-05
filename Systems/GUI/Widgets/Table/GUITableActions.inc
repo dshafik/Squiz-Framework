@@ -141,6 +141,7 @@ class GUITableActions
             $columns['_remove'] = array(
                                    'name'  => '',
                                    'align' => 'right',
+                                   'width' => '1px',
                                   );
 
             // Update the settings array.
