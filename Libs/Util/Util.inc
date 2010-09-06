@@ -456,7 +456,15 @@ class Util
         // It now needs to go back to raw '&' char to make keyword work.
         if (empty($ampersands) === FALSE) {
             foreach ($ampersands as $ampStr) {
-                $value = str_replace($ampStr, rawurldecode($ampStr), $value);
+                // Firstly, encode any keywords to prevent rawurldecode() from touching them.
+                $ampStr = self::encodeKeywords($ampStr);
+                $value  = self::encodeKeywords($value);
+
+                // Decode any url encodings.
+                $value  = str_replace($ampStr, rawurldecode($ampStr), $value);
+
+                // Finally, decode the keywords back to keyword format.
+                $value  = self::decodeKeywords($value);
             }
         }
 
@@ -470,6 +478,54 @@ class Util
         return $value;
 
     }//end getHTML()
+
+
+    /**
+     * Encode keywords from %some_keyword% to __some_keyword__.
+     *
+     * @param string $content The content to encode.
+     *
+     * @return string
+     */
+    public static function encodeKeywords($content)
+    {
+        $matches = array();
+        preg_match_all('/%[a-zA-Z]{2}[a-zA-Z0-9\-_]+%/', $content, $matches);
+        $keywords = array_unique($matches[0]);
+        if (empty($keywords) === FALSE) {
+            foreach ($keywords as $keyword) {
+                $key     = trim($keyword, '%');
+                $content = str_replace($keyword, '__'.$key.'__', $content);
+            }
+        }
+
+        return $content;
+
+    }//end encodeKeywords()
+
+
+    /**
+     * Decode keywords from __some_keyword__ to %some_keyword%.
+     *
+     * @param string $content The content to decode.
+     *
+     * @return string
+     */
+    public static function decodeKeywords($content)
+    {
+        $matches = array();
+        preg_match_all('/__[a-zA-Z]{2}[a-zA-Z0-9\-_]+__/', $content, $matches);
+        $keywords = array_unique($matches[0]);
+        if (empty($keywords) === FALSE) {
+            foreach ($keywords as $keyword) {
+                $key     = substr($keyword, 2, -2);
+                $content = str_replace($keyword, '%'.$key.'%', $content);
+            }
+        }
+
+        return $content;
+
+    }//end decodeKeywords()
 
 
     /**
