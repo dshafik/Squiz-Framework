@@ -236,6 +236,7 @@ class GUITableActions
                 echo 'rowOdd';
             }
 
+            echo ' row-'.$rowid;
             echo '">';
 
             if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
