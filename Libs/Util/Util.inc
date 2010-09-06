@@ -461,10 +461,10 @@ class Util
                 $value  = self::encodeKeywords($value);
 
                 // Decode any url encodings.
-                $value  = str_replace($ampStr, rawurldecode($ampStr), $value);
+                $value = str_replace($ampStr, rawurldecode($ampStr), $value);
 
                 // Finally, decode the keywords back to keyword format.
-                $value  = self::decodeKeywords($value);
+                $value = self::decodeKeywords($value);
             }
         }
 
