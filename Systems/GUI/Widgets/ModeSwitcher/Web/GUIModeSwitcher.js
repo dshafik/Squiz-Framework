@@ -88,11 +88,16 @@ GUIModeSwitcher.prototype = {
         var dynamicButtons = this._getDynamicButtons();
 
         // Get last button width.
-        var lastButtonIndex = this.getLastVisibleButtonIndex();
-        var lastButtonWidth = dfx.getElementWidth(dynamicButtons[lastButtonIndex]);
+
+        var width = this._staticButtonsWidth;
+        if (dynamicButtons.length > 0) {
+            var lastButtonIndex = this.getLastVisibleButtonIndex();
+            var lastButtonWidth = dfx.getElementWidth(dynamicButtons[lastButtonIndex]);
+            width += lastButtonWidth;
+        }
 
         if (setWidth === true) {
-            dfx.setStyle(this._staticBtnContainer.parentNode.parentNode, 'width', this._staticButtonsWidth + lastButtonWidth + 'px');
+            dfx.setStyle(this._staticBtnContainer.parentNode.parentNode, 'width', width + 'px');
             dfx.setStyle(this._dynamicBtnContainer, 'left', this._getSlideOffset() + 'px');
         }
 
