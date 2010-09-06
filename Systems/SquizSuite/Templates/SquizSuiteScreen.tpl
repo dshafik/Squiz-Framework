@@ -2,7 +2,7 @@
     <widget type="GUI/Box" id="squizSuite-currentProduct-box">
         <setting name="title"><text>Current Product</text></setting>
         <setting name="content">
-            <widget type="GUI/Table" id="squizSuiteList">
+            <widget type="GUI/Table" id="currProductTable">
                 <setting name="columns">
                     <currTypeIcon>
                         <name><text>Type</text></name>
@@ -30,8 +30,18 @@
     </widget>
     <widget type="GUI/Box" id="squizSuite-connectedProduct-box">
         <setting name="title"><text>Connected Products</text></setting>
+        <setting name="headerContent">
+            <content>
+                <div class="addNewButtonContainer">
+                    <widget type="GUI/Button" id="addNewProduct">
+                        <setting name="value"><text>Add New</text></setting>
+                        <setting name="click">SquizSuiteScreen.addProduct()</setting>
+                    </widget>
+                </div>
+            </content>
+        </setting>
         <setting name="content">
-            <widget type="GUI/Table" id="squizSuiteList">
+            <widget type="GUI/Table" id="connProductsTable">
                 <setting name="columns">
                     <currTypeIcon>
                         <name><text>Type</text></name>
@@ -57,4 +67,7 @@
             </widget>
         </setting>
     </widget>
+    <dataProvider action="SquizSuite::getSquizSuiteScreenInitCode">
+        <arg></arg>
+    </dataProvider>
 </div>

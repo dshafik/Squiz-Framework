@@ -11,6 +11,10 @@
     padding: 0px;
 }
 
+#squizSuite-connectedProduct-box div.SquizSuiteScreen-productDetailWrap {
+    padding-left: 15px;
+}
+
 #squizSuite-currentProduct-box tr.rowOdd {
     height: 76px;
 }
@@ -61,22 +65,35 @@
     background-color: #F7F7F7;
 }
 
-#squizSuiteList td.col-currTypeIcon {
+td.col-currTypeIcon {
     background-color: #E7F1FF;
     width: 47px;
 }
 
-#squizSuiteList td.col-currName {
+/* Expanded section */
+#squizSuite-connectedProduct-box tr.rowEven {
+    height: 87px;
+}
+
+#squizSuite-connectedProduct-box tr.hidden {
+    display: none;
+}
+
+#squizSuite-connectedProduct-box tr.rowEven td.col-currTypeIcon {
+    background-color: #F8F8F8;
+}
+
+td.col-currName {
     padding-left: 15px;
     width: 378px;
 }
 
-#squizSuiteList td.col-currStatusIcon {
+td.col-currStatusIcon {
     background-color: #F5F5F5;
     width: 67px;
 }
 
-#squizSuiteList td.col-currSummary {
+td.col-currSummary {
     padding-left: 15px;
     width: 406px;
 }
@@ -170,4 +187,28 @@ span.SquizSuiteScreen-productExpander {
 
 span.SquizSuiteScreen-productExpander.expanded {
     background-position: 0 -14px;
+}
+
+/* New Product */
+#SquizSuiteScreen-newProductTable {
+    background-color: #FFF;
+}
+
+#SquizSuiteScreen-newProductTable tr.rowEven td.col-currTypeIcon {
+    background-color: #F8F8F8;
+}
+
+#SquizSuiteScreen-newProductTable td.col-currName {
+    padding-left: 15px;
+    width: 871px;
+}
+
+#SquizSuiteScreen-newProductTable td.col-currStatusIcon {
+    background-color: #F5F5F5;
+    width: 67px;
+}
+
+span.SquizSuiteScreen-newProductHeadDesc {
+    font-style: italic;
+    color: #9C9B9B;
 }

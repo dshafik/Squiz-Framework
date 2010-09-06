@@ -1252,8 +1252,10 @@ class SquizSuiteActions
      */
     public static function getConnectedProductRows()
     {
+        Channels::includeSystem('GUI');
         $rows = array();
 
+        $count       = 0;
         $allProducts = SquizSuite::getAllProducts();
         foreach ($allProducts as $product) {
             // Skip the current product.
@@ -1261,27 +1263,29 @@ class SquizSuiteActions
                 continue;
             }
 
+            // Product Type Icon.
             $typeC    = str_replace(' ', '', $product['type']);
             $typeIcon = '<div class="SquizSuiteScreen-productIconWrap '.$typeC.'">&nbsp;</div>';
 
+            // Product Name.
             $name  = $product['connection']['name'];
-            $name .= '<span class="SquizSuiteScreen-productExpander">&nbsp;</span>';
+            $name .= '<span class="SquizSuiteScreen-productExpander" rowid="'.$count.'">&nbsp;</span>';
 
+            // Product Summary Status and Summary.
             $statucC = 'live';
             $summary = '<strong>'._('Summary').'</strong><br /><div class="SquizSuiteScreen-summaryWrap">';
-
             switch ($product['status']) {
                 case 'live':
                     $statusC = 'live';
-                default;
+                break;
 
                 case 'pending':
                     $statusC = 'pending';
-                default;
+                break;
 
                 case 'pending approval':
                     $statusC = 'pending';
-                default;
+                break;
 
                 default:
                     // No default status.
@@ -1289,20 +1293,124 @@ class SquizSuiteActions
             }//end switch
 
             $statusIcon = '<div class="SquizSuiteScreen-statusWrap '.$statusC.'">&nbsp;</div>';
+            $summary   .= '</div>';
 
-            $summary .= '</div>';
-
+            // Product Row.
             $rows[] = array(
                        'currTypeIcon'   => $typeIcon,
                        'currName'       => $name,
                        'currStatusIcon' => $statusIcon,
                        'currSummary'    => $summary,
                       );
+
+            // Product Details Row.
+            $setting     = array('value' => $product['connection']['url']);
+            $colContent  = '<div class="SquizSuiteScreen-productDetailWrap">';
+            $colContent .= '<strong>API URL</strong><br />';
+            $colContent .= GUI::createWidget('squizSuite-'.$product['systemid'].'-apiURL', 'GUITextBox', $setting);
+            $colContent .= '</div>';
+
+            $rows[] = array(
+                       'currTypeIcon' => array(
+                                          'colspan'    => 5,
+                                          'colContent' => $colContent,
+                                         ),
+                      );
+
+            $count++;
         }//end foreach
 
+        $rows[] = array(
+                   'currTypeIcon' => array(
+                                      'colspan'    => 5,
+                                      'colContent' => self::_getNewProductRowContent(),
+                                     ),
+                  );
         return $rows;
 
     }//end getConnectedProductRows()
+
+
+    /**
+     * Returns the HTML code to create a new product row.
+     *
+     * @return string
+     */
+    private static function _getNewProductRowContent()
+    {
+        Channels::includeSystem('GUI');
+
+        // New product field.
+        $typeIcon         = '<div class="SquizSuiteScreen-productIconWrap unknown">&nbsp;</div>';
+        $newProductLabel  = 'New product connection - ';
+        $newProductLabel .= '<span class="SquizSuiteScreen-newProductHeadDesc">';
+        $newProductLabel .= 'Name and summary information will be available after the initial connection is made</span>';
+        $newProductLabel .= '</span>';
+
+        $setting = array(
+                    'allowDelete' => TRUE,
+                    'hideHeader'  => TRUE,
+                    'columns'     => array(
+                                      'currTypeIcon' => array(
+                                                         'name'  => _('Type'),
+                                                         'align' => 'left',
+                                                        ),
+                                      'currName'     => array(
+                                                         'name'  => _('Name'),
+                                                         'align' => 'left',
+                                                        ),
+                                     ),
+                   );
+
+        $setting['rows'][] = array(
+                              'currTypeIcon' => $typeIcon,
+                              'currName'     => $newProductLabel,
+                             );
+
+        $textSetting = array('value' => '');
+        $colContent  = '<div class="SquizSuiteScreen-productDetailWrap">';
+        $colContent .= '<strong>API URL</strong><br />';
+        $colContent .= GUI::createWidget('squizSuite-new-apiURL', 'GUITextBox', $textSetting);
+        $colContent .= '</div>';
+
+        $setting['rows'][] = array(
+                              'currTypeIcon' => array(
+                                                 'colspan'    => 2,
+                                                 'colContent' => $colContent,
+                                                ),
+                             );
+
+        $newTable = GUI::createWidget('SquizSuiteScreen-newProductTable', 'GUITable', $setting);
+        return $newTable;
+
+    }//end _getNewProductRowContent()
+
+
+    /**
+     * Returns the JS code to initialise the Roles Screen.
+     *
+     * @return string
+     */
+    public static function getSquizSuiteScreenInitCode()
+    {
+        $products = SquizSuite::getAllProducts();
+        $data     = array(
+                     'currentProduct'    => array(),
+                     'connectedProducts' => array(),
+                    );
+
+        foreach ($products as $p) {
+            if ($p['current'] === TRUE) {
+                $data['currentProduct'] = $p;
+            } else {
+                $data['connectedProducts'][] = $p;
+            }
+        }
+
+        $data = json_encode($data);
+        return '<script>SquizSuiteScreen.initScreen('.$data.');</script>';
+
+    }//end getSquizSuiteScreenInitCode()
 
 
 }//end class
