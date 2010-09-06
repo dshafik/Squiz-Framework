@@ -329,7 +329,8 @@ class GUIActions
         // If <head> element exists, insert API token hidden input field
         // for the interface to work.
         if ($head->length !== 0) {
-            $replacement  = '<?php '."\n";
+            $replacement  = '<body>'."\n";
+            $replacement .= '<?php '."\n";
             $replacement .= 'Channels::includeSystem(\'User\');'."\n";
             $replacement .= 'Channels::includeSystem(\'API\');'."\n";
             $replacement .= '$currUserid = User::getCurrentUserid();'."\n";
@@ -342,9 +343,8 @@ class GUIActions
             $replacement .= '   echo \'<input id="__api_token" type="hidden" value="\'.$currToken.\'" />\';'."\n";
             $replacement .= '}'."\n";
             $replacement .= '?'.">\n";
-            $replacement .= '</body>'."\n";
 
-            $htmlCont = str_replace('</body>', $replacement, $htmlCont);
+            $htmlCont = str_replace('<body>', $replacement, $htmlCont);
         } else {
             // Replce the doc type for sub level templates.
             $htmlCont = str_replace(self::$_docType, '', $htmlCont);
