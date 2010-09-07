@@ -14,3 +14,9 @@ for dir in $dirs; do
         find $dir -type f ! -perm 0644 -exec chmod 644 {} \;
     fi
 done
+
+#Finally, fix the perm of the error_log
+if [ ! -e "$basedir/error_log" ]; then
+    touch $basedir/error_log
+fi
+chown www-data:www-data $basedir/error_log
