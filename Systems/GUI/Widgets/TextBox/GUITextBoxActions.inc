@@ -38,6 +38,20 @@ class GUITextBoxActions
     protected static $size = '30';
 
     /**
+     * Max length attribute of the text field.
+     *
+     * @var string
+     */
+    protected static $maxlength = '30';
+
+    /**
+     * Name attribute of the text field.
+     *
+     * @var string
+     */
+    protected static $name = 'GUITextBox';
+
+    /**
      * Value attribute of the text field.
      *
      * @var string
