@@ -1527,6 +1527,10 @@ class GUIActions
 
                 if (is_array($retVal) === TRUE) {
                     if (isset($retVal['errors']) === TRUE) {
+                        if (is_array($retVal['errors']) === FALSE) {
+                            $retVal['errors'] = array($retVal['errors']);
+                        }
+
                         $errors[$key] = $retVal['errors'];
 
                         // Do not continue and rollback changes.
@@ -1579,8 +1583,10 @@ class GUIActions
         $content  = '<div class="GUI-overlay-errorList">';
         $content .= '<ul>';
 
-        foreach ($errors as $error) {
-            $content .= '<li>'.$error.'</li>';
+        foreach ($errors as $templateErrors) {
+            foreach ($templateErrors as $error) {
+                $content .= '<li>'.$error.'</li>';
+            }
         }
 
         $content .= '</ul>';
