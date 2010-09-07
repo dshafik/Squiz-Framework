@@ -86,14 +86,7 @@ class SquizSuiteActions
      */
     public static function getProductSummary()
     {
-        Channels::includeSystem('User');
-        $summary    = array();
-        $currUserid = User::getCurrentUserid();
-        if (User::isSystemAdministrator($currUserid) === FALSE) {
-            // If it's not a system administrator, die!
-            exit;
-        }
-
+        $summary = array();
         return $summary;
 
     }//end getProductSummary()
@@ -654,15 +647,16 @@ class SquizSuiteActions
             }
 
             $systemid    = $message['system_id'];
-            $systemUrl   = rtrim($message['system_url'], '/');
+            $systemUrl   = $message['system_url'];
             $systemName  = $message['system_name'];
             $systemType  = $message['system_type'];
             $certificate = $message['cert'];
+
             $allProducts = SquizSuite::getAllProducts();
             $productInfo = array();
             foreach ($allProducts as $product) {
                 if ($product['status'] === 'pending'
-                    && rtrim($product['connection']['url'], '/') === $systemUrl
+                    && $product['connection']['url'] === $systemUrl
                 ) {
                     $productInfo = $product;
                     break;
@@ -1261,28 +1255,43 @@ class SquizSuiteActions
                 continue;
             }
 
+            $systemid = $product['systemid'];
+
             // Product Type Icon.
             $typeC    = str_replace(' ', '', $product['type']);
             $typeIcon = '<div class="SquizSuiteScreen-productIconWrap '.$typeC.'">&nbsp;</div>';
 
             // Product Name.
-            $name  = $product['connection']['name'];
-            $name .= '<span class="SquizSuiteScreen-productExpander" rowid="'.$count.'">&nbsp;</span>';
+            if ($product['status'] === 'pending approval' || $product['status'] === 'pending') {
+                $name  = 'Unknown';
+                $name .= '<span class="SquizSuiteScreen-productExpander" rowid="'.$count.'">&nbsp;</span>';
+            } else {
+                $name  = $product['connection']['name'];
+                $name .= '<span class="SquizSuiteScreen-productExpander" rowid="'.$count.'">&nbsp;</span>';
+            }
 
             // Product Summary Status and Summary.
             $statucC = 'live';
-            $summary = '<strong>'._('Summary').'</strong><br /><div class="SquizSuiteScreen-summaryWrap">';
+            $summary = '<div id="squizSuite-'.$systemid.'-summary">';
             switch ($product['status']) {
                 case 'live':
-                    $statusC = 'live';
+                    $summary .= '<span class="SquizSuiteScreen-pendingApprovalMsg">'._('Loading ...').'</span><br /><div class="SquizSuiteScreen-summaryWrap"></div>';
+                    $statusC  = 'loading';
                 break;
 
                 case 'pending':
-                    $statusC = 'pending';
+                    $summary .= '<span class="SquizSuiteScreen-pendingApprovalMsg">'._('Connection Pending ...').'</span>';
+                    $statusC  = 'pending';
                 break;
 
                 case 'pending approval':
-                    $statusC = 'pending';
+                    $setting  = array(
+                                 'value' => 'Approve Connection',
+                                 'click' => 'SquizSuiteScreen.approveConnection(this)',
+                                );
+                    $summary .= '<span class="SquizSuiteScreen-pendingApprovalMsg">'._('Connection Pending ...').'</span>';
+                    $summary .= GUI::createWidget('squizSuite-'.$product['systemid'].'-approve-btn', 'GUIButton', $setting);
+                    $statusC  = 'pending';
                 break;
 
                 default:
@@ -1290,8 +1299,10 @@ class SquizSuiteActions
                 break;
             }//end switch
 
-            $statusIcon = '<div class="SquizSuiteScreen-statusWrap '.$statusC.'">&nbsp;</div>';
+            $statusIcon = '<div id="squizSuite-'.$systemid.'-statusWrap" class="SquizSuiteScreen-statusWrap '.$statusC.'">&nbsp;</div>';
             $summary   .= '</div>';
+
+            $deleteIcon = '<div class="SquizSuiteScreen-deleteColBtn" systemid="'.$systemid.'">&nbsp;</div>';
 
             // Product Row.
             $rows[] = array(
@@ -1299,10 +1310,14 @@ class SquizSuiteActions
                        'currName'       => $name,
                        'currStatusIcon' => $statusIcon,
                        'currSummary'    => $summary,
+                       'delIcon'        => $deleteIcon,
                       );
 
             // Product Details Row.
-            $setting     = array('value' => $product['connection']['url']);
+            $setting     = array(
+                            'value' => $product['connection']['url'],
+                            'size'  => 45,
+                           );
             $colContent  = '<div class="SquizSuiteScreen-productDetailWrap">';
             $colContent .= '<strong>API URL</strong><br />';
             $colContent .= GUI::createWidget('squizSuite-'.$product['systemid'].'-apiURL', 'GUITextBox', $setting);
@@ -1365,7 +1380,10 @@ class SquizSuiteActions
                               'currName'     => $newProductLabel,
                              );
 
-        $textSetting = array('value' => '');
+        $textSetting = array(
+                        'value' => '',
+                        'size'  => 45,
+                       );
         $colContent  = '<div class="SquizSuiteScreen-productDetailWrap">';
         $colContent .= '<strong>API URL</strong><br />';
         $colContent .= GUI::createWidget('squizSuite-new-apiURL', 'GUITextBox', $textSetting);
@@ -1409,6 +1427,209 @@ class SquizSuiteActions
         return '<script>SquizSuiteScreen.initScreen('.$data.');</script>';
 
     }//end getSquizSuiteScreenInitCode()
+
+
+    /**
+     * Save the SuperUsers screen settings.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function saveSquizSuiteScreen(array $data)
+    {
+        include_once 'Libs/Util/Util.inc';
+        $retVal = array();
+        $type   = Util::getArrayIndex($data, 'type', NULL);
+        switch ($type) {
+            // Get the live product summary.
+            case 'getProductSummary':
+                $retVal = self::_savaGetProductSummary($data);
+                if (is_string($retVal) === TRUE) {
+                    $retVal = array('errors' => $retVal);
+                }
+            break;
+
+            // Approve the pending approval system.
+            case 'approveConnection':
+                $retVal = self::_saveApproveConnection($data);
+                if (is_string($retVal) === TRUE) {
+                    $retVal = array('errors' => $retVal);
+                }
+            break;
+
+            // Save the connected system form fields.
+            default:
+                $retVal = self::_saveSquizSquiteScreen($data);
+                if (is_string($retVal) === TRUE) {
+                    $retVal = array('errors' => $retVal);
+                }
+            break;
+        }//end switch
+
+        if (isset($retVal['errors']) === FALSE) {
+            $retVal = array('success' => $retVal);
+        }
+
+        return $retVal;
+
+    }//end saveSquizSuiteScreen()
+
+
+    /**
+     * Save the SuperUsers screen settings.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    private static function _saveSquizSquiteScreen(array $data)
+    {
+        include_once 'Libs/Util/Util.inc';
+        $retVal = TRUE;
+
+        // Current product name.
+        $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
+        if ($currProductName !== NULL) {
+            $currProduct = SquizSuite::getProduct();
+            if ($currProduct['connection']['name'] !== $currProductName) {
+                $connection         = $currProduct['connection'];
+                $connection['name'] = $currProductName;
+                SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
+            }
+        }
+
+        // Deleted Product Connection.
+        $templateData    = Util::getArrayIndex($data, 'templateData', array());
+        $deletedProducts = Util::getArrayIndex($templateData, 'deletedProducts', array());
+        foreach ($deletedProducts as $systemid => $delete) {
+            if ($delete === TRUE) {
+                SquizSuite::removeProduct($systemid);
+            }
+        }
+
+        // New Product.
+        $newProductURL = Util::getArrayIndex($data, 'squizSuite-new-apiURL', '');
+        if (empty($newProductURL) === FALSE) {
+            $url = rtrim($newProductURL, '/');
+            if (strpos($url, '__api') !== (strlen($url) - 5)) {
+                $url .= '/__api';
+            }
+
+            $response = SquizSuite::sendMessage($url, 'suiteConnect');
+            if ($response['curlInfo']['http_code'] !== 200) {
+                $retVal = _($response['curlInfo']['http_code'].' response returned.');
+            } else {
+                $response = $response['result'];
+                if (strpos($response, '<?xml') !== 0) {
+                    $retVal = _('Error occurred.');
+                } else {
+                    Channels::includeSystem('API');
+                    $dom = new DomDocument();
+                    $dom->loadXML($response);
+
+                    $responseDom = $dom->getElementsByTagName('result')->item(0);
+                    $response    = API::getResponseFromXMLDom($responseDom);
+                    if ($response === 'ok') {
+                        $tempid     = uniqid();
+                        $systemType = 'unknown';
+                        $connection = array('url' => $url);
+                    }
+
+                    SquizSuite::registerProduct($tempid, $systemType, $connection);
+                    SquizSuite::updateProduct($tempid, 'status', 'pending');
+                }//end if
+            }//end if
+        }//end if
+
+        return $retVal;
+
+    }//end _saveSquizSquiteScreen()
+
+
+    /**
+     * Returns the given product summary.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    private static function _savaGetProductSummary(array $data)
+    {
+        include_once 'Libs/Util/Util.inc';
+        $retVal   = TRUE;
+        $systemid = Util::getArrayIndex($data, 'systemid', NULL);
+
+        $currProduct = SquizSuite::getProduct();
+        $product     = SquizSuite::getProduct($systemid);
+        if (array_key_exists('url', $product['connection']) === TRUE
+            && empty($product['connection']['url']) === FALSE
+        ) {
+            Channels::includeSystem('API');
+            $url = $product['connection']['url'];
+            $msg = array(
+                    '_enc'            => array(
+                                          '_system'   => 'SquizSuite',
+                                          '_action'   => 'getProductSummary',
+                                          '_format'   => 'json',
+                                          '_systemid' => $currProduct['systemid'],
+                                         ),
+                    '_pubKeySystemid' => $systemid,
+                   );
+
+            $response = API::sendCURLAPIRequest($product['connection']['url'], $msg);
+            if ($response['curlInfo']['http_code'] === 200) {
+                $response = json_decode($response['result'], TRUE);
+                $retVal   = array();
+                foreach ($response['result'] as $key => $value) {
+                    $retVal[] = array(
+                                 'key'   => $key,
+                                 'value' => $value,
+                                );
+                }
+            } else {
+                $retVal = $response['curlInfo']['http_code'].' response returned.';
+            }
+        }//end if
+
+        return $retVal;
+
+    }//end _savaGetProductSummary()
+
+
+    /**
+     * Approve the pending approval product connection.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    private static function _saveApproveConnection(array $data)
+    {
+        include_once 'Libs/Util/Util.inc';
+        $retVal   = TRUE;
+        $systemid = Util::getArrayIndex($data, 'systemid', NULL);
+        if ($systemid !== NULL) {
+            $response = SquizSuite::sendMessage($systemid, 'suiteConnectAck');
+            if ($response['curlInfo']['http_code'] !== 200) {
+                $dom = new DomDocument();
+                $dom->loadXML($response['result']);
+                $exceptionDom = $dom->getElementsByTagName('exception')->item(0);
+                if (isset($exceptionDom) === TRUE) {
+                    $retVal = $exceptionDom->nodeValue;
+                }
+            } else {
+                $retVal = 'Approving Failed.';
+            }
+        }
+
+        return $retVal;
+
+    }//end _saveApproveConnection()
 
 
 }//end class

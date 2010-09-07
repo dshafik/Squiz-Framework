@@ -27,6 +27,10 @@
     height: 39px;
 }
 
+#squizSuite-connectedProduct-box tr.deleted {
+    background: url("/__web/Systems/GUI/Web/delete_overlay.png") repeat scroll 0 0 transparent;
+}
+
 #squizSuite-connectedProduct-box thead tr {
     height: 24px;
 }
@@ -55,14 +59,30 @@
     border-bottom: 1px solid #DFDEDE;
 }
 
-#squizSuite-connectedProduct-box th.th-_remove {
+#squizSuite-connectedProduct-box th.th-delIcon {
     color: #5F5F5F;
     background-color: #F7F7F7;
     border-bottom: 1px solid #DFDEDE;
 }
 
-#squizSuite-connectedProduct-box td.col-_remove {
+#squizSuite-connectedProduct-box td.col-delIcon {
     background-color: #F7F7F7;
+}
+
+#squizSuite-connectedProduct-box tr.deleted td.col-delIcon {
+    background-color: transparent;
+}
+
+div.SquizSuiteScreen-deleteColBtn {
+    background: transparent url(/__web/Systems/GUI/Web/delete.png);
+    cursor: pointer;
+    height: 16px;
+    margin-left: 8px;
+    width: 16px;
+}
+
+div.SquizSuiteScreen-deleteColBtn.recover {
+    background-position: 0 16px;
 }
 
 td.col-currTypeIcon {
@@ -83,6 +103,10 @@ td.col-currTypeIcon {
     background-color: #F8F8F8;
 }
 
+#squizSuite-connectedProduct-box tr.deleted td.col-currTypeIcon {
+    background-color: transparent;
+}
+
 td.col-currName {
     padding-left: 15px;
     width: 378px;
@@ -91,6 +115,10 @@ td.col-currName {
 td.col-currStatusIcon {
     background-color: #F5F5F5;
     width: 67px;
+}
+
+#squizSuite-connectedProduct-box tr.deleted td.col-currStatusIcon {
+    background-color: transparent;
 }
 
 td.col-currSummary {
@@ -211,4 +239,13 @@ span.SquizSuiteScreen-productExpander.expanded {
 span.SquizSuiteScreen-newProductHeadDesc {
     font-style: italic;
     color: #9C9B9B;
+}
+
+/* Peddning Approval */
+span.SquizSuiteScreen-pendingApprovalMsg {
+    color: #5F5F5F;
+    display: block;
+    float: left;
+    font-style: italic;
+    margin-right: 10px;
 }

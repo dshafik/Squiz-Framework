@@ -59,8 +59,12 @@
                         <name>Summary</name>
                         <align>left</align>
                     </currSummary>
+                    <delIcon>
+                        <name />
+                        <align>left</align>
+                    </delIcon>
                 </setting>
-                <setting name="allowDelete">true</setting>
+                <setting name="allowDelete">false</setting>
                 <setting name="rows">
                     <dataProvider action="SquizSuite::getConnectedProductRows" />
                 </setting>

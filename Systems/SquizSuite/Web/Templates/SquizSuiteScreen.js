@@ -28,9 +28,12 @@ var SquizSuiteScreen = new function()
     var _currentTableDOM      = null;
     var _connectedTableDOM    = null;
     var _connectedProductRows = null;
+    var _liveProductsIdx      = [];
 
     var _newRow       = null;
     var _newDetailRow = null;
+
+    var _deletedProducts = {};
 
     this.initScreen = function(data) {
         var self = this;
@@ -65,12 +68,40 @@ var SquizSuiteScreen = new function()
             return true;
         });
 
+        // Attach delete event.
+        var delBtns = dfx.getClass('SquizSuiteScreen-deleteColBtn', _connectedTableDOM);
+        dfx.foreach(delBtns, function(idx) {
+            var delBtn = delBtns[idx];
+            dfx.addEvent(delBtn, 'click', function() {
+                self.toggleProductDelete(delBtn);
+            });
+
+            return true;
+        });
+
         // Hide new product row.
         _newRow       = _connectedProductRows[(_connectedProductRows.length - 3)];
         _newDetailRow = _connectedProductRows[(_connectedProductRows.length - 1)];
         dfx.hideElement(dfx.getClass('GUI-delete', _newDetailRow)[0]);
         this.toggleNewRow();
-    },
+
+        // Collect the list of live products and
+        // update the summary information.
+        _liveProductsIdx = [];
+        dfx.foreach(_connectedProducts, function(idx) {
+            if (_connectedProducts[idx].status === 'live') {
+                _liveProductsIdx.push(idx);
+            }
+
+            return true;
+        });
+
+        if (_liveProductsIdx.length > 0) {
+            self._initLiveProductStatus(0, null);
+        }
+
+        GUI.setModified(this, true);
+    };
 
     this.toggleProductDetails = function(span) {
         var rowid = parseInt(span.getAttribute('rowid'));
@@ -82,13 +113,31 @@ var SquizSuiteScreen = new function()
             dfx.addClass(row, 'hidden');
             dfx.removeClass(span, 'expanded');
         }
-    },
+    };
+
+    this.toggleProductDelete = function(delBtn) {
+        var trDom    = dfx.getParents(delBtn, 'tr', _connectedTableDOM)[0];
+        var rowid    = parseInt(trDom.getAttribute('rowid'));
+        var row      = _connectedProductRows[(rowid * 2) + 1];
+        var systemid = delBtn.getAttribute('systemid');
+        if (dfx.hasClass(trDom, 'deleted') === true) {
+            dfx.removeClass(trDom, 'deleted');
+            dfx.removeClass(delBtn, 'recover');
+            dfx.removeClass(row, 'deleted');
+            _deletedProducts[systemid] = false;
+        } else {
+            dfx.addClass(trDom, 'deleted');
+            dfx.addClass(delBtn, 'recover');
+            dfx.addClass(row, 'deleted');
+            _deletedProducts[systemid] = true;
+        }
+    };
 
     this.addProduct = function() {
         if (dfx.hasClass(_newRow, 'hidden') === true) {
             this.toggleNewRow();
         }
-    },
+    };
 
     this.toggleNewRow = function() {
         if (dfx.hasClass(_newRow, 'hidden') === true) {
@@ -98,6 +147,101 @@ var SquizSuiteScreen = new function()
             dfx.addClass(_newRow, 'hidden');
             dfx.addClass(_newDetailRow, 'hidden');
         }
-    }
+    };
+
+    this.approveConnection = function(btn) {
+        var screenid = 'SquizSuite:SquizSuiteScreen';
+        var systemid = btn.id.replace('squizSuite-', '');
+        systemid     = systemid.replace('-approve-btn', '');
+
+        var data       = {};
+        data[screenid] = {
+            type: 'approveConnection',
+            systemid: systemid
+        };
+
+        var params = {
+            templateData: dfx.jsonEncode(data)
+        };
+
+        GUI.sendRequest('GUI', 'saveTemplateData', params, function(data) {
+            if (data.result.success) {
+            } else if (data.result.errors) {
+            }
+        });
+    };
+
+    this._initLiveProductStatus = function(idx, callback) {
+        var self     = this;
+        var systemid = _connectedProducts[_liveProductsIdx[idx]].systemid;
+
+        this._requestProductSummary(systemid, function() {
+            if (idx < (_liveProductsIdx.length - 1)) {
+                self._initLiveProductStatus((idx + 1), callback);
+            } else {
+                if (callback) {
+                    callback.call(self);
+                }
+            }
+        });
+    };
+
+    this._requestProductSummary = function(systemid, callback) {
+        var self = this;
+
+        var data       = {};
+        var screenid   = 'SquizSuite:SquizSuiteScreen';
+        data[screenid] = {
+            type: 'getProductSummary',
+            systemid: systemid
+        };
+
+        var params = {
+            templateData: dfx.jsonEncode(data)
+        };
+
+        GUI.sendRequest('GUI', 'saveTemplateData', params, function(data) {
+            var statusDiv  = dfx.getId('squizSuite-' + systemid + '-statusWrap');
+            var summaryDiv = dfx.getId('squizSuite-' + systemid + '-summary');
+            if (data.result.success) {
+                var summaryInfo = data.result.success[screenid];
+                dfx.swapClass(statusDiv, 'loading', 'live');
+
+                var c     = '<span class="SquizSuiteScreen-summaryLabel">No summary information</span>';
+                var first = true;
+                dfx.foreach(summaryInfo, function(idx) {
+                    if (first === true) {
+                        c     = '';
+                        first = false;
+                    }
+
+                    c += '<span class="SquizSuiteScreen-summaryLabel">' + summaryInfo[idx].key + '</span>';
+                    c += '<span class="SquizSuiteScreen-summaryValue">' + summaryInfo[idx].value + '</span>';
+
+                    return true;
+                });
+
+                dfx.setHtml(summaryDiv, c);
+            } else if (data.result.errors) {
+                var summaryInfo = data.result.errors[screenid];
+                dfx.swapClass(statusDiv, 'loading', 'error');
+                var c = '<span class="SquizSuiteScreen-summaryLabel">';
+                c    += 'Failed to get the product summary ...</span>';
+                c    += '</span>';
+                dfx.setHtml(summaryDiv, c);
+            }//end if
+
+            if (callback) {
+                callback.call(self);
+            }
+        });
+    };
+
+    this.getValue = function() {
+        var data = {};
+        data.currProductName = GUI.getWidget('squizSuite-currProductName').getValue();
+        data.deletedProducts = _deletedProducts;
+        return data;
+    };
 
 }
