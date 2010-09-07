@@ -150,16 +150,15 @@ class SquizSuiteActions
     {
         $query  = DAL::getDALQuery('SquizSuite', 'getAllProducts');
         $result = DAL::getAssoc($query);
-        foreach ($result as &$p) {
-            $p['connection'] = unserialize($p['connection']);
-        }
+        foreach ($result as &$product) {
+            $product['connection'] = unserialize($product['connection']);
 
-        foreach ($result as $product) {
+            // Adding to asset cache.
             $systemid = $product['systemid'];
             if (array_key_exists($systemid, self::$_productCache) === FALSE) {
                 self::$_productCache[$systemid] = $product;
             }
-        }
+        }//end foreach
 
         return $result;
 
