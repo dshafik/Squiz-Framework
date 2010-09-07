@@ -114,7 +114,7 @@ class APIActions
 
         $success = curl_exec($ch);
         if ($success === FALSE) {
-            $errMsg = 'cURL failed.';
+            $errMsg = 'cURL failed: '.curl_error($ch);
             throw new ChannelException($errMsg);
         }
 
