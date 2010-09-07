@@ -90,8 +90,7 @@ class SquizSuiteActions
         $summary    = array();
         $currUserid = User::getCurrentUserid();
         if (User::isSystemAdministrator($currUserid) === FALSE) {
-            // If it's not a system administrator,
-            // die!
+            // If it's not a system administrator, die!
             exit;
         }
 
@@ -655,16 +654,15 @@ class SquizSuiteActions
             }
 
             $systemid    = $message['system_id'];
-            $systemUrl   = $message['system_url'];
+            $systemUrl   = rtrim($message['system_url'], '/');
             $systemName  = $message['system_name'];
             $systemType  = $message['system_type'];
             $certificate = $message['cert'];
-
             $allProducts = SquizSuite::getAllProducts();
             $productInfo = array();
             foreach ($allProducts as $product) {
                 if ($product['status'] === 'pending'
-                    && $product['connection']['url'] === $systemUrl
+                    && rtrim($product['connection']['url'], '/') === $systemUrl
                 ) {
                     $productInfo = $product;
                     break;
