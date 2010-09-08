@@ -551,6 +551,11 @@ class UserActions
      */
     public static function isSystemAdministrator($userid=NULL)
     {
+        Channels::includeSystem('SquizSuite');
+        if (SquizSuite::isSuiteSystemUser() === TRUE) {
+            return TRUE;
+        }
+
         if ($userid === NULL) {
             $userid = User::getCurrentUserid();
         }
