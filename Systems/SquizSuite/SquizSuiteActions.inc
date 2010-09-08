@@ -359,11 +359,12 @@ class SquizSuiteActions
      *                         the API URL when sendConnect message is being
      *                         sent.
      * @param string $msgType  Type of message to send.
+     * @param array  $options  Optional variables to pass.
      *
      * @return mixed
      * @throws ChannelException Error occurred.
      */
-    public static function sendMessage($targetid, $msgType)
+    public static function sendMessage($targetid, $msgType, array $options=array())
     {
         if ($msgType !== 'suiteConnect') {
             $productInfo = SquizSuite::getProduct($targetid);
@@ -374,7 +375,7 @@ class SquizSuiteActions
         }
 
         $dom = self::_createSuiteMessageDOMTemplate();
-        self::_createSuiteMessageDOM($dom, $msgType);
+        self::_createSuiteMessageDOM($dom, $msgType, $options);
         $xml = $dom->saveXML();
 
         $apiURL         = '';
@@ -459,11 +460,15 @@ class SquizSuiteActions
      *
      * @param object &$dom    DOM object to work with.
      * @param string $msgType Type of the message to send.
+     * @param array  $options Optional variables to pass.
      *
      * @return object
      */
-    private static function _createSuiteMessageDOM(&$dom, $msgType)
-    {
+    private static function _createSuiteMessageDOM(
+        &$dom,
+        $msgType,
+        array $options=array()
+    ) {
         Channels::includeSystem('API');
         $msgEl     = $dom->getElementsByTagName('message')->item(0);
         $msgTypeEl = $dom->createElement('message_type');
@@ -483,6 +488,28 @@ class SquizSuiteActions
                 $pubkeyEl    = $dom->createElement('cert');
                 API::buildResponseXMLDom($pubkeyEl, $pubKey);
                 $msgEl->appendChild($pubkeyEl);
+            break;
+
+            case 'suiteProductSync':
+                $products   = SquizSuite::getAllProducts();
+                $productsEl = $dom->createElement('products');
+                $productsEl->setAttribute('type', 'array');
+                $msgEl->appendChild($productsEl);
+                foreach ($products as $product) {
+                    if ($product['current'] === FALSE
+                        && $product['status'] === 'live'
+                    ) {
+                        $productEl = $dom->createElement('product');
+                        API::buildResponseXMLDom($productEl, $product);
+                        $productsEl->appendChild($productEl);
+                    }
+                }
+
+                if (array_key_exists('sync_direction', $options) === TRUE) {
+                    $syncDir = $dom->createElement('sync_direction');
+                    API::buildResponseXMLDom($syncDir, $options['sync_direction']);
+                    $msgEl->appendChild($syncDir);
+                }
             break;
 
             default:
@@ -508,40 +535,95 @@ class SquizSuiteActions
      *
      * @api read
      */
-    public static function suiteConnect()
+    public static function suitePing()
     {
         try {
             // Verify the User Agent string. Can we get the system type out of it?
-            $systemType = self::_getSystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
-            if ($systemType === FALSE) {
-                $errMsg = 'User-agent string can not be parsed.';
-                throw new ChannelException($errMsg);
-            }
+            self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
             include_once 'Libs/Security/Security.inc';
-            $xml     = Security::getRequestData('xml', NULL, FALSE, 'post');
-            $xml     = html_entity_decode($xml);
-            $message = self::_parseSuiteXML($xml);
+            $xml = Security::getRequestData('_enc', NULL, FALSE, 'post');
+            if ($xml === NULL) {
+                throw new ChannelException('Unencrypted suitePing message received');
+            }
 
-            // All the required fields exist?
+            // If XML parsing fails, it will throw an exception.
             $required = array(
                          'system_id',
                          'system_url',
                          'system_name',
-                         'cert',
                         );
-            foreach ($required as $field) {
-                if ($message[$field] === NULL) {
-                    $errMsg = $field.' has not been specified.';
-                    throw new ChannelException($errMsg);
-                }
+            $xml      = html_entity_decode($xml);
+            $message  = self::_parseSuiteXML($xml, $required);
+
+            $systemid   = $message['system_id'];
+            $systemUrl  = $message['system_url'];
+            $systemName = $message['system_name'];
+
+            // If the sender is a sync pending product,
+            // make it live.
+            $product = SquizSuite::getProduct($systemid);
+            if (empty($product) === FALSE
+                && $product['status'] === 'sync pending'
+            ) {
+                SquizSuite::updateProduct($systemid, 'status', 'live');
             }
 
-            // TODO: Maximum daily request exceeded?
+            self::_logReceivedMessage($systemid, 'suitePing');
+
+            $response = 'ok';
+            return $response;
+        } catch (Exception $e) {
+            $errMsg  = 'suiteConnect failed'."\n";
+            $errMsg .= $e->getMessage()."\n";
+            self::_logErrorMessage($errMsg);
+            DAL::rollback();
+
+            // Re-throw exception here so that API system can send
+            // the proper error HTTP header.
+            throw new ChannelException($e->getMessage());
+        }//end try
+
+    }//end suitePing()
+
+
+    /**
+     * Suite system connection request handler.
+     *
+     * Other suite system will make a request to connect by sharing
+     * the security certificate that includes public key information.
+     * The submitter's key certificate will be registered together and
+     * it will send suiteConnectAck message back as a response.
+     *
+     * @return array
+     * @throws ChannelException Error occurred.
+     *
+     * @api read
+     */
+    public static function suiteConnect()
+    {
+        try {
+            // Verify the User Agent string. Can we get the system type out of it?
+            self::_parseUserAgentString();
+
+            // Parse the posted XML file. Exception will be thrown in case error occurs.
+            include_once 'Libs/Security/Security.inc';
+            $required = array(
+                         'system_id',
+                         'system_url',
+                         'system_name',
+                         'system_type',
+                         'cert',
+                        );
+            $xml      = Security::getRequestData('xml', NULL, FALSE, 'post');
+            $xml      = html_entity_decode($xml);
+            $message  = self::_parseSuiteXML($xml, $required);
+
             $systemid    = $message['system_id'];
             $systemUrl   = $message['system_url'];
             $systemName  = $message['system_name'];
+            $systemType  = $message['system_type'];
             $certificate = $message['cert'];
 
             self::_logReceivedMessage($systemid, 'suiteConnect');
@@ -618,19 +700,10 @@ class SquizSuiteActions
     {
         try {
             // Verify the User Agent string. Can we get the system type out of it?
-            $systemType = self::_getSystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
-            if ($systemType === FALSE) {
-                $errMsg = 'User-agent string can not be parsed.';
-                throw new ChannelException($errMsg);
-            }
+            self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
             include_once 'Libs/Security/Security.inc';
-            $xml     = Security::getRequestData('_enc', NULL, FALSE, 'post');
-            $xml     = html_entity_decode($xml);
-            $message = self::_parseSuiteXML($xml);
-
-            // All the required fields exist?
             $required = array(
                          'system_id',
                          'system_url',
@@ -638,12 +711,9 @@ class SquizSuiteActions
                          'system_type',
                          'cert',
                         );
-            foreach ($required as $field) {
-                if ($message[$field] === NULL) {
-                    $errMsg = $field.' has not been specified.';
-                    throw new ChannelException($errMsg);
-                }
-            }
+            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
+            $xml      = html_entity_decode($xml);
+            $message  = self::_parseSuiteXML($xml, $required);
 
             $systemid    = $message['system_id'];
             $systemUrl   = rtrim($message['system_url'], '/');
@@ -735,30 +805,18 @@ class SquizSuiteActions
     {
         try {
             // Verify the User Agent string. Can we get the system type out of it?
-            $systemType = self::_getSystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
-            if ($systemType === FALSE) {
-                $errMsg = 'User-agent string can not be parsed.';
-                throw new ChannelException($errMsg);
-            }
+            self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
             include_once 'Libs/Security/Security.inc';
-            $xml     = Security::getRequestData('_enc', NULL, FALSE, 'post');
-            $xml     = html_entity_decode($xml);
-            $message = self::_parseSuiteXML($xml);
-
-            // All the required fields exist?
             $required = array(
                          'system_id',
                          'system_url',
                         );
-            foreach ($required as $field) {
-                if ($message[$field] === NULL) {
-                    $errMsg = $field.' has not been specified.';
-                    throw new ChannelException($errMsg);
-                }
-            }
+            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
+            $xml      = html_entity_decode($xml);
 
+            $message   = self::_parseSuiteXML($xml, $required);
             $systemid  = $message['system_id'];
             $systemUrl = $message['system_url'];
 
@@ -774,6 +832,25 @@ class SquizSuiteActions
 
             SquizSuite::updateProduct($systemid, 'status', 'live');
 
+            // The final acknowlegement has been received.
+            // Send the list of my connected products for syncing.
+            $allProducts = SquizSuite::getAllProducts();
+            foreach ($allProducts as $product) {
+                if ($product['current'] === TRUE
+                    || $product['systemid'] === $systemid
+                    || $product['status'] !== 'live'
+                ) {
+                    continue;
+                }
+
+                $options  = array('sync_direction' => 'one');
+                $response = SquizSuite::sendMessage(
+                    $product['systemid'],
+                    'suiteProductSync',
+                    $options
+                );
+            }
+
             $response = 'ok';
             return $response;
         } catch (Exception $e) {
@@ -786,15 +863,154 @@ class SquizSuiteActions
 
 
     /**
+     * Suite product sync request handler.
+     *
+     * The connected system can send suiteProductSync message
+     * to deliver the information about its the connected products.
+     * Once it's receive, it automatically adds then as a live connected system.
+     *
+     * @return string
+     * @throws ChannelException Error occurred.
+     *
+     * @api read
+     */
+    public static function suiteProductSync()
+    {
+        try {
+            // Verify the User Agent string. Can we get the system type out of it?
+            self::_parseUserAgentString();
+
+            // Parse the posted XML file. Exception will be thrown in case error occurs.
+            include_once 'Libs/Security/Security.inc';
+            $required = array(
+                         'system_id',
+                         'system_url',
+                         'products',
+                         'sync_direction',
+                        );
+            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
+            $xml      = html_entity_decode($xml);
+            $message  = self::_parseSuiteXML($xml, $required);
+
+            $systemid  = $message['system_id'];
+            $systemUrl = $message['system_url'];
+            $products  = $message['products'];
+            foreach ($products as $product) {
+                // Does this product exist?
+                $p = SquizSuite::getProduct($product['systemid']);
+                if (empty($p) === FALSE) {
+                    continue;
+                }
+
+                $connection         = array();
+                $connection['url']  = $product['connection']['url'];
+                $connection['cert'] = $product['connection']['cert'];
+                $connection['name'] = $product['connection']['name'];
+                SquizSuite::registerProduct(
+                    $product['systemid'],
+                    $product['type'],
+                    $connection
+                );
+
+                SquizSuite::updateProduct($product['systemid'], 'status', 'live');
+            }//end foreach
+
+            // Sync Direction is 'broadcast' so send out the message
+            // to all the connected systems.
+            if ($message['sync_direction'] === 'broadcast') {
+                $allProducts = SquizSuite::getAllProducts();
+                foreach ($allProducts as $product) {
+                    if ($product['current'] === TRUE
+                        || $product['status'] !== 'live'
+                    ) {
+                        continue;
+                    }
+
+                    $options  = array('sync_direction' => 'one');
+                    $response = SquizSuite::sendMessage(
+                        $product['systemid'],
+                        'suiteProductSync',
+                        $options
+                    );
+                }
+            }
+
+            self::_logReceivedMessage($systemid, 'suiteProductSync');
+
+            $response = 'ok';
+            return $response;
+        } catch (Exception $e) {
+            $errMsg  = 'suiteProductSync failed.'."\n";
+            $errMsg .= $e->getMessage()."\n";
+            self::_logErrorMessage($errMsg);
+        }//end try
+
+    }//end suiteProductSync()
+
+
+    /**
+     * Helper function to parse user agent string for suite message.
+     *
+     * On failure, it will throw an exception.
+     *
+     * @return void
+     * @throws ChannelException If the user agent string parsing fails.
+     */
+    private static function _parseUserAgentString()
+    {
+        // Verify the User Agent string. Can we get the system type out of it?
+        $systemType = self::_getSystemTypeFromUserAgent($_SERVER['HTTP_USER_AGENT']);
+        if ($systemType === FALSE) {
+            $errMsg = 'User-agent string can not be parsed.';
+            throw new ChannelException($errMsg);
+        }
+
+    }//end _parseUserAgentString()
+
+
+    /**
+     * Helper function to get the result from suite message response string.
+     *
+     * If the response string is not a XML string, it will return FALSE.
+     *
+     * @param string $response Suite message response string.
+     *
+     * @return mixed
+     */
+    private static function _getSuiteMessageResult($response)
+    {
+        $response = $response['result'];
+        if (strpos($response, '<?xml') !== 0) {
+            return FALSE;
+        } else {
+            Channels::includeSystem('API');
+            $dom = new DomDocument();
+            $dom->loadXML($response);
+
+            $responseDom = $dom->getElementsByTagName('result')->item(0);
+            $response    = API::getResponseFromXMLDom($responseDom);
+            return $response;
+        }
+
+    }//end _getSuiteMessageResult()
+
+
+    /**
      * Parse the passed XML file and return.
      *
-     * @param string $xml SquizSuite specific XML message string.
+     * @param string  $xml    SquizSuite specific XML message string.
+     * @param array   $fields Optional list of fields to extract from XML.
+     * @param boolean $silent When FALSE, it will throw an exception if the
+     *                        fields does not exist.
      *
      * @return array
      * @throws ChannelException Invalid XML caused DomDocument() error.
      */
-    private static function _parseSuiteXML($xml)
-    {
+    private static function _parseSuiteXML(
+        $xml,
+        array $fields=array(),
+        $silent=FALSE
+    ) {
         $doc    = new DomDocument();
         $result = $doc->loadXML($xml);
         if ($result === FALSE) {
@@ -802,20 +1018,33 @@ class SquizSuiteActions
             throw new ChannelException($errMsg);
         }
 
+        if (empty($fields) === TRUE) {
+            $fields = array(
+                       'system_id',
+                       'system_url',
+                       'system_name',
+                       'system_type',
+                       'cert',
+                      );
+        }
+
         $result = array();
-        $fields = array(
-                   'system_id',
-                   'system_url',
-                   'system_name',
-                   'system_type',
-                   'cert',
-                  );
+
+        Channels::includeSystem('API');
         foreach ($fields as $field) {
             $fieldEl = $doc->getElementsByTagName($field)->item(0);
             if ($fieldEl === NULL) {
                 $result[$field] = NULL;
+                if ($silent === FALSE) {
+                    $errMsg = $field.' has not been specified.';
+                    throw new ChannelException($errMsg);
+                }
             } else {
-                $result[$field] = $fieldEl->nodeValue;
+                if ($fieldEl->nodeType === XML_ELEMENT_NODE) {
+                    $result[$field] = API::getResponseFromXMLDom($fieldEl);
+                } else {
+                    $result[$field] = $fieldEl->nodeValue;
+                }
             }
         }
 
@@ -1003,6 +1232,7 @@ class SquizSuiteActions
         }
 
         $encrypted = SquizSuite::decryptData($encrypted, $password);
+
         if ($encrypted !== FALSE) {
             // @codingStandardsIgnoreStart
             $encrypted     = json_decode($encrypted, TRUE);
@@ -1622,9 +1852,17 @@ class SquizSuiteActions
                     $retVal = $exceptionDom->nodeValue;
                 }
             } else {
-                $retVal = 'Approving Failed.';
+                // Now sync both of systems.
+                $options  = array('sync_direction' => 'broadcast');
+                $response = SquizSuite::sendMessage(
+                    $systemid,
+                    'suiteProductSync',
+                    $options
+                );
+
+                $retVal = TRUE;
             }
-        }
+        }//end if
 
         return $retVal;
 
