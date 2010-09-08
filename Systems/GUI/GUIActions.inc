@@ -89,6 +89,13 @@ class GUIActions
     private static $_templateInitCode = '';
 
     /**
+     * Template variable initialisation codes.
+     *
+     * @var string
+     */
+    private static $_templateVariablesCode = '';
+
+    /**
      * List of available widget settings.
      *
      * @var array
@@ -151,7 +158,7 @@ class GUIActions
 
         // Need to wrap content.
         $contents  = self::$_docType;
-        $contents .= $fileCont;
+        $contents .= '<gui_root_element>'.$fileCont.'</gui_root_element>';
 
         $tpl = new DOMDocument('1.0');
         $tpl->loadXML($contents);
@@ -297,12 +304,16 @@ class GUIActions
         $php .= self::_getVarCode().' = array();'."\n";
 
         // Add the PHP code to member var so that during parsing it can be updated.
-        self::$_templateInitCode = $php;
+        self::$_templateInitCode      = $php;
+        self::$_templateVariablesCode = '';
 
         // Parse the special tags in the template file.
         GUI::parseTemplate($tplDoc);
 
-        $phpNode = $tplDoc->createProcessingInstruction('php', self::$_templateInitCode);
+        $initCodes  = self::$_templateVariablesCode;
+        $initCodes .= self::$_templateInitCode;
+
+        $phpNode = $tplDoc->createProcessingInstruction('php', $initCodes);
         $tplDoc->insertBefore($phpNode, $tplDoc->firstChild);
 
         $resetCurrTemplateCode = 'GUI::setCurrentTemplateKey($'.$tplVarName.');'."\n";
@@ -324,7 +335,12 @@ class GUIActions
         }
 
         include_once 'Libs/XML/XML.inc';
-        $htmlCont = XML::xmlToXHTML($tplDoc->saveXML());
+        $xmlContent = $tplDoc->saveXML();
+        // Remove the root element that was added when loading XML content from file.
+        $xmlContent = str_replace('<gui_root_element>', '', $xmlContent);
+        $xmlContent = str_replace('</gui_root_element>', '', $xmlContent);
+
+        $htmlCont = XML::xmlToXHTML($xmlContent);
 
         // If <head> element exists, insert API token hidden input field
         // for the interface to work.
@@ -357,6 +373,9 @@ class GUIActions
         $htmlCont = str_replace('&lt;?php', '<?php', $htmlCont);
         $htmlCont = str_replace('?&gt;', '?>', $htmlCont);
 
+        // Change all variable keywords (e.g. {varName}) with PHP code.
+        $htmlCont = self::_replaceVarKeywords($htmlCont);
+
         include_once 'Libs/FileSystem/FileSystem.inc';
         $syDataPath = BaseSystem::getDataDir($systemName).'/Templates';
         if (file_exists($syDataPath) === FALSE) {
@@ -368,6 +387,46 @@ class GUIActions
         file_put_contents($dest, $htmlCont);
 
     }//end bakeTemplate()
+
+
+    /**
+     * Replace variable keywords in parsed HTML content.
+     *
+     * @param string $content The HTML content to search.
+     *
+     * @return string
+     */
+    private static function _replaceVarKeywords($content)
+    {
+        $content = preg_replace_callback('/{([a-z0-9_:]+)}/i', array('self', '_replaceVarKeywordsCallback'), $content);
+        return $content;
+
+    }//end _replaceVarKeywords()
+
+
+    /**
+     * Callback method for the _replaceVarKeywords preg_replace_callback function.
+     *
+     * @param array $matches Array of matches.
+     *
+     * @return string
+     */
+    private static function _replaceVarKeywordsCallback(array $matches)
+    {
+        $code    = '';
+        $indexes = explode(':', $matches[1]);
+        if (count($indexes) > 1) {
+            $varName = array_shift($indexes);
+            $code    = '$_gui_'.$varName.'[\''.implode('\'][\'', $indexes).'\']';
+        } else {
+            $code = '$_gui_'.$matches[1];
+        }
+
+        $code = '<?php echo '.$code.';?>';
+
+        return $code;
+
+    }//end _replaceVarKeywordsCallback()
 
 
     /**
@@ -445,6 +504,7 @@ class GUIActions
     {
         include_once 'Libs/XML/XML.inc';
         $tagNames = array(
+                     'var',
                      'widget',
                      'text',
                      'dataProvider',
@@ -1232,6 +1292,43 @@ class GUIActions
         return $php;
 
     }//end _parseConditionTag()
+
+
+    /**
+     * Converts a given var tag.
+     *
+     * The var tag is used to initialise PHP variables with specific name which can
+     * be referenced in template using {varName}. These "keywords" will be replaced
+     * with PHP code after the whole document is parsed.
+     *
+     * @param DOMNode $var The var tag to convert.
+     *
+     * @since  4.0.0
+     * @return string
+     * @throws ChannelException If the var tag does not have a name attribute.
+     */
+    private static function _parseVarTag(DOMNode $var)
+    {
+        include_once 'Libs/XML/XML.inc';
+
+        $varName = $var->getAttribute('name');
+        if (empty($varName) === TRUE) {
+            throw new ChannelException(_('var tag must have a "name" attribute.'));
+        }
+
+        $varName = '$_gui_'.$varName;
+
+        $firstChild = XML::getFirstChildElement($var);
+        $php       .= self::_parseTag($firstChild, $varName);
+
+        self::$_templateVariablesCode .= $php;
+
+        // Remove the var tag.
+        $var->parentNode->removeChild($var);
+
+        return '';
+
+    }//end _parseVarTag()
 
 
     /**
