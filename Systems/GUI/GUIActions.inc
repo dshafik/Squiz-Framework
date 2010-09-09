@@ -398,6 +398,7 @@ class GUIActions
      */
     private static function _replaceVarKeywords($content)
     {
+        // Replace all template variables with the actual PHP variables.
         $content = preg_replace_callback('/{([a-z0-9_:]+)}/i', array('self', '_replaceVarKeywordsCallback'), $content);
         return $content;
 
@@ -413,20 +414,36 @@ class GUIActions
      */
     private static function _replaceVarKeywordsCallback(array $matches)
     {
-        $code    = '';
-        $indexes = explode(':', $matches[1]);
-        if (count($indexes) > 1) {
-            $varName = array_shift($indexes);
-            $code    = '$_gui_'.$varName.'[\''.implode('\'][\'', $indexes).'\']';
-        } else {
-            $code = '$_gui_'.$matches[1];
-        }
-
-        $code = '<?php echo '.$code.';?>';
+        $code = self::_getKeywordVariableCode($matches[1]);
+        $code = '<'.'?php echo '.$code.';?'.'>';
 
         return $code;
 
     }//end _replaceVarKeywordsCallback()
+
+
+    /**
+     * Returns the actual PHP variable string from a given keyword string.
+     *
+     * @param string $keyword The variable keyword string.
+     *
+     * @return string
+     */
+    private static function _getKeywordVariableCode($keyword)
+    {
+        $keyword = trim($keyword, '}{');
+        $code    = '';
+        $indexes = explode(':', $keyword);
+        if (count($indexes) > 1) {
+            $varName = array_shift($indexes);
+            $code    = '$_gui_'.$varName.'[\''.implode('\'][\'', $indexes).'\']';
+        } else {
+            $code = '$_gui_'.$keyword;
+        }
+
+        return $code;
+
+    }//end _getKeywordVariableCode()
 
 
     /**
@@ -1033,6 +1050,9 @@ class GUIActions
             $value = (float) $value;
         } else if (is_int($value) === TRUE) {
             $value = (int) $value;
+        } else if (preg_match('/{([a-z0-9_:]+)}/i', $value) !== 0) {
+            // Call replacement function.
+            $value = self::_getKeywordVariableCode($value);
         } else {
             $value = '"'.addcslashes((string) $value, "\"\\\0").'"';
         }
@@ -1156,12 +1176,18 @@ class GUIActions
      *
      * @since  4.0.0
      * @return string
+     * @throws ChannelException If the text content has a keyword.
      */
     private static function _parseTextTag(DOMNode $text, $assignTo=NULL)
     {
         $php     = "\n";
         $tagInfo = self::_getTextTagInfo($text);
         $args    = Util::getArrayIndex($tagInfo, 'argsCode', array());
+
+        $value = $tagInfo['value'];
+        if (preg_match('/{([a-z0-9_:]+)}/i', $value) !== 0) {
+            throw new ChannelException(_('Cannot use variable keyword inside a text tag'));
+        }
 
         if (empty($args) === TRUE) {
             if ($assignTo !== NULL) {
@@ -1170,12 +1196,12 @@ class GUIActions
                 $php .= 'echo ';
             }
 
-            $php .= '_("'.$tagInfo['value'].'");'."\n";
+            $php .= '_("'.$value.'");'."\n";
         } else {
             // Init code for the arguments.
             $php .= $tagInfo['argsCode']['init'];
 
-            $printArgCode = '_("'.$tagInfo['value'].'"), '.$tagInfo['argsCode']['list'];
+            $printArgCode = '_("'.$value.'"), '.$tagInfo['argsCode']['list'];
 
             if ($assignTo !== NULL) {
                 $php .= $assignTo.' = sprintf('.$printArgCode.');'."\n";
