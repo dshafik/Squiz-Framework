@@ -166,6 +166,30 @@ class SquizSuiteActions
 
 
     /**
+     * Get the list of all live suite products.
+     *
+     * @return array
+     */
+    public static function getLiveProducts()
+    {
+        $liveProducts = array();
+        $allProducts  = SquizSuite::getAllProducts();
+        foreach ($allProducts as $product) {
+            if ($product['current'] === TRUE
+                || $product['status'] !== 'live'
+            ) {
+                continue;
+            }
+
+            $liveProducts[] = $product;
+        }
+
+        return $liveProducts;
+
+    }//end getLiveProducts()
+
+
+    /**
      * Get the product information for the given systemid.
      *
      * If NULL is given for the systemid, then the current product
@@ -399,7 +423,6 @@ class SquizSuiteActions
         $currProductInfo = SquizSuite::getProduct();
         $userAgentStr    = self::$_userAgentPrefix.$currProductInfo['type'].'/4.0';
         Channels::includeSystem('API');
-        self::_logSentMessage($targetid, $msgType);
         $result = API::sendCURLAPIRequest(
             $apiURL,
             $msg,
@@ -409,7 +432,6 @@ class SquizSuiteActions
         if ($result['curlInfo']['http_code'] !== 200) {
             $errMsg  = 'HTTP Response '.$result['curlInfo']['http_code']."\n";
             $errMsg .= var_export($result, 1)."\n";
-            self::_logErrorMessage($errMsg);
         }
 
         return $result;
@@ -512,6 +534,15 @@ class SquizSuiteActions
                 }
             break;
 
+            case 'suiteProductUpdate':
+                $updateTypeEl = $dom->createElement('update_type');
+                $updateValEl  = $dom->createElement('update_value');
+                API::buildResponseXMLDom($updateTypeEl, $options['updateType']);
+                API::buildResponseXMLDom($updateValEl, $options['updateValue']);
+                $msgEl->appendChild($updateTypeEl);
+                $msgEl->appendChild($updateValEl);
+            break;
+
             default:
                 // No default behaviour.
             break;
@@ -570,14 +601,11 @@ class SquizSuiteActions
                 SquizSuite::updateProduct($systemid, 'status', 'live');
             }
 
-            self::_logReceivedMessage($systemid, 'suitePing');
-
             $response = 'ok';
             return $response;
         } catch (Exception $e) {
             $errMsg  = 'suiteConnect failed'."\n";
             $errMsg .= $e->getMessage()."\n";
-            self::_logErrorMessage($errMsg);
             DAL::rollback();
 
             // Re-throw exception here so that API system can send
@@ -626,8 +654,6 @@ class SquizSuiteActions
             $systemType  = $message['system_type'];
             $certificate = $message['cert'];
 
-            self::_logReceivedMessage($systemid, 'suiteConnect');
-
             DAL::beginTransaction();
 
             // The systemid already exists?
@@ -672,7 +698,6 @@ class SquizSuiteActions
         } catch (Exception $e) {
             $errMsg  = 'suiteConnect failed'."\n";
             $errMsg .= $e->getMessage()."\n";
-            self::_logErrorMessage($errMsg);
             DAL::rollback();
 
             // Re-throw exception here so that API system can send
@@ -743,8 +768,6 @@ class SquizSuiteActions
                 throw new ChannelException($errMsg);
             }
 
-            self::_logReceivedMessage($systemid, 'suiteConnectAck');
-
             DAL::beginTransaction();
             // Connection Request accepted by the other system.
             // Remove the temporary product entry first.
@@ -780,7 +803,6 @@ class SquizSuiteActions
         } catch (Exception $e) {
             $errMsg  = 'suiteConnectAck failed.'."\n";
             $errMsg .= $e->getMessage()."\n";
-            self::_logErrorMessage($errMsg);
             DAL::rollback();
 
             // Re-throw exception here so that API system can send
@@ -828,8 +850,6 @@ class SquizSuiteActions
                 throw new ChannelException($errMsg);
             }
 
-            self::_logReceivedMessage($systemid, 'suiteConnectAckAck');
-
             SquizSuite::updateProduct($systemid, 'status', 'live');
 
             // The final acknowlegement has been received.
@@ -856,7 +876,6 @@ class SquizSuiteActions
         } catch (Exception $e) {
             $errMsg  = 'suiteConnectAckAck failed.'."\n";
             $errMsg .= $e->getMessage()."\n";
-            self::_logErrorMessage($errMsg);
         }//end try
 
     }//end suiteConnectAckAck()
@@ -935,17 +954,75 @@ class SquizSuiteActions
                 }
             }
 
-            self::_logReceivedMessage($systemid, 'suiteProductSync');
-
             $response = 'ok';
             return $response;
         } catch (Exception $e) {
             $errMsg  = 'suiteProductSync failed.'."\n";
             $errMsg .= $e->getMessage()."\n";
-            self::_logErrorMessage($errMsg);
         }//end try
 
     }//end suiteProductSync()
+
+
+    /**
+     * Suite product update request handler.
+     *
+     * The connected system can send suiteProductUpdate message
+     * to deliver the information about any changes in the system.
+     * So, the receiver can update the details of the product.
+     *
+     * @return string
+     * @throws ChannelException Error occurred.
+     *
+     * @api read
+     */
+    public static function suiteProductUpdate()
+    {
+        try {
+            // Verify the User Agent string. Can we get the system type out of it?
+            self::_parseUserAgentString();
+
+            // Parse the posted XML file. Exception will be thrown in case error occurs.
+            include_once 'Libs/Security/Security.inc';
+            $required = array(
+                         'system_id',
+                         'system_url',
+                         'update_type',
+                         'update_value',
+                        );
+            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
+            $xml      = html_entity_decode($xml);
+            $message  = self::_parseSuiteXML($xml, $required);
+
+            $product     = SquizSuite::getProduct($systemid);
+            $systemid    = $message['system_id'];
+            $systemUrl   = $message['system_url'];
+            $updateType  = $message['update_type'];
+            $updateValue = $message['update_value'];
+            switch($updateType) {
+                case 'name':
+                case 'cert':
+                    $product['connection'][$updateType] = $updateValue;
+                    SquizSuite::updateProduct(
+                        $systemid,
+                        'connection',
+                        $product['connection']
+                    );
+                break;
+
+                default:
+                    // Do nothing.
+                break;
+            }
+
+            $response = 'ok';
+            return $response;
+        } catch (Exception $e) {
+            $errMsg  = 'suiteProductUpdate failed.'."\n";
+            $errMsg .= $e->getMessage()."\n";
+        }//end try
+
+    }//end suiteProductUpdate()
 
 
     /**
@@ -1722,8 +1799,10 @@ class SquizSuiteActions
         // Current product name.
         $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
         if ($currProductName !== NULL) {
+            $nameUpdated = FALSE;
             $currProduct = SquizSuite::getProduct();
             if ($currProduct['connection']['name'] !== $currProductName) {
+                $nameUpdated        = TRUE;
                 $connection         = $currProduct['connection'];
                 $connection['name'] = $currProductName;
                 SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
@@ -1771,6 +1850,23 @@ class SquizSuiteActions
                     SquizSuite::updateProduct($tempid, 'status', 'pending');
                 }//end if
             }//end if
+        }//end if
+
+        // Product name has been changed. Send out the product update message.
+        if ($nameUpdated === TRUE) {
+            $liveProducts = SquizSuite::getLiveProducts();
+            $options      = array(
+                             'updateType'  => 'name',
+                             'updateValue' => $currProductName,
+                            );
+
+            foreach ($liveProducts as $product) {
+                $response = SquizSuite::sendMessage(
+                    $product['systemid'],
+                    'suiteProductUpdate',
+                    $options
+                );
+            }
         }//end if
 
         return $retVal;

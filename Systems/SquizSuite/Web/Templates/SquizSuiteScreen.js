@@ -69,6 +69,8 @@ var SquizSuiteScreen = new function()
         });
 
         // Attach delete event.
+        _deletedProducts = {}
+
         var delBtns = dfx.getClass('SquizSuiteScreen-deleteColBtn', _connectedTableDOM);
         dfx.foreach(delBtns, function(idx) {
             var delBtn = delBtns[idx];
@@ -160,13 +162,14 @@ var SquizSuiteScreen = new function()
             systemid: systemid
         };
 
+        var self   = this;
         var params = {
             templateData: dfx.jsonEncode(data)
         };
 
         GUI.sendRequest('GUI', 'saveTemplateData', params, function(data) {
             if (data.result.success) {
-            } else if (data.result.errors) {
+                self._requestProductSummary(systemid, function() {});
             }
         });
     };
@@ -205,7 +208,11 @@ var SquizSuiteScreen = new function()
             var summaryDiv = dfx.getId('squizSuite-' + systemid + '-summary');
             if (data.result.success) {
                 var summaryInfo = data.result.success[screenid];
-                dfx.swapClass(statusDiv, 'loading', 'live');
+                if (dfx.hasClass(statusDiv, 'pending') === true) {
+                    dfx.swapClass(statusDiv, 'pending', 'live');
+                } else {
+                    dfx.swapClass(statusDiv, 'loading', 'live');
+                }
 
                 var c     = '<span class="SquizSuiteScreen-summaryLabel">No summary information</span>';
                 var first = true;
