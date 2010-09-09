@@ -205,7 +205,7 @@ class APIActions
             // Requested service is not available. Not Found.
             $responseContent['exception'] = 'Requested service & is not found.';
             self::_sendHeader(404);
-            self::_sendResponse($responseContent);
+            self::_sendResponse($responseContent, $request['outputFormat']);
             exit;
         }
 
@@ -229,7 +229,7 @@ class APIActions
             // Insufficient parameters are provided.
             self::_sendHeader(400);
             $responseContent['exception'] = 'Provided parameters are not sufficient';
-            self::_sendResponse($responseContent);
+            self::_sendResponse($responseContent, $request['outputFormat']);
             exit;
         }
 
@@ -244,7 +244,7 @@ class APIActions
             // Permission denied.
             self::_sendHeader(401);
             $responseContent['exception'] = 'You do not have permission to perform the requested action';
-            self::_sendResponse($responseContent);
+            self::_sendResponse($responseContent, $outputFormat);
             exit;
         }
 
