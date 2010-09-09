@@ -222,7 +222,7 @@ var SquizSuiteScreen = new function()
                         first = false;
                     }
 
-                    c += '<span class="SquizSuiteScreen-summaryLabel">' + summaryInfo[idx].key + '</span>';
+                    c += '<span class="SquizSuiteScreen-summaryLabel">' + summaryInfo[idx].label + '</span>';
                     c += '<span class="SquizSuiteScreen-summaryValue">' + summaryInfo[idx].value + '</span>';
 
                     return true;

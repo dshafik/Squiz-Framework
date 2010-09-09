@@ -1523,9 +1523,9 @@ class SquizSuiteActions
 
         $summary        = '<strong>'._('Summary').'</strong><br /><div class="SquizSuiteScreen-summaryWrap">';
         $productSummary = SquizSuite::getProductSummary();
-        foreach ($productSummary as $key => $value) {
-            $summary .= '<span class="SquizSuiteScreen-summaryLabel">'._($key).'</span>';
-            $summary .= '<span class="SquizSuiteScreen-summaryValue">'._($value).'</span>';
+        foreach ($productSummary as $field) {
+            $summary .= '<span class="SquizSuiteScreen-summaryLabel">'._($field['label']).'</span>';
+            $summary .= '<span class="SquizSuiteScreen-summaryValue">'._($field['value']).'</span>';
         }
 
         $summary .= '</div>';
@@ -1908,13 +1908,7 @@ class SquizSuiteActions
             $response = API::sendCURLAPIRequest($product['connection']['url'], $msg);
             if ($response['curlInfo']['http_code'] === 200) {
                 $response = json_decode($response['result'], TRUE);
-                $retVal   = array();
-                foreach ($response['result'] as $key => $value) {
-                    $retVal[] = array(
-                                 'key'   => $key,
-                                 'value' => $value,
-                                );
-                }
+                $retVal   = $response['result'];
             } else {
                 $retVal = $response['curlInfo']['http_code'].' response returned.';
             }
