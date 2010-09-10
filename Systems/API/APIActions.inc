@@ -640,6 +640,7 @@ class APIActions
      */
     private static function _sendJSONResponse(array $responseContent)
     {
+        require_once 'Libs/Util/Util.inc';
         header('Content-type: application/json');
 
         $attrs  = array();
@@ -658,7 +659,7 @@ class APIActions
         }
 
         if (array_key_exists('result', $responseContent) === TRUE) {
-            $attrs[] = '"result": '.API::buildResponseJSONString($responseContent['result']);
+            $attrs[] = '"result": '.Util::encodeJson($responseContent['result']);
         }
 
         $jsonString = '{'.implode(','."\n", $attrs).'}';
@@ -938,60 +939,6 @@ class APIActions
         }
 
     }//end _addTextToNode()
-
-
-    /**
-     * Build JSON string for the reponse type.
-     *
-     * The passed content will be converted to JSON string.
-     *
-     * @param mixed $content Content to create.
-     *
-     * @return string
-     */
-    public static function buildResponseJSONString($content)
-    {
-        $type   = '';
-        $result = '';
-        if (is_scalar($content) === TRUE) {
-            $result = json_encode($content);
-        } else if ($content === NULL) {
-            $result = 'null';
-        } else if (is_array($content) === TRUE) {
-            $type = 'array';
-
-            include_once 'Libs/Util/Util.inc';
-            if (Util::isAssoc($content) === TRUE) {
-                $type = 'struct';
-            }
-
-            $arr = array();
-            switch ($type) {
-                case 'array':
-                    foreach ($content as $val) {
-                        $arr[] = API::buildResponseJSONString($val);
-                    }
-
-                    $result = '['.implode(',', $arr).']';
-                break;
-
-                case 'struct':
-                    foreach ($content as $key => $val) {
-                        $arr[] = json_encode((string) $key).':'.API::buildResponseJSONString($val);
-                    }
-
-                    $result = '{'.implode(',', $arr).'}';
-                break;
-
-                default:
-                    // No default behaviour.
-                break;
-            }//end switch
-        }//end if
-
-        return $result;
-
-    }//end buildResponseJSONString()
 
 
     /**
