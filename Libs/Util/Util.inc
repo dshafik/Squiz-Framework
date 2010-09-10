@@ -553,6 +553,54 @@ class Util
     }//end isAssoc()
 
 
+    /**
+     * Encode content to a JSON object. 
+     *
+     * @param mixed   $content Content to encode.
+     * @param boolean $force   Force an array as an assoc array.
+     *
+     * @return string
+     */
+    public static function encodeJson($content, $force=FALSE)
+    {
+        $result = '';
+        if (is_scalar($content) === TRUE) {
+            $result = json_encode($content);
+        } else if ($content === NULL) {
+            $result = 'null';
+        } else if (is_array($content) === TRUE) {
+            $type = 'array';
+
+            if ($force === TRUE || self::isAssoc($content) === TRUE) {
+                $type = 'struct';
+            }
+
+            $arr = array();
+            switch ($type) {
+                case 'struct':
+                    foreach ($content as $key => $val) {
+                        $arr[] = json_encode((string) $key).':'.self::encodeJson($val);
+                    }
+
+                    $result = '{'.implode(',', $arr).'}';
+                break;
+
+                case 'array':
+                default:
+                    foreach ($content as $val) {
+                        $arr[] = self::encodeJson($val);
+                    }
+
+                    $result = '['.implode(',', $arr).']';
+                break;
+            }//end switch
+        }//end if
+
+        return $result;
+
+    }//end encodeJson()
+
+
 }//end class
 
 ?>
