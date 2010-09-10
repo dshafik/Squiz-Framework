@@ -107,7 +107,7 @@ var SquizSuiteScreen = new function()
 
     this.toggleProductDetails = function(span) {
         var rowid = parseInt(span.getAttribute('rowid'));
-        var row   = _connectedProductRows[(rowid * 2) + 1];
+        var row   = _connectedProductRows[rowid + 1];
         if (dfx.hasClass(row, 'hidden') === true) {
             dfx.removeClass(row, 'hidden');
             dfx.addClass(span, 'expanded');
@@ -120,7 +120,7 @@ var SquizSuiteScreen = new function()
     this.toggleProductDelete = function(delBtn) {
         var trDom    = dfx.getParents(delBtn, 'tr', _connectedTableDOM)[0];
         var rowid    = parseInt(trDom.getAttribute('rowid'));
-        var row      = _connectedProductRows[(rowid * 2) + 1];
+        var row      = _connectedProductRows[rowid + 1];
         var systemid = delBtn.getAttribute('systemid');
         if (dfx.hasClass(trDom, 'deleted') === true) {
             dfx.removeClass(trDom, 'deleted');

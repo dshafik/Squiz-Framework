@@ -573,11 +573,7 @@ class SquizSuiteActions
             self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
-            include_once 'Libs/Security/Security.inc';
-            $xml = Security::getRequestData('_enc', NULL, FALSE, 'post');
-            if ($xml === NULL) {
-                throw new ChannelException('Unencrypted suitePing message received');
-            }
+            $xml = self::_getDecryptedXML();
 
             // If XML parsing fails, it will throw an exception.
             $required = array(
@@ -728,7 +724,8 @@ class SquizSuiteActions
             self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
-            include_once 'Libs/Security/Security.inc';
+            $xml = self::_getDecryptedXML();
+
             $required = array(
                          'system_id',
                          'system_url',
@@ -736,8 +733,6 @@ class SquizSuiteActions
                          'system_type',
                          'cert',
                         );
-            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
-            $xml      = html_entity_decode($xml);
             $message  = self::_parseSuiteXML($xml, $required);
 
             $systemid    = $message['system_id'];
@@ -830,15 +825,14 @@ class SquizSuiteActions
             self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
-            include_once 'Libs/Security/Security.inc';
+            $xml = self::_getDecryptedXML();
+
             $required = array(
                          'system_id',
                          'system_url',
                         );
-            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
-            $xml      = html_entity_decode($xml);
+            $message  = self::_parseSuiteXML($xml, $required);
 
-            $message   = self::_parseSuiteXML($xml, $required);
             $systemid  = $message['system_id'];
             $systemUrl = $message['system_url'];
 
@@ -900,15 +894,14 @@ class SquizSuiteActions
             self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
-            include_once 'Libs/Security/Security.inc';
+            $xml = self::_getDecryptedXML();
+
             $required = array(
                          'system_id',
                          'system_url',
                          'products',
                          'sync_direction',
                         );
-            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
-            $xml      = html_entity_decode($xml);
             $message  = self::_parseSuiteXML($xml, $required);
 
             $systemid  = $message['system_id'];
@@ -983,6 +976,8 @@ class SquizSuiteActions
             self::_parseUserAgentString();
 
             // Parse the posted XML file. Exception will be thrown in case error occurs.
+            $xml = self::_getDecryptedXML();
+
             include_once 'Libs/Security/Security.inc';
             $required = array(
                          'system_id',
@@ -1023,6 +1018,30 @@ class SquizSuiteActions
         }//end try
 
     }//end suiteProductUpdate()
+
+
+    /**
+     * Returns _enc field from $_POST var.
+     *
+     * If _enc field doesn't exist in $_POST, it will
+     * throw an exception.
+     *
+     * @return string
+     * @throws ChannelException If _enc field does not exist.
+     */
+    private static function _getDecryptedXML()
+    {
+        include_once 'Libs/Security/Security.inc';
+        $xml = Security::getRequestData('_enc', NULL, FALSE, 'post');
+        if ($xml === NULL) {
+            $errMsg = 'Non encrypted message received.';
+            throw new ChannelException($errMsg);
+        }
+
+        $xml = html_entity_decode($xml);
+        return $xml;
+
+    }//end _getDecryptedXML()
 
 
     /**
@@ -1328,8 +1347,7 @@ class SquizSuiteActions
             }
 
             if ($systemid !== NULL) {
-                $systemid = $encrypted['_systemid'];
-                $product  = SquizSuite::getProduct($systemid);
+                $product = SquizSuite::getProduct($systemid);
                 if (empty($product) === FALSE && $product['status'] === 'live') {
                     // This is the API request from the connected
                     // SquizSuite system.
@@ -1636,7 +1654,7 @@ class SquizSuiteActions
                                          ),
                       );
 
-            $count++;
+            $count += 2;
         }//end foreach
 
         $rows[] = array(
@@ -1697,7 +1715,7 @@ class SquizSuiteActions
 
         $setting['rows'][] = array(
                               'currTypeIcon' => array(
-                                                 'colspan'    => 2,
+                                                 'colspan'    => 3,
                                                  'colContent' => $colContent,
                                                 ),
                              );
