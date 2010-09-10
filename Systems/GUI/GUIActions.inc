@@ -1798,6 +1798,18 @@ class GUIActions
 
 
     /**
+     * Returns the Doctype used by GUI.
+     *
+     * @return string
+     */
+    public static function getDocType()
+    {
+        return self::$_docType;
+
+    }//end getDocType()
+
+
+    /**
      * Serves any file on the file system, using X-Sendfile.
      *
      * @param string $filePath Path to the file.

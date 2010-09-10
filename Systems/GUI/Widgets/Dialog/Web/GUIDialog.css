@@ -8,6 +8,7 @@
     left: 50%;
     display: none;
     visibility: hidden;
+    -moz-box-shadow: 0 0 25px #222;
 }
 
 .GUIDialog-top {

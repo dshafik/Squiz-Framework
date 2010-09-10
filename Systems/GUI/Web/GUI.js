@@ -52,6 +52,12 @@ var GUI = new function()
         }
 
         this.widgetTemplates[parent][id] = obj;
+
+        // Also if the lineage is empty then we need to add the parent template as the
+        // initial lineage item.
+        if (this.templateLineage.length === 0) {
+            this.templateLineage.push(parent);
+        }
     };
 
     this.removeWidget = function(id) {
@@ -148,6 +154,10 @@ var GUI = new function()
 
     this.addTemplate = function(template) {
         this.templateLineage.push(template);
+    };
+
+    this.getCurrentTemplate = function() {
+        return this.templateLineage[(this.templateLineage.length - 1)];
     };
 
     /**
