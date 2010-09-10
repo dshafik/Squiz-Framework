@@ -1,0 +1,22 @@
+#helpToolbarButton {
+    background: url(help_toolbarIcon.png) no-repeat;
+    cursor: pointer;
+    float: right;
+    height: 25px;
+    margin-right: 50px;
+    margin-top: 5px;
+    width: 32px;
+}
+
+#Help-dialog .GUIDialog-top {
+    background-image: -moz-linear-gradient(0% 0 -90deg, #F9F06F, #C5BF66);
+    border-color: #CCC664;
+}
+
+#Help-dialog .GUIDialog-title {
+    color: #000;
+}
+
+#Help-dialog .GUIDialog-closeIcon {
+    background-image: url(close.png);
+}

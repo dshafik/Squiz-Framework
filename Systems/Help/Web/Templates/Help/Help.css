@@ -1,0 +1,152 @@
+#Help-dialog .GUIDialog-middle {
+    border: none;
+}
+
+/* Navigation styles */
+a.Help-control-button {
+    float: left;
+    cursor: pointer;
+    width: 23px;
+    height: 20px;
+    background: url(help_toolbar.png) no-repeat 0 0;
+    border: none;
+    outline: none;
+}
+
+a.Help-control-button.back {
+    background-position: 0 0;
+}
+
+a.Help-control-button.back:active {
+    background-position: 0 -20px;
+}
+
+a.Help-control-button.forward {
+    background-position: -23px 0;
+    width: 22px;
+}
+
+a.Help-control-button.forward:active {
+    background-position: -23px -20px;
+}
+
+a.Help-control-button.home {
+    background-position: -45px 0;
+    margin-left: 5px;
+    width: 25px;
+}
+
+a.Help-control-button.home:active {
+    background-position: -45px -20px;
+}
+
+a.Help-control-button.menu {
+    background-position: -70px 0;
+    width: 13px;
+}
+
+a.Help-control-button.menu:active {
+    background-position: -70px -20px;
+}
+
+a.Help-control-button.picker {
+    background-position: -83px 0;
+    width: 28px;
+    margin-left: 5px;
+}
+
+a.Help-control-button.picker:active {
+    background-position: -83px -20px;
+}
+
+a.Help-control-button.glossary {
+    background-position: -111px 0;
+    width: 28px;
+    margin-left: 5px;
+}
+
+a.Help-control-button.glossary:active {
+    background-position: -111px -20px;
+}
+
+a.Help-control-button.general {
+    background-position: -139px 0;
+    width: 28px;
+    margin-left: 5px;
+}
+
+a.Help-control-button.general:active {
+    background-position: -139px -20px;
+}
+
+/* IFrame styles */
+.Help-iframe {
+    font-family: arial;
+    font-size: 12px;
+    line-height: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+.Help-iframe.glossaryPage h2 {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.Help-iframe a {
+    text-decoration: none;
+    color: #699FC7;
+}
+
+.Help-iframe.glossaryPage .Help-glossary-letters {
+    color: #CCC;
+    font-size: 13px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #FFF;
+    width: 100%;
+    padding: 3px 10px;
+}
+
+.Help-iframe {
+    padding: 15px 10px;
+}
+
+.Help-iframe hr {
+    border: none;
+    border-top: 1px solid #CCC;
+    height: 1px;
+    margin: 0 0 8px;
+    padding: 0;
+}
+
+.Help-iframe ul,
+.Help-iframe ol {
+    margin: 0 0 15px;
+    padding: 0 0 0 15px;
+}
+
+.Help-iframe ul li {
+    list-style-image: url(listitem.png);
+}
+
+.Help-iframe li a {
+    color: #000;
+}
+
+.Help-iframe li a:hover {
+    color: #666;
+}
+
+.Help-iframe h1 {
+    font-size: 15px;
+    margin: 5px 0px 7px;
+    padding: 0px;
+}
+
+.Help-iframe .Help-locator-img {
+    border: none;
+    cursor: pointer;
+    vertical-align: middle;
+}
