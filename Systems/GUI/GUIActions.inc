@@ -1288,14 +1288,18 @@ class GUIActions
                 $condition = $child->getAttribute('condition');
 
                 // Get the system name so we can include it.
-                list($systemName, $method) = explode('::', $condition);
-                $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
+                if (empty($condition) === FALSE) {
+                    list($systemName, $method) = explode('::', $condition);
+                    $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
+                }
 
                 // Print the if, else block.
                 $php .= $tagTypes[$child->tagName];
 
                 if ($child->tagName !== 'else') {
                     $php .= ' ('.$condition.' === TRUE) {'."\n";
+                } else {
+                    $php .= ' {'."\n";
                 }
 
                 foreach ($child->childNodes as $condChild) {
