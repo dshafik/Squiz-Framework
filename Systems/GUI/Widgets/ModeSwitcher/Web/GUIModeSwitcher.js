@@ -88,7 +88,6 @@ GUIModeSwitcher.prototype = {
         var dynamicButtons = this._getDynamicButtons();
 
         // Get last button width.
-
         var width = this._staticButtonsWidth;
         if (dynamicButtons.length > 0) {
             var lastButtonIndex = this.getLastVisibleButtonIndex();
@@ -234,17 +233,25 @@ GUIModeSwitcher.prototype = {
         // Get last button width.
         var dynamicButtons  = this._getDynamicButtons();
         var lastButtonIndex = this.getLastVisibleButtonIndex();
-        var lastButtonWidth = dfx.getElementWidth(dynamicButtons[lastButtonIndex]);
+
+        var animate = false;
+        if (dynamicButtons.length > 0) {
+            animate = true;
+
+            var lastButtonWidth = dfx.getElementWidth(dynamicButtons[lastButtonIndex]);
+        }
 
         dfx.attr(this._staticBtnContainer, 'state', 0);
 
-        dfx.animate(this._sliderElement, {
-            width: (this._staticButtonsWidth + lastButtonWidth)
-        }, this._slideTime);
+        if (animate === true) {
+            dfx.animate(this._sliderElement, {
+                width: (this._staticButtonsWidth + lastButtonWidth)
+            }, this._slideTime);
 
-        dfx.animate(this._dynamicBtnContainer, {
-            left: this._getSlideOffset()
-        }, this._slideTime);
+            dfx.animate(this._dynamicBtnContainer, {
+                left: this._getSlideOffset()
+            }, this._slideTime);
+        }
 
     },
 
