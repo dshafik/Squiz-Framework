@@ -68,6 +68,13 @@ class HelpActions
      */
     private static $_docsInfo = array();
 
+    /**
+     * Sections that are displayed on the template index page.
+     *
+     * @var array
+     */
+    private static $_sections = array();
+
 
     /**
      * Returns the path to the documentation's directory.
@@ -89,6 +96,11 @@ class HelpActions
      */
     public static function createDocs()
     {
+        self::$_sections = array(
+                            'tasks'           => _('Tasks'),
+                            'troubleshooting' => _('Troubleshooting'),
+                           );
+
         include_once 'Libs/FileSystem/FileSystem.inc';
 
         // Create the base help data dir.
@@ -195,7 +207,7 @@ class HelpActions
                     if ($fileName === 'glossary.html') {
                         self::_parseGlossaryFile('glossary-'.$idPrefix.'-', $srcFile, $parentGlossaryFile);
                     } else {
-                        self::_parseArticleFile('article-'.$idPrefix.'-', $srcFile);
+                        self::_parseArticleFile('article-'.$idPrefix.'-', $srcFile, TRUE);
                     }
                 }
             }
@@ -214,7 +226,7 @@ class HelpActions
                 self::$_convertedFiles[] = $file;
             }
         } catch (ChannelException $e) {
-            $msg = sprintf(_('Exception thrown while parsing %s: %s'), $file, $e->getMessage());
+            $msg = sprintf(_('%s (Exception while parsing %s)'), $e->getMessage(), $file);
             throw new ChannelException($msg);
         }
 
@@ -340,13 +352,14 @@ class HelpActions
     /**
      * Parse a single Help article file.
      *
-     * @param string $idPrefix    The prefix to use (e.g. <articleType>-<system>-<tamplte>).
-     * @param string $articleFile The article file to parse.
+     * @param string  $idPrefix          The prefix to use (e.g. <articleType>-<system>-<tamplte>).
+     * @param string  $articleFile       The article file to parse.
+     * @param boolean $isTemplateArticle If TRUE then article is inside a template Docs folder.
      *
      * @return void
      * @throws ChannelException If the article cannot be parsed.
      */
-    private static function _parseArticleFile($idPrefix, $articleFile)
+    private static function _parseArticleFile($idPrefix, $articleFile, $isTemplateArticle=FALSE)
     {
         $fileContents = trim(file_get_contents($articleFile));
         if (empty($fileContents) === TRUE) {
@@ -354,13 +367,13 @@ class HelpActions
             throw new ChannelException($msg);
         }
 
-        // If the file name is "index.html" then its special and just needs to be copied.
+        $isIndexPage       = FALSE;
+        $isSystemIndexPage = FALSE;
         if (basename($articleFile) === 'index.html') {
-              include_once 'Libs/FileSystem/FileSystem.inc';
-              $dataDir  = Help::getDocsDirectory();
-              $destFile = $dataDir.trim(str_replace('article-', 'index-', $idPrefix), '-').'.html';
-              FileSystem::filePutContents($destFile, $fileContents);
-              return;
+            $isIndexPage = TRUE;
+            if ($isTemplateArticle === FALSE ) {
+                $isSystemIndexPage = TRUE;
+            }
         }
 
         Channels::includeSystem('GUI');
@@ -374,12 +387,6 @@ class HelpActions
         $doc = new DomDocument();
         @$doc->loadHTML($html);
 
-        // Get the info tag.
-        $infoTags = $doc->getElementsByTagName('info');
-        if ($infoTags->length === 0) {
-            throw new ChannelException(sprintf(_('Article file does not have "info" tag: %s.'), $articleFile));
-        }
-
         // Get the title.
         $titleTags = $doc->getElementsByTagName('h1');
         if ($titleTags->length === 0) {
@@ -389,52 +396,75 @@ class HelpActions
         $title     = $titleTags->item(0)->nodeValue;
         $articleid = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', str_replace('.html', '', basename($articleFile))));
 
-        self::$_articleTitles[$idPrefix.$articleid] = $title;
-
-        $showInTag = $doc->getElementsByTagName('show-in');
-        if ($showInTag->length === 0) {
-            throw new ChannelException(sprintf(_('Article file does not have "show-in" tag: %s.'), $articleFile));
+        // Get the info tag.
+        $infoTags = $doc->getElementsByTagName('info');
+        if ($isSystemIndexPage === FALSE && $infoTags->length === 0) {
+            throw new ChannelException(sprintf(_('Article file does not have "info" tag: %s.'), $articleFile));
         }
 
-        $showIn = explode(',', $showInTag->item(0)->nodeValue);
+        // If not an index page then it must have show-in tag.
+        $showIn = array();
+        if ($isIndexPage === FALSE) {
+            self::$_articleTitles[$idPrefix.$articleid] = $title;
 
-        // Validate show locations.
-        if (empty($showIn) === TRUE) {
-            throw new ChannelException(sprintf(_('Article does not have show-in values: %s'), $articleFile));
-        }
-
-        // Todo: Move to member var.
-        $validLocations = array(
-                           'tasks',
-                           'troubleshooting',
-                          );
-
-        foreach ($showIn as $index => $showLocation) {
-            $showLocation = trim(strtolower($showLocation));
-            if (in_array($showLocation, $validLocations) === TRUE) {
-                $showIn[$index] = $showLocation;
-            } else {
-                throw new ChannelException(sprintf(_('Invalid show-in value "%s" in %s'), $showLocation, $articleFile));
+            $showInTag = $doc->getElementsByTagName('show-in');
+            if ($showInTag->length === 0) {
+                throw new ChannelException(sprintf(_('Article file does not have "show-in" tag: %s.'), $articleFile));
             }
+
+            $showIn = explode(',', $showInTag->item(0)->nodeValue);
+
+            // Validate show locations.
+            if (empty($showIn) === TRUE) {
+                throw new ChannelException(sprintf(_('Article does not have show-in values: %s'), $articleFile));
+            }
+
+            foreach ($showIn as $index => $showLocation) {
+                $showLocation = trim(strtolower($showLocation));
+                if (isset(self::$_sections[$showLocation]) === TRUE) {
+                    $showIn[$index] = $showLocation;
+                } else {
+                    throw new ChannelException(sprintf(_('Invalid show-in value "%s" in %s'), $showLocation, $articleFile));
+                }
+            }
+        }//end if
+
+        // Get the summary if there is one.
+        $summary     = '';
+        $summaryTags = $doc->getElementsByTagName('summary');
+        if ($summaryTags->length > 1) {
+            throw new ChannelException(sprintf(_('Article has more than 1 summary tag: %s.'), $articleFile));
+        } else if ($summaryTags->length === 1) {
+            $summary = trim($summaryTags->item(0)->nodeValue);
         }
 
         // Save the file in data dir.
         $dataDir  = Help::getDocsDirectory();
-        $destFile = $dataDir.'/'.$idPrefix.$articleid.'.html';
+        $destFile = '';
+
+        if ($isIndexPage === TRUE) {
+            // The index pages are prefixed with index-.
+            $destFile = $dataDir.trim(str_replace('article-', 'index-', $idPrefix), '-').'.html';
+        } else {
+            $destFile = $dataDir.'/'.$idPrefix.$articleid.'.html';
+        }
 
         $articleInfo = array(
-                        'id'     => $idPrefix.$articleid,
-                        'title'  => $title,
-                        'showIn' => $showIn,
+                        'id'      => $idPrefix.$articleid,
+                        'title'   => $title,
+                        'showIn'  => $showIn,
+                        'summary' => $summary,
                        );
-        self::_addArticleToIndex($idPrefix.$articleid, $articleInfo);
+        self::_addArticleToIndex($idPrefix.$articleid, $articleInfo, $isIndexPage);
 
         if (file_exists($destFile) === TRUE) {
             throw new ChannelException(sprintf(_('Duplicate article found in: %s.'), $articleFile));
         }
 
         // Remove the info tag.
-        $infoTags->item(0)->parentNode->removeChild($infoTags->item(0));
+        if ($infoTags->length !== 0) {
+            $infoTags->item(0)->parentNode->removeChild($infoTags->item(0));
+        }
 
         $doc->saveHTMLFile($destFile);
 
@@ -613,15 +643,27 @@ class HelpActions
             throw new ChannelException(_('Found glossary tag with no content'));
         }
 
+        // Check if glossary term exists.
+        $dataDir  = Help::getDocsDirectory();
+        $termFile = $dataDir.'glossary-'.$id.'.html';
+        if (file_exists($termFile) === FALSE) {
+            throw new ChannelException(sprintf(_('Referenced glossary term "%s" not found!'), $id));
+        }
+
         $doc  = $tag->ownerDocument;
         $aTag = $doc->createElement('a');
         $aTag->setAttribute('href', 'javascript:parent.window.Help.loadPage(\'glossary-'.$id.'\');');
 
         $words = explode(' ', $content);
+        $span  = NULL;
         foreach ($words as $word) {
             $span = $doc->createElement('span');
             $span->nodeValue = $word.' ';
             $aTag->appendChild($span);
+        }
+
+        if ($span !== NULL) {
+            $span->nodeValue = rtrim($span->nodeValue);
         }
 
         // Create the element locator icon.
@@ -654,9 +696,40 @@ class HelpActions
      * @param DomNode $tag The article tag to convert.
      *
      * @return void
+     * @throws ChannelException If tag cannot be converted.
      */
     private static function _convertArticleTag(DomNode $tag)
     {
+        $id = trim($tag->getAttribute('id'));
+        if (empty($id) === TRUE) {
+            throw new ChannelException(_('Found article tag with empty id'));
+        }
+
+        $content = trim($tag->nodeValue);
+        if (empty($content) === TRUE) {
+            throw new ChannelException(_('Found article tag with no content'));
+        }
+
+        // Check if article exists.
+        $dataDir     = Help::getDocsDirectory();
+        $articleFile = $dataDir.'article-'.$id.'.html';
+        if (file_exists($articleFile) === FALSE) {
+            throw new ChannelException(sprintf(_('Referenced article "%s" not found!'), $id));
+        }
+
+        $doc  = $tag->ownerDocument;
+        $aTag = $doc->createElement('a');
+        $aTag->setAttribute('href', 'javascript:parent.window.Help.loadPage(\'article-'.$id.'\');');
+
+        $words = explode(' ', $content);
+        foreach ($words as $word) {
+            $span = $doc->createElement('span');
+            $span->nodeValue = $word;
+            $aTag->appendChild($span);
+        }
+
+        // Replace tag with the new one.
+        $tag->parentNode->replaceChild($aTag, $tag);
 
     }//end _convertArticleTag()
 
@@ -768,12 +841,13 @@ class HelpActions
     /**
      * Adds an article to the index array.
      *
-     * @param string $docFile File name of the article.
-     * @param array  $info    Information about the article.
+     * @param string  $docFile     File name of the article.
+     * @param array   $info        Information about the article.
+     * @param boolean $isIndexPage If TRUE then the article is an index page.
      *
      * @return void
      */
-    private static function _addArticleToIndex($docFile, array $info)
+    private static function _addArticleToIndex($docFile, array $info, $isIndexPage=FALSE)
     {
         $parts = explode('-', $docFile);
 
@@ -785,6 +859,7 @@ class HelpActions
                                          'glossary' => array(),
                                          'article'  => array(),
                                          'template' => array(),
+                                         'summary'  => array(),
                                         );
         }
 
@@ -798,6 +873,7 @@ class HelpActions
                 self::$_docsInfo[$system]['template'][$template] = array(
                                                                     'glossary' => array(),
                                                                     'article'  => array(),
+                                                                    'summary'  => array(),
                                                                    );
             }
 
@@ -807,6 +883,10 @@ class HelpActions
                 }
 
                 self::$_docsInfo[$system]['template'][$template]['article'][$showin][$id] = $info;
+            }
+
+            if (empty($info['summary']) === FALSE) {
+                self::$_docsInfo[$system]['template'][$template]['summary'] = $info['summary'];
             }
         } else {
             // Base system.
@@ -842,7 +922,11 @@ class HelpActions
             @$doc->loadHTMLFile($termFile);
             $container = $doc->createElement('div');
             $container->setAttribute('id', 'Help-articleListWrapper');
-            $container->nodeValue = _('Articles');
+            $containerTitle = $doc->createElement('h2');
+            $containerTitle->nodeValue = _('Articles');
+            $container->appendChild($containerTitle);
+            $hr = $doc->createElement('hr');
+            $container->appendChild($hr);
 
             $ulTag = $doc->createElement('ul');
             $ulTag->setAttribute('id', 'Help-articleList');
@@ -908,7 +992,6 @@ class HelpActions
         // Need the title and the id of the article.
         asort($glossaryTerms);
 
-        // TODO: What do we do about different languages?
         $letters     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $length      = strlen($letters);
         $contents    = '<div class="Help-glossary-letters">';
@@ -995,9 +1078,11 @@ class HelpActions
 
         // Print each template and their summary.
         foreach ($docsInfo['template'] as $templateName => $tplInfo) {
-            $tplHref   = $systemName.'-'.$templateName.'-index.html';
-
-            $desc = '&nbsp;';
+            $tplHref = $systemName.'-'.$templateName.'-index.html';
+            $desc    = '&nbsp;';
+            if (empty($tplInfo['summary']) === FALSE) {
+                $desc = $tplInfo['summary'];
+            }
 
             $contents .= '<h1>'.$templateName.' <a href="javascript:parent.window.Help.loadPage(\''.$tplHref.'\');">==&gt;</a></h1>';
             $contents .= '<hr />';
@@ -1051,25 +1136,17 @@ class HelpActions
         $contents .= '</div>';
         $contents .= '<div class="Help-iframe-templateArticles">';
 
-        // Tasks section.
-        $contents .= '<h1>'._('Tasks').'</h1>';
-        $contents .= '<hr />';
-        $contents .= '<ul>';
-        foreach ($templateArticles['tasks'] as $title => $info) {
-            $contents .= '<li><a href="javascript:parent.window.Help.loadPage(\''.$info['id'].'\');">'.$title.'</a></li>';
+        // Print index page sections (e.g. Tasks, Troubleshooting).
+        foreach (self::$_sections as $section) {
+            $contents .= '<h1>'.$section.'</h1>';
+            $contents .= '<hr />';
+            $contents .= '<ul>';
+            foreach ($templateArticles[strtolower($section)] as $title => $info) {
+                $contents .= '<li><a href="javascript:parent.window.Help.loadPage(\''.$info['id'].'\');">'.$title.'</a></li>';
+            }
+
+            $contents .= '</ul></div>';
         }
-
-        $contents .= '</ul></div>';
-
-        // Troubleshooting section.
-        $contents .= '<h1>'._('Troubleshooting').'</h1>';
-        $contents .= '<hr />';
-        $contents .= '<ul>';
-        foreach ($templateArticles['troubleshooting'] as $title => $info) {
-            $contents .= '<li><a href="javascript:parent.window.Help.loadPage(\''.$info['id'].'\');">'.$title.'</a></li>';
-        }
-
-        $contents .= '</ul></div>';
 
         Channels::includeSystem('GUI');
         $cssHref = self::_getPageCSSPath();

@@ -94,6 +94,15 @@ a.Help-control-button.general:active {
 }
 
 .Help-iframe a {
+    color: #153864;
+    text-decoration: none;
+}
+
+.Help-iframe a span {
+    text-decoration: underline;
+}
+
+.Help-iframe .Help-glossary-letters a {
     text-decoration: none;
     color: #699FC7;
 }
@@ -133,6 +142,7 @@ a.Help-control-button.general:active {
 
 .Help-iframe li a {
     color: #000;
+    text-decoration: none;
 }
 
 .Help-iframe li a:hover {
@@ -149,4 +159,5 @@ a.Help-control-button.general:active {
     border: none;
     cursor: pointer;
     vertical-align: middle;
+    padding-left: 2px;
 }
