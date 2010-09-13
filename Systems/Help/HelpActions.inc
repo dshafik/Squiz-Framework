@@ -334,7 +334,11 @@ class HelpActions
                         $term->getAttribute('elemid'),
                         $term->getAttribute('elemclass')
                     );
-                    $importedNode->appendChild($elemLocator);
+
+                    if ($elemLocator !== NULL) {
+                        $importedNode->appendChild($elemLocator);
+                    }
+
                     $bodyTag->appendChild($importedNode);
 
                     // Create the content contentWrapper.
@@ -345,7 +349,7 @@ class HelpActions
                     throw new ChannelException(_('Found content before H1 element'));
                 } else {
                     $contentWrapper->appendChild($importedNode);
-                }
+                }//end if
 
                 // Loop until another term is found (h1 tag).
                 $node = $node->nextSibling;
@@ -522,10 +526,12 @@ class HelpActions
         $iconEl = $dom->createElement('img');
         $iconEl->setAttribute('title', _('Click to show location on screen'));
 
-        if (empty($elemId) !== TRUE) {
+        if (empty($elemId) === FALSE) {
             $iconEl->setAttribute('elemid', $elemId);
-        } else if (empty($elemClass) !== TRUE) {
+        } else if (empty($elemClass) === FALSE) {
             $iconEl->setAttribute('elemclass', $elemClass);
+        } else {
+            return NULL;
         }
 
         $iconEl->setAttribute(
@@ -725,7 +731,9 @@ class HelpActions
             $elemClass
         );
 
-        $aTag->appendChild($locator);
+        if ($locator !== NULL) {
+            $aTag->appendChild($locator);
+        }
 
         // Replace tag with the new one.
         $tag->parentNode->replaceChild($aTag, $tag);
@@ -1041,8 +1049,7 @@ class HelpActions
      */
     private static function _createGlossaryIndexPage(array $glossaryTerms, $systemName, $templateName=NULL)
     {
-        // Need the title and the id of the article.
-        asort($glossaryTerms);
+        ksort($glossaryTerms);
 
         $letters     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $length      = strlen($letters);
@@ -1057,14 +1064,15 @@ class HelpActions
             $id    = current($glossaryTerms);
             $title = key($glossaryTerms);
 
-            while ($title !== FALSE) {
+            while ($title !== NULL) {
                 $firstLt = strtoupper($title[0]);
                 if ($firstLt === $letters[$i]) {
                     $url = 'javascript:window.parent.Help.loadPage(\''.$id.'\');';
 
                     $listContent .= '<li><a href="'.$url.'">'.$title.'</a></li>';
-                    $title        = next($glossaryTerms);
-                    $hasArticle   = TRUE;
+                    next($glossaryTerms);
+                    $title      = key($glossaryTerms);
+                    $hasArticle = TRUE;
                 } else {
                     break;
                 }
@@ -1168,6 +1176,7 @@ class HelpActions
      * @param string $templateName     Name of the template the articles belong to.
      *
      * @return void
+     * @throws ChannelException If the index page not found for specified template.
      */
     private static function _createTemplateIndexPage(array $templateArticles, array $parentArticles, $systemName, $templateName)
     {
@@ -1197,6 +1206,10 @@ class HelpActions
 
         // Get the template document file and add it to the HTML (if exists).
         $indexFile = Help::getDocsDirectory().'/index-'.$systemName.'-'.$templateName.'.html';
+
+        if (file_exists($indexFile) === FALSE) {
+            throw new ChannelException(_('Index file for template does not exist.'));
+        }
 
         $contents  = '';
         $contents .= '<div class="Help-iframe-templateInto">';

@@ -330,7 +330,7 @@ var Help = new function()
             if (elemid) {
                 refElems.push(dfx.getId(elemid));
             } else {
-                var elemClass = dfx.atrr(pointerIconElem, 'elemClass');
+                var elemClass = dfx.attr(pointerIconElem, 'elemClass');
                 if (!elemClass) {
                     return;
                 }
