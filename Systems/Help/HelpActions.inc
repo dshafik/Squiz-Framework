@@ -82,6 +82,13 @@ class HelpActions
      */
      private static $_generalArticlesFilePath = NULL;
 
+    /**
+     * Widget id and class references for glossary terms.
+     *
+     * @var string
+     */
+     private static $_widgetReferences = NULL;
+
 
     /**
      * Returns the path to the documentation's directory.
@@ -108,6 +115,11 @@ class HelpActions
                             'tasks'           => _('Tasks'),
                             'troubleshooting' => _('Troubleshooting'),
                            );
+
+        self::$_widgetReferences = array(
+                                    'elemid'    => array(),
+                                    'elemclass' => array(),
+                                   );
 
         // Get the general articles file.
         self::$_generalArticlesFilePath = self::_getGeneralArticleFilePath();
@@ -344,6 +356,12 @@ class HelpActions
             $fileName = $idPrefix.strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', $glossaryid));
             $destFile = $dataDir.'/'.$fileName.'.html';
 
+            if ($term->hasAttribute('elemid') === TRUE) {
+                self::$_widgetReferences['elemid'][$fileName] = $term->getAttribute('elemid');
+            } else if ($term->hasAttribute('elemclass') === TRUE) {
+                self::$_widgetReferences['elemclass'][$fileName] = $term->getAttribute('elemclass');
+            }
+
             $glossaryInfo = array(
                              'id'    => $fileName,
                              'title' => $glossaryTitle,
@@ -503,15 +521,11 @@ class HelpActions
     {
         $iconEl = $dom->createElement('img');
         $iconEl->setAttribute('title', _('Click to show location on screen'));
-        $iconEl->setAttribute('system', $system);
-        if (is_array($widgetRef) === TRUE) {
-            $iconEl->setAttribute(
-                'widgetclass',
-                $widgetRef['val']
-            );
-            $iconEl->setAttribute('widget', '');
-        } else {
-            $iconEl->setAttribute('widget', $widgetRef);
+
+        if (empty($elemId) !== TRUE) {
+            $iconEl->setAttribute('elemid', $elemId);
+        } else if (empty($elemClass) !== TRUE) {
+            $iconEl->setAttribute('elemclass', $elemClass);
         }
 
         $iconEl->setAttribute(
@@ -523,6 +537,16 @@ class HelpActions
         $iconEl->setAttribute(
             'src',
             '/__web/'.GUI::getSystemWebPath('Help').'/Templates/Help/link_locator.png'
+        );
+
+        $iconEl->setAttribute(
+            'onclick',
+            'parent.window.Help.pointer.pointTo(this.getAttribute(\'elemid\'), this.getAttribute(\'elemclass\'));return false;'
+        );
+
+        $iconEl->setAttribute(
+            'onload',
+            'parent.window.Help.pointer.updateLinkIconState(this);'
         );
 
         return $iconEl;
@@ -685,11 +709,20 @@ class HelpActions
             $span->nodeValue = rtrim($span->nodeValue);
         }
 
+        // Get the element id or the class that is being referenced.
+        $elemId    = NULL;
+        $elemClass = NULL;
+        if (isset(self::$_widgetReferences['elemid']['glossary-'.$id]) === TRUE) {
+            $elemId = self::$_widgetReferences['elemid']['glossary-'.$id];
+        } else if (isset(self::$_widgetReferences['elemclass']['glossary-'.$id]) === TRUE) {
+            $elemClass = self::$_widgetReferences['elemclass']['glossary-'.$id];
+        }
+
         // Create the element locator icon.
         $locator = self::_createElementLocator(
             $doc,
-            $tag->getAttribute('elemid'),
-            $tag->getAttribute('elemclass')
+            $elemId,
+            $elemClass
         );
 
         $aTag->appendChild($locator);

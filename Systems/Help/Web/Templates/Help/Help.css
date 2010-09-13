@@ -157,3 +157,34 @@ a.Help-control-button.general:active {
     vertical-align: middle;
     padding-left: 2px;
 }
+
+/* Pointer */
+.Help-pointer {
+    width: 70px;
+    height: 70px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 9999;
+}
+
+.Help-pointer-hidden {
+    visibility: hidden;
+}
+
+.Help-pointer-down {
+    background: url(pointer_down.png) no-repeat 50%;
+}
+
+.Help-pointer-up {
+    background: url(pointer_up.png) no-repeat 50%;
+}
+
+.Help-pointer-left {
+    background: url(pointer_left.png) no-repeat 50%;
+}
+
+.Help-pointer-right {
+    background: url(pointer_right.png) no-repeat 50%;
+}
+
