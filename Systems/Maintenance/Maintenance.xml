@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<system>
+  <plugs />
+  <cron_jobs>
+    <cron_job script="MaintenanceCron.inc" name="System Maintenance" interval="daily">
+      <description>This job performs a number of system maintenance tasks to reduce data storage and improve system performance. It is recommended that you run this job daily.</description>
+    </cron_job>
+  </cron_jobs>
+</system>
