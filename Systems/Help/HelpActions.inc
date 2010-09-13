@@ -75,6 +75,13 @@ class HelpActions
      */
     private static $_sections = array();
 
+    /**
+     * Path to the general articles file.
+     *
+     * @var string
+     */
+     private static $_generalArticlesFilePath = NULL;
+
 
     /**
      * Returns the path to the documentation's directory.
@@ -96,10 +103,14 @@ class HelpActions
      */
     public static function createDocs()
     {
+        // Set the valid sections for template index page.
         self::$_sections = array(
                             'tasks'           => _('Tasks'),
                             'troubleshooting' => _('Troubleshooting'),
                            );
+
+        // Get the general articles file.
+        self::$_generalArticlesFilePath = self::_getGeneralArticleFilePath();
 
         include_once 'Libs/FileSystem/FileSystem.inc';
 
@@ -367,13 +378,16 @@ class HelpActions
             throw new ChannelException($msg);
         }
 
+        $isGeneralPage     = FALSE;
         $isIndexPage       = FALSE;
         $isSystemIndexPage = FALSE;
         if (basename($articleFile) === 'index.html') {
             $isIndexPage = TRUE;
-            if ($isTemplateArticle === FALSE ) {
+            if ($isTemplateArticle === FALSE) {
                 $isSystemIndexPage = TRUE;
             }
+        } else if ($articleFile === self::$_generalArticlesFilePath) {
+            $isGeneralPage = TRUE;
         }
 
         Channels::includeSystem('GUI');
@@ -398,13 +412,16 @@ class HelpActions
 
         // Get the info tag.
         $infoTags = $doc->getElementsByTagName('info');
-        if ($isSystemIndexPage === FALSE && $infoTags->length === 0) {
+        if ($isSystemIndexPage === FALSE
+            && $isGeneralPage === FALSE
+            && $infoTags->length === 0
+        ) {
             throw new ChannelException(sprintf(_('Article file does not have "info" tag: %s.'), $articleFile));
         }
 
         // If not an index page then it must have show-in tag.
         $showIn = array();
-        if ($isIndexPage === FALSE) {
+        if ($isIndexPage === FALSE && $isGeneralPage === FALSE) {
             self::$_articleTitles[$idPrefix.$articleid] = $title;
 
             $showInTag = $doc->getElementsByTagName('show-in');
@@ -445,6 +462,8 @@ class HelpActions
         if ($isIndexPage === TRUE) {
             // The index pages are prefixed with index-.
             $destFile = $dataDir.trim(str_replace('article-', 'index-', $idPrefix), '-').'.html';
+        } else if ($isGeneralPage === TRUE) {
+            $destFile = $dataDir.'general.html';
         } else {
             $destFile = $dataDir.'/'.$idPrefix.$articleid.'.html';
         }
@@ -678,8 +697,8 @@ class HelpActions
         // Replace tag with the new one.
         $tag->parentNode->replaceChild($aTag, $tag);
 
-        // Do not track glossary terms that refer to other terms.
-        if (strpos($fileName, 'glossary-') !== 0) {
+        // Do not track glossary terms that refer to other terms or being refered by general article.
+        if (strpos($fileName, 'glossary-') !== 0 && basename($fileName) !== 'general.html') {
             if (isset(self::$_glossaryUsage[$id]) === FALSE) {
                 self::$_glossaryUsage[$id] = array();
             }
@@ -1163,6 +1182,32 @@ class HelpActions
         FileSystem::filePutContents($filePath, $html);
 
     }//end _createTemplateIndexPage()
+
+
+    /**
+     * Returns the file path of the general articles.
+     *
+     * @return string
+     * @throws ChannelException If there is a problem with retrieving current product.
+     */
+    private static function _getGeneralArticleFilePath()
+    {
+        Channels::includeSystem('SquizSuite');
+        $currentProductInfo = SquizSuite::getCurrentProduct();
+        if (isset($currentProductInfo['type']) === FALSE) {
+            throw new ChannelException(_('Failed to retrieve product type'));
+        }
+
+        $productSystem = str_replace(' ', '', ucwords($currentProductInfo['type']));
+        if (Channels::systemExists($productSystem) === FALSE) {
+            throw new ChannelException(sprintf(_('Product type system (%s) not found!'), $productSystem));
+        }
+
+        // General articles path.
+        $path = Channels::getSystemsPath().'/'.$productSystem.'/Docs/general.html';
+        return $path;
+
+    }//end _getGeneralArticleFilePath()
 
 
     /**

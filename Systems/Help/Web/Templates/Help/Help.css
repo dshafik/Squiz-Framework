@@ -85,7 +85,7 @@ a.Help-control-button.general:active {
     font-size: 12px;
     line-height: 18px;
     margin: 0;
-    padding: 0;
+    padding: 15px 10px;
 }
 
 .Help-iframe.glossaryPage h2 {
@@ -116,10 +116,6 @@ a.Help-control-button.general:active {
     background-color: #FFF;
     width: 100%;
     padding: 3px 10px;
-}
-
-.Help-iframe {
-    padding: 15px 10px;
 }
 
 .Help-iframe hr {

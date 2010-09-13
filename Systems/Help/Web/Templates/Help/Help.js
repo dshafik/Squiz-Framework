@@ -1,3 +1,26 @@
+/**
+ * JS Class for Help system.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage Help
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
+ */
+
 var Help = new function()
 {
     var _apiURL = null;
@@ -23,11 +46,10 @@ var Help = new function()
         GUI.getWidget('Help-dialog').addDialogResizedCallback(function(ui, contentSize) {
             dfx.setStyle(iframe, 'height', (contentSize.height - navHeight - 27) + 'px');
         });
-
     }
 
     this.refresh = function() {
-        this.loadGlossaryPage();
+        this.loadIndexPage();
     };
 
     this.loadGlossaryPage = function(template) {
@@ -36,25 +58,22 @@ var Help = new function()
         // Construct the glossary page id for this template.
         var pageid = template.split(':').join('-') + '-glossary-index.html';
         this.loadPage(pageid);
-
     };
 
     this.loadIndexPage = function(template) {
         template   = template || GUI.getCurrentTemplate();
         var pageid = template.split(':').join('-') + '-index.html';
-    pageid = 'User-index.html';
         this.loadPage(pageid);
     };
 
-    this.loadGeneralPage = function(template) {
-
+    this.loadGeneralPage = function() {
+        this.loadPage('general.html');
     };
 
     this.loadPage = function(pageid) {
         var helpIframe = dfx.getId('Help-iframe');
 
         dfx.attr(helpIframe, 'src', _apiURL + 'pageid=' + escape(pageid));
-
     };
 
     this.iframeLoaded = function() {
@@ -80,6 +99,5 @@ var Help = new function()
     this.general = function() {
         this.loadGeneralPage();
     };
-
 
 };
