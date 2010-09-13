@@ -1072,6 +1072,7 @@ class HelpActions
                     $listContent .= '<li><a href="'.$url.'">'.$title.'</a></li>';
                     next($glossaryTerms);
                     $title      = key($glossaryTerms);
+                    $id         = current($glossaryTerms);
                     $hasArticle = TRUE;
                 } else {
                     break;
