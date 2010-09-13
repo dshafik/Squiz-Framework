@@ -1171,6 +1171,22 @@ class HelpActions
      */
     private static function _createTemplateIndexPage(array $templateArticles, array $parentArticles, $systemName, $templateName)
     {
+        if (isset($templateArticles['tasks']) === FALSE) {
+            $templateArticles['tasks'] = array();
+        }
+
+        if (isset($parentArticles['tasks']) === FALSE) {
+            $parentArticles['tasks'] = array();
+        }
+
+        if (isset($templateArticles['troubleshooting']) === FALSE) {
+            $templateArticles['troubleshooting'] = array();
+        }
+
+        if (isset($parentArticles['troubleshooting']) === FALSE) {
+            $parentArticles['troubleshooting'] = array();
+        }
+
         // Merge the current template articles with the system's articles.
         $templateArticles['tasks'] = array_merge($templateArticles['tasks'], $parentArticles['tasks']);
         $templateArticles['troubleshooting'] = array_merge($templateArticles['troubleshooting'], $parentArticles['troubleshooting']);
