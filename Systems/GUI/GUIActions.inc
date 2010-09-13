@@ -988,11 +988,15 @@ class GUIActions
                 $subTemplateStr = trim(str_replace('<?xml version="1.0"?>', '', $subTemplateStr));
                 $subTemplateStr = str_replace('<__tempContent>', '', $subTemplateStr);
                 $subTemplateStr = str_replace('</__tempContent>', '', $subTemplateStr);
-                $subTemplateStr = ' ?>'.$subTemplateStr.'<? ';
+                $subTemplateStr = ' ?>'.$subTemplateStr.'<?php ';
 
-                $php .= 'ob_start();'."\n";
-                $php .= $subTemplateStr;
-                $php .= $assignTo.' = ob_get_clean();'."\n";
+                if ($assignTo !== NULL) {
+                    $php .= 'ob_start();'."\n";
+                    $php .= $subTemplateStr;
+                    $php .= $assignTo.' = ob_get_clean();'."\n";
+                } else {
+                    $php .= $subTemplateStr;
+                }
             break;
 
             default:
@@ -1288,8 +1292,8 @@ class GUIActions
                 $condition = $child->getAttribute('condition');
 
                 // Get the system name so we can include it.
-                if (empty($condition) === FALSE) {
-                    list($systemName, $method) = explode('::', $condition);
+                list($systemName, $method) = explode('::', $condition);
+                if (empty($method) === FALSE) {
                     $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
                 }
 
@@ -1299,23 +1303,31 @@ class GUIActions
                 if ($child->tagName !== 'else') {
                     $php .= ' ('.$condition.' === TRUE) {'."\n";
                 } else {
-                    $php .= ' {'."\n";
+                    $php .= " {\n";
                 }
 
                 foreach ($child->childNodes as $condChild) {
                     $php .= self::_parseTag($condChild, $assignTo);
                 }
 
-                $php .= "\n}\n";
+                $php .= "\n} ";
             }//end if
         }//end foreach
 
+        $php .= "\n";
+
         if ($assignTo === NULL) {
             // Top level.
-            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
-            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
-            $newNode = $node->ownerDocument->importNode($tmpNode, TRUE);
-            $node->parentNode->insertBefore($newNode, $node);
+            $tmpDoc      = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+            $phpCodeElem = $tmpDoc->getElementsByTagName('phpCode')->item(0);
+            $childCount  = $phpCodeElem->childNodes->length;
+
+            for ($i = 0; $i < $childCount; $i++) {
+                $tmpNode = $phpCodeElem->childNodes->item($i);
+                $newNode = $node->ownerDocument->importNode($tmpNode, TRUE);
+                $node->parentNode->insertBefore($newNode, $node);
+            }
+
             $node->parentNode->removeChild($node);
         }
 
