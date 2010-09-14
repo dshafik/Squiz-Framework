@@ -119,3 +119,25 @@ sfapi.get = function(system, action, params, callback) {
     scriptTag.src = src;
 
 };
+
+sfapi.post = function(system, action, params, successCallback, errorCallback) {
+    var url = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix;
+
+    var token = document.getElementById('__api_token');
+    if (token) {
+        params._api_token = token.value;
+    }
+
+    params._system  = system;
+    params._action = action;
+    params._format  = sfapi.outputDataFormat;
+
+    dfx.post(url, params, function(data) {
+        data = dfx.jsonDecode(data);
+        if (data.error) {
+            alert('Invalid token');
+        } else if (successCallback) {
+            successCallback.call(null, data);
+        }
+    }, errorCallback);
+};
