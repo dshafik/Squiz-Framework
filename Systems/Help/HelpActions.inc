@@ -583,7 +583,15 @@ class HelpActions
                          'self',
                          '_convert'.ucfirst($tagName).'Tag',
                         );
+
+            // Add the DOMNodeList items to array since they will change and node
+            // list will be updated.
+            $tagsArray = array();
             foreach ($tags as $tag) {
+                $tagsArray[] = $tag;
+            }
+
+            foreach ($tagsArray as $tag) {
                 call_user_func($function, $tag, $fileName);
             }
         }
