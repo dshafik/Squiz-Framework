@@ -86,14 +86,24 @@ class SimplePermissionActions implements PermissionActions
     /**
      * Returns TRUE if User has specified Permission for Asset.
      *
-     * @param integer $resource  Asset id to check access to.
-     * @param integer $userid    Check access for this User id.
+     * @param integer $resource  Resource ID to check access to.
      * @param string  $privilege The privilege to check for.
+     * @param integer $userid    Check access for this User ID.
      *
      * @return boolean
      */
-    public static function hasPermission($resource, $userid, $privilege)
+    public static function hasPermission($resource, $privilege, $userid=NULL)
     {
+        Channels::includeSystem('User');
+        if (User::isSystemAdministrator($userid) === TRUE) {
+            return TRUE;
+        }
+
+        if ($userid === NULL) {
+            $userid = User::getCurrentUserid();
+            Channels::modifyBasket('userid', $userid);
+        }
+
         $query  = DAL::getQuery('SimplePermission', 'hasPermission');
         $result = (bool) DAL::getOne($query);
         return $result;
