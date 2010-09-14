@@ -63,9 +63,8 @@ class AttributeActions
      *
      * @return mixed
      *
-     * @api           read
-     * @api-privilege asset.read.content
-     * @api-mustlock  false
+     * @api            read
+     * @api-permission assetid asset.read.content
      */
     public static function getAttributeValue($assetid, $attributeid)
     {
@@ -94,10 +93,6 @@ class AttributeActions
      * @param string  $attributeid The attribute to find.
      *
      * @return mixed
-     *
-     * @api           read
-     * @api-privilege asset.read.content
-     * @api-mustlock  false
      */
     private static function _getAttributeValue($assetid, $attributeid)
     {
@@ -198,9 +193,8 @@ class AttributeActions
      * @throws ChannelException If the attribute is not found for the asset.
      * @throws ChannelException If there is an attribute constraints violation.
      *
-     * @api           write
-     * @api-privilege asset.edit.content
-     * @api-mustlock  false
+     * @api            write
+     * @api-permission assetid asset.edit.content
      */
     public static function setAttributeValue($assetid, $attributeid, $value)
     {
