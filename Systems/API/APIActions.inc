@@ -142,6 +142,31 @@ class APIActions
         $responseContent['system'] = '';
         $responseContent['action'] = '';
 
+        // Only support GET and POST method.
+        $requestMethod = strtolower($_SERVER['REQUEST_METHOD']);
+        if ($requestMethod !== 'get' && $requestMethod !== 'post') {
+            // We must send the Allow header to be compliant with the requirements
+            // of the 405 definition.
+            API::sendHeader(405);
+            header('Allow: GET, POST');
+            $responseContent['exception'] = 'The request method is not supported';
+            API::sendResponse($responseContent);
+            exit;
+        }
+
+        // Get the requested service details from GET or POST request.
+        $request = API::getRequestedAction($requestMethod);
+        if ($request === FALSE) {
+            API::sendHeader(400);
+            $responseContent['exception'] = 'Failed to get system and action from the request';
+            API::sendResponse($responseContent);
+            exit;
+        }
+
+        self::$_outputFormat       = $request['outputFormat'];
+        $responseContent['system'] = $request['system'];
+        $responseContent['action'] = $request['action'];
+
         // Token validation for every request.
         Channels::includeSystem('User');
         $userid = User::getCurrentUserid();
@@ -151,51 +176,30 @@ class APIActions
             $apiToken = Security::getRequestData('_api_token', NULL, TRUE);
             if ($apiToken === NULL) {
                 // Logged in user didn't submit the API token.
-                // Invalid.
-                self::_sendHeader(503);
-                self::_sendResponse(array('error' => 'Invalid token'));
+                API::sendHeader(403);
+                $responseContent['exception'] = 'Invalid API token';
+                API::sendResponse($responseContent);
                 exit;
             }
 
             $userTokens = API::getUserToken();
             if ($userTokens === NULL) {
                 // What is this token?
-                self::_sendHeader(503);
-                self::_sendResponse(array('error' => 'Invalid token'));
+                API::sendHeader(403);
+                $responseContent['exception'] = 'Invalid API token';
+                API::sendResponse($responseContent);
                 exit;
             } else if ($userTokens !== $apiToken) {
-                self::_sendHeader(503);
-                self::_sendResponse(array('error' => 'Invalid token'));
+                API::sendHeader(403);
+                $responseContent['exception'] = 'Invalid API token';
+                API::sendResponse($responseContent);
                 exit;
-            }//end if
+            }
         }//end if
 
-        // Only support GET and POST method.
-        // We must send the Allow header to be compliant with the requirements
-        // of the 405 definition.
-        $requestMethod = strtolower($_SERVER['REQUEST_METHOD']);
-        if ($requestMethod !== 'get' && $requestMethod !== 'post') {
-            self::_sendHeader(405);
-            header('Allow: GET, POST');
-            $responseContent['exception'] = 'The request method is not supported.';
-            self::_sendResponse($responseContent);
-            exit;
-        }
-
-        // Get the requested service details from GET or POST request.
-        $request = API::getRequestedAction($requestMethod);
-        if ($request === FALSE) {
-            self::_sendHeader(400);
-            $responseContent['exception'] = 'Failed to get system and action from the request';
-            self::_sendResponse($responseContent);
-            exit;
-        }
-
         // Is the requested service available?
-        $request['assetid']        = API::getAssetid($requestMethod);
-        $api                       = API::getAPI($request['system'], $request['action']);
-        $responseContent['system'] = $request['system'];
-        $responseContent['action'] = $request['action'];
+        $request['assetid'] = API::getAssetid($requestMethod);
+        $api                = API::getAPI($request['system'], $request['action']);
         if ($request['assetid'] !== NULL) {
             // Add in the assetid as it was found.
             $responseContent['assetid'] = $request['assetid'];
@@ -203,9 +207,9 @@ class APIActions
 
         if ($api === FALSE) {
             // Requested service is not available. Not Found.
-            $responseContent['exception'] = 'Requested service & is not found.';
-            self::_sendHeader(404);
-            self::_sendResponse($responseContent, $request['outputFormat']);
+            $responseContent['exception'] = 'The requested service was not found';
+            API::sendHeader(404);
+            API::sendResponse($responseContent);
             exit;
         }
 
@@ -227,31 +231,16 @@ class APIActions
 
         if ($params === FALSE) {
             // Insufficient parameters are provided.
-            self::_sendHeader(400);
+            API::sendHeader(400);
             $responseContent['exception'] = 'Provided parameters are not sufficient';
-            self::_sendResponse($responseContent, $request['outputFormat']);
+            API::sendResponse($responseContent);
             exit;
         }
 
-        $system       = $api['system'];
-        $action       = $api['action'];
-        $assetid      = $request['assetid'];
-        $outputFormat = $request['outputFormat'];
-
-        // Permission and locking check should come here.
-        $perm = API::checkPermission($assetid, $api['options']);
-        if ($perm === FALSE) {
-            // Permission denied.
-            self::_sendHeader(401);
-            $responseContent['exception'] = 'You do not have permission to perform the requested action';
-            self::_sendResponse($responseContent, $outputFormat);
-            exit;
-        }
-
-        Channels::includeSystem($system);
+        Channels::includeSystem($api['system']);
         try {
             ob_start();
-                $returnValue = self::_getActionResult($system, $action, $params);
+                $returnValue = API::executeRequest($api['system'], $api['action'], $params, $api['options']);
                 $output      = ob_get_contents();
             ob_end_clean();
 
@@ -273,25 +262,47 @@ class APIActions
             }
         }//end try
 
-        self::_sendHeader($response);
-        self::_sendResponse($responseContent, $outputFormat);
+        API::sendHeader($response);
+        API::sendResponse($responseContent);
 
     }//end processRequest()
 
 
     /**
-     * Check whether the caller can perform the requested action.
+     * It executes the requested action and returns the result.
      *
-     * @param float $assetid Assetid to check the permission.
-     * @param array $options Request Method, GET or POST.
+     * If DAL Query has been returned, then it converts it to
+     * SQL string. If an exception is thrown, it's handled by the caller.
      *
-     * @return boolean
+     * @param string $system   System name where action resides.
+     * @param string $action   Action name to call.
+     * @param array  $args     Parameters to pass to the action.
+     * @param array  $settings API settings defined on the method being called.
+     *
+     * @return mixed
      */
-    public static function checkPermission($assetid, array $options)
+    public static function executeRequest($system, $action, array $args, array $settings)
     {
-        return TRUE;
+        $callback = array(
+                     $system,
+                     $action,
+                    );
+        $result   = call_user_func_array($callback, $args);
 
-    }//end checkPermission()
+        // DAL Query has been returned! In general this should not happen as
+        // we don't want the product's API to return DAL uueries. If this happens,
+        // we will return the SQL string of the query instead.
+        if ($result instanceof Query) {
+            ob_start();
+                echo $result;
+                $result = ob_get_contents();
+            ob_end_clean();
+        }
+
+        return $result;
+
+    }//end executeRequest()
+
 
 
     /**
@@ -497,48 +508,13 @@ class APIActions
             if ($value === NULL && $param['optional'] === FALSE) {
                 return FALSE;
             } else {
-                $params[] = $value;
+                $params[$param['name']] = $value;
             }
         }//end foreach
 
         return $params;
 
     }//end getActionParameters()
-
-
-    /**
-     * It executes the requested action and returns the result.
-     *
-     * If DAL Query has been returned, then it converts it to
-     * SQL string. If an exception is thrown, it's handled on the caller.
-     *
-     * @param string $system System name where action resides.
-     * @param string $action Action name to call.
-     * @param array  $args   Parameters to pass to the action.
-     *
-     * @return mixed
-     */
-    private static function _getActionResult($system, $action, array $args)
-    {
-        $callback = array(
-                     $system,
-                     $action,
-                    );
-        $result   = call_user_func_array($callback, $args);
-
-        // DAL Query has been returned! In general this should not happen as
-        // we don't want the product's API return DAL Query. If this happens,
-        // we will return SQL string of the query instead.
-        if ($result instanceof Query) {
-            ob_start();
-                echo $result;
-                $result = ob_get_contents();
-            ob_end_clean();
-        }
-
-        return $result;
-
-    }//end _getActionResult()
 
 
     /**
@@ -552,8 +528,12 @@ class APIActions
      *
      * @return void
      */
-    private static function _sendResponse(array $responseContent, $format='json')
+    public static function sendResponse(array $responseContent, $format=NULL)
     {
+        if ($format === NULL) {
+            $format = self::$_outputFormat;
+        }
+
         switch ($format) {
             case 'json':
                 self::_sendJSONResponse($responseContent);
@@ -576,7 +556,7 @@ class APIActions
             break;
         }//end switch
 
-    }//end _sendResponse()
+    }//end sendResponse()
 
 
     /**
@@ -948,13 +928,13 @@ class APIActions
      *
      * @return void
      */
-    private static function _sendHeader($response)
+    public static function sendHeader($response)
     {
         $headerString = 'HTTP/1.0 '.$response.' '.self::$_responseCode[$response];
         $replace      = TRUE;
         header($headerString, $replace, $response);
 
-    }//end _sendHeader()
+    }//end sendHeader()
 
 
     /**
@@ -1010,7 +990,12 @@ class APIActions
             if ($option === '' && ($value === 'read' || $value === 'write')) {
                 $options['type'] = $value;
             } else if ($option[0] === '-' && empty($value) === FALSE) {
-                $options[substr($option, 1, (strlen($option) - 1))] = $value;
+                $optionType = substr($option, 1, (strlen($option) - 1));
+                if (isset($options[$optionType]) === FALSE) {
+                    $options[$optionType] = array();
+                }
+
+                $options[$optionType][] = $value;
             }
         }
 
