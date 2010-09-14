@@ -252,6 +252,12 @@ class APIActions
 
             $response = 200;
         } catch (Exception $e) {
+            // Make sure there is nothing in the buffer or else the output
+            // may contain additional invalid content.
+            if (ob_get_length() > 0) {
+                ob_end_clean();
+            }
+
             $responseContent['exception'] = $e->getMessage();
             $apiToken = Security::getRequestData('_api_token', NULL, TRUE);
             if ($apiToken === NULL) {
