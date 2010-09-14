@@ -24,7 +24,7 @@
         <widget type="GUI/Box" id="PatchingScreenMainBox">
             <setting name="title"><text>Cron Jobs</text></setting>
             <setting name="content">
-                <div>hello world</div>
+                <div><text>hello world</text></div>
             </setting>
         </widget>
         <!-- End Cront Screen Jobs List -->
