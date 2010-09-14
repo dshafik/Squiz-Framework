@@ -133,7 +133,6 @@ sfapi.post = function(system, action, params, successCallback, errorCallback) {
     params._format  = sfapi.outputDataFormat;
 
     dfx.post(url, params, function(data) {
-        data = dfx.jsonDecode(data);
         if (data.error) {
             alert('Invalid token');
         } else if (successCallback) {
