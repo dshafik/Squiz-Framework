@@ -125,6 +125,32 @@ class SquizSuiteActions
 
 
     /**
+     * Returns TRUE if the current product is a demo product.
+     *
+     * @return boolean
+     */
+    public static function isDemoProduct()
+    {
+        $isDemoSystem = FALSE;
+        $demoIds      = array(
+                         'sales_demo',
+                         'cms_demo',
+                         'analytics_demo',
+                         'search_demo',
+                         'update_demo',
+                        );
+
+        $currProduct = SquizSuite::getProduct();
+        if (in_array($currProduct['systemid'], $demoIds) === TRUE) {
+            $isDemoSystem = TRUE;
+        }
+
+        return $isDemoSystem;
+
+    }//end isDemoProduct()
+
+
+    /**
      * Return TRUE if suite system user mode is on.
      *
      * When it is TRUE, the system runs as a system administrator.
