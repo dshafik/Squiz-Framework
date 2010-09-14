@@ -1,3 +1,9 @@
+<condition>
+    <if-not condition="User::isSystemAdministrator()">
+        <exception><text>You must be a super user to access this screen</text></exception>
+    </if-not>
+</condition>
+
 <div id="CronScreen">
     <div class="CronSettingsBoxContainer GUI-screen-left">
         <!-- Start Cront Screen settings box -->
