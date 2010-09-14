@@ -1,3 +1,9 @@
+<condition>
+    <if-not condition="User::isSystemAdministrator()">
+        <exception><text>You must be a super user to access this screen</text></exception>
+    </if-not>
+</condition>
+
 <div id="SuperUsersScreen">
     <widget type="GUI/Box" id="superUsers-box">
         <setting name="title"><text>Super Users</text></setting>
