@@ -989,11 +989,11 @@ class SquizSuiteActions
             $xml      = html_entity_decode($xml);
             $message  = self::_parseSuiteXML($xml, $required);
 
-            $product     = SquizSuite::getProduct($systemid);
             $systemid    = $message['system_id'];
             $systemUrl   = $message['system_url'];
             $updateType  = $message['update_type'];
             $updateValue = $message['update_value'];
+            $product     = SquizSuite::getProduct($systemid);
             switch($updateType) {
                 case 'name':
                 case 'cert':
