@@ -68,13 +68,13 @@ interface PermissionActions
     /**
      * Returns TRUE if User has specified Permission for Asset.
      *
-     * @param integer $assetid   Asset id to check access to.
-     * @param integer $userid    Check access for this User id.
+     * @param integer $resource  Resource ID to check access to.
      * @param string  $privilege The privilege to check for.
+     * @param integer $userid    Check access for this User ID.
      *
      * @return boolean
      */
-    public static function hasPermission($assetid, $userid, $privilege);
+    public static function hasPermission($assetid, $privilege, $userid=NULL);
 
 
 }//end interface
