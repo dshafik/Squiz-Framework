@@ -207,7 +207,7 @@ var GUI = new function()
     };
 
     this.sendRequest = function(system, action, params, callback) {
-        sfapi.get(system, action, params, function(data) {
+        sfapi.post(system, action, params, function(data) {
             if (!data || data.exception) {
                 // Show error message.
                 GUI.showOverlay({
