@@ -965,6 +965,10 @@ class GUIActions
                 $php .= self::_parseConditionTag($node, $varName);
             break;
 
+            case 'exception':
+                $php .= self::_parseExceptionTag($node, $varName);
+            break;
+
             case 'content':
                 // Need to wrap content.
                 $domContent  = self::$_docType;
@@ -1280,8 +1284,9 @@ class GUIActions
     private static function _parseConditionTag(DOMNode $node, $assignTo=NULL)
     {
         $tagTypes = array(
-                     'if'   => 'if',
-                     'else' => 'else',
+                     'if'     => 'if',
+                     'if-not' => 'if',
+                     'else'   => 'else',
                     );
 
         $php = '';
@@ -1300,10 +1305,16 @@ class GUIActions
                 // Print the if, else block.
                 $php .= $tagTypes[$child->tagName];
 
-                if ($child->tagName !== 'else') {
-                    $php .= ' ('.$condition.' === TRUE) {'."\n";
-                } else {
-                    $php .= " {\n";
+                switch ($child->tagName) {
+                    case 'if':
+                        $php .= ' ('.$condition.' === TRUE) {'."\n";
+                    break;
+                    case 'if-not':
+                        $php .= ' ('.$condition.' === FALSE) {'."\n";
+                    break;
+                    default:
+                        $php .= " {\n";
+                    break;
                 }
 
                 foreach ($child->childNodes as $condChild) {
@@ -1334,6 +1345,45 @@ class GUIActions
         return $php;
 
     }//end _parseConditionTag()
+
+
+    /**
+     * Returns the PHP script of the given exception tag.
+     *
+     * @param DOMNode $node     The text node to convert.
+     * @param string  $assignTo The variable to assign to. This must be a valid PHP
+     *                          variable name (e.g. $example['value']).
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseExceptionTag(DOMNode $node, $assignTo=NULL)
+    {
+        foreach ($node->childNodes as $child) {
+            $php = self::_parseTag($child, '$_gui_exception');
+        }
+
+        $php .= "\n";
+        $php .= 'throw new ChannelException($_gui_exception);';
+
+        if ($assignTo === NULL) {
+            // Top level.
+            $tmpDoc      = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+            $phpCodeElem = $tmpDoc->getElementsByTagName('phpCode')->item(0);
+            $childCount  = $phpCodeElem->childNodes->length;
+
+            for ($i = 0; $i < $childCount; $i++) {
+                $tmpNode = $phpCodeElem->childNodes->item($i);
+                $newNode = $node->ownerDocument->importNode($tmpNode, TRUE);
+                $node->parentNode->insertBefore($newNode, $node);
+            }
+
+            $node->parentNode->removeChild($node);
+        }
+
+        return $php;
+
+    }//end _parseExceptionTag()
 
 
     /**
