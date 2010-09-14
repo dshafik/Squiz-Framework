@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<queries system="Patching">
+
+  <query id="registerPatch">
+    <primary>
+      <insert>
+        <fields table="patching">
+          <field>name</field>
+          <field>userid</field>
+          <field>patch_sha1</field>
+        </fields>
+        <values>
+          <value column="name">:name</value>
+          <value column="userid">:userid</value>
+          <value column="patch_sha1">:sha1</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+
+  <query id="removePatch">
+    <primary>
+      <delete>
+        <where>
+          <equal table="patching" column="name">:name</equal>
+        </where>
+      </delete>
+    </primary>
+  </query>
+
+  <query id="schedulePatch">
+    <primary>
+      <update>
+        <fields table="patching">
+          <field>scheduled</field>
+        </fields>
+        <values>
+          <value column="scheduled">:scheduled</value>
+          <value column="userid">:userid</value>
+        </values>
+        <where>
+          <equal table="patching" column="name">:name</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+
+  <query id="getPatches">
+    <primary>
+      <select>
+        <fields>
+          <field table="patching" column="name" />
+          <field table="patching" column="scheduled" />
+          <field table="patching" column="patch_sha1" />
+        </fields>
+        <from>
+          <table>patching</table>
+        </from>
+        <where>
+          <is-null>
+            <field table="patching" column="patched"/>
+          </is-null>
+        </where>
+      </select>
+    </primary>
+  </query>
+
+  <query id="getPendingPatches">
+    <primary>
+      <select>
+        <fields>
+          <field table="patching" column="name" />
+          <field table="patching" column="scheduled" />
+        </fields>
+        <from>
+          <table>patching</table>
+        </from>
+        <where>
+          <not-null>
+            <field table="patching" column="scheduled"/>
+          </not-null>
+          <is-null>
+            <field table="patching" column="patched"/>
+          </is-null>
+        </where>
+      </select>
+    </primary>
+  </query>
+
+  <query id="getScheduledPatches">
+    <primary>
+      <select>
+        <fields>
+          <field table="patching" column="name" />
+          <field table="patching" column="scheduled" />
+          <field table="patching" column="patched" />
+          <field table="patching" column="userid" />
+          <field table="patching" column="patch_sha1" />
+        </fields>
+        <from>
+          <table>patching</table>
+        </from>
+        <where>
+          <not-null>
+            <field table="patching" column="scheduled"/>
+          </not-null>
+          <is-null>
+            <field table="patching" column="patched"/>
+          </is-null>
+        </where>
+      </select>
+    </primary>
+  </query>
+
+  <query id="archivePatch">
+    <primary>
+      <update>
+        <fields table="patching">
+          <field>patched</field>
+        </fields>
+        <values>
+          <value column="patched">:patched</value>
+        </values>
+        <where>
+          <equal table="patching" column="name">:name</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+
+  <query id="getPatchingInfo">
+    <primary>
+      <select>
+        <fields>
+          <field table="patching" column="name" />
+          <field table="patching" column="scheduled" />
+          <field table="patching" column="patched" />
+          <field table="patching" column="userid" />
+        </fields>
+        <from>
+          <table>patching</table>
+        </from>
+      </select>
+    </primary>
+  </query>
+
+</queries>

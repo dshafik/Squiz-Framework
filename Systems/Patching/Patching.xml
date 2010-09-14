@@ -1,4 +1,18 @@
 <?xml version="1.0"?>
 <system>
-  <plugs/>
+    <plugs>
+        <refiner>
+            <required>yes</required>
+            <method>addProductSummary</method>
+            <action>SquizSuite::getProductSummary</action>
+            <parameters>
+                <parameter>retval</parameter>
+            </parameters>
+        </refiner>
+    </plugs>
+    <cron_jobs>
+        <cron_job script="PatchingCron.inc" name="Up-to-Date Service" interval="frequent">
+            <description>This job checks for available MySource Mini updates and installs scheduled patches. It is recommended that you run this job frequently.</description>
+        </cron_job>
+    </cron_jobs>
 </system>

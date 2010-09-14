@@ -1,0 +1,20 @@
+<schema system="Patching">
+    <udts>
+      <udt-import system="Asset">ASSETID</udt-import>
+    </udts>
+
+    <table name="patching">
+      <columns>
+        <column type="VARCHAR" size="25" allow-null="false">name</column>
+        <column type="TIMESTAMP" allow-null="true">scheduled</column>
+        <column type="TIMESTAMP" allow-null="true">patched</column>
+        <column type="ASSETID" allow-null="false">userid</column>
+        <column type="VARCHAR" size="50" allow-null="false">patch_sha1</column>
+      </columns>
+      <constraints>
+        <primary-key name="patching_pk">
+          <column>name</column>
+        </primary-key>
+      </constraints>
+    </table>
+</schema>
