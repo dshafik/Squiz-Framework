@@ -81,6 +81,7 @@ HelpToolbarButton.prototype = {
         Help.init();
 
         Help.refresh();
+        this._loaded = false;
 
     }
 

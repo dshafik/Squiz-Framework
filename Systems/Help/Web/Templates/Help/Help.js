@@ -26,10 +26,13 @@ var Help = new function()
     var _apiURL = null;
 
     this.init = function() {
+        var elem = dfx.getId('Help-dialog');
+        if (!elem) {
+            return;
+        }
+
         // Set the API URL.
         _apiURL = '/__api/raw/Help/getPage?_api_token=' + dfx.getId('__api_token').value + '&';
-
-        var elem = dfx.getId('Help-dialog');
 
         var navHeight = parseInt(dfx.getElementHeight(dfx.getClass('Help-controls', elem)[0]));
         var iframe    = dfx.getId('Help-iframe');
