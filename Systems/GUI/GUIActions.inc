@@ -393,13 +393,20 @@ class GUIActions
      * Replace variable keywords in parsed HTML content.
      *
      * @param string $content The HTML content to search.
+     * @param bool   $echo    If TRUE, variable is echo'd. Otherwise var is printed.
      *
      * @return string
      */
-    private static function _replaceVarKeywords($content)
+    private static function _replaceVarKeywords($content, $echo=TRUE)
     {
+        if ($echo == TRUE) {
+            $callback = '_replaceVarKeywordsEchoCallback';
+        } else {
+            $callback = '_replaceVarKeywordsCallback';
+        }
+
         // Replace all template variables with the actual PHP variables.
-        $content = preg_replace_callback('/{([a-z0-9_:]+)}/i', array('self', '_replaceVarKeywordsCallback'), $content);
+        $content = preg_replace_callback('/{([a-z0-9_:]+)}/i', array('self', $callback), $content);
         return $content;
 
     }//end _replaceVarKeywords()
@@ -413,6 +420,20 @@ class GUIActions
      * @return string
      */
     private static function _replaceVarKeywordsCallback(array $matches)
+    {
+        return self::_getKeywordVariableCode($matches[1]);
+
+    }//end _replaceVarKeywordsCallback()
+
+
+    /**
+     * Callback method for the _replaceVarKeywords preg_replace_callback function.
+     *
+     * @param array $matches Array of matches.
+     *
+     * @return string
+     */
+    private static function _replaceVarKeywordsEchoCallback(array $matches)
     {
         $code = self::_getKeywordVariableCode($matches[1]);
         $code = '<'.'?php echo '.$code.';?'.'>';
@@ -1301,6 +1322,9 @@ class GUIActions
                 if (empty($method) === FALSE) {
                     $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
                 }
+
+                // Replace kewords.
+                $condition = self::_replaceVarKeywords($condition, FALSE);
 
                 // Print the if, else block.
                 $php .= $tagTypes[$child->tagName];
