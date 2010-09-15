@@ -163,7 +163,7 @@ class GUIGraphPieActions
         Channels::includeSystem('API');
         $userToken = API::getUserToken();
 
-        $params['fileName']    = $baseName;
+        $params['fileName']   = $baseName;
         $params['_api_token'] = $userToken;
         $url = Web::appendQueryString($params, $url);
 
