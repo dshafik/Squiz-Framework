@@ -643,6 +643,11 @@ class UserActions
      */
     public static function saveSuperUsersScreen(array $data)
     {
+        Channels::includeSystem('User');
+        if (User::isSystemAdministrator() === FALSE) {
+            throw new ChannelException(_('You must be a super user to access this screen'));
+        }
+
         $errors = array();
 
         $superUsersList = Util::getArrayIndex($data, 'superUsersList', NULL);
