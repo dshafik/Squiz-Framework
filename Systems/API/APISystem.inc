@@ -73,12 +73,21 @@ class APISystem extends BaseSystem
                     $docComment = $method->getDocComment();
                     $options    = API::getAPIOptionsFromComment($docComment);
                     if ($options !== FALSE) {
+                        $parameters = $method->getParameters();
+                        $arguments  = array();
+                        foreach ($parameters as $param) {
+                            $arguments[] = array(
+                                            'name'     => $param->getName(),
+                                            'optional' => $param->isOptional(),
+                                           );
+                        }
+
                         $actionName = $method->getName();
                         $actionType = $options['type'];
-                        API::addAPI($systemName, $actionName, $actionType, $options);
-                    }
-                }
-            }
+                        API::addAPI($systemName, $actionName, $actionType, $arguments, $options);
+                    }//end if
+                }//end if
+            }//end foreach
 
             unset($refl);
             unset($methods);

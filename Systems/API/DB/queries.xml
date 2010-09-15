@@ -7,6 +7,7 @@
                     <field table="api" column="system" />
                     <field table="api" column="action" />
                     <field table="api" column="type" />
+                    <field table="api" column="arguments" />
                     <field table="api" column="options" />
                 </fields>
                 <from>
@@ -41,12 +42,14 @@
                     <field>system</field>
                     <field>action</field>
                     <field>type</field>
+                    <field>arguments</field>
                     <field>options</field>
                 </fields>
                 <values>
                     <value column="system">:system</value>
                     <value column="action">:action</value>
                     <value column="type">:type</value>
+                    <value column="arguments">:arguments</value>
                     <value column="options">:options</value>
                 </values>
             </insert>

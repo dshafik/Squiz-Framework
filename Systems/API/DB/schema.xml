@@ -5,7 +5,8 @@
                 <column type="VARCHAR" allow-null="false" size="50">system</column>
                 <column type="VARCHAR" allow-null="false" size="50">action</column>
                 <column type="VARCHAR" allow-null="false" size="5">type</column>
-                <column type="CLOB" allow-null="true">options</column>
+                <column type="CLOB" allow-null="false">arguments</column>
+                <column type="CLOB" allow-null="false">options</column>
             </columns>
             <indexes>
                 <index name="api_idx1">

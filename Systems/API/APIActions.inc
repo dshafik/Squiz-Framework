@@ -226,6 +226,7 @@ class APIActions
             $requestMethod,
             $api['system'],
             $api['action'],
+            $api['arguments'],
             $request['assetid']
         );
 
@@ -447,9 +448,8 @@ class APIActions
     /**
      * The the list of parameters needed to make Channel call.
      *
-     * It first check the actual function parameters using Reflection.
-     * Then, it tries to get the requied values to from submitted data.
-     * If all the required parameters can not be found, then it will
+     * Tries to get the requied values to from submitted data.
+     * If any of the required parameters can not be found, it will
      * return FALSE.
      *
      * Note that the submited data will be JSON decoded.
@@ -457,6 +457,7 @@ class APIActions
      * @param string $requestMethod Request Method being used. POST or GET.
      * @param string $system        System name where action resides.
      * @param string $action        Action name to call.
+     * @param array  $arguments     The arguments to the action.
      * @param float  $assetid       Optional assetid to use. If the action requires
      *                              a parameter called 'assetid' and it's not passed
      *                              in POST or GET, this value will be used
@@ -464,30 +465,19 @@ class APIActions
      *
      * @return array|boolean
      */
-    public static function getActionParameters($requestMethod, $system, $action, $assetid=NULL)
+    public static function getActionParameters($requestMethod, $system, $action, array $arguments, $assetid=NULL)
     {
-        $requiredParams = array();
-
-        Channels::includeSystem($system);
-        $method     = new ReflectionMethod($system, $action);
-        $parameters = $method->getParameters();
-        foreach ($parameters as $parameter) {
-            $requiredParams[] = array(
-                                 'name'     => $parameter->getName(),
-                                 'optional' => $parameter->isOptional(),
-                                );
-        }
+        include_once 'Libs/Security/Security.inc';
 
         $params          = array();
         $parametersExist = TRUE;
-        include_once 'Libs/Security/Security.inc';
-        $default    = NULL;
-        $jsonDecode = TRUE;
+        $default         = NULL;
+        $jsonDecode      = TRUE;
 
         // Action parameters can come from '_enc' field if
         // system key ecryption is being used.
         $encrypted = Security::getRequestData('_enc', $default, FALSE, 'post');
-        foreach ($requiredParams as $param) {
+        foreach ($arguments as $param) {
             $value = Security::getRequestData(
                 $param['name'],
                 $default,
@@ -1030,27 +1020,28 @@ class APIActions
         }
 
         $api = $result[0];
-        $api['options'] = unserialize($api['options']);
+        $api['arguments'] = unserialize($api['arguments']);
+        $api['options']   = unserialize($api['options']);
         return $api;
 
     }//end getAPI()
 
 
     /**
-     * Register API to the system.
+     * Register an API method.
      *
-     * @param string $system  Name of the system for action.
-     * @param string $action  Name of the action.
-     * @param string $type    Type of API call. Either 'read' or 'write'.
-     * @param array  $options Options for API call.
+     * @param string $system    Name of the system for action.
+     * @param string $action    Name of the action.
+     * @param string $type      Type of API call. Either 'read' or 'write'.
+     * @param array  $arguments Arguments to the action.
+     * @param array  $options   Options for API call.
      *
      * @return void
      */
-    public static function addAPI($system, $action, $type, array $options)
+    public static function addAPI($system, $action, $type, array $arguments, array $options)
     {
-        if (is_array($options) === TRUE) {
-            Channels::modifyBasket('options', serialize($options));
-        }
+        Channels::modifyBasket('arguments', serialize($arguments));
+        Channels::modifyBasket('options', serialize($options));
 
         $query = DAL::getQuery('API', 'addAPI');
         DAL::executeQuery($query);
