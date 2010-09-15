@@ -195,7 +195,8 @@ class HelpActions
      *
      * @return void
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function getPage($pageid)
     {
