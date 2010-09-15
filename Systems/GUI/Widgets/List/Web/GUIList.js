@@ -98,15 +98,15 @@ GUIList.prototype = {
                 var listObj = dfx.getId(self.id);
                 var newRow  = dfx.getParents(this)[0];
 
-                var rows     = dfx.getClass('existingRow', listObj);
-                var lastRow  = rows[rows.length - 1];
+                var rows     = dfx.getClass('extraRow', listObj);
+                var lastRow  = rows[0];
 
                 var newRowParent = dfx.getParents(this)[0];
 
                 // Clone the row, and remove any "deleted" attribute from it so it
                 // begins "active".
                 var rowClone = dfx.cloneNode(lastRow)[0];
-                dfx.removeClass(rowClone, 'deleted');
+                dfx.removeClass(rowClone, 'extraRow');
 
                 // Move the "new row" input box into the cloned row, then remove its
                 // existing input box.
@@ -126,7 +126,7 @@ GUIList.prototype = {
                 this.focus();
 
                 // Now make a new "add new row" text box.
-                var newTb   = dfx.cloneNode(this)[0];
+                var newTb   = dfx.cloneNode(this, false)[0];
                 newTb.value = '';
                 newTb.id    = newRowName;
 
@@ -219,21 +219,21 @@ GUIList.prototype = {
             var li = listItems[i];
             var rowId = listItems[i].id.replace(this.id + '-', '');
 
-            value['order'].push(rowId);
+            if (rowId !== '__new') {
+                value['order'].push(rowId);
 
-            // If we allow deletion of rows, check for whether row
-            // is showing as marked for deletion.
-            if (this.settings.allowDelete === true) {
-                if (dfx.hasClass(li, 'deleted') === true) {
-                    value['deleted'].push(rowId);
+                // If we allow deletion of rows, check for whether row
+                // is showing as marked for deletion.
+                if (this.settings.allowDelete === true) {
+                    if (dfx.hasClass(li, 'deleted') === true) {
+                        value['deleted'].push(rowId);
+                    }
                 }
+
+                var tb = dfx.getId(listItems[i].id + '-value');
+                value['values'][rowId] = tb.value;
             }
-
-            var tb = dfx.getId(listItems[i].id + '-value');
-            value['values'][rowId] = tb.value;
         }
-
-        console.info(value);
 
         return value;
     },

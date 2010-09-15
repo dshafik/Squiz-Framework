@@ -17,6 +17,10 @@
     padding: 0 5px;
 }
 
+.GUIList li.extraRow {
+    display: none;
+}
+
 .GUIList-left {
     padding-left: 13px;
     background: transparent url(listShadowLeft.png) 0 0 repeat-y;
@@ -43,6 +47,10 @@
     background: url(delete_recover.png) left top no-repeat;
     margin: 6px 2px 0px 10px;
     cursor: pointer;
+}
+
+.GUIList-right li.deleted {
+    text-align: left;
 }
 
 .GUIList-right li.deleted {

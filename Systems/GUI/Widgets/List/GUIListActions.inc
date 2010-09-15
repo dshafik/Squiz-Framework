@@ -126,7 +126,15 @@ class GUIListActions
             $extraClasses .= ' noDelete';
         }
 
+        if ($allowAdd === TRUE) {
+            $settings['items']['__new'] = '';
+        }
+
         foreach ($settings['items'] as $itemIndex => $item) {
+            if ($itemIndex === '__new') {
+                $extraClasses .= ' extraRow';
+            }
+
             echo '<li class="existingRow'.$extraClasses.'" id="'.$id.'-'.$itemIndex.'">';
             if ($sortable === TRUE) {
                 echo '<span class="'.$class.' dragHandle" title="'.$sortTitle.'"></span>';
