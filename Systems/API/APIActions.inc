@@ -198,13 +198,7 @@ class APIActions
         }//end if
 
         // Is the requested service available?
-        $request['assetid'] = API::getAssetid($requestMethod);
-        $api                = API::getAPI($request['system'], $request['action']);
-        if ($request['assetid'] !== NULL) {
-            // Add in the assetid as it was found.
-            $responseContent['assetid'] = $request['assetid'];
-        }
-
+        $api = API::getAPI($request['system'], $request['action']);
         if ($api === FALSE) {
             // Requested service is not available. Not Found.
             $responseContent['exception'] = 'The requested service was not found';
@@ -226,16 +220,21 @@ class APIActions
             $requestMethod,
             $api['system'],
             $api['action'],
-            $api['arguments'],
-            $request['assetid']
+            $api['arguments']
         );
 
         if ($params === FALSE) {
-            // Insufficient parameters are provided.
+            // Insufficient parameters were provided.
             API::sendHeader(400);
             $responseContent['exception'] = 'Provided parameters are not sufficient';
             API::sendResponse($responseContent);
             exit;
+        }
+
+        // Add additional gathered paramters into the response
+        // so they know what data we used for missing values.
+        foreach ($params as $paramName => $paramValue) {
+            $responseContent[$paramName] = $paramValue;
         }
 
         Channels::includeSystem($api['system']);
@@ -311,21 +310,6 @@ class APIActions
     }//end executeRequest()
 
 
-
-    /**
-     * Get assetid for the requested action if applicable.
-     *
-     * @param string $requestMethod GET or POST request.
-     *
-     * @return mixed
-     */
-    public static function getAssetid($requestMethod)
-    {
-        return NULL;
-
-    }//end getAssetid()
-
-
     /**
      * Return the current URL without service web path.
      *
@@ -363,78 +347,47 @@ class APIActions
         $url = Web::getCurrentURL();
 
         // Confirm the URL includes the service suffix.
-        $pattern = '(\/'.self::$_serviceWebPath.'$|\/'.self::$_serviceWebPath.'\/)';
-        $result  = preg_match($pattern, $url, $matches, PREG_OFFSET_CAPTURE);
-        if ($result === 0) {
+        $serviceStartPos = strpos($url, '/'.self::$_serviceWebPath.'/');
+        if ($serviceStartPos === FALSE) {
             return FALSE;
-        } else {
-            $serviceStartPos = $matches[0][1];
         }
 
-        $result  = array();
-        $currUrl = substr($url, 0, $serviceStartPos);
-        if ($requestMethod === 'get') {
-            // Get the URL without service request part so that we can get
-            // the assetid from Lookup system.
-            $queryStrPos   = strpos($url, '?');
-            $serviceEndPos = (strlen($url) - 1);
-            if ($queryStrPos !== FALSE) {
-                $currUrl      .= substr($url, $queryStrPos, (strlen($url) - $queryStrPos));
-                $serviceEndPos = ($queryStrPos - 1);
-            }
+        $serviceEndPos = strpos($url, '?');
+        if ($serviceEndPos === FALSE) {
+            $serviceUrl = substr($url, $serviceStartPos);
+        } else {
+            $serviceUrl = substr($url, $serviceStartPos, ($serviceEndPos - $serviceStartPos));
+        }
 
-            // Now, find the system and action names for the requested service.
-            // By default it checks '_serviceWebPath/SYSTEM_NAME/ACTION_NAME/'
-            // format. Optionally, output format can be included prior to
-            // SYSTEM_NAME like following:
-            // '_serviceWebPath/(xml|json)/SYSTEM_NAME/ACTION_NAME/'.
-            $matches        = array();
-            $serviceUrlPart = substr(
-                $url,
-                $serviceStartPos,
-                (($serviceEndPos - $serviceStartPos) + 1)
-            );
+        // The service URL is in the form: /__api/format/System/Action
+        // so split it up and remove the first entry as this will be the
+        // service web path (__api in this example).
+        $serviceParts = explode('/', trim($serviceUrl, '/ '));
+        array_shift($serviceParts);
 
+        if (count($serviceParts) === 2) {
+            // No format, so set to default.
+            $format = self::$_outputFormat;
+            $system = $serviceParts[0];
+            $action = $serviceParts[1];
+        } else if (count($serviceParts) === 3) {
             $formatTypes = array(
-                            'xml',
-                            'json',
-                            'raw',
-                           );
-            $serviceUrlPattern           = '/\/'.self::$_serviceWebPath.'\/([^\/]+)\/([^\/]+)/';
-            $serviceUrlPatternWithFormat = '/\/'.self::$_serviceWebPath.'\/('.implode('|', $formatTypes).')\/([^\/]+)\/([^\/]+)/';
-            $res = preg_match($serviceUrlPattern, $serviceUrlPart, $matches);
+                        'xml',
+                        'json',
+                        'raw',
+                       );
 
-            if ($res === 1 && in_array($matches[1], $formatTypes) === FALSE) {
-                $system = $matches[1];
-                $action = $matches[2];
-                $format = self::$_outputFormat;
-            } else {
-                $res = preg_match($serviceUrlPatternWithFormat, $serviceUrlPart, $matches);
-                if ($res === 1) {
-                    $format = $matches[1];
-                    $system = $matches[2];
-                    $action = $matches[3];
-                } else {
-                    return FALSE;
-                }
+            $format = strtolower($serviceParts[0]);
+            if (in_array($format, $formatTypes) === FALSE) {
+                // Invalid format.
+                return FALSE;
             }
-        } else if ($requestMethod === 'post') {
-            // POST request is much simpler.
-            include_once 'Libs/Security/Security.inc';
 
-            $default    = NULL;
-            $jsonDecode = FALSE;
-            $encrypted  = Security::getRequestData('_enc', $default, FALSE, 'post');
-            $system     = Security::getRequestData('_system', $default, $jsonDecode, $requestMethod);
-            $action     = Security::getRequestData('_action', $default, $jsonDecode, $requestMethod);
-            $format     = Security::getRequestData('_format', self::$_outputFormat, $jsonDecode, $requestMethod);
-            if ($system === $default && $encrypted !== NULL) {
-                // When the message is encrypted, look for the variables in _enc field.
-                include_once 'Libs/Util/Util.inc';
-                $system = Util::getArrayIndex($encrypted, '_system', $default);
-                $action = Util::getArrayIndex($encrypted, '_action', $default);
-                $format = Util::getArrayIndex($encrypted, '_format', self::$_outputFormat);
-            }
+            $system = $serviceParts[1];
+            $action = $serviceParts[2];
+        } else {
+            // URL is invalid.
+            return FALSE;
         }//end if
 
         $result['system']       = strtolower($system);
@@ -458,15 +411,18 @@ class APIActions
      * @param string $system        System name where action resides.
      * @param string $action        Action name to call.
      * @param array  $arguments     The arguments to the action.
-     * @param float  $assetid       Optional assetid to use. If the action requires
-     *                              a parameter called 'assetid' and it's not passed
-     *                              in POST or GET, this value will be used
-     *                              if specified.
+     * @param array  $gatheredData  Additional values that can be used as argument
+     *                              values. Data will come from gatherer plugs.
      *
      * @return array|boolean
      */
-    public static function getActionParameters($requestMethod, $system, $action, array $arguments, $assetid=NULL)
-    {
+    public static function getActionParameters(
+        $requestMethod,
+        $system,
+        $action,
+        array $arguments,
+        array $gatheredData=array()
+    ) {
         include_once 'Libs/Security/Security.inc';
 
         $params          = array();
@@ -475,7 +431,7 @@ class APIActions
         $jsonDecode      = TRUE;
 
         // Action parameters can come from '_enc' field if
-        // system key ecryption is being used.
+        // system key encryption is being used.
         $encrypted = Security::getRequestData('_enc', $default, FALSE, 'post');
         foreach ($arguments as $param) {
             $value = Security::getRequestData(
@@ -487,11 +443,8 @@ class APIActions
 
             // Special case for assetid parameter binding. If the assetid is not
             // specified, then use the one from URL.
-            if ($value === NULL
-                && $assetid !== NULL
-                && $param['name'] === 'assetid'
-            ) {
-                $value = $assetid;
+            if ($value === NULL && isset($gatheredData[$param['name']]) === TRUE) {
+                $value = $gatheredData[$param['name']];
             }
 
             if ($value === NULL
@@ -540,11 +493,15 @@ class APIActions
             break;
 
             case 'raw':
-                if (isset($responseContent['contentType']) === TRUE) {
-                    header('Content-Type: '.$responseContent['contentType']);
-                }
+                if (isset($responseContent['exception']) === TRUE) {
+                    echo $responseContent['exception'];
+                } else {
+                    if (isset($responseContent['contentType']) === TRUE) {
+                        header('Content-Type: '.$responseContent['contentType']);
+                    }
 
-                echo $responseContent['result'];
+                    echo $responseContent['result'];
+                }
             break;
 
             default:
@@ -572,21 +529,14 @@ class APIActions
         $rspElem = $dom->createElement('rsp');
         $dom->appendChild($rspElem);
 
-        // System and Action requested.
-        $fields = array(
-                   'system',
-                   'action',
-                   'assetid',
-                   'new_token',
-                   'next_token',
-                   'exception',
-                  );
-        foreach ($fields as $field) {
-            if (array_key_exists($field, $responseContent) === TRUE) {
-                $fieldElem = $dom->createElement($field);
-                self::_addTextToNode($fieldElem, $responseContent[$field]);
-                $rspElem->appendChild($fieldElem);
+        foreach ($responseContent as $field => $value) {
+            if ($field === 'result') {
+                continue;
             }
+
+            $fieldElem = $dom->createElement($field);
+            self::_addTextToNode($fieldElem, $value);
+            $rspElem->appendChild($fieldElem);
         }
 
         if (array_key_exists('result', $responseContent) === TRUE) {
@@ -620,18 +570,12 @@ class APIActions
         header('Content-type: application/json');
 
         $attrs  = array();
-        $fields = array(
-                   'system',
-                   'action',
-                   'assetid',
-                   'new_token',
-                   'next_token',
-                   'exception',
-                  );
-        foreach ($fields as $field) {
-            if (array_key_exists($field, $responseContent) === TRUE) {
-                $attrs[] = '"'.$field.'": '.json_encode($responseContent[$field]);
+        foreach ($responseContent as $field => $value) {
+            if ($field === 'result') {
+                continue;
             }
+
+            $attrs[] = '"'.$field.'": '.json_encode($value);
         }
 
         if (array_key_exists('result', $responseContent) === TRUE) {

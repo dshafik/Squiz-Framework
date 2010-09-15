@@ -122,6 +122,7 @@ sfapi.get = function(system, action, params, callback) {
 
 sfapi.post = function(system, action, params, successCallback, errorCallback) {
     var url = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix;
+    url    += '/' + sfapi.outputDataFormat + '/' + system + '/' + action;
 
     var token = document.getElementById('__api_token');
     if (token) {
