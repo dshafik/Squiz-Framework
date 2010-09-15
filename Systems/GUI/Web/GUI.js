@@ -54,7 +54,7 @@ var GUI = new function()
         // Also if the lineage is empty then we need to add the parent template as the
         // initial lineage item.
         if (this.templateLineage.length === 0) {
-            this.templateLineage.push(parent);
+            this.addTemplate(parent);
         }
     };
 
@@ -151,7 +151,9 @@ var GUI = new function()
     };
 
     this.addTemplate = function(template) {
-        this.templateLineage.push(template);
+        if (dfx.inArray(template, this.templateLineage) === false) {
+            this.templateLineage.push(template);
+        }
     };
 
     this.getCurrentTemplate = function() {

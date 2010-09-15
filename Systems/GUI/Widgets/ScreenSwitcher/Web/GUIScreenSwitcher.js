@@ -36,6 +36,16 @@ function GUIScreenSwitcher(id, settings)
     GUI.addWidgetEvent(this, 'screenLoadStarts');
     GUI.addWidgetEvent(this, 'screenLoadFinished');
 
+    // Add the inital item template to GUI's template list.
+    var itemsCount = settings.items.length;
+    for (var i = 0; i < itemsCount; i++) {
+        if (settings.items[i].id === settings.initialItem) {
+            // Add the initially loaded template.
+            GUI.addTemplate(settings.items[i].system + ':' + settings.items[i].id);
+            break;
+        }
+    }
+
 }
 
 GUIScreenSwitcher.prototype = {
