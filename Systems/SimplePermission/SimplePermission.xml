@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+    <runner>
+      <required>no</required>
+      <method>checkAPIPermission</method>
+      <action listen="before">API::executeRequest</action>
+      <fatal>yes</fatal>
+      <parameters>
+        <parameter>system</parameter>
+        <parameter>action</parameter>
+        <parameter>args</parameter>
+        <parameter>settings</parameter>
+      </parameters>
+    </runner>
+  </plugs>
+</system>
