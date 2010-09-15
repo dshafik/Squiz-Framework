@@ -38,8 +38,6 @@ var GUI = new function()
 
     this.addWidget = function(id, obj) {
         if (!obj.id || !obj.settings || !obj.settings.template) {
-            // Invalid widget.
-            GUI.message('developer', 'Could not find "settings" array for widget #' + id, 'warning');
             return;
         }
 

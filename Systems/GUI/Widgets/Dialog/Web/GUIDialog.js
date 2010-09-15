@@ -150,6 +150,13 @@ GUIDialog.prototype = {
 
     },
 
+    setSubTitle: function(title)
+    {
+        var subTitleEl = dfx.getClass('GUIDialog-subTitle', this.elem)[0];
+        dfx.setHtml(subTitleEl, title);
+
+    },
+
     setContent: function(content)
     {
         if (this.elem === null) {

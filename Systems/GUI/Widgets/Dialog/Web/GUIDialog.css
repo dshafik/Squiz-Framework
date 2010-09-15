@@ -14,7 +14,7 @@
 .GUIDialog-top {
     -moz-border-radius: 9px;
     border: 1px solid #3C5690;
-    min-height: 80px;
+    min-height: 65px;
     margin: 5px;
     background-color: #4C72B7;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4C72B7), to(#2B4165));
@@ -35,7 +35,7 @@
 
 .GUIDialog-title {
     color: #FFF;
-    font-size: 18px;
+    font-size: 19px;
     margin-bottom: 5px;
     margin-left: 20px;
     margin-top: 10px;
