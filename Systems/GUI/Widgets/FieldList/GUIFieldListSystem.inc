@@ -27,20 +27,20 @@ require_once 'Systems/BaseSystem.inc';
 /**
  * GUI List System Class.
  */
-class GUIListSystem extends BaseSystem
+class GUIFieldListSystem extends BaseSystem
 {
 
 
-    /**
-     * Install this system.
-     *
-     * @return void
-     */
-    public function install()
-    {
-        parent::install();
+	/**
+	 * Install this system.
+	 *
+	 * @return void
+	 */
+	public function install()
+	{
+		parent::install();
 
-    }//end install()
+	}//end install()
 
 
 }//end class

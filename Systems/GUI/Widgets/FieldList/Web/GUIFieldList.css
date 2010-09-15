@@ -1,0 +1,102 @@
+.GUIFieldList {
+	background-color: #EFEFEF;
+	border-top: 1px dotted #C9C9C9;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.GUIFieldList li, .GUIFieldList-newRow {
+	background-color: #FFF;
+	border-bottom: 1px dotted #C9C9C9;
+	font-family: arial;
+	font-size: 12px;
+	height: 30px;
+	line-height: 30px;
+	overflow: hidden;
+	padding: 0 5px;
+}
+
+.GUIFieldList li.extraRow {
+	display: none;
+}
+
+.GUIFieldList-left {
+	padding-left: 13px;
+	background: transparent url(listShadowLeft.png) 0 0 repeat-y;
+}
+
+.GUIFieldList-right {
+	padding-right: 13px;
+	background: transparent url(listShadowRight.png) 100% 0 repeat-y;
+}
+
+.GUIFieldList-right .dragHandle {
+	float: left;
+	height: 18px;
+	width: 19px;
+	background: url(drag_move.png) left top no-repeat;
+	margin: 5px 10px 0px 2px;
+	cursor: move;
+}
+
+.GUIFieldList-right .deleteIcon {
+	float: right;
+	height: 16px;
+	width: 16px;
+	background: url(delete_recover.png) left top no-repeat;
+	margin: 6px 2px 0px 10px;
+	cursor: pointer;
+}
+
+.GUIFieldList-right li.deleted {
+	text-align: left;
+}
+
+.GUIFieldList-right li.deleted {
+	background: url(delete_overlay.png) center bottom white;
+}
+
+.GUIFieldList-right li.deleted .deleteIcon {
+	background-position: left bottom;
+}
+
+.GUIFieldList-newRow .deleteIcon, .GUIFieldList-newRow .dragHandle {
+	visibility: hidden;
+}
+
+.GUIFieldList-right .editableItem {
+	border: 1px solid #C2C3C5;
+	background-color: white;
+	position: relative;
+	margin: 5px 28px 5px 31px;
+	padding: 2px;
+}
+
+.GUIFieldList-right .editableItem input {
+	position: relative;
+	border: none;
+	width: 100%;
+	padding: 0;
+	background-color: transparent;
+	z-index: 2;
+}
+
+.GUIFieldList-newRow .newRowName {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	color: #AAA;
+	font-style: italic;
+	z-index: 1;
+	line-height: 1em;
+	padding: 3px;
+}
+
+.GUIFieldList-right .noSort .editableItem {
+	margin-left: 0px;
+}
+
+.GUIFieldList-right .noDelete .editableItem {
+	margin-right: 0px;
+}
