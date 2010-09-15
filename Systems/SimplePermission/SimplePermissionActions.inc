@@ -111,6 +111,78 @@ class SimplePermissionActions implements PermissionActions
     }//end hasPermission()
 
 
+    /**
+     * Performs permission checks on API calls.
+     *
+     * Permission checks are defined in the function comment and are
+     * in the form: api-permission [argument] [privilage]
+     * Meaning that the value of [argument] will be checked to see if the current
+     * user has [privilage].
+     *
+     * @param string $system   System name where action resides.
+     * @param string $action   Action name to call.
+     * @param array  $args     Parameters to pass to the action.
+     * @param array  $settings API settings defined on the method being called.
+     *
+     * @return void
+     */
+    public static function checkAPIPermission($system, $action, array $args, array $settings)
+    {
+        // Assume no access, even if they are a super user. This forces
+        // developers to define permission checks for all API functions.
+        $perm = FALSE;
+
+        Channels::includeSystem('User');
+        $userid = User::getCurrentUserid();
+
+        if (isset($settings['permission']) === TRUE) {
+            foreach ($settings['permission'] as $permission) {
+                // Check our special cases.
+                switch ($permission) {
+                    case 'public':
+                        // API method can be accessed by everyone.
+                        return;
+                    break;
+
+                    case 'superuser':
+                        // Must be a super user.
+                        $perm = User::isSystemAdministrator($userid);
+                    break(2);
+
+                    default:
+                        list($arg, $priv) = explode(' ', $permission);
+                        if (isset($args[$arg]) === FALSE) {
+                            continue;
+                        }
+
+                        $resourceid = $args[$arg];
+                        $perm       = Permission::hasPermission($resourceid, $priv, $userid);
+                        if ($perm === FALSE) {
+                            break(2);
+                        } else {
+                            $perm = TRUE;
+                        }
+                    break;
+                }//end switch
+            }//end foreach
+        }//end if
+
+        if ($perm === FALSE) {
+            $response = array(
+                        'system'    => $system,
+                        'action'    => $action,
+                        'exception' => 'You do not have permission to perform the requested action',
+                       );
+
+            Channels::includeSystem('API');
+            API::sendHeader(401);
+            API::sendResponse($response);
+            exit;
+        }
+
+    }//end checkAPIPermission()
+
+
 }//end class
 
 ?>
