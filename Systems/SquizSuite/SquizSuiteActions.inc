@@ -82,7 +82,8 @@ class SquizSuiteActions
      *
      * @return array
      *
-     * @api read
+     * @api            read
+     * @api-permission superuser
      */
     public static function getProductSummary()
     {
@@ -428,11 +429,8 @@ class SquizSuiteActions
         self::_createSuiteMessageDOM($dom, $msgType, $options);
         $xml = $dom->saveXML();
 
-        $apiURL         = '';
-        $msg            = array();
-        $msg['_format'] = 'xml';
-        $msg['_system'] = 'SquizSuite';
-        $msg['_action'] = $msgType;
+        $apiURL = '';
+        $msg    = array();
 
         // Do not encrypt suiteConnect message. In fact, it can not encrypt as
         // the current system does not know the public key of the destined system.
@@ -451,6 +449,9 @@ class SquizSuiteActions
         Channels::includeSystem('API');
         $result = API::sendCURLAPIRequest(
             $apiURL,
+            'xml',
+            'SquizSuite',
+            $msgType,
             $msg,
             $userAgentStr
         );
@@ -590,7 +591,8 @@ class SquizSuiteActions
      * @return array
      * @throws ChannelException Error occurred.
      *
-     * @api read
+     * @api            read
+     * @api-permission superuser
      */
     public static function suitePing()
     {
@@ -649,7 +651,8 @@ class SquizSuiteActions
      * @return array
      * @throws ChannelException Error occurred.
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function suiteConnect()
     {
@@ -741,7 +744,8 @@ class SquizSuiteActions
      * @return void
      * @throws ChannelException Error occurred.
      *
-     * @api read
+     * @api            read
+     * @api-permission superuser
      */
     public static function suiteConnectAck()
     {
@@ -842,7 +846,8 @@ class SquizSuiteActions
      * @return string
      * @throws ChannelException Error occurred.
      *
-     * @api read
+     * @api            read
+     * @api-permission superuser
      */
     public static function suiteConnectAckAck()
     {
@@ -911,7 +916,8 @@ class SquizSuiteActions
      * @return string
      * @throws ChannelException Error occurred.
      *
-     * @api read
+     * @api            read
+     * @api-permission superuser
      */
     public static function suiteProductSync()
     {
@@ -993,7 +999,8 @@ class SquizSuiteActions
      * @return string
      * @throws ChannelException Error occurred.
      *
-     * @api read
+     * @api            read
+     * @api-permission superuser
      */
     public static function suiteProductUpdate()
     {
