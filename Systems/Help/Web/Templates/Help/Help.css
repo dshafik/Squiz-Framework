@@ -45,6 +45,7 @@ a.Help-control-button.menu {
     width: 13px;
 }
 
+a.Help-control-button.menu.active,
 a.Help-control-button.menu:active {
     background-position: -70px -20px;
 }
@@ -188,3 +189,69 @@ a.Help-control-button.general:active {
     background: url(pointer_right.png) no-repeat 50%;
 }
 
+/* Systems Menu */
+.Help-systemsMenu {
+    position: absolute;
+    left: 79px;
+    background-color: #5F5F5F;
+    min-width: 150px;
+    margin-top: 20px;
+    display: none;
+}
+
+.Help-systemsMenu.active {
+    display: block;
+}
+
+.Help-systemsMenu li {
+    cursor: pointer;
+    line-height: 23px;
+    list-style-type: none;
+    padding: 2px 0;
+    position: relative;
+}
+
+.Help-systemsMenu-selectedIcon {
+    position: absolute;
+    right: 5px;
+    background: url(sys_menu_tick.png) no-repeat;
+    width: 22px;
+    height: 17px;
+    top: 50%;
+    margin-top: -8px;
+    display: none;
+}
+
+.Help-systemsMenu li.selected .Help-systemsMenu-selectedIcon {
+    display: block;
+}
+
+.Help-systemsMenu li:hover {
+    background-image: url(sys_menu_hover.png);
+}
+
+.Help-systemsMenu a {
+    color: #FFF;
+    font-size: 13px;
+    text-decoration: none;
+    padding-left: 5px;
+    padding-right: 35px;
+}
+
+.Help-systemsMenu-itemIcon {
+    background-repeat: no-repeat;
+    background-position: 0 -22px;
+    float: left;
+    height: 22px;
+    width: 36px;
+}
+
+.Help-systemsMenu li:hover .Help-systemsMenu-itemIcon {
+    background-position: 0 0;
+}
+
+/* Override Dialog styles */
+#Help-dialog .GUIDialog-subTitle {
+    font-size: 15px;
+    color: #000;
+}

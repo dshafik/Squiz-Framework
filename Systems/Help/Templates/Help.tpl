@@ -20,10 +20,11 @@
                 <a href="javascript:Help.back();" class="Help-control-button back" title="{backButtonTitle}"></a>
                 <a href="javascript:Help.forward();" class="Help-control-button forward" title="{forwardButtonTitle}"></a>
                 <a href="javascript:Help.home();" class="Help-control-button home" title="{homeButtonTitle}"></a>
-                <a href="javascript:Help.openMenu();" class="Help-control-button menu" title="{menuButtonTitle}"></a>
+                <a href="javascript:Help.toggleMenu();" class="Help-control-button menu" title="{menuButtonTitle}"></a>
                 <a href="javascript:Help.picker();" class="Help-control-button picker" title="{pickerButtonTitle}"></a>
                 <a href="javascript:Help.glossary();" class="Help-control-button glossary" title="{glossaryButtonTitle}"></a>
                 <a href="javascript:Help.general();" class="Help-control-button general" title="{generalButtonTitle}"></a>
+                <dataProvider action="Help::getSystemsMenu" />
             </div>
             <iframe frameborder="0" border="0" name="Help-iframe" id="Help-iframe" width="100%" height="100%" src=""></iframe>
         </content>

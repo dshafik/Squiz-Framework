@@ -142,13 +142,7 @@ class HelpActions
         // exclusive system.
         $systems = $xpath->query('/systems/system');
         foreach ($systems as $system) {
-            if ($system === 'Keyword') {
-                // Skip keyword format for now.
-                continue;
-            }
-
-            $helpDirs[$system->getAttribute('name')]
-                = $system->getAttribute('path').'/Docs';
+            $helpDirs[$system->getAttribute('name')] = $system->getAttribute('path').'/Docs';
         }
 
         $systems = $xpath->query('/systems/system[@exclusive="true"]');
@@ -189,8 +183,48 @@ class HelpActions
         self::_parseDocs($docs);
         self::_addGlossaryUsageToGlossaryFiles();
         self::_createIndexPages();
+        self::_createHelpSystemsMenu();
 
     }//end createDocs()
+
+
+    /**
+     * Prints the Help doc page for the specified page.
+     *
+     * @param string $pageid Id of the page to load.
+     *
+     * @return void
+     *
+     * @api read
+     */
+    public static function getPage($pageid)
+    {
+        $filePath = Help::getDocsDirectory().'/'.$pageid;
+        if (strpos($pageid, '.html') === FALSE) {
+            $filePath .= '.html';
+        }
+
+        if (file_exists($filePath) === FALSE) {
+            printf(_('Page does not exist: #%s'), $pageid);
+            return;
+        }
+
+        echo file_get_contents($filePath);
+
+    }//end getPage()
+
+
+    /**
+     * Returns the contents of the Help popup systems menu dropdown.
+     *
+     * @return string
+     */
+    public static function getSystemsMenu()
+    {
+        $filePath = Help::getDocsDirectory().'/_systems_menu.html';
+        return file_get_contents($filePath);
+
+    }//end getSystemsMenu()
 
 
     /**
@@ -280,6 +314,8 @@ class HelpActions
             $fileContents .= file_get_contents($parentGlossaryFile);
         }
 
+        $idParts = explode('-', $idPrefix);
+
         $doc = new DomDocument();
         @$doc->loadHTML($fileContents);
 
@@ -316,6 +352,7 @@ class HelpActions
             $html    = GUI::getDocType();
             $html   .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
             $html   .= '</head><body class="Help-iframe glossaryPage">';
+            $html   .= self::_getSetCurrentSystemScript($idParts[1]);
             $html   .= '</body></html>';
             @$termDoc->loadHTML($html);
             $bodyTag = $termDoc->getElementsByTagName('body')->item(0);
@@ -412,11 +449,14 @@ class HelpActions
             $isGeneralPage = TRUE;
         }
 
+        $idParts = explode('-', $idPrefix);
+
         Channels::includeSystem('GUI');
         $cssHref = self::_getPageCSSPath();
         $html    = GUI::getDocType();
         $html    = '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" /></head>';
         $html   .= '<body class="Help-iframe articlePage">';
+        $html   .= self::_getSetCurrentSystemScript($idParts[1]);
         $html   .= $fileContents;
         $html   .= '</body></html>';
 
@@ -477,6 +517,12 @@ class HelpActions
             $summary = trim($summaryTags->item(0)->nodeValue);
         }
 
+        $screenTitle     = '';
+        $screenTitleTags = $doc->getElementsByTagName('screen_title');
+        if ($screenTitleTags->length > 0) {
+            $screenTitle = trim($screenTitleTags->item(0)->nodeValue);
+        }
+
         // Save the file in data dir.
         $dataDir  = Help::getDocsDirectory();
         $destFile = '';
@@ -491,10 +537,11 @@ class HelpActions
         }
 
         $articleInfo = array(
-                        'id'      => $idPrefix.$articleid,
-                        'title'   => $title,
-                        'showIn'  => $showIn,
-                        'summary' => $summary,
+                        'id'          => $idPrefix.$articleid,
+                        'title'       => $title,
+                        'showIn'      => $showIn,
+                        'summary'     => $summary,
+                        'screenTitle' => $screenTitle,
                        );
         self::_addArticleToIndex($idPrefix.$articleid, $articleInfo, $isIndexPage);
 
@@ -924,11 +971,20 @@ class HelpActions
         if (isset(self::$_docsInfo[$system]) === FALSE) {
             // Initialise docs info array.
             self::$_docsInfo[$system] = array(
-                                         'glossary' => array(),
-                                         'article'  => array(),
-                                         'template' => array(),
-                                         'summary'  => array(),
+                                         'glossary'    => array(),
+                                         'article'     => array(),
+                                         'template'    => array(),
+                                         'summary'     => '',
+                                         'screenTitle' => '',
                                         );
+        }
+
+        if (empty($info['screenTitle']) === FALSE) {
+            self::$_docsInfo[$system]['screenTitle'] = $info['screenTitle'];
+        }
+
+        if (empty($info['summary']) === FALSE) {
+            self::$_docsInfo[$system]['summary'] = $info['summary'];
         }
 
         // Id of the glossary term is the title so that it can be sorted later on.
@@ -939,9 +995,10 @@ class HelpActions
             $template = $parts[2];
             if (isset(self::$_docsInfo[$system]['template'][$template]) === FALSE) {
                 self::$_docsInfo[$system]['template'][$template] = array(
-                                                                    'glossary' => array(),
-                                                                    'article'  => array(),
-                                                                    'summary'  => array(),
+                                                                    'glossary'    => array(),
+                                                                    'article'     => array(),
+                                                                    'summary'     => '',
+                                                                    'screenTitle' => '',
                                                                    );
             }
 
@@ -1113,6 +1170,7 @@ class HelpActions
         $html    = GUI::getDocType();
         $html   .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
         $html   .= '</head><body class="Help-iframe glossaryPage">';
+        $html   .= self::_getSetCurrentSystemScript($systemName);
         $html   .= $contents;
         $html   .= '</body></html>';
 
@@ -1165,6 +1223,7 @@ class HelpActions
         $html    = GUI::getDocType();
         $html   .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
         $html   .= '</head><body class="Help-iframe systemIndexPage">';
+        $html   .= self::_getSetCurrentSystemScript($systemName);
         $html   .= $contents;
         $html   .= '</body></html>';
 
@@ -1243,6 +1302,7 @@ class HelpActions
         $html    = GUI::getDocType();
         $html   .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
         $html   .= '</head><body class="Help-iframe templateIndexPage">';
+        $html   .= self::_getSetCurrentSystemScript($systemName);
         $html   .= $contents;
         $html   .= '</body></html>';
 
@@ -1282,29 +1342,61 @@ class HelpActions
 
 
     /**
-     * Prints the index page for the specified tamplate.
-     *
-     * @param string $pageid Id of the page to load.
+     * Creates the Systems menu for the dropdown list in Help dialog.
      *
      * @return void
-     *
-     * @api read
      */
-    public static function getPage($pageid)
+    private static function _createHelpSystemsMenu()
     {
-        $filePath = Help::getDocsDirectory().'/'.$pageid;
-        if (strpos($pageid, '.html') === FALSE) {
-            $filePath .= '.html';
+        $html        = '<div class="Help-systemsMenu"><ul>';
+        $systemInfos = array();
+
+        foreach (self::$_docsInfo as $systemName => $docsInfo) {
+            $systemTitle = $systemName;
+            if (empty($docsInfo['screenTitle']) === FALSE) {
+                $systemTitle = $docsInfo['screenTitle'];
+            }
+
+            $systemInfos[$systemName] = array('title' => $systemTitle);
+
+            // Small icon for the system.
+            $iconURL = '/__web/Systems/'.$systemName.'/Web/sm_'.strtolower($systemName).'_icon.png';
+
+            $href  = 'Help.closeMenu();Help.loadIndexPage(\''.$systemName.'\');';
+            $html .= '<li onclick="'.$href.'" id="Help-dialog-sysMenuItem-'.$systemName.'" >';
+            $html .= '<div style="background-image:url('.$iconURL.')" class="Help-systemsMenu-itemIcon">&nbsp;</div>';
+            $html .= '<a href="javascript:'.$href.'">'.$systemTitle.'</a>';
+            $html .= '<div class="Help-systemsMenu-selectedIcon"></div>';
+            $html .= '</li>';
         }
 
-        if (file_exists($filePath) === FALSE) {
-            printf(_('Page does not exist: #%s'), $pageid);
-            return;
-        }
+        $html .= '</ul></div>';
 
-        echo file_get_contents($filePath);
+        // Also add script tag that will set the systemName => title  array in Help.
+        $html .= '<script>Help.setSystems('.json_encode($systemInfos).')</script>';
 
-    }//end getPage()
+        $filePath = Help::getDocsDirectory().'/_systems_menu.html';
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        FileSystem::filePutContents($filePath, $html);
+
+    }//end _createHelpSystemsMenu()
+
+
+    /**
+     * Returns the script tag HTML that sets the Help dialogs system info.
+     *
+     * The script tag is added to each page so that it can be executed when it loads.
+     *
+     * @param string $systemName Name of the system that the page belongs to.
+     *
+     * @return string
+     */
+    private static function _getSetCurrentSystemScript($systemName)
+    {
+        $script = '<script>parent.window.Help.setCurrentSystem("'.$systemName.'");</script>';
+        return $script;
+
+    }//end _getSetCurrentSystemScript()
 
 
     /**

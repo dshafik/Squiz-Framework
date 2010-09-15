@@ -23,7 +23,10 @@
 
 var Help = new function()
 {
-    var _apiURL = null;
+    var _apiURL        = null;
+    var _systemInfos   = {};
+    var _currentSystem = null;
+    var _iframe        = null;
 
     this.init = function() {
         var elem = dfx.getId('Help-dialog');
@@ -31,12 +34,14 @@ var Help = new function()
             return;
         }
 
+        var self = this;
+
         // Set the API URL.
         _apiURL = '/__api/raw/Help/getPage?_api_token=' + dfx.getId('__api_token').value + '&';
 
         var navHeight = parseInt(dfx.getElementHeight(dfx.getClass('Help-controls', elem)[0]));
         var iframe    = dfx.getId('Help-iframe');
-        var self      = this;
+        _iframe       = iframe;
         iframe.onload = function(e) {
             self.iframeLoaded();
         }
@@ -80,7 +85,15 @@ var Help = new function()
     };
 
     this.iframeLoaded = function() {
-        jQuery(dfx.getId('Help-iframe')).localScroll({offset: {top: -32}});
+        var self = this;
+        dfx.removeEvent([document, dfx.getIframeDocument(_iframe)], 'click.Help-dialog');
+        dfx.addEvent([document, dfx.getIframeDocument(_iframe)], 'click.Help-dialog', function(e) {
+            var target     = dfx.getMouseEventTarget(e);
+            var menuButton = dfx.getClass('Help-control-button menu', dfx.getId('Help-dialog'))[0];
+            if (target !== menuButton) {
+                self.closeMenu();
+            }
+        });
     };
 
     this.back = function() {
@@ -95,12 +108,52 @@ var Help = new function()
         this.loadIndexPage();
     };
 
+    this.toggleMenu = function() {
+        var menuButton = dfx.getClass('Help-control-button menu', dfx.getId('Help-dialog'))[0];
+        var menuElem   = dfx.getClass('Help-systemsMenu', dfx.getId('Help-dialog'))[0];
+        dfx.toggleClass([menuElem, menuButton], 'active');
+    };
+
+    this.openMenu = function() {
+        var menuElem   = dfx.getClass('Help-systemsMenu', dfx.getId('Help-dialog'))[0];
+        var menuButton = dfx.getClass('Help-control-button menu', dfx.getId('Help-dialog'))[0];
+        dfx.addClass([menuElem, menuButton], 'active');
+    };
+
+    this.closeMenu = function() {
+        var menuElem   = dfx.getClass('Help-systemsMenu', dfx.getId('Help-dialog'))[0];
+        var menuButton = dfx.getClass('Help-control-button menu', dfx.getId('Help-dialog'))[0];
+        if (menuElem && menuButton) {
+            dfx.removeClass([menuElem, menuButton], 'active');
+        }
+    };
+
     this.glossary = function() {
         this.loadGlossaryPage();
     };
 
     this.general = function() {
         this.loadGeneralPage();
+    };
+
+    this.setSystems = function(systemInfos) {
+        _systemInfos = systemInfos;
+    };
+
+    this.setCurrentSystem = function(systemid) {
+        if (_currentSystem !== systemid) {
+            var dialogElem = dfx.getId('Help-dialog');
+            dfx.addClass(dialogElem, 'activeItem-' + systemid);
+            GUI.getWidget('Help-dialog').setSubTitle(_systemInfos[systemid].title);
+            _currentSystem = systemid;
+
+            var selectedItem = dfx.getId('Help-dialog-sysMenuItem-' + systemid);
+            if (selectedItem) {
+                var listItems = dfx.getTag('li', dfx.getClass('Help-systemsMenu', dialogElem));
+                dfx.removeClass(listItems, 'selected');
+                dfx.addClass(selectedItem, 'selected');
+            }
+        }
     };
 
     this.pointer = {
