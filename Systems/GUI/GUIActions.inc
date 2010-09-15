@@ -1713,12 +1713,16 @@ class GUIActions
     /**
      * Saves the widget data for each specified template.
      *
+     * This method is public, so the save functions for each template need
+     * to implement their own permission checking.
+     *
      * @param array $templateData List if templates and data for its widgets.
      *
      * @return mixed
      * @throws ChannelException If there was an error while processing save data.
      *
-     * @api write
+     * @api            write
+     * @api-permission public
      */
     public static function saveTemplateData(array $templateData)
     {
