@@ -284,7 +284,8 @@ class UserActions
      *
      * @return boolean
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function loginUser($username, $password)
     {
@@ -326,7 +327,8 @@ class UserActions
      *
      * @return boolean
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function logoutUser()
     {
@@ -348,7 +350,8 @@ class UserActions
      *
      * @return float
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function getCurrentUserid()
     {
@@ -364,7 +367,8 @@ class UserActions
      *
      * @return string
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function processAuthentication()
     {
@@ -602,7 +606,8 @@ class UserActions
      *
      * @return array
      *
-     * @api read
+     * @api            read
+     * @api-permission superuser
      */
     public static function getSuperUserTableColumns($userid)
     {
