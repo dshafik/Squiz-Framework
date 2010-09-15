@@ -77,6 +77,24 @@ interface PermissionActions
     public static function hasPermission($assetid, $privilege, $userid=NULL);
 
 
+    /**
+     * Performs permission checks on API calls.
+     *
+     * Permission checks are defined in the function comment and are
+     * in the form: api-permission [argument] [privilage]
+     * Meaning that the value of [argument] will be checked to see if the current
+     * user has [privilage].
+     *
+     * @param string $system   System name where action resides.
+     * @param string $action   Action name to call.
+     * @param array  $args     Parameters to pass to the action.
+     * @param array  $settings API settings defined on the method being called.
+     *
+     * @return void
+     */
+    public static function checkAPIPermission($system, $action, array $args, array $settings);
+
+
 }//end interface
 
 ?>
