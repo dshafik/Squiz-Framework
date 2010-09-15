@@ -1091,9 +1091,14 @@ dfx.clearFormData = function(element)
 };//end getFormData()
 
 
-dfx.cloneNode = function(elems)
+dfx.cloneNode = function(elems, cloneEvents)
 {
-    return jQuery(elems).clone(true);
+    // Default to cloning events.
+    if (cloneEvents === undefined) {
+        cloneEvents = true;
+    }
+
+    return jQuery(elems).clone(cloneEvents);
 
 };
 
