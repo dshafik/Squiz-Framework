@@ -250,12 +250,16 @@ class GUIContentSwitcherActions
     /**
      * Get the requested template for a system's screen.
      *
+     * Permissions are handled by the templates themselves, so this method
+     * is considered public in the API.
+     *
      * @param string $system The name of the system providing the screen.
      * @param string $modeid The ID of the mode.
      *
      * @return string
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function getDynamicItemContent($system, $modeid)
     {

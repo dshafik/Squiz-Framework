@@ -114,13 +114,17 @@ class GUIActions
     /**
      * Includes the template PHP file.
      *
+     * Permission are handled by the templates themselves, so this
+     * method is public.
+     *
      * @param string $systemName Name of the system.
      * @param string $template   The template to load.
      *
      * @since  4.0.0
      * @return void
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function printTemplate($systemName, $template)
     {

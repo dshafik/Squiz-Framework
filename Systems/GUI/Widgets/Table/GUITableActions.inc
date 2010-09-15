@@ -311,15 +311,25 @@ class GUITableActions
      * @return void
      * @throws ChannelException If invalid API channel is specified.
      *
-     * @api read
+     * @api            read
+     * @api-permission public
      */
     public static function generateRows(array $rowsData, array $channel, array $settings)
     {
         // Check if channel is callable.
         Channels::includeSystem('API');
-        if (API::getAPI($channel['system'], $channel['action']) === FALSE) {
-            throw new ChannelException(_('Specified channel is invalid.'));
+        $api = API::getAPI($channel['system'], $channel['action']);
+        if ($api === FALSE) {
+            throw new ChannelException(_('Specified channel is invalid'));
         }
+
+        Channels::includeSystem('Permission');
+        Permission::checkAPIPermission(
+            $channel['system'],
+            $channel['action'],
+            array(),
+            $api['options']
+        );
 
         // This is an API request therefore we need to set the current template, it
         // should be the same as the table's template.

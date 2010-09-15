@@ -385,6 +385,7 @@ class GUIGraphPieActions
      * @return string
      *
      * @api             read
+     * @api-permission  public
      * @api-contentType image/svg+xml
      */
     public static function getSVGContents($fileName)
