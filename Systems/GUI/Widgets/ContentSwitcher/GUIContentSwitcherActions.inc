@@ -147,7 +147,7 @@ class GUIContentSwitcherActions
             }
 
             echo '<li id="'.$id.'-'.$item['id'].'" class="'.$className.'-modeButton'.$extraClass.$selected.'">';
-            echo '<a href="#" modeid="'.$item['id'].'" system="'.$itemSystem.'">'.$item['label'].'</a></li>';
+            echo '<a id="'.$id.'-link-'.$item['id'].'" href="#" modeid="'.$item['id'].'" system="'.$itemSystem.'">'.$item['label'].'</a></li>';
 
             if (($total - 1) === $count) {
                 $extraClass = ' positionLast';

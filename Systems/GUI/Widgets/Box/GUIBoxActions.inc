@@ -122,7 +122,7 @@ class GUIBoxActions
         }
 
         echo '</div><!-- end box header -->';
-        echo '<div class="'.$class.'-content">';
+        echo '<div class="'.$class.'-content GUIBox-for-'.$id.'">';
 
         if (isset($settings['content']) === TRUE) {
             echo $settings['content'];
