@@ -70,38 +70,23 @@ class APIActions
      * It sends API request via POST to the destined system.
      *
      * @param string $url       URL of the system to send the request.
+     * @param string $format    The format to get the response in.
+     * @param string $system    The system the action is in.
+     * @param string $action    The action to call.
      * @param array  $msg       Array of messages to send.
      * @param string $userAgent Optional User Agent string to send.
      *
      * @return array
      * @throws ChannelException Error occurred.
      */
-    public static function sendCURLAPIRequest($url, array $msg, $userAgent='')
+    public static function sendCURLAPIRequest($url, $format, $system, $action, array $msg, $userAgent='')
     {
-        $requiredFields = array(
-                           '_system',
-                           '_action',
-                           '_format',
-                          );
-        foreach ($requiredFields as $field) {
-            if (array_key_exists('_enc', $msg) === TRUE) {
-                if (isset($msg[$field]) === FALSE
-                    && isset($msg['_enc'][$field]) === FALSE
-                ) {
-                    $errMsg = 'The required field '.$field.' is missing.';
-                    throw new ChannelException($errMsg);
-                }
-            } else {
-                if (isset($msg[$field]) === FALSE) {
-                    $errMsg = 'The required field '.$field.' is missing.';
-                    throw new ChannelException($errMsg);
-                }
-            }
-        }
+        $url  = rtrim($url, '/');
+        $url .= '/'.$format;
+        $url .= '/'.$system;
+        $url .= '/'.$action;
 
-        $url = rtrim($url, '/');
         $ch  = curl_init();
-
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
