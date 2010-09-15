@@ -1,0 +1,102 @@
+.GUIList {
+    background-color: #EFEFEF;
+    border-top: 1px dotted #C9C9C9;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.GUIList li, .GUIList-newRow {
+    background-color: #FFF;
+    border-bottom: 1px dotted #C9C9C9;
+    font-family: arial;
+    font-size: 12px;
+    height: 30px;
+    line-height: 30px;
+    overflow: hidden;
+    padding: 0 5px;
+}
+
+.GUIList li.extraRow {
+    display: none;
+}
+
+.GUIList-left {
+    padding-left: 13px;
+    background: transparent url(listShadowLeft.png) 0 0 repeat-y;
+}
+
+.GUIList-right {
+    padding-right: 13px;
+    background: transparent url(listShadowRight.png) 100% 0 repeat-y;
+}
+
+.GUIList-right .dragHandle {
+    float: left;
+    height: 18px;
+    width: 19px;
+    background: url(drag_move.png) left top no-repeat;
+    margin: 5px 10px 0px 2px;
+    cursor: move;
+}
+
+.GUIList-right .deleteIcon {
+    float: right;
+    height: 16px;
+    width: 16px;
+    background: url(delete_recover.png) left top no-repeat;
+    margin: 6px 2px 0px 10px;
+    cursor: pointer;
+}
+
+.GUIList-right li.deleted {
+    text-align: left;
+}
+
+.GUIList-right li.deleted {
+    background: url(delete_overlay.png) center bottom white;
+}
+
+.GUIList-right li.deleted .deleteIcon {
+    background-position: left bottom;
+}
+
+.GUIList-newRow .deleteIcon, .GUIList-newRow .dragHandle {
+    visibility: hidden;
+}
+
+.GUIList-right .editableItem {
+    border: 1px solid #C2C3C5;
+    background-color: white;
+    position: relative;
+    margin: 5px 28px 5px 31px;
+    padding: 2px;
+}
+
+.GUIList-right .editableItem input {
+    position: relative;
+    border: none;
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+    z-index: 2;
+}
+
+.GUIList-newRow .newRowName {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    color: #AAA;
+    font-style: italic;
+    z-index: 1;
+    line-height: 1em;
+    padding: 3px;
+}
+
+.GUIList-right .noSort .editableItem {
+    margin-left: 0px;
+}
+
+.GUIList-right .noDelete .editableItem {
+    margin-right: 0px;
+}
