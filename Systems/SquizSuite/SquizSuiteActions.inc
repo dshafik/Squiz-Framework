@@ -745,7 +745,7 @@ class SquizSuiteActions
      * @throws ChannelException Error occurred.
      *
      * @api            read
-     * @api-permission superuser
+     * @api-permission public
      */
     public static function suiteConnectAck()
     {
@@ -1796,6 +1796,11 @@ class SquizSuiteActions
      */
     public static function saveSquizSuiteScreen(array $data)
     {
+        Channels::includeSystem('User');
+        if (User::isSystemAdministrator() === FALSE) {
+            throw new ChannelException(_('You must be a super user to access this screen'));
+        }
+
         include_once 'Libs/Util/Util.inc';
         $retVal = array();
         $type   = Util::getArrayIndex($data, 'type', NULL);

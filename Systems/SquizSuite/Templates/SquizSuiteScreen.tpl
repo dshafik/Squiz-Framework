@@ -1,3 +1,9 @@
+<condition>
+    <if-not condition="User::isSystemAdministrator()">
+        <exception><text>You must be a super user to access this screen</text></exception>
+    </if-not>
+</condition>
+
 <div id="SquizSuiteScreen">
     <widget type="GUI/Box" id="squizSuite-currentProduct-box">
         <setting name="title"><text>Current Product</text></setting>
