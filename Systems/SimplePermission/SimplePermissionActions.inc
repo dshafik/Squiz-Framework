@@ -171,7 +171,7 @@ class SimplePermissionActions implements PermissionActions
             $response = array(
                         'system'    => $system,
                         'action'    => $action,
-                        'exception' => 'You do not have permission to perform the requested action',
+                        'exception' => _('You do not have permission to perform the requested action'),
                        );
 
             Channels::includeSystem('API');
