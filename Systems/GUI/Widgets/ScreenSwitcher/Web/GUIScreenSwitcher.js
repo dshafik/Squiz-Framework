@@ -37,11 +37,11 @@ function GUIScreenSwitcher(id, settings)
     GUI.addWidgetEvent(this, 'screenLoadFinished');
 
     // Add the inital item template to GUI's template list.
-    var itemsCount = settings.items.length;
+    var itemsCount = settings._items.length;
     for (var i = 0; i < itemsCount; i++) {
-        if (settings.items[i].id === settings.initialItem) {
+        if (settings._items[i].id === settings.initialItem) {
             // Add the initially loaded template.
-            GUI.addTemplate(settings.items[i].system + ':' + settings.items[i].id);
+            GUI.addTemplate(settings._items[i].system + ':' + settings._items[i].id);
             break;
         }
     }
@@ -54,9 +54,9 @@ GUIScreenSwitcher.prototype = {
     {
         var self = this;
 
-        dfx.foreach(this.settings.items, function(idx) {
-            var itemId     = self.settings.items[idx].id;
-            var itemSystem = self.settings.items[idx].system;
+        dfx.foreach(this.settings._items, function(idx) {
+            var itemId     = self.settings._items[idx].id;
+            var itemSystem = self.settings._items[idx].system;
             var domId      = self.id + '-' + itemId;
 
             dfx.addEvent(dfx.getId(domId), 'click', function(evt) {
@@ -79,13 +79,13 @@ GUIScreenSwitcher.prototype = {
             dfx.addEvent(dfx.getId(domId), 'mouseover', function(evt) {
                 var doEvent = true;
                 if (self.current !== null) {
-                    if (self.current.modeid === self.settings.items[idx].id) {
+                    if (self.current.modeid === self.settings._items[idx].id) {
                         doEvent = false;
                     }
                 }
 
                 if (doEvent === true) {
-                    if (self.settings.items[idx].disabled !== 'true') {
+                    if (self.settings._items[idx].disabled !== 'true') {
                         dfx.addClass(this, 'hover');
                     }
                 }
@@ -94,13 +94,13 @@ GUIScreenSwitcher.prototype = {
             dfx.addEvent(dfx.getId(domId), 'mouseout', function(evt) {
                 var doEvent = true;
                 if (self.current !== null) {
-                    if (self.current.modeid === self.settings.items[idx].id) {
+                    if (self.current.modeid === self.settings._items[idx].id) {
                         doEvent = false;
                     }
                 }
 
                 if (doEvent === true) {
-                    if (self.settings.items[idx].disabled !== 'true') {
+                    if (self.settings._items[idx].disabled !== 'true') {
                         dfx.removeClass(this, 'hover');
                     }
                 }

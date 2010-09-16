@@ -54,11 +54,11 @@ function GUIModeSwitcher(id, settings)
     this.addModeClickEvent();
 
     // Add the inital item template to GUI's template list.
-    var itemsCount = settings.items.length;
+    var itemsCount = settings._items.length;
     for (var i = 0; i < itemsCount; i++) {
-        if (settings.items[i].id === settings.initialItem) {
+        if (settings._items[i].id === settings.initialItem) {
             // Add the initially loaded template.
-            GUI.addTemplate(settings.items[i].system + ':' + settings.items[i].id);
+            GUI.addTemplate(settings._items[i].system + ':' + settings._items[i].id);
             break;
         }
     }

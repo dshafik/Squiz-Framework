@@ -34,6 +34,7 @@ class GUIContentSwitcherActions
      * List of items for the content switcher.
      *
      * @var array
+     * @internal
      */
     protected static $items = array();
 
@@ -100,6 +101,12 @@ class GUIContentSwitcherActions
             );
         } else {
             echo '<span />';
+        }
+
+        $settings['_items'] = array();
+        foreach ($settings['items'] as $item) {
+            unset($item['itemContent']);
+            $settings['_items'][] = $item;
         }
 
         return $settings;

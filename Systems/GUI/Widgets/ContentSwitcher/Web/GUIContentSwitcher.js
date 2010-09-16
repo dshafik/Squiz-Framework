@@ -34,8 +34,8 @@ function GUIContentSwitcher(id, settings)
     if (settings.initialItem) {
         var self = this;
 
-        dfx.foreach(settings.items, function(idx) {
-            var item = settings.items[idx];
+        dfx.foreach(settings._items, function(idx) {
+            var item = settings._items[idx];
 
             if (item.id === settings.initialItem) {
                 self.current = {
