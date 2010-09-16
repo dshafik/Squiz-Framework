@@ -564,8 +564,16 @@ class UserActions
             $userid = User::getCurrentUserid();
         }
 
-        $users = User::getSuperUsers($userid);
+        if ($userid === NULL) {
+            return FALSE;
+        }
+
+        $users = User::getSuperUsers($userid, TRUE);
         if (empty($users) === TRUE) {
+            return FALSE;
+        }
+
+        if (in_array($userid, $users) === FALSE) {
             return FALSE;
         }
 
