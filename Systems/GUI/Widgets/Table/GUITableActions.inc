@@ -323,13 +323,15 @@ class GUITableActions
             throw new ChannelException(_('Specified channel is invalid'));
         }
 
-        Channels::includeSystem('Permission');
-        Permission::checkAPIPermission(
-            $channel['system'],
-            $channel['action'],
-            array(),
-            $api['options']
-        );
+        if (Channels::systemExists('Permission') === TRUE) {
+            Channels::includeSystem('Permission');
+            Permission::checkAPIPermission(
+                $channel['system'],
+                $channel['action'],
+                array(),
+                $api['options']
+            );
+        }
 
         // This is an API request therefore we need to set the current template, it
         // should be the same as the table's template.
