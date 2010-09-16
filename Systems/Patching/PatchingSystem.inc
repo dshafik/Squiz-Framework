@@ -70,13 +70,6 @@ class PatchingSystem extends BaseSystem
                              );
             Channels::includeSystem('SystemConfig');
             SystemConfig::setConfig('Patching', $configDefault);
-
-            if (Channels::systemExists('Log') === TRUE) {
-                Channels::includeSystem('Log');
-                Log::registerLogType(array('patching.schedule' => TRUE));
-                Log::registerLogType(array('patching.unschedule' => TRUE));
-                Log::registerLogType(array('patching.installed' => TRUE));
-            }
         }//end if
 
     }//end install()

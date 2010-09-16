@@ -155,9 +155,8 @@ class PatchingActions
                 system('/usr/bin/svn info '.Init::ROOT_DIR);
                 $result = ob_get_contents();
             ob_end_clean();
-
             $matches = array();
-            preg_match('/Revision: (\d{4,5})/i', $result, $matches);
+            preg_match('/Revision: (\d{1,5})/i', $result, $matches);
             if (empty($matches) === FALSE) {
                 $revision = $matches[1];
             } else {
@@ -961,44 +960,56 @@ class PatchingActions
             return FALSE;
         }
 
-        self::$_updateServerCache = $updateServer;
-        return $updateServer;
+        self::$_updateServerCache = array_pop($updateServer);
+        return self::$_updateServerCache;
 
     }//end _getUpdateServer()
 
 
     /**
-     * Returns API message template for the communication with Update system.
+     * Send API call to the update server and returns the result.
      *
+     * @param string  $url         URL to the update server's API.
      * @param string  $serviceType Type of the service to make API call.
      * @param array   $ops         List of options to pass.
      * @param boolean $enc         TRUE if the encryption is needed.
      *
      * @return array
      */
-    private static function _wsMsgTemplate($serviceType, array $ops, $enc=TRUE)
+    private static function _wsSendMessage($url, $serviceType, array $ops, $enc=TRUE)
     {
+        Channels::includeSystem('API');
         Channels::includeSystem('SquizSuite');
-        $currProduct = SquizSuite::getProduct();
-        $msg         = array(
-                        '_system'  => 'SquizUpdate',
-                        '_action'  => 'updateService',
-                        '_format'  => 'json',
-                        'systemid' => $currProduct['systemid'],
-                       );
-
+        $currProduct  = SquizSuite::getProduct();
+        $updateServer = self::_getUpdateServer();
+        $msg          = array();
         if ($enc === TRUE) {
-            $updateServer               = self::_getUpdateServer();
             $msg['_pubKeySystemid']     = $updateServer['systemid'];
             $msg['_enc']                = array();
             $msg['_enc']['systemid']    = $currProduct['systemid'];
             $msg['_enc']['serviceType'] = $serviceType;
             $msg['_enc']['options']     = json_encode($ops);
+        } else {
+            $msg['systemid']    = $currProduct['systemid'];
+            $msg['serviceType'] = $serviceType;
+            $msg['options']     = json_encode($ops);
         }
 
-        return $msg;
+        Channels::includeSystem('API');
+        $format = 'json';
+        $system = 'SquizUpdate';
+        $action = 'updateService';
+        $result = API::sendCURLAPIRequest(
+            $updateServer['connection']['url'],
+            $format,
+            $system,
+            $action,
+            $msg
+        );
 
-    }//end _wsMsgTemplate()
+        return $result;
+
+    }//end _wsSendMessage()
 
 
     /**
@@ -1024,29 +1035,72 @@ class PatchingActions
      */
     public static function wsActivateInstall($systemid)
     {
-        Channels::includeSystem('API');
-
         $updateServer = self::_getUpdateServer();
         if ($updateServer === FALSE) {
+            return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
+        }
+
+        if ($updateServer['status'] === 'pending') {
             // Never contacted the update server.
             // Or failed to establish the connection.
-            $patchingConfig = Patching::getPatchingConfig();
+            $patchingConfig             = Patching::getPatchingConfig();
+            $patchingConfig['revision'] = Patching::getCurrentRevision();
 
-            $ops = array('currentRevision' => $patchingConfig['revision']);
-            $msg = self::_wsMsgTemplate();
-            $msg['_publicKeySystemid']  = $updateServer['systemid'];
-            $msg['_enc']                = array();
-            $msg['_enc']['systemid']    = $systemid;
-            $msg['_enc']['serviceType'] = 'ActivateInstall';
-            $msg['_enc']['options']     = json_encode($ops);
+            // Set my own systemid with the new one.
+            Channels::includeSystem('SquizSuite');
+            $currProduct = SquizSuite::getCurrentProduct();
+            $oriSysId    = $currProduct['systemid'];
+            SquizSuite::updateProduct(
+                $currProduct['systemid'],
+                'systemid',
+                $systemid
+            );
 
-            $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
-        } else {
-            if ($updateServer['status'] === 'live') {
-                // Already activated.
-                return 'ERR_ALREADY_ACTIVATED';
-            }
+            $enc    = FALSE;
+            $ops    = array(
+                       'systemURL'  => $currProduct['connection']['url'],
+                       'systemName' => $currProduct['connection']['name'],
+                       'version'    => $patchingConfig['revision'],
+                       'cert'       => $currProduct['connection']['cert'],
+                      );
+            $result = self::_wsSendMessage(
+                $updateServer['connection']['url'],
+                'ActivateInstall',
+                $ops,
+                $enc
+            );
+
+            $result = json_decode($result['result'], TRUE);
+            $status = $result['result']['status'];
+            switch ($status) {
+                case 'OK':
+                    // Set the update server to be live.
+                    SquizSuite::updateProduct(
+                        $updateServer['systemid'],
+                        'status',
+                        'live'
+                    );
+
+                    // Set patching config.
+                    $patchingConfig             = Patching::getPatchingConfig();
+                    $patchingConfig['systemid'] = $systemid;
+                    Channels::includeSystem('SystemConfig');
+                    SystemConfig::setConfig('Patching', $patchingConfig);
+                    return TRUE;
+                break;
+
+                case 'ERR_ALREADY_ACTIVATED':
+                default:
+                    SquizSuite::updateProduct(
+                        $systemid,
+                        'systemid',
+                        $oriSysId
+                    );
+                break;
+            }//end switch
         }//end if
+
+        return FALSE;
 
     }//end wsActivateInstall()
 
@@ -1080,12 +1134,15 @@ class PatchingActions
             }
         }
 
-        Channels::includeSystem('API');
         Channels::includeSystem('Message');
         $ops    = array('currentRevision' => $config['revision']);
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('CheckForUpdates', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'CheckForUpdates',
+            $ops,
+            $enc
+        );
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
         switch ($status) {
@@ -1202,13 +1259,14 @@ class PatchingActions
 
         // Check if need to check for update according to interval setting.
         $config = Patching::getPatchingConfig();
-
-        Channels::includeSystem('API');
         $ops    = array();
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('CheckSubscription', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
-
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'CheckSubscription',
+            $ops,
+            $enc
+        );
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
         switch ($status) {
@@ -1251,9 +1309,6 @@ class PatchingActions
         }
 
         // Check if need to check for update according to interval setting.
-        $config = Patching::getPatchingConfig();
-
-        Channels::includeSystem('API');
         $ops = array(
                 'installedTime'   => date('c'),
                 'previousVersion' => $old,
@@ -1268,8 +1323,12 @@ class PatchingActions
         }
 
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('NotifyApplied', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'NotifyApplied',
+            $ops,
+            $enc
+        );
 
         return TRUE;
 
@@ -1290,15 +1349,17 @@ class PatchingActions
 
         // Check if need to check for update according to interval setting.
         $config = Patching::getPatchingConfig();
-
-        Channels::includeSystem('API');
         $ops    = array(
                    'currentVersion' => $config['revision'],
                    'restoredTime'   => date('c'),
                   );
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('NotifyRestored', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'NotifyRestored',
+            $ops,
+            $enc
+        );
 
         return TRUE;
 
@@ -1324,7 +1385,6 @@ class PatchingActions
         }
 
         Channels::includeSystem('Patching');
-        Channels::includeSystem('API');
         Channels::includeSystem('SquizSuite');
         $currProduct = SquizSuite::getProduct();
         $config      = Patching::getPatchingConfig();
@@ -1336,8 +1396,13 @@ class PatchingActions
                        'version' => $version,
                        'type'    => $currProduct['type'],
                       );
-            $msg    = self::_wsMsgTemplate('DownloadUpdate', $ops, $enc);
-            $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+            $result = self::_wsSendMessage(
+                $updateServer['connection']['url'],
+                'DownloadUpdate',
+                $ops,
+                $enc
+            );
+
             $result = json_decode($result['result'], TRUE);
             if ($result['result']['status'] === 'OK') {
                 $filename      = $result['result']['filename'];
@@ -1397,11 +1462,14 @@ class PatchingActions
         }
 
         // Check if need to check for update according to interval setting.
-        Channels::includeSystem('API');
         $ops    = array();
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('GetAWSKeys', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'GetAWSKeys',
+            $ops,
+            $enc
+        );
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
 
@@ -1434,11 +1502,10 @@ class PatchingActions
         }
 
         // Check if need to check for update according to interval setting.
-        Channels::includeSystem('API');
         $ops    = array();
         $enc    = TRUE;
         $msg    = self::_wsMsgTemplate('ReleaseStatus', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage($updateServer['connection']['url'], $msg);
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
 
@@ -1501,15 +1568,18 @@ class PatchingActions
         $sha1 = sha1_file($patchFile);
 
         // Check if need to check for update according to interval setting.
-        Channels::includeSystem('API');
         $ops    = array(
                    'name' => $name,
                    'sha1' => $sha1,
                    'size' => $size,
                   );
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('ValidateUpdate', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'ValidateUpdate',
+            $ops,
+            $enc
+        );
 
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
@@ -1547,11 +1617,14 @@ class PatchingActions
         }
 
         // Check if need to check for update according to interval setting.
-        Channels::includeSystem('API');
         $ops    = array();
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('GetBugzilla', $ops, $enc);
-        $result = API::sendCURLAPIRequest($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'GetBugzilla',
+            $ops,
+            $enc
+        );
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
 
@@ -1569,6 +1642,42 @@ class PatchingActions
         return array();
 
     }//end wsGetBugzilla()
+
+
+    /**
+     * Save the SuperUsers screen settings.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     */
+    public static function savePatchingScreen(array $data)
+    {
+        include_once 'Libs/Util/Util.inc';
+        $result = array();
+
+        $activationID = Util::getArrayIndex(
+            $data,
+            'PatchingScreen-activateIdText',
+            ''
+        );
+
+        $activationID = trim($activationID);
+        if (empty($activationID) === FALSE) {
+            $result = Patching::wsActivateInstall($activationID);
+            if ($result === FALSE) {
+                $result['errors'] = _('Activation Failed.');
+            }
+        }
+
+        if (isset($result['errors']) === FALSE) {
+            $result = array('success' => TRUE);
+        }
+
+        return $result;
+
+    }//end savePatchingScreen()
 
 
 }//end class
