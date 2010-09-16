@@ -246,6 +246,9 @@ var GUI = new function()
      * Available options:
      * - [modal] (true|false): If true then the template contents will be shown as
      * modal dialog. False by default.
+     * - [targetElement] (HTMLElement): If specified, the contents of the template
+     * will be appended to this element's contents. If omitted, the document body
+     * will be used.
      *
      * @param string   system       The system that has the template.
      * @param string   templateName Name of the template (with the extension).
@@ -264,6 +267,12 @@ var GUI = new function()
         if (options && options.modal === true) {
             GUI.showOverlay();
         }
+        
+        if ((options) && (options.targetElement)) {
+            var targetElement = options.targetElement;
+        } else {
+            var targetElement = document.body;
+        }
 
         GUI.sendRequest('GUI', 'printTemplate', params, function(data) {
             if (!data.result) {
@@ -276,7 +285,7 @@ var GUI = new function()
 
             // Hide the element and add it to body so that events and DOM operations
             // can work.
-            document.body.appendChild(main);
+            targetElement.appendChild(main);
             dfx.setHtml(main, data.result);
 
             if (callback) {
