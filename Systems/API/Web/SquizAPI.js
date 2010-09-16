@@ -39,13 +39,6 @@ sfapi.rootUrl = '';
 sfapi.rootUrlSuffix = '__api';
 
 /**
- * Return data format.
- * @type String
- */
-sfapi.outputDataFormat = 'json';
-
-
-/**
  * ID for script tag to use.
  * @type String
  */
@@ -70,7 +63,9 @@ sfapi._api_token = null;
  * @param {String} Name of Channel action to call.
  * @param {Object} Parameters to pass via GET reuqest.
  */
-sfapi.get = function(system, action, params, callback) {
+sfapi.get = function(system, action, params, callback, format) {
+    format = format || 'json';
+
     // Create script tag if it hasn't been created.
     var scriptTag = document.getElementById(sfapi.scriptTagid);
     var head = document.getElementsByTagName("head").item(0);
@@ -88,7 +83,7 @@ sfapi.get = function(system, action, params, callback) {
     head.appendChild(scriptTag);
 
     // Form URL to send the request.
-    var src = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix + '/' + sfapi.outputDataFormat;
+    var src = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix + '/' + format;
     src    += '/' + system + '/' + action;
     src    += '?_callback=sfapi._getCallback';
 
@@ -120,13 +115,23 @@ sfapi.get = function(system, action, params, callback) {
 
 };
 
-sfapi.post = function(system, action, params, successCallback, errorCallback) {
+sfapi.post = function(system, action, params, successCallback, errorCallback, format) {
+    format = format || 'json';
+
     var url = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix;
-    url    += '/' + sfapi.outputDataFormat + '/' + system + '/' + action;
+    url    += '/' + format + '/' + system + '/' + action;
 
     var token = document.getElementById('__api_token');
     if (token) {
         params._api_token = token.value;
+    }
+
+    if (!errorCallback) {
+        errorCallback = function(xhr) {
+            if (console && console.error && xhr && xhr.responseText) {
+                console.error(xhr.statusText);
+            }
+        };
     }
 
     dfx.post(url, params, function(data) {
