@@ -986,7 +986,7 @@ class APIActions
      *
      * @return void
      */
-    public static function removeAPI($system, $action)
+    public static function removeAPI($system=NULL, $action=NULL)
     {
         $query = DAL::getQuery('API', 'removeAPI');
         DAL::executeQuery($query);

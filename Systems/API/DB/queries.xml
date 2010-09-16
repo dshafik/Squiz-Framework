@@ -65,6 +65,28 @@
                 </where>
             </delete>
         </primary>
+        <alternate>
+            <assert-not-null data="system">
+                <assert-null data="action">
+                    <delete>
+                        <where>
+                            <equal table="api" column="system">:system</equal>
+                        </where>
+                    </delete>
+                </assert-null>
+            </assert-not-null>
+        </alternate>
+        <alternate>
+            <assert-null data="system">
+                <assert-null data="action">
+                    <delete from="api">
+                        <where>
+                            <not-null><field table="api" column="system" /></not-null>
+                        </where>
+                    </delete>
+                </assert-null>
+            </assert-null>
+        </alternate>
     </query>
 
     <query id="updateAPI">
