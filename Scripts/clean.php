@@ -83,34 +83,20 @@ require_once $rootdir.'/Libs/FileSystem/FileSystem.inc';
 $systemNames = Install::getInstallOptions(FALSE, FALSE);
 
 // Clean up data and oven dir before full install.
-echo '9. Cleaning data & oven directories';
+echo '9. Preparing data directories';
 system('rm -rf ./data/* >> /dev/null 2>&1');
-system('rm -rf '.$rootdir.'/DAL/QueryStore/* >> /dev/null 2>&1');
-system('rm -rf '.$rootdir.'/DAL/Oven/* >> /dev/null 2>&1');
-system('rm -rf '.$rootdir.'/Channels/Oven/* >> /dev/null 2>&1');
-echoDone();
-
-echo '10. Preparing data directories';
 Install::prepareDataDir($rootdir, $url);
 echoDone();
 
-echo '11. Rebaking oven';
-Install::rebakeOven($rootdir, $url);
+echo '10. Rebaking system';
+system('/usr/bin/php '.$rootdir.'/Scripts/rebake.php >> /dev/null 2>&1');
 echoDone();
 
-echo '12. Installing queries';
-Install::installQueries($systemNames);
-echoDone();
-
-echo '13. Installing SQL functions';
-Install::installSqlFunctions($systemNames);
-echoDone();
-
-echo '14. Running system install methods';
+echo '11. Running system install methods';
 Install::runSystemInstallMethods($systemNames);
 echoDone();
 
-echo '15. Initialising product';
+echo '12. Initialising product';
 $initProductScript = $rootdir.'/initialise_product.php';
 if (file_exists($initProductScript) === TRUE) {
     include_once $initProductScript;
@@ -119,7 +105,7 @@ if (file_exists($initProductScript) === TRUE) {
     echoSkip();
 }
 
-echo '16. Generating help docs';
+echo '13. Generating help docs';
 if (file_exists($rootdir.'/Systems/Help/Scripts/generate_docs.php') === TRUE) {
     system('/usr/bin/php '.$rootdir.'/Systems/Help/Scripts/generate_docs.php >> /dev/null 2>&1');
     echoDone();
@@ -127,15 +113,11 @@ if (file_exists($rootdir.'/Systems/Help/Scripts/generate_docs.php') === TRUE) {
     echoSkip();
 }
 
-echo '17. Copying web files';
-Install::copyWebFiles();
-echoDone();
-
 require_once $rootdir.'/data/init.inc';
 require_once $rootdir.'/Channels/Channels.inc';
 require_once $rootdir.'/Systems/BaseSystem.inc';
 
-echo '18. Fixing file system permissions';
+echo '14. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
 system('chmod 777 '.$rootdir.'/error_log');
 echoDone();
