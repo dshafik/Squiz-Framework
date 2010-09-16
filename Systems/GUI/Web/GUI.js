@@ -135,17 +135,19 @@ var GUI = new function()
     this.unloadTemplate = function(parent) {
         var self = this;
         var ln   = this.templateLineage.length;
-        for (var i = (ln - 1); i >= 0; i--) {
-            var p = this.templateLineage[i];
-            dfx.foreach(this.widgetTemplates[p], function(idx) {
-                self.removeWidget(idx);
-            });
-
-            delete self.widgetTemplates[p];
-            this.templateLineage.pop();
-
-            if (p === parent) {
-                break;
+        if (this.templateLineage.inArray(parent) === true) {            
+            for (var i = (ln - 1); i >= 0; i--) {
+                var p = this.templateLineage[i];
+                dfx.foreach(this.widgetTemplates[p], function(idx) {
+                    self.removeWidget(idx);
+                });
+    
+                delete self.widgetTemplates[p];
+                this.templateLineage.pop();
+    
+                if (p === parent) {
+                    break;
+                }
             }
         }
     };
