@@ -278,7 +278,9 @@ class APIActions
                      $system,
                      $action,
                     );
-        $result   = call_user_func_array($callback, $args);
+
+        Channels::includeSystem($system);
+        $result = call_user_func_array($callback, $args);
 
         // DAL Query has been returned! In general this should not happen as
         // we don't want the product's API to return DAL uueries. If this happens,
