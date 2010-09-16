@@ -472,10 +472,6 @@ class GUIGraphBarActions
                 }
             }
 
-            echo '<li class="'.$class.'-data-point-alt-text">';
-            echo 'Bar '.$rowNumber;
-            echo '</li>';
-
             echo '<ul class="'.$class.'-data-row';
 
             // We have a bar style?
@@ -503,10 +499,7 @@ class GUIGraphBarActions
 
             // Do we have a label for this data row?
             if (array_key_exists('label', $dataRow) === TRUE) {
-                echo '<li class="'.$class.'-data-label">';
-                echo '<span class="'.$class.'-data-point-alt-text">';
-                echo 'Bar label: ';
-                echo '</span>';
+                echo '<li class="'.$class.'-data-label">';                
                 echo $dataRow['label'];
                 echo '</li>';
             }
@@ -519,9 +512,6 @@ class GUIGraphBarActions
             $cumHeight        = 0;
 
             // Separate the data block in a list.
-            echo '<li class="'.$class.'-data-point-alt-text">';
-            echo 'Data';
-            echo '</li>';
 
             echo '<ul style="display: block;">';
 
@@ -569,15 +559,6 @@ class GUIGraphBarActions
             $liTexts = array_reverse($liTexts);
             echo implode('', $liTexts);
 
-            // Get an empty (hidden) x-axis text, since we need to use it
-            // a few times.
-            ob_start();
-                echo '<span class="'.$class.'-data-point-alt-text">';
-                echo 'X-axis: No label';
-                echo '</span>';
-                $emptyXAxisText = ob_get_contents();
-            ob_end_clean();
-
             // Do we have to print the x-axis? If so, print only those for which we
             // have x-axis values, and the empty label otherwise.
             if ($hasXAxis === TRUE) {
@@ -585,21 +566,13 @@ class GUIGraphBarActions
 
                 if (array_key_exists('x-axis', $dataRow) === TRUE) {
                     if ($dataRow['x-axis'] !== '') {
-                        echo '<span class="'.$class.'-data-point-alt-text">';
-                        echo 'X-axis: ';
-                        echo '</span>';
                         echo $dataRow['x-axis'];
-                    } else {
-                        echo $emptyXAxisText;
                     }
-                } else {
-                    echo $emptyXAxisText;
                 }
 
                 echo '</li>';
             } else {
                 echo '<li class="'.$class.'-data-x-axis-empty">';
-                echo $emptyXAxisText;
                 echo '</li>';
             }//end if
 
@@ -610,10 +583,6 @@ class GUIGraphBarActions
             // If numeric or string, it'll display if not an empty string.
             // If null or unset, it's hidden.
             if (count($flags) > 0) {
-                echo '<li class="'.$class.'-data-point-alt-text">';
-                echo 'Flags';
-                echo '</li>';
-
                 echo '<ul style="display: block">';
 
                 $liTexts = array();
@@ -649,31 +618,9 @@ class GUIGraphBarActions
 
                         echo '"';
 
-                        if ($showFlag === TRUE) {
-                            echo ' title="'.$flagTitle.'"';
-                        }
-
                         echo ' style="height: '.$flag['height'].'px;';
                         echo ' line-height: '.($flag['height']).'px;"';
                         echo '>';
-                        echo '<span class="'.$class.'-data-point-alt-text">';
-                        echo $flagTitle.': ';
-
-                        if ($flagValue === NULL) {
-                            echo _('Blank');
-                        } else if (is_bool($flagValue) === TRUE) {
-                            if ($showFlag === TRUE) {
-                                echo _('Yes');
-                            } else {
-                                echo _('No');
-                            }
-
-                            echo '</span>';
-                        } else {
-                            echo '</span>';
-                            echo $flagValue;
-                        }//end if
-
                         echo '</li>';
                         $liTexts[] = ob_get_contents();
                     ob_end_clean();
