@@ -109,6 +109,17 @@ GUIScreenSwitcher.prototype = {
             return true;
         });
 
+    },
+
+    loadMode: function(system, modeid)
+    {
+        // Unload the current template and call parent function.
+        if (this.current !== null) {
+            GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
+        }
+
+        GUIContentSwitcher.prototype.loadMode.call(this, system, modeid);
+
     }
 
 };

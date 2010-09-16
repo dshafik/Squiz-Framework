@@ -137,10 +137,6 @@ GUIContentSwitcher.prototype = {
 
         dfx.addClass(itemContentElem, 'visible');
 
-        if (this.current !== null) {
-            GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
-        }
-
         GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
 
         this.current = {
@@ -159,10 +155,7 @@ GUIContentSwitcher.prototype = {
 
         GUI.loadContent(this.className, 'getDynamicItemContent', dfx.getId(this.settings.target), params);
 
-        if (this.current !== null) {
-            GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
-        }
-
+        // Add the loaded template.
         GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
 
         this.current = {

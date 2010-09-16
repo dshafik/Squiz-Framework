@@ -283,15 +283,7 @@ class GUIContentSwitcherActions
             $contents = ob_get_contents();
         ob_end_clean();
 
-        $widgets = array();
-
-        if (isset($depFiles['widgets']) === TRUE) {
-            $widgets = $depFiles['widgets'];
-        }
-
-        $retval = array('contents' => $contents);
-
-        return $retval;
+        return $contents;
 
     }//end getDynamicItemContent()
 

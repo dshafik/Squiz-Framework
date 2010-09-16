@@ -206,7 +206,7 @@ var GUI = new function()
         };
     };
 
-    this.sendRequest = function(system, action, params, callback) {
+    this.sendRequest = function(system, action, params, callback, format) {
         sfapi.post(system, action, params, function(data) {
             if (!data || data.exception) {
                 // Show error message.
@@ -217,7 +217,7 @@ var GUI = new function()
             } else if (callback) {
                 callback.call(this, data);
             }
-        });
+        }, null, format);
     };
 
     /**
@@ -231,10 +231,10 @@ var GUI = new function()
             targetElement = dfx.getId(targetElement);
         }
 
-        GUI.sendRequest(system, method, params, function(data) {
+        GUI.sendRequest(system, method, params, function(contents) {
             // Set the contents.
-            dfx.setHtml(targetElement, data.result.contents);
-        });
+            dfx.setHtml(targetElement, contents);
+        }, 'raw');
     };
 
     /**
