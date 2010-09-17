@@ -229,6 +229,146 @@ class HelpActions
 
 
     /**
+     * Searches docs and returns the results as a sarch result page.
+     *
+     * @param string  $searchString String to search for (space separated).
+     * @param integer $startOffset  The search result offset.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function searchDocs($searchString, $startOffset=0)
+    {
+        $maxResults = 10;
+        $docsDir    = Help::getDocsDirectory();
+
+        $wordList          = explode(' ', $searchString);
+        $originalWordsList = array();
+        foreach ($wordList as $index => $word) {
+            $len = strlen($word);
+            if ($len > 3) {
+                // Only keep words that has more than 3 characters and remove the
+                // last character from the word. This is a simple way to match plurals
+                // (e.g. "goals" will match "goal" and "test" will match "tes").
+                $originalWordsList[] = $word;
+                $wordList[$index]    = substr($word, 0, -1);
+            } else if ($len < 3) {
+                unset($wordList[$index]);
+            }
+        }
+
+        if (empty($wordList) === TRUE) {
+            return self::_getSearchResultsPage($wordList);
+        }
+
+        $words = implode('|', $wordList);
+
+        // Search articles and glossary file names.
+        $cmd            = 'grep -liE ".*('.$words.').*" '.$docsDir.'* | grep -E ".*/(article|glossary)-.*"';
+        $contentResults = array();
+        exec($cmd, $contentResults);
+
+        $cmd       = 'find '.$docsDir.' -regextype posix-egrep -iregex ".*/(article|glossary)-.*('.$words.').*" -print';
+        $fileNames = array();
+        exec($cmd, $fileNames);
+
+        $rawSearchResults = array();
+        foreach ($contentResults as $filePath) {
+            $matches    = array();
+            $contents   = file_get_contents($filePath);
+            $numMatches = preg_match_all('/.*\b('.$words.').*/imU', $contents, $matches);
+            $numWords   = str_word_count($contents);
+            $score      = ((ceil($numMatches / ($numWords * 100)) * 2) + $numMatches);
+
+            $rawSearchResults[basename($filePath)] = $score;
+        }
+
+        $fileScore = 5;
+        foreach ($fileNames as $filePath) {
+            $fileName   = basename($filePath);
+            $matches    = array();
+            $numMatches = preg_match_all('/.*('.$words.').*/iU', $fileName, $matches);
+
+            if (isset($rawSearchResults[$fileName]) === FALSE) {
+                $rawSearchResults[$fileName] = ($numMatches * $fileScore);
+            } else {
+                $rawSearchResults[$fileName] += ($numMatches * $fileScore);
+            }
+        }
+
+        if (empty($rawSearchResults) === TRUE) {
+            return self::_getSearchResultsPage($wordList);
+        }
+
+        arsort($rawSearchResults);
+
+        $rawSearchResults = array_slice($rawSearchResults, $startOffset, $maxResults, TRUE);
+
+        $contents = self::_getSearchResultsPage($originalWordsList, $rawSearchResults);
+        return $contents;
+
+    }//end searchDocs()
+
+
+    /**
+     * Prints the search results page using the given results list.
+     *
+     * @param array $words   List of searched words.
+     * @param array $results List of search results.
+     *
+     * @return string
+     */
+    private static function _getSearchResultsPage(array $words, array $results=array())
+    {
+        // For each result file open it and retrieve the article details.
+        $dom     = new DomDocument();
+        $docsDir = Help::getDocsDirectory();
+
+        Channels::includeSystem('GUI');
+        $cssHref   = self::_getPageCSSPath();
+        $contents  = GUI::getDocType();
+        $contents .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
+        $contents .= '</head><body class="Help-iframe searchResultsPage">';
+
+        if (empty($results) === TRUE) {
+            $contents .= '<h2>'._('No search results').'</h2>';
+        } else {
+            // Options for the 2nd argument of Help.loadPage function.
+            $opts = urlencode(json_encode(array('searchedWords' => $words)));
+
+            $contents .= '<div class="Help-searchResults-list">';
+            foreach ($results as $fileName => $score) {
+                $dom->loadHTMLFile($docsDir.$fileName);
+
+                $id       = str_replace('.html', '', basename($fileName));
+                $title    = $dom->getElementsByTagName('h1')->item(0)->nodeValue;
+                $summary  = '';
+                $metaTags = $dom->getElementsByTagName('meta');
+                foreach ($metaTags as $metaTag) {
+                    if ($metaTag->getAttribute('name') === 'summary') {
+                        $summary = $metaTag->getAttribute('content');
+                    }
+                }
+
+                $href      = 'javascript:parent.window.Help.loadPage(\''.$id.'\', '.$opts.');';
+                $contents .= '<div class="Help-searchResult">';
+                $contents .= '<h4><a href="'.$href.'">'.$title.'</a></h4>';
+                $contents .= '<p>'.$summary.'</p>';
+                $contents .= '</div>';
+            }
+        }//end if
+
+        $contents .= '</div>';
+        $contents .= '</body></html>';
+
+        return $contents;
+
+    }//end _getSearchResultsPage()
+
+
+    /**
      * Parses specified Help articles.
      *
      * @param array $docs Array of Help files.
@@ -516,6 +656,8 @@ class HelpActions
             throw new ChannelException(sprintf(_('Article has more than 1 summary tag: %s.'), $articleFile));
         } else if ($summaryTags->length === 1) {
             $summary = trim($summaryTags->item(0)->nodeValue);
+        } else {
+            //throw new ChannelException(sprintf(_('Article must have a summary tag: %s.'), $articleFile));
         }
 
         $screenTitle     = '';
@@ -554,6 +696,12 @@ class HelpActions
         if ($infoTags->length !== 0) {
             $infoTags->item(0)->parentNode->removeChild($infoTags->item(0));
         }
+
+        // Add the summary to HTML doc as a meta tag.
+        $summaryMetaTag = $doc->createElement('meta');
+        $summaryMetaTag->setAttribute('name', 'summary');
+        $summaryMetaTag->setAttribute('content', $summary);
+        $doc->getElementsByTagName('head')->item(0)->appendChild($summaryMetaTag);
 
         $doc->saveHTMLFile($destFile);
 

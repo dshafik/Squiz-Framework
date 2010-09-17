@@ -24,9 +24,11 @@
 var Help = new function()
 {
     var _apiURL        = null;
+    var _searchURL     = null;
     var _systemInfos   = {};
     var _currentSystem = null;
     var _iframe        = null;
+    var _loadPageOpts  = null;
 
     this.init = function() {
         var elem = dfx.getId('Help-dialog');
@@ -37,7 +39,8 @@ var Help = new function()
         var self = this;
 
         // Set the API URL.
-        _apiURL = '/__api/raw/Help/getPage?_api_token=' + dfx.getId('__api_token').value + '&';
+        _searchURL = '/__api/raw/Help/searchDocs?_api_token=' + dfx.getId('__api_token').value + '&';
+        _apiURL    = '/__api/raw/Help/getPage?_api_token=' + dfx.getId('__api_token').value + '&';
 
         var navHeight = parseInt(dfx.getElementHeight(dfx.getClass('Help-controls', elem)[0]));
         var iframe    = dfx.getId('Help-iframe');
@@ -53,6 +56,19 @@ var Help = new function()
 
         GUI.getWidget('Help-dialog').addDialogResizedCallback(function(ui, contentSize) {
             dfx.setStyle(iframe, 'height', (contentSize.height - navHeight - 27) + 'px');
+        });
+
+        // Add search field event.
+        var searchBox = GUI.getWidget('Help-search');
+        searchBox.addKeyPressCallback(function(value, e) {
+            if (e.keyCode === 13) {
+                value = dfx.trim(value);
+                if (value.length === 0) {
+                    return;
+                }
+
+                self.search(value);
+            }
         });
     }
 
@@ -78,8 +94,9 @@ var Help = new function()
         this.loadPage('general.html');
     };
 
-    this.loadPage = function(pageid) {
+    this.loadPage = function(pageid, options) {
         var helpIframe = dfx.getId('Help-iframe');
+        _loadPageOpts  = options;
 
         dfx.attr(helpIframe, 'src', _apiURL + 'pageid=' + escape(pageid));
     };
@@ -94,6 +111,53 @@ var Help = new function()
                 self.closeMenu();
             }
         });
+
+        _handlePageLoadOptions();
+    };
+
+    _handlePageLoadOptions = function() {
+        if (!_loadPageOpts) {
+            return;
+        }
+
+        var iframeDoc = dfx.getIframeDocument(_iframe);
+
+        // Search.
+        if (_loadPageOpts.searchedWords) {
+            // Need to highlight all the searched words.
+            var sln = _loadPageOpts.searchedWords.length;
+            for (var i = 0; i < sln; i++) {
+                var word      = _loadPageOpts.searchedWords[i];
+                var textNodes = dfx.getTextNodes(iframeDoc.body);
+                var tln       = textNodes.length;
+                var regExp    = new RegExp(word, 'gi');
+                for (var j = 0; j < tln; j++) {
+                    textNodes[j].nodeValue = textNodes[j].nodeValue.replace(regExp, '__REPLACE_' + i + '__$&__');
+                }
+            }
+
+            var c    = 1;
+            var html = dfx.getHtml(iframeDoc.body);
+            for (var i = 0; i < sln; i++) {
+                if (c > 7) {
+                    c = 1;
+                }
+
+                var word   = _loadPageOpts.searchedWords[i];
+                var regExp = new RegExp('__REPLACE_' + i + '__(' + word + ')__', 'ig');
+                html       = html.replace(regExp, '<span class="Help-searchTerm-' + c + '">$1</span>');
+                c++;
+            }
+
+            dfx.setHtml(iframeDoc.body, html);
+        }//end if
+
+        _loadPageOpts = null;
+    };
+
+    this.search = function(value) {
+        var helpIframe = dfx.getId('Help-iframe');
+        dfx.attr(helpIframe, 'src', _searchURL + 'searchString=' + escape(value));
     };
 
     this.back = function() {

@@ -80,6 +80,10 @@ a.Help-control-button.general:active {
     background-position: -139px -20px;
 }
 
+#Help-search {
+    float: right;
+}
+
 /* IFrame styles */
 .Help-iframe {
     font-family: arial;
@@ -157,6 +161,74 @@ a.Help-control-button.general:active {
     cursor: pointer;
     vertical-align: middle;
     padding-left: 2px;
+}
+
+/* Help Search results */
+.Help-iframe .Help-searchResult {
+    border-bottom: 1px solid #DDD;
+    margin-bottom: 5px;
+}
+
+.Help-iframe .Help-searchResult h4 {
+    margin: 0;
+    padding: 2px 0;
+}
+
+.Help-iframe .Help-searchResult h4 a {
+    text-decoration: none;
+    color: #000;
+}
+
+.Help-iframe .Help-searchResult h4 a:hover {
+    text-decoration: underline;
+}
+
+.Help-iframe .Help-searchResult p {
+    margin: 0;
+    padding: 0;
+    padding-left: 10px;
+}
+
+.Help-iframe .Help-searchTerm-1 {
+    border: 1px solid;
+    background-color: #D4F1D0;
+    border-color: #93DC8A;
+}
+
+.Help-iframe .Help-searchTerm-2 {
+    border: 1px solid;
+    background-color: #D3E1F1;
+    border-color: #90B5DC;
+}
+
+.Help-iframe .Help-searchTerm-3 {
+    border: 1px solid;
+    background-color: #F1D5D5;
+    border-color: #DD9595;
+}
+
+.Help-iframe .Help-searchTerm-4 {
+    border: 1px solid;
+    background-color: #FFF6AE;
+    border-color: #FEED5D;
+}
+
+.Help-iframe .Help-searchTerm-5 {
+    border: 1px solid;
+    background-color: #FBE3D1;
+    border-color: #F4B88C;
+}
+
+.Help-iframe .Help-searchTerm-6 {
+    border: 1px solid;
+    background-color: #EAD7EB;
+    border-color: #CA9BCD;
+}
+
+.Help-iframe .Help-searchTerm-7 {
+    border: 1px solid;
+    background-color: #FEDAF7;
+    border-color: #FEA2EB;
 }
 
 /* Pointer */

@@ -24,6 +24,10 @@
                 <a href="javascript:Help.picker();" class="Help-control-button picker" title="{pickerButtonTitle}"></a>
                 <a href="javascript:Help.glossary();" class="Help-control-button glossary" title="{glossaryButtonTitle}"></a>
                 <a href="javascript:Help.general();" class="Help-control-button general" title="{generalButtonTitle}"></a>
+                <widget id="Help-search" type="GUI/TextBox">
+                    <setting name="size">20</setting>
+                    <setting name="value"><text>Search</text></setting>
+                </widget>
                 <dataProvider action="Help::getSystemsMenu" />
             </div>
             <iframe frameborder="0" border="0" name="Help-iframe" id="Help-iframe" width="100%" height="100%" src=""></iframe>
