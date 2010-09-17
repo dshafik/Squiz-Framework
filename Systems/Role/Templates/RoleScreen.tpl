@@ -11,7 +11,7 @@
                         <widget type="GUI/Button" id="addNewRole">
                             <setting name="value"><text>Add New</text></setting>
                             <setting name="click">
-                                <function>RoleScreen.createNewRole</function>
+                                <function>RoleRoleScreen.createNewRole</function>
                             </setting>
                         </widget>
                     </div>

@@ -10,7 +10,7 @@
         <div class="LoginScreen-main">
             <p><text>Enter your username and password to log in</text></p>
             <div class="form-top"> </div>
-            <form id="loginForm" action="" method="post" onsubmit="return LoginScreen.submit();">
+            <form id="loginForm" action="" method="post" onsubmit="return UserLoginScreen.submit();">
                 <p id="LoginError" class="error"> </p>
                 <label for="loginName-input"><text>Username</text></label>
                 <widget type="GUI/TextBox" id="loginName">

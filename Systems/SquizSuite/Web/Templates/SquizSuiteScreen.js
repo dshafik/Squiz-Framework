@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-var SquizSuiteScreen = new function()
+var SquizSuiteSquizSuiteScreen = new function()
 {
     var _currentProduct       = null;
     var _connectedProducts    = [];

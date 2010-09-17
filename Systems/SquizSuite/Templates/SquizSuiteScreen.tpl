@@ -41,7 +41,7 @@
                 <div class="addNewButtonContainer">
                     <widget type="GUI/Button" id="addNewProduct">
                         <setting name="value"><text>Add New</text></setting>
-                        <setting name="click">SquizSuiteScreen.addProduct()</setting>
+                        <setting name="click">SquizSuiteSquizSuiteScreen.addProduct()</setting>
                     </widget>
                 </div>
             </content>

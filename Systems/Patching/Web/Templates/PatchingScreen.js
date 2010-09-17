@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-var PatchingScreen = new function()
+var PatchingPatchingScreen = new function()
 {
     _patchingSettingsDiv = null;
 

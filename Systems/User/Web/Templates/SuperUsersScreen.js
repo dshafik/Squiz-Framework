@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-var SuperUsersScreen = new function()
+var UserSuperUsersScreen = new function()
 {
     this.addUser = function() {
         var options = {

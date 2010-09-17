@@ -450,7 +450,7 @@ class RoleActions
         }
 
         $data = json_encode($data);
-        return '<script>RoleScreen.initScreen('.$data.');</script>';
+        return '<script>RoleRoleScreen.initScreen('.$data.');</script>';
 
     }//end getRolesScreenInitCode()
 

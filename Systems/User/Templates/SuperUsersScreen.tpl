@@ -12,7 +12,7 @@
                 <div class="addNewButtonContainer">
                     <widget type="GUI/Button" id="addNewSuperUser">
                         <setting name="value"><text>Add Existing User</text></setting>
-                        <setting name="click">SuperUsersScreen.addUser()</setting>
+                        <setting name="click">UserSuperUsersScreen.addUser()</setting>
                     </widget>
                 </div>
             </content>

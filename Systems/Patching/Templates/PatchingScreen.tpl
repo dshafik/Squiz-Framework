@@ -40,7 +40,7 @@
                                                 <arg>
                                                     <widget type="GUI/Button" id="PatchingScreen-activateDemoBtn">
                                                         <setting name="value"><text>Activate Demo</text></setting>
-                                                        <setting name="click"><![CDATA[PatchingScreen.toggleActivation()]]></setting>
+                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.toggleActivation()]]></setting>
                                                     </widget>
                                                 </arg>
                                                 <arg>
@@ -53,7 +53,7 @@
                                                     <widget type="GUI/Button" id="PatchingScreen-cancelActivationBtn">
                                                         <setting name="value"><text>Cancel</text></setting>
                                                         <setting name="colour">Dark</setting>
-                                                        <setting name="click"><![CDATA[PatchingScreen.toggleActivation()]]></setting>
+                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.toggleActivation()]]></setting>
                                                     </widget>
                                                 </arg>
                                             </args>

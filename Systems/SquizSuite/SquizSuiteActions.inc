@@ -1644,7 +1644,7 @@ class SquizSuiteActions
                 case 'pending approval':
                     $setting  = array(
                                  'value' => 'Approve Connection',
-                                 'click' => 'SquizSuiteScreen.approveConnection(this)',
+                                 'click' => 'SquizSuiteSquizSuiteScreen.approveConnection(this)',
                                 );
                     $summary .= '<span class="SquizSuiteScreen-pendingApprovalMsg">'._('Connection Pending ...').'</span>';
                     $summary .= GUI::createWidget('squizSuite-'.$product['systemid'].'-approve-btn', 'GUIButton', $setting);
@@ -1781,7 +1781,7 @@ class SquizSuiteActions
         }
 
         $data = json_encode($data);
-        return '<script>SquizSuiteScreen.initScreen('.$data.');</script>';
+        return '<script>SquizSuiteSquizSuiteScreen.initScreen('.$data.');</script>';
 
     }//end getSquizSuiteScreenInitCode()
 

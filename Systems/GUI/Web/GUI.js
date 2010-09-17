@@ -315,7 +315,10 @@ var GUI = new function()
 
             // Template it self may have a getValue function.
             // The templateData variable is a reserved var.
-            var tplClassName = template.split(':')[1];
+            var tplSystemName   = template.split(':')[0];
+            var tplTemplateName = template.split(':')[1];
+            var tplClassName    = tplSystemName + tplTemplateName;
+            
             if (window[tplClassName] && window[tplClassName].getValue) {
                 values[template].templateData = window[tplClassName].getValue();
                 isEmpty = false;
@@ -356,7 +359,10 @@ var GUI = new function()
                     var retVal = data.result.success[templateKey];
                     // For each template that returned a success call their "saved"
                     // method to perform extra actions.
-                    var tplClassName = templateKey.split(':')[1];
+                    var tplSystemName   = templateKey.split(':')[0];
+                    var tplTemplateName = templateKey.split(':')[1];
+                    var tplClassName    = tplSystemName + tplTemplateName;
+            
                     var saveChildren = true;
                     if (window[tplClassName] && window[tplClassName].saved) {
                         saveChildren = window[tplClassName].saved(retVal);

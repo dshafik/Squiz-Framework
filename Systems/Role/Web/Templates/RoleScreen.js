@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-var RoleScreen = new function()
+var RoleRoleScreen = new function()
 {
     var _data             = null;
     var _prevSelectedRole = null;

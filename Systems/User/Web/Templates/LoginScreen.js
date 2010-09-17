@@ -1,4 +1,4 @@
-var LoginScreen = new function()
+var UserLoginScreen = new function()
 {
     this.hashEnabled = true;
 

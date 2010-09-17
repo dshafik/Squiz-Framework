@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-var CronScreen = {
+var CronCronScreen = {
     init: function()
     {
 
@@ -29,5 +29,5 @@ var CronScreen = {
 
 };
 
-CronScreen.init();
+CronCronScreen.init();
 
