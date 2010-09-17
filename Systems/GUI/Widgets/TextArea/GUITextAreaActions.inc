@@ -118,7 +118,7 @@ class GUITextAreaActions
         // The input field.
         echo '<textarea id="'.$id.'-textarea" class="'.$class.' textarea"';
         echo ' rows="'.$rowsProp.'" cols="'.$colsProp.'">';
-        echo $value.'hell world';
+        echo $value;
         echo '</textarea>';
         echo '</div>';
 
