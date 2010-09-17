@@ -1,0 +1,9 @@
+.GUICheckBox.container {
+    font-family: verdana;
+    height: 24px;
+    line-height: 24px;
+}
+
+.GUICheckBox.container.inline {
+    display: inline;
+}
