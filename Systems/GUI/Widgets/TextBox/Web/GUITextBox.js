@@ -30,6 +30,8 @@ function GUITextBox(id, settings)
 
     this.init();
 
+    GUI.addWidgetEvent(this, 'keyPress');
+
 }
 
 GUITextBox.prototype = {
@@ -47,12 +49,14 @@ GUITextBox.prototype = {
             dfx.addClass(textBox, 'selected');
         });
 
-        dfx.addEvent(textBox, 'keypress', function() {
+        dfx.addEvent(textBox, 'keypress', function(e) {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
                 GUI.setModified(self, true);
             }
+
+            self.fireKeyPressCallbacks(value, e);
         });
 
     },
