@@ -85,7 +85,7 @@ class UserActions
             $msg  = 'Failed to create a new user.'."\n";
             $msg .= $e->getMessage();
             DAL::rollback();
-            throw new ChannelException();
+            throw new ChannelException($msg);
         }//end try
 
         return $userid;
@@ -118,7 +118,7 @@ class UserActions
             $msg  = 'Failed to create a new user.'."\n";
             $msg .= $e->getMessage();
             DAL::rollback();
-            throw new ChannelException();
+            throw new ChannelException($msg);
         }
 
         return $userid;
