@@ -74,6 +74,13 @@ class GUITextBoxActions
     protected static $type = 'text';
 
     /**
+     * Checked field for 'checkbox' type.
+     *
+     * @var string
+     */
+    protected static $checked = FALSE;
+
+    /**
      * If TRUE then the input box will have the focus.
      *
      * It is possible that this input box may not have the focus if there are
@@ -131,7 +138,14 @@ class GUITextBoxActions
         $type = Util::getArrayIndex($settings, 'type', self::$type);
 
         // The input field.
-        echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength.' />';
+        echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength;
+
+        $checked = Util::getArrayIndex($settings, 'checked', self::$checked);
+        if ($checked === TRUE && $type === 'checkbox') {
+            echo ' checked';
+        }
+
+        echo ' />';
 
         echo '</div>';
 
