@@ -994,6 +994,10 @@ class GUIActions
                 $php .= self::_parseExceptionTag($node, $varName);
             break;
 
+            case 'var':
+                $php .= self::_parseVarTag($node);
+            break;
+
             case 'content':
                 // Need to wrap content.
                 $domContent  = self::$_docType;
@@ -1439,7 +1443,12 @@ class GUIActions
         $varName = '$_gui_'.$varName;
 
         $firstChild = XML::getFirstChildElement($var);
-        $php       .= self::_parseTag($firstChild, $varName);
+        if ($firstChild !== NULL) {
+            $php = self::_parseTag($firstChild, $varName);
+        } else {
+            // Just a text node.
+            return $varName." = '".str_replace("'", "\'", $var->nodeValue)."';";
+        }
 
         self::$_templateVariablesCode .= $php;
 
