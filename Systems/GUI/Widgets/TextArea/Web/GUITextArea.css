@@ -1,0 +1,20 @@
+.GUITextArea.container {
+    font-family: verdana;
+    line-height: 24px;
+}
+
+.GUITextArea.container.inline {
+    display: inline;
+}
+
+.GUITextArea.input {
+    background-color: #FFF;
+    color: #000;
+    border: 1px solid #C2C3C5;
+    opacity: 1;
+    padding: 3px 2px;
+}
+
+.GUITextArea.selected {
+    border: 1px solid #6FA8D7;
+}
