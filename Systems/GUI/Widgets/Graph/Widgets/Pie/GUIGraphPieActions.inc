@@ -170,7 +170,7 @@ class GUIGraphPieActions
         echo '<span class="GUIGraphPie-container">';
         echo '<object data="'.$url.'"';
         echo ' style="width: '.$size.'px; height: '.$size.'px;"';
-        echo ' type="image/svg+xml">'."\n";
+        echo ' type="image/svg+xml" id="'.$settings['widget']['id'].'">'."\n";
         echo '</object>'."\n";
         echo '</span>'."\n";
 
