@@ -162,7 +162,7 @@ class PatchingActions
             } else {
                 // SVN Fail, try looking up the Revision directly.
                 ob_start();
-                    system('cat '.Init::ROOT_DIR.'/.svn/entries | grep -B 1 "mysource/trunk"');
+                    system('cat '.Init::ROOT_DIR.'/.svn/entries | grep -B 1 "https://cvs.squiz.net/svn"');
                     $svnRevision = ob_get_contents();
                 ob_end_clean();
                 $svnRevision = explode("\n", $svnRevision);
