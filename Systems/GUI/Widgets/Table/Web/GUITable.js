@@ -136,8 +136,7 @@ GUITable.prototype = {
         };
 
         var self = this;
-        GUI.sendRequest('GUITable', 'generateRows', params, function(data) {
-            var rowHTML = data.result;
+        GUI.sendRequest('GUITable', 'generateRows', params, function(rowHTML) {
             var tmp     = document.createElement('div');
             dfx.setStyle(tmp, 'display', 'none');
 
@@ -177,7 +176,7 @@ GUITable.prototype = {
             if (callback) {
                 callback.call(self, rows);
             }
-        });
+        }, 'raw');
 
     },
 
