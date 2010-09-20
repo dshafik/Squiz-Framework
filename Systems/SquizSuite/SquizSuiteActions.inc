@@ -875,7 +875,7 @@ class SquizSuiteActions
                 throw new ChannelException($errMsg);
             }
 
-            if ($productInfo['status'] === 'pending') {
+            if ($productInfo['status'] === 'pending approval') {
                 SquizSuite::updateProduct($systemid, 'status', 'live');
 
                 // The final acknowlegement has been received.
