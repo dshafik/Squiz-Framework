@@ -323,16 +323,6 @@ class GUITableActions
             throw new ChannelException(_('Specified channel is invalid'));
         }
 
-        if (Channels::systemExists('Permission') === TRUE) {
-            Channels::includeSystem('Permission');
-            Permission::checkAPIPermission(
-                $channel['system'],
-                $channel['action'],
-                array(),
-                $api['options']
-            );
-        }
-
         // This is an API request therefore we need to set the current template, it
         // should be the same as the table's template.
         Channels::includeSystem('GUI');
@@ -344,7 +334,7 @@ class GUITableActions
 
         $rows = array();
         foreach ($rowsData as $rowid => $columns) {
-            $rows[$rowid] = call_user_func(array_values($channel), $rowsData[$rowid]);
+            $rows[$rowid] = API::executeRequest($channel['system'], $channel['action'], array($rowsData[$rowid]), $api['options']);
         }
 
         GUITable::paintRows($rows, $columnNames, $settings);

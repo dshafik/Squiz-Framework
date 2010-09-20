@@ -13,10 +13,10 @@
                         <setting name="dynamicLoading">true</setting>
                         <setting name="dynamicDataProvider">
                             <system>GUIAssetPicker</system>
-                            <method>getAssets</method>
+                            <method>getChildren</method>
                         </setting>
                         <setting name="items">
-                            <dataProvider action="GUIAssetPicker::getAssets"></dataProvider>
+                            <dataProvider action="GUIAssetPicker::getChildren"></dataProvider>
                         </setting>
                     </widget>
                 </content>

@@ -238,8 +238,9 @@ class GUIColumnBrowserActions
      * @return string
      *
      * @api read
+     * @api-permission public
      */
-    public static function getChildredContents(array $settings, $parentid)
+    public static function getChildrenContents(array $settings, $parentid)
     {
         $actionInfo = Util::getArrayIndex($settings, 'dynamicDataProvider', NULL);
         if ($actionInfo === NULL) {
@@ -253,8 +254,18 @@ class GUIColumnBrowserActions
             return NULL;
         }
 
-        Channels::includeSystem($system);
-        $items = call_user_func(array($system, $method), $parentid);
+        // Check if channel is callable.
+        Channels::includeSystem('API');
+        $api = API::getAPI($system, $method);
+        if ($api === FALSE) {
+            throw new ChannelException(_('Specified channel is invalid'));
+        }
+
+        $items = API::executeRequest($system, $method, array($parentid), $api['options']);
+
+        if (empty($items) === TRUE) {
+            return '&nbsp;';
+        }
 
         ob_start();
             foreach ($items as $item) {
@@ -266,7 +277,7 @@ class GUIColumnBrowserActions
 
         return $contents;
 
-    }//end getChildredContents()
+    }//end getChildrenContents()
 
 
 }//end class

@@ -205,12 +205,7 @@ GUIColumnBrowser.prototype = {
         dfx.insertAfter(parentColumnElement, this._loaderElem);
 
         var self = this;
-        GUI.sendRequest('GUIColumnBrowser', 'getChildredContents', params, function(data) {
-            if (!data.result) {
-                GUI.message('developer', 'Failed to get children', 'error');
-                return;
-            }
-
+        GUI.sendRequest('GUIColumnBrowser', 'getChildrenContents', params, function(contents) {
             var childLevel  = (parentLevel + 1);
             var lookupClass = 'GUIColumnBrowser-column level-' + childLevel;
 
@@ -229,13 +224,13 @@ GUIColumnBrowser.prototype = {
             dfx.attr(card, 'parentid', parentid);
             childColumnElement.appendChild(card);
 
-            dfx.setHtml(card, data.result);
+            dfx.setHtml(card, contents);
 
             dfx.remove(self._loaderElem);
 
             // Now call showChildren again to apply classes.
             self.showChildren(parentElement);
-        });
+        }, 'raw');
 
     },
 

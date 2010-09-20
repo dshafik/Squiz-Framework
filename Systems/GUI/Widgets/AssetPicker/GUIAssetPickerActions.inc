@@ -72,13 +72,23 @@ class GUIAssetPickerActions
      * @param string $rootNode The parent assetid.
      *
      * @return array
+     *
+     * @api            read
+     * @api-permission public
      */
-    public static function getAssets($rootNode=NULL)
+    public static function getChildren($rootNode=NULL)
     {
         include_once 'Libs/Security/Security.inc';
         $jsSettings = Security::getRequestData('templateOptions', NULL, TRUE);
         if ($jsSettings !== NULL) {
             $rootNode = Util::getArrayIndex($jsSettings, 'rootNode', $rootNode);
+        }
+
+        // Check read permission here incase the function is called by another system
+        // (e.g. by a dataProvider).
+        Channels::includeSystem('Permission');
+        if (Permission::hasPermission($rootNode, 'asset.read.content') === FALSE) {
+            return array();
         }
 
         Channels::includeSystem('Linking');
@@ -104,7 +114,7 @@ class GUIAssetPickerActions
 
         return $data;
 
-    }//end getAssets()
+    }//end getChildren()
 
 
 }//end class
