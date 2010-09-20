@@ -1203,7 +1203,7 @@ class HelpActions
 
 
     /**
-     * Adds links to articles that refer to glossary terms.
+     * Adds links to articles that refer to glossary terms (related articles).
      *
      * @see    self::$_glossaryUsage
      * @return void
@@ -1232,6 +1232,7 @@ class HelpActions
             $ulTag->setAttribute('id', 'Help-articleList');
             $container->appendChild($ulTag);
 
+            $references = array_unique($references);
             foreach ($references as $ref) {
                 $liTag = $doc->createElement('li');
                 $aTag  = $doc->createElement('a');
