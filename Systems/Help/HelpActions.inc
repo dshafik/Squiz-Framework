@@ -241,8 +241,7 @@ class HelpActions
      */
     public static function searchDocs($searchString, $startOffset=0)
     {
-        $maxResults = 10;
-        $docsDir    = Help::getDocsDirectory();
+        $docsDir = Help::getDocsDirectory();
 
         $wordList          = explode(' ', $searchString);
         $originalWordsList = array();
@@ -256,6 +255,8 @@ class HelpActions
                 $wordList[$index]    = substr($word, 0, -1);
             } else if ($len < 3) {
                 unset($wordList[$index]);
+            } else {
+                $originalWordsList[] = $word;
             }
         }
 
@@ -304,9 +305,7 @@ class HelpActions
 
         arsort($rawSearchResults);
 
-        $rawSearchResults = array_slice($rawSearchResults, $startOffset, $maxResults, TRUE);
-
-        $contents = self::_getSearchResultsPage($originalWordsList, $rawSearchResults);
+        $contents = self::_getSearchResultsPage($searchString, $originalWordsList, $rawSearchResults, $startOffset);
         return $contents;
 
     }//end searchDocs()
@@ -315,25 +314,42 @@ class HelpActions
     /**
      * Prints the search results page using the given results list.
      *
-     * @param array $words   List of searched words.
-     * @param array $results List of search results.
+     * @param string  $searchString String to search for (space separated).
+     * @param array   $words        List of searched words.
+     * @param array   $results      List of search results.
+     * @param integer $startOffset  The search result offset.
      *
      * @return string
      */
-    private static function _getSearchResultsPage(array $words, array $results=array())
+    private static function _getSearchResultsPage($searchString, array $words, array $results=array(), $startOffset=0)
     {
+        $startOffset    = (int) $startOffset;
+        $maxResults     = 10;
+        $totalResults   = count($results);
+        $results        = array_slice($results, $startOffset, $maxResults, TRUE);
+        $hasMoreResults = FALSE;
+
+        if (($totalResults - ($startOffset + $maxResults)) > 0) {
+            $hasMoreResults = TRUE;
+        }
+
         // For each result file open it and retrieve the article details.
         $dom     = new DomDocument();
         $docsDir = Help::getDocsDirectory();
 
         Channels::includeSystem('GUI');
-        $cssHref   = self::_getPageCSSPath();
-        $contents  = GUI::getDocType();
-        $contents .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
-        $contents .= '</head><body class="Help-iframe searchResultsPage">';
+        $cssHref = self::_getPageCSSPath();
+
+        if ($startOffset === 0) {
+            $contents  = GUI::getDocType();
+            $contents .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
+            $contents .= '</head><body class="Help-iframe searchResultsPage">';
+        }
 
         if (empty($results) === TRUE) {
-            $contents .= '<h2>'._('No search results').'</h2>';
+            if ($startOffset === 0) {
+                $contents .= '<h2>'._('No search results').'</h2>';
+            }
         } else {
             // Options for the 2nd argument of Help.loadPage function.
             $opts = urlencode(json_encode(array('searchedWords' => $words)));
@@ -360,8 +376,18 @@ class HelpActions
             }
         }//end if
 
-        $contents .= '</div>';
-        $contents .= '</body></html>';
+        if ($startOffset === 0) {
+            $contents .= '</div>';
+        }
+
+        if ($hasMoreResults === TRUE) {
+            $href      = 'javascript:parent.window.Help.getSearchResults(\''.$searchString.'\', '.($startOffset + $maxResults).');';
+            $contents .= '<p class="Help-searchResults-moreLink"><a href="'.$href.'">'._('Show more results').'</a></p>';
+        }
+
+        if ($startOffset === 0) {
+            $contents .= '</body></html>';
+        }
 
         return $contents;
 

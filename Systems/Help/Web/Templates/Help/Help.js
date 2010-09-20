@@ -160,6 +160,27 @@ var Help = new function()
         dfx.attr(helpIframe, 'src', _searchURL + 'searchString=' + escape(value));
     };
 
+    this.getSearchResults = function(searchString, startOffset) {
+        var params = {
+            searchString: searchString,
+            startOffset: startOffset
+        };
+
+        GUI.sendRequest('Help', 'searchDocs', params, function(content) {
+            // Append the content to the end of the current search results page.
+            var wrapper = document.createElement('div');
+            dfx.setHtml(wrapper, content);
+
+            var iframeDoc       = dfx.getIframeDocument(_iframe);
+            var currentMoreLink = dfx.getClass('Help-searchResults-moreLink', iframeDoc);
+
+            dfx.insertAfter(currentMoreLink, wrapper);
+
+            // Remove the old 'More' link.
+            dfx.remove(currentMoreLink);
+        }, 'raw');
+    };
+
     this.back = function() {
         history.back(1);
     };
