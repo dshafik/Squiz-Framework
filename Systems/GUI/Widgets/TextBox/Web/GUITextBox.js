@@ -57,9 +57,8 @@ GUITextBox.prototype = {
             dfx.addClass(textBox, 'selected');
         });
 
-
         var value = textBox.value;
-        dfx.addEvent(textBox, 'Keypress', function(e) {
+        dfx.addEvent(textBox, 'keypress', function(e) {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
@@ -69,7 +68,7 @@ GUITextBox.prototype = {
             self.fireKeyPressCallbacks(value, e);
         });
 
-        dfx.addEvent(textBox, 'KeyUp', function(e) {
+        dfx.addEvent(textBox, 'keyup', function(e) {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
@@ -78,6 +77,7 @@ GUITextBox.prototype = {
 
             self.fireKeyUpCallbacks(value, e);
         });
+
     },
 
     getValue: function()
