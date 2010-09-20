@@ -847,7 +847,7 @@ class SquizSuiteActions
      * @throws ChannelException Error occurred.
      *
      * @api            read
-     * @api-permission superuser
+     * @api-permission public
      */
     public static function suiteConnectAckAck()
     {
@@ -875,25 +875,27 @@ class SquizSuiteActions
                 throw new ChannelException($errMsg);
             }
 
-            SquizSuite::updateProduct($systemid, 'status', 'live');
+            if ($productInfo['status'] === 'pending') {
+                SquizSuite::updateProduct($systemid, 'status', 'live');
 
-            // The final acknowlegement has been received.
-            // Send the list of my connected products for syncing.
-            $allProducts = SquizSuite::getAllProducts();
-            foreach ($allProducts as $product) {
-                if ($product['current'] === TRUE
-                    || $product['systemid'] === $systemid
-                    || $product['status'] !== 'live'
-                ) {
-                    continue;
+                // The final acknowlegement has been received.
+                // Send the list of my connected products for syncing.
+                $allProducts = SquizSuite::getAllProducts();
+                foreach ($allProducts as $product) {
+                    if ($product['current'] === TRUE
+                        || $product['systemid'] === $systemid
+                        || $product['status'] !== 'live'
+                    ) {
+                        continue;
+                    }
+
+                    $options  = array('sync_direction' => 'one');
+                    $response = SquizSuite::sendMessage(
+                        $product['systemid'],
+                        'suiteProductSync',
+                        $options
+                    );
                 }
-
-                $options  = array('sync_direction' => 'one');
-                $response = SquizSuite::sendMessage(
-                    $product['systemid'],
-                    'suiteProductSync',
-                    $options
-                );
             }
 
             $response = 'ok';
@@ -1807,7 +1809,7 @@ class SquizSuiteActions
         switch ($type) {
             // Get the live product summary.
             case 'getProductSummary':
-                $retVal = self::_savaGetProductSummary($data);
+                $retVal = self::_saveGetProductSummary($data);
                 if (is_string($retVal) === TRUE) {
                     $retVal = array('errors' => $retVal);
                 }
@@ -1938,7 +1940,7 @@ class SquizSuiteActions
      * @since  4.0.0
      * @return mixed
      */
-    private static function _savaGetProductSummary(array $data)
+    private static function _saveGetProductSummary(array $data)
     {
         include_once 'Libs/Util/Util.inc';
         $retVal   = TRUE;
@@ -1953,15 +1955,12 @@ class SquizSuiteActions
             $url = $product['connection']['url'];
             $msg = array(
                     '_enc'            => array(
-                                          '_system'   => 'SquizSuite',
-                                          '_action'   => 'getProductSummary',
-                                          '_format'   => 'json',
                                           '_systemid' => $currProduct['systemid'],
                                          ),
                     '_pubKeySystemid' => $systemid,
                    );
 
-            $response = API::sendCURLAPIRequest($product['connection']['url'], $msg);
+            $response = API::sendCURLAPIRequest($product['connection']['url'], 'json', 'SquizSuite', 'getProductSummary', $msg);
             if ($response['curlInfo']['http_code'] === 200) {
                 $response = json_decode($response['result'], TRUE);
                 $retVal   = $response['result'];
@@ -1972,7 +1971,7 @@ class SquizSuiteActions
 
         return $retVal;
 
-    }//end _savaGetProductSummary()
+    }//end _saveGetProductSummary()
 
 
     /**
