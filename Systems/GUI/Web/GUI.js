@@ -135,16 +135,16 @@ var GUI = new function()
     this.unloadTemplate = function(parent) {
         var self = this;
         var ln   = this.templateLineage.length;
-        if (this.templateLineage.inArray(parent) === true) {            
+        if (this.templateLineage.inArray(parent) === true) {
             for (var i = (ln - 1); i >= 0; i--) {
                 var p = this.templateLineage[i];
                 dfx.foreach(this.widgetTemplates[p], function(idx) {
                     self.removeWidget(idx);
                 });
-    
+
                 delete self.widgetTemplates[p];
                 this.templateLineage.pop();
-    
+
                 if (p === parent) {
                     break;
                 }
@@ -227,6 +227,11 @@ var GUI = new function()
      *
      * Result from the called method must have result.contents and result.widgets.
      * All widgets that are contained in the content will be initialised.
+     *
+     * @param {string}     system        Name of the system that has the action.
+     * @param {string}     method        Name of the API method.
+     * @param {DOMElement} targetElement The DOMElement that will wrap the content.
+     * @param {object}     params        Parameters for the API method.
      */
     this.loadContent = function(system, method, targetElement, params) {
         if (dfx.isObj(targetElement) === false) {
@@ -269,15 +274,15 @@ var GUI = new function()
         if (options && options.modal === true) {
             GUI.showOverlay();
         }
-        
+
         if ((options) && (options.targetElement)) {
             var targetElement = options.targetElement;
         } else {
             var targetElement = document.body;
         }
 
-        GUI.sendRequest('GUI', 'printTemplate', params, function(data) {
-            if (!data.result) {
+        GUI.sendRequest('GUI', 'printTemplate', params, function(content) {
+            if (!content) {
                 GUI.message('developer', 'Failed to load template content', 'error');
                 return;
             }
@@ -288,12 +293,16 @@ var GUI = new function()
             // Hide the element and add it to body so that events and DOM operations
             // can work.
             targetElement.appendChild(main);
-            dfx.setHtml(main, data.result);
+            dfx.setHtml(main, content);
 
             if (callback) {
                 callback.call(this, main);
             }
-        });
+        }, 'raw');
+    };
+
+    this.reloadTemplate = function(template) {
+        this.fireReloadTemplateCallbacks(template);
     };
 
     this.save = function() {
@@ -318,7 +327,7 @@ var GUI = new function()
             var tplSystemName   = template.split(':')[0];
             var tplTemplateName = template.split(':')[1];
             var tplClassName    = tplSystemName + tplTemplateName;
-            
+
             if (window[tplClassName] && window[tplClassName].getValue) {
                 values[template].templateData = window[tplClassName].getValue();
                 isEmpty = false;
@@ -362,7 +371,7 @@ var GUI = new function()
                     var tplSystemName   = templateKey.split(':')[0];
                     var tplTemplateName = templateKey.split(':')[1];
                     var tplClassName    = tplSystemName + tplTemplateName;
-            
+
                     var saveChildren = true;
                     if (window[tplClassName] && window[tplClassName].saved) {
                         saveChildren = window[tplClassName].saved(retVal);
@@ -516,5 +525,6 @@ var GUI = new function()
     };
 
     this.addWidgetEvent(this, 'modified');
+    this.addWidgetEvent(this, 'reloadTemplate');
 
 };

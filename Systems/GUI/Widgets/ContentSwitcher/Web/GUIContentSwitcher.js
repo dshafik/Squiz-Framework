@@ -30,9 +30,9 @@ function GUIContentSwitcher(id, settings)
     this.loadedWidgets = [];
 
     this.current = null;
+    var self     = this;
 
     if (settings.initialItem) {
-        var self = this;
 
         dfx.foreach(settings._items, function(idx) {
             var item = settings._items[idx];
@@ -47,6 +47,17 @@ function GUIContentSwitcher(id, settings)
     }
 
     GUI.addWidgetEvent(this, 'itemChanged');
+
+    GUI.addReloadTemplateCallback(function(template) {
+        if (!self.current) {
+            return;
+        }
+
+        var currentTemplate = self.current.system + ':' + self.current.modeid;
+        if (currentTemplate === template) {
+            self.reload();
+        }
+    });
 
     this.init();
 
@@ -162,6 +173,12 @@ GUIContentSwitcher.prototype = {
             system: system,
             modeid: modeid
         };
+
+    },
+
+    reload: function()
+    {
+        this.loadMode(this.current.system, this.current.modeid);
 
     }
 
