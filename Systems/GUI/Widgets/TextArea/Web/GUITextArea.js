@@ -21,12 +21,22 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
+/**
+ * Construct GUITextArea JS object.
+ *
+ * @param {String} id ID of the widget.
+ * @param {Object} settings Settings for the widget.
+ * @return {Void}
+ */
 function GUITextArea(id, settings)
 {
     this.id           = id;
     this.settings     = settings;
     var widgetElement = dfx.getId(self.id);
     this.textArea     = dfx.getClass('textarea', widgetElement)[0];
+
+    // Add itemSelected widget event.
+    GUI.addWidgetEvent(this, 'keyUp');
 
     this.init();
 
@@ -47,12 +57,16 @@ GUITextArea.prototype = {
             dfx.addClass(textArea, 'selected');
         });
 
-        dfx.addEvent(textArea, 'keypress', function() {
+        var value = textArea.value;
+        dfx.addEvent(textArea, 'keyup', function(e) {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
                 GUI.setModified(self, true);
             }
+
+            // Fire textChanged widget event when a new value is selected.
+            self.fireKeyUpCallbacks(value, e);
         });
 
     },

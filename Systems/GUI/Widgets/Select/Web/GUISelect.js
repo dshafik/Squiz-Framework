@@ -21,6 +21,13 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
+/**
+ * Construct GUISelect JS object.
+ *
+ * @param {String} id ID of the widget.
+ * @param {Object} settings Settings for the widget.
+ * @return {Void}
+ */
 function GUISelect(id, settings)
 {
     this.id       = id;
@@ -28,34 +35,44 @@ function GUISelect(id, settings)
 
     this.currentValue = [];
 
+    // Add itemSelected widget event.
+    GUI.addWidgetEvent(this, 'change');
+
     this.init();
+
 }
 
 GUISelect.prototype = {
     init: function()
     {
-        var self = this;
+        var self      = this;
         var selectBox = dfx.getId(this.id);
 
         selectBox.getSelectedItems = function() {
             var selected = [];
 
-            for (var i = 0; i < this.options.length; i++) {
+            var len = this.options.length;
+            for (var i = 0; i < len; i++) {
                 var option = this.options[i];
 
                 if (option.selected === true) {
                     selected.push(option.value);
                 }
             }
+
             return selected;
         }
 
         self.currentValue = selectBox.getSelectedItems();
 
-        dfx.addEvent(selectBox, 'change', function() {
+        dfx.addEvent(selectBox, 'change', function(e) {
             var newValue = this.getSelectedItems();
             self.setValue(newValue);
+
+            // Fire itemSelected widget event when a new value is selected.
+            self.fireChangeCallbacks(newValue, e);
         });
+
     },
 
     getValue: function()
@@ -72,6 +89,7 @@ GUISelect.prototype = {
             self.currentValue = newValue;
             GUI.setModified(self, true);
         }
+
     }
 
 };

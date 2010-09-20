@@ -21,6 +21,13 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
+/**
+ * Construct GUITextBox JS object.
+ *
+ * @param {String} id ID of the widget.
+ * @param {Object} settings Settings for the widget.
+ * @return {Void}
+ */
 function GUITextBox(id, settings)
 {
     this.id           = id;
@@ -31,6 +38,7 @@ function GUITextBox(id, settings)
     this.init();
 
     GUI.addWidgetEvent(this, 'keyPress');
+    GUI.addWidgetEvent(this, 'keyUp');
 
 }
 
@@ -49,7 +57,9 @@ GUITextBox.prototype = {
             dfx.addClass(textBox, 'selected');
         });
 
-        dfx.addEvent(textBox, 'keypress', function(e) {
+
+        var value = textBox.value;
+        dfx.addEvent(textBox, 'Keypress', function(e) {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
@@ -59,6 +69,15 @@ GUITextBox.prototype = {
             self.fireKeyPressCallbacks(value, e);
         });
 
+        dfx.addEvent(textBox, 'KeyUp', function(e) {
+            if (value !== this.value) {
+                // If the value of the box has changed, set it modified.
+                value = this.value;
+                GUI.setModified(self, true);
+            }
+
+            self.fireKeyUpCallbacks(value, e);
+        });
     },
 
     getValue: function()

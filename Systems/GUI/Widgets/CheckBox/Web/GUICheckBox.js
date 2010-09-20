@@ -21,12 +21,22 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
+/**
+ * Construct GUICheckBox JS object.
+ *
+ * @param {String} id ID of the widget.
+ * @param {Object} settings Settings for the widget.
+ * @return {Void}
+ */
 function GUICheckBox(id, settings)
 {
     this.id           = id;
     this.settings     = settings;
     var widgetElement = dfx.getId(self.id);
     this.textBox      = dfx.getClass('checkbox', widgetElement)[0];
+
+    // Add itemSelected widget event.
+    GUI.addWidgetEvent(this, 'click');
 
     this.init();
 
@@ -38,6 +48,10 @@ GUICheckBox.prototype = {
         var self          = this;
         var widgetElement = dfx.getId(self.id);
         var checkbox      = dfx.getClass('checkbox', widgetElement)[0];
+
+        dfx.addEvent(checkbox, 'click', function(e) {
+            self.fireClickCallbacks(this.checked, e);
+        });
 
     },
 
