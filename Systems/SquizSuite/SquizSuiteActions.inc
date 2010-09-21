@@ -436,11 +436,7 @@ class SquizSuiteActions
             $msg['xml']         = $xml;
             $msg['con_request'] = 1;
         } else {
-            $currProduct            = SquizSuite::getCurrentProduct();
-            $msg['_enc']            = array(
-                                       'xml'       => $xml,
-                                       '_systemid' => $currProduct['systemid'],
-                                      );
+            $msg['_enc']            = array('xml' => $xml);
             $msg['_pubKeySystemid'] = $targetid;
         }
 
@@ -526,6 +522,14 @@ class SquizSuiteActions
             $apiURL .= '/'.$format;
             $apiURL .= '/'.$system;
             $apiURL .= '/'.$action;
+            if (isset($message['_enc']) === FALSE) {
+                $message['_enc'] = array();
+                $message['_pubKeySystemid'] = $targetid;
+            }
+
+            if (isset($message['_enc']['_systemid']) === FALSE) {
+                $message['_enc']['_systemid'] = $currProductInfo['systemid']; 
+            }
         }//end if
 
         // Perform the request.
