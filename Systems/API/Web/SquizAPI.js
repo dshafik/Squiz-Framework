@@ -62,13 +62,14 @@ sfapi._api_token = null;
  * @param {String} Name of System to make action call.
  * @param {String} Name of Channel action to call.
  * @param {Object} Parameters to pass via GET reuqest.
+ * @param {Function} callback Optional callback function.
+ * @param {String} format The response format.
  */
-sfapi.get = function(system, action, params, callback, format) {
-    format = format || 'json';
-
+sfapi.get = function(system, action, params, callback, format)
+{
     // Create script tag if it hasn't been created.
     var scriptTag = document.getElementById(sfapi.scriptTagid);
-    var head = document.getElementsByTagName("head").item(0);
+    var head      = document.getElementsByTagName("head").item(0);
 
     // TODO: Do we need to ever need to repeat an API call?
     // If we do, then there is a problem if the same script tag is used - a lack of
@@ -83,8 +84,7 @@ sfapi.get = function(system, action, params, callback, format) {
     head.appendChild(scriptTag);
 
     // Form URL to send the request.
-    var src = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix + '/' + format;
-    src    += '/' + system + '/' + action;
+    var src = sfapi.createURL(system, action, format);
     src    += '?_callback=sfapi._getCallback';
 
     var token = document.getElementById('__api_token');
@@ -115,11 +115,9 @@ sfapi.get = function(system, action, params, callback, format) {
 
 };
 
-sfapi.post = function(system, action, params, successCallback, errorCallback, format) {
-    format = format || 'json';
-
-    var url = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix;
-    url    += '/' + format + '/' + system + '/' + action;
+sfapi.post = function(system, action, params, successCallback, errorCallback, format)
+{
+    var url = sfapi.createURL(system, action, format);
 
     var token = document.getElementById('__api_token');
     if (token) {
@@ -141,4 +139,16 @@ sfapi.post = function(system, action, params, successCallback, errorCallback, fo
             successCallback.call(null, data);
         }
     }, errorCallback);
+
+};
+
+sfapi.createURL = function(system, action, format)
+{
+    format = format || 'json';
+
+    var url = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix;
+    url    += '/' + format + '/' + system + '/' + action;
+
+    return url;
+
 };
