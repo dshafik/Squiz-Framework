@@ -1,0 +1,25 @@
+form.GUIFileUpload-upload-form.hidden {
+    display: none;
+}
+
+.GUIFileUpload-complete-wrap {
+    height: 22px;
+    line-height: 22px;
+}
+
+.GUIFileUpload-complete-wrap.hidden {
+    display: none;
+}
+
+.GUIFileUpload-complete-filename {
+    font-weight: bold;
+}
+
+.GUIFileUpload-progress-wrap {
+    height: 22px;
+    line-height: 22px;
+}
+
+.GUIFileUpload-progress-wrap.hidden {
+    display: none;
+}
