@@ -70,22 +70,14 @@ class APIActions
      * It sends API request via POST to the destined system.
      *
      * @param string $url       URL of the system to send the request.
-     * @param string $format    The format to get the response in.
-     * @param string $system    The system the action is in.
-     * @param string $action    The action to call.
      * @param array  $msg       Array of messages to send.
      * @param string $userAgent Optional User Agent string to send.
      *
      * @return array
      * @throws ChannelException Error occurred.
      */
-    public static function sendCURLAPIRequest($url, $format, $system, $action, array $msg, $userAgent='')
+    public static function sendCURLAPIRequest($url, array $msg, $userAgent='')
     {
-        $url  = rtrim($url, '/');
-        $url .= '/'.$format;
-        $url .= '/'.$system;
-        $url .= '/'.$action;
-
         $ch  = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, TRUE);
