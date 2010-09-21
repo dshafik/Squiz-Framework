@@ -507,11 +507,7 @@ class SquizSuiteActions
                         $message['_enc']['matrix']['username'] = $productInfo['connection']['username'];
                     }
 
-                    if (isset($productInfo['connection']['password']) === TRUE) {
-                        if (isset($message['_enc']['matrix']) === FALSE) {
-                            $message['_enc']['matrix'] = array();
-                        }
-
+                if (isset($productInfo['connection']['password']) === TRUE) {
                         $message['_enc']['matrix']['password'] = $productInfo['connection']['password'];
                     }
                 }//end if
