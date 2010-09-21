@@ -469,7 +469,10 @@ var Help = new function()
             var elemid   = dfx.attr(pointerIconElem, 'elemid');
             var refElems = [];
             if (elemid) {
-                refElems.push(dfx.getId(elemid));
+                var elem = dfx.getId(elemid);
+                if (elem) {
+                    refElems.push(elem);
+                }
             } else {
                 var elemClass = dfx.attr(pointerIconElem, 'elemClass');
                 if (!elemClass) {
@@ -479,9 +482,9 @@ var Help = new function()
                 refElems = dfx.getClass(elemClass);
             }
 
-            if (refElems.length === 0) {
+            if (refElems.length > 0) {
                 // Element is not on the screen hide the link pointer icon.
-                dfx.setStyle(pointerIconElem, 'display', 'none');
+                dfx.setStyle(pointerIconElem, 'display', 'inline');
             }
         }
 

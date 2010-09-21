@@ -156,11 +156,45 @@ a.Help-control-button.general:active {
     padding: 0px;
 }
 
+.Help-iframe pre {
+    border: 1px solid #CCC;
+    background-color: #EEE;
+    padding: 10px;
+    overflow: auto;
+}
+
+.Help-iframe table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.Help-iframe th, .Help-iframe td {
+    text-align: left;
+    font-size: 12px;
+}
+
+.Help-iframe th {
+    background-color: #EEE;
+    font-size: 11px;
+    color: #333;
+    padding: 6px;
+    border-top: 1px solid #EEE;
+    border-left: 1px solid #EEE;
+    border-right: 1px solid #FFF;
+}
+
+.Help-iframe td {
+    vertical-align: top;
+    padding: 6px;
+    border: 1px solid #EEE;
+}
+
 .Help-iframe .Help-locator-img {
     border: none;
     cursor: pointer;
     vertical-align: middle;
     padding-left: 2px;
+    display: none;
 }
 
 /* Help Search results */

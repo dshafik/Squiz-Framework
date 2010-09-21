@@ -243,10 +243,11 @@ class HelpActions
     {
         $docsDir = Help::getDocsDirectory();
 
-        $wordList          = explode(' ', $searchString);
+        $wordList          = array_unique(explode(' ', $searchString));
         $originalWordsList = array();
         foreach ($wordList as $index => $word) {
-            $len = strlen($word);
+            $word = preg_replace('/[^a-z0-9_-]/i', '', $word);
+            $len  = strlen($word);
             if ($len > 3) {
                 // Only keep words that has more than 3 characters and remove the
                 // last character from the word. This is a simple way to match plurals
@@ -261,7 +262,7 @@ class HelpActions
         }
 
         if (empty($wordList) === TRUE) {
-            return self::_getSearchResultsPage($wordList);
+            return self::_getSearchResultsPage($wordList, $originalWordsList);
         }
 
         $words = implode('|', $wordList);
@@ -300,7 +301,7 @@ class HelpActions
         }
 
         if (empty($rawSearchResults) === TRUE) {
-            return self::_getSearchResultsPage($wordList);
+            return self::_getSearchResultsPage($wordList, $originalWordsList);
         }
 
         arsort($rawSearchResults);
@@ -624,8 +625,9 @@ class HelpActions
         $html    = '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" /></head>';
         $html   .= '<body class="Help-iframe articlePage">';
         $html   .= self::_getSetCurrentSystemScript($idParts[1]);
+        $html   .= '<div id="help-article-wrapper">';
         $html   .= $fileContents;
-        $html   .= '</body></html>';
+        $html   .= '</div></body></html>';
 
         $doc = new DomDocument();
         @$doc->loadHTML($html);
@@ -636,7 +638,13 @@ class HelpActions
             throw new ChannelException(sprintf(_('Article does not have a title (h1 tag): %s.'), $articleFile));
         }
 
-        $title     = $titleTags->item(0)->nodeValue;
+        $titleTag = $titleTags->item(0);
+
+        // Move the title tag outside of the help-article-wrapper (for importing).
+        $wrapperElement = $doc->getElementsByTagName('div')->item(0);
+        $wrapperElement->parentNode->insertBefore($titleTag, $wrapperElement);
+
+        $title     = $titleTag->nodeValue;
         $articleid = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '_', str_replace('.html', '', basename($articleFile))));
 
         // Get the info tag.
@@ -887,6 +895,10 @@ class HelpActions
         @$doc->loadHTMLFile($file);
         $xpath       = new DOMXPath($doc);
         $articleNode = $xpath->query('//div[@id="help-article-wrapper"]')->item(0);
+        if ($articleNode === NULL) {
+            $msg = sprintf(_('Could not find the "help-article-wrapper" element in article file (%s)'), $file);
+            throw new ChannelException($msg);
+        }
 
         $importedNode = $tag->ownerDocument->importNode($articleNode, TRUE);
         while ($importedNode->firstChild) {
@@ -1014,7 +1026,7 @@ class HelpActions
         $words = explode(' ', $content);
         foreach ($words as $word) {
             $span = $doc->createElement('span');
-            $span->nodeValue = $word;
+            $span->nodeValue = $word.' ';
             $aTag->appendChild($span);
         }
 
