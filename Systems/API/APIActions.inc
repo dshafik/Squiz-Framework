@@ -514,7 +514,7 @@ class APIActions
             }
 
             $fieldElem = $dom->createElement($field);
-            self::_addTextToNode($fieldElem, $value);
+            API::buildResponseXMLDom($fieldElem, $value);
             $rspElem->appendChild($fieldElem);
         }
 
