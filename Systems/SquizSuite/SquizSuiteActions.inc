@@ -436,7 +436,11 @@ class SquizSuiteActions
             $msg['xml']         = $xml;
             $msg['con_request'] = 1;
         } else {
-            $msg['_enc']            = array('xml' => $xml);
+            $currProduct            = SquizSuite::getCurrentProduct();
+            $msg['_enc']            = array(
+                                       'xml'       => $xml,
+                                       '_systemid' => $currProduct['systemid'],
+                                      );
             $msg['_pubKeySystemid'] = $targetid;
         }
 
@@ -488,15 +492,33 @@ class SquizSuiteActions
             $message['_format'] = $format;
             $message['_system'] = $system;
             $message['_action'] = $action;
-            if (is_array($message['_enc']) === TRUE) {
-                $message['_enc']['matrix'] = array();
-                if (isset($productInfo['connection']['username']) === TRUE) {
-                        $message['_enc']['matrix']['username'] = $productInfo['connection']['username'];
-                }
+            if ($system !== 'SquizSuite' && $action !== 'suiteConnect') {
+                // Only set the username/password if the _enc array isset.
+                if (isset($message['_enc']) === FALSE || is_array($message['_enc']) === TRUE) {
+                    if (isset($message['_pubKeySystemid']) === FALSE) {
+                        $message['_pubKeySystemid'] = $targetid;
+                    }
 
-                if (isset($productInfo['connection']['upassword']) === TRUE) {
+                    if (isset($message['_enc']['_systemid']) === FALSE) {
+                        $message['_enc']['_systemid'] = $currProductInfo['systemid'];
+                    }
+
+                    if (isset($productInfo['connection']['username']) === TRUE) {
+                        if (isset($message['_enc']['matrix']) === FALSE) {
+                            $message['_enc']['matrix'] = array();
+                        }
+
+                        $message['_enc']['matrix']['username'] = $productInfo['connection']['username'];
+                    }
+
+                    if (isset($productInfo['connection']['password']) === TRUE) {
+                        if (isset($message['_enc']['matrix']) === FALSE) {
+                            $message['_enc']['matrix'] = array();
+                        }
+
                         $message['_enc']['matrix']['password'] = $productInfo['connection']['password'];
-                }
+                    }
+                }//end if
             }//end if
         } else {
             // Everybody else.
