@@ -507,7 +507,7 @@ class SquizSuiteActions
                         $message['_enc']['matrix']['username'] = $productInfo['connection']['username'];
                     }
 
-                if (isset($productInfo['connection']['password']) === TRUE) {
+                    if (isset($productInfo['connection']['password']) === TRUE) {
                         $message['_enc']['matrix']['password'] = $productInfo['connection']['password'];
                     }
                 }//end if
@@ -518,14 +518,18 @@ class SquizSuiteActions
             $apiURL .= '/'.$format;
             $apiURL .= '/'.$system;
             $apiURL .= '/'.$action;
-            if (isset($message['_enc']) === FALSE) {
-                $message['_enc'] = array();
-                $message['_pubKeySystemid'] = $targetid;
-            }
+            if ($system === 'SquizSuite' && strpos($action, 'suiteConnect') !== 0) {
+                // Set the encryption for all requests except suiteConnect*,
+                // so the target system treats this request as a superuser.
+                if (isset($message['_enc']) === FALSE) {
+                    $message['_enc'] = array();
+                    $message['_pubKeySystemid'] = $targetid;
+                }
 
-            if (isset($message['_enc']['_systemid']) === FALSE) {
-                $message['_enc']['_systemid'] = $currProductInfo['systemid']; 
-            }
+                if (isset($message['_enc']['_systemid']) === FALSE) {
+                    $message['_enc']['_systemid'] = $currProductInfo['systemid'];
+                }
+            }//end if
         }//end if
 
         // Perform the request.
