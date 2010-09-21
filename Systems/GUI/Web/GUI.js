@@ -25,12 +25,13 @@
 
 var GUI = new function()
 {
-    this.widgetStore     = {};
-    var _publicDirName   = 'Web';
-    var _modifiedWidgets = {};
-    var _reverting       = false;
-    this.widgetTemplates = {};
-    this.templateLineage = [];
+    this.widgetStore       = {};
+    var _publicDirName     = 'Web';
+    var _modifiedWidgets   = {};
+    var _modifiedTemplates = {};
+    var _reverting         = false;
+    this.widgetTemplates   = {};
+    this.templateLineage   = [];
 
     this.getWidget = function(id) {
         return this.widgetStore[id];
@@ -414,8 +415,9 @@ var GUI = new function()
             }
         });
 
-        _modifiedWidgets = {};
-        _reverting       = false;
+        _modifiedWidgets   = {};
+        _modifiedTemplates = {};
+        _reverting         = false;
     };
 
     this.setModified = function(widget, state) {
@@ -423,13 +425,24 @@ var GUI = new function()
             return;
         }
 
-        if (state === true) {
-            _modifiedWidgets[widget.id] = true;
-        } else if (_modifiedWidgets[widget.id] === true) {
-            delete _modifiedWidgets[widget.id];
-        }
+        if (typeof widget === 'string') {
+            // If we are passed a string in place of the widget, we believe we
+            // are being sent a template.
+            if (state === true) {
+                _modifiedTemplates[widget] = true;
+            } else if (_modifiedTemplates[widget] === true) {
+                delete _modifiedTemplates[widget];
+            }
+        } else {
+            // It's an object, hence we believe this is a widget.
+            if (state === true) {
+                _modifiedWidgets[widget.id] = true;
+            } else if (_modifiedWidgets[widget.id] === true) {
+                delete _modifiedWidgets[widget.id];
+            }
 
-        this.fireModifiedCallbacks(widget.id, state);
+            this.fireModifiedCallbacks(widget.id, state);
+        }
     };
 
     /**
