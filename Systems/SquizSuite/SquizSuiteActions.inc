@@ -429,31 +429,24 @@ class SquizSuiteActions
         self::_createSuiteMessageDOM($dom, $msgType, $options);
         $xml = $dom->saveXML();
 
-        $apiURL = '';
-        $msg    = array();
 
         // Do not encrypt suiteConnect message. In fact, it can not encrypt as
         // the current system does not know the public key of the destined system.
+        $msg = array();
         if ($msgType === 'suiteConnect') {
             $msg['xml']         = $xml;
             $msg['con_request'] = 1;
-            $apiURL             = $targetid;
         } else {
             $msg['_enc']            = $xml;
             $msg['_pubKeySystemid'] = $targetid;
-            $apiURL                 = $productInfo['connection']['url'];
         }
 
-        $currProductInfo = SquizSuite::getProduct();
-        $userAgentStr    = self::$_userAgentPrefix.$currProductInfo['type'].'/4.0';
-        Channels::includeSystem('API');
-        $result = API::sendCURLAPIRequest(
-            $apiURL,
+        $result = SquizSuite::sendRequest(
+            $targetid,
             'xml',
             'SquizSuite',
             $msgType,
-            $msg,
-            $userAgentStr
+            $msg
         );
 
         if ($result['curlInfo']['http_code'] !== 200) {
@@ -464,6 +457,86 @@ class SquizSuiteActions
         return $result;
 
     }//end sendMessage()
+
+
+    /**
+     * Send a suite request to other system.
+     *
+     * @param string $targetid The targetid of the destination system. 
+     * @param string $format   The format of the results. 
+     * @param string $system   The system on the destination system.
+     * @param string $action   The function to call on the destination system.
+     * @param array  $message  The message to send.
+     *
+     * @return array
+     */
+    public static function sendRequest($targetid, $format, $system, $action, array $message)
+    {
+        $currProductInfo = SquizSuite::getProduct();
+        $userAgentStr    = self::$_userAgentPrefix.$currProductInfo['type'].'/4.0';
+        $productInfo     = SquizSuite::getProduct($targetid);
+
+        // Get the target API url.
+        $apiURL = '';
+        if ($action === 'suiteConnect') {
+            $apiURL = $targetid;
+        } else {
+            $apiURL = $productInfo['connection']['url'];
+        }
+
+        if (self::_isMatrixSystem($targetid) === TRUE) {
+            // Matrix needs a special case to handle
+            $message['_format'] = $format;
+            $message['_system'] = $system;
+            $message['_action'] = $action;
+        } else {
+            // Everybody else
+            $apiURL  = rtrim($apiURL, '/');
+            $apiURL .= '/'.$format;
+            $apiURL .= '/'.$system;
+            $apiURL .= '/'.$action;
+        }//end if
+
+        // Perform the request.
+        Channels::includeSystem('API');
+        $response = API::sendCURLAPIRequest(
+            $apiURL,
+            $message,
+            $userAgentStr
+        );
+
+        return $response;
+
+    }//end sendRequest()
+
+
+    /**
+     * Return TRUE if the System is a Matrix System.
+     *
+     * @param string $systemid The systemid to test.
+     *
+     * @return boolean
+     */
+    private static function _isMatrixSystem($systemid)
+    {
+        $isMatrix = FALSE;
+
+        $product = SquizSuite::getProduct($systemid);
+        if (empty($product) === FALSE) {
+            if ($product['type'] === 'Squiz Matrix') {
+                // This is a Matrix system.
+                $isMatrix = TRUE;
+            }
+        } else {
+            // Unregistered system, work it out from the URL (aka systemid) instead.
+            if (strpos($systemid, '__api') === FALSE) {
+                $isMatrix = TRUE;
+            }
+        }
+
+        return $isMatrix;
+
+    }//end _isMatrixSystem()
 
 
     /**
@@ -1948,11 +2021,7 @@ class SquizSuiteActions
 
         $currProduct = SquizSuite::getProduct();
         $product     = SquizSuite::getProduct($systemid);
-        if (array_key_exists('url', $product['connection']) === TRUE
-            && empty($product['connection']['url']) === FALSE
-        ) {
-            Channels::includeSystem('API');
-            $url = $product['connection']['url'];
+        if (empty($product['connection']) === FALSE) {
             $msg = array(
                     '_enc'            => array(
                                           '_systemid' => $currProduct['systemid'],
@@ -1960,7 +2029,7 @@ class SquizSuiteActions
                     '_pubKeySystemid' => $systemid,
                    );
 
-            $response = API::sendCURLAPIRequest($product['connection']['url'], 'json', 'SquizSuite', 'getProductSummary', $msg);
+            $response = SquizSuite::sendRequest($systemid, 'json', 'SquizSuite', 'getProductSummary', $msg);
             if ($response['curlInfo']['http_code'] === 200) {
                 $response = json_decode($response['result'], TRUE);
                 $retVal   = $response['result'];
