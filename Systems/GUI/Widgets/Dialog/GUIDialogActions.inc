@@ -88,28 +88,28 @@ class GUIDialogActions
      *
      * @var integer
      */
-     protected static $maxWidth = NULL;
+    protected static $maxWidth = NULL;
 
     /**
      * Maximum height of the dialog.
      *
      * @var integer
      */
-     protected static $maxHeight = NULL;
+    protected static $maxHeight = NULL;
 
     /**
      * Initial width of the dialog.
      *
      * @var integer
      */
-     protected static $width = NULL;
+    protected static $width = NULL;
 
     /**
      * Initial height of the dialog.
      *
      * @var integer
      */
-     protected static $height = NULL;
+    protected static $height = NULL;
 
     /**
      * If TRUE then the dialog will be resizable.
@@ -124,6 +124,16 @@ class GUIDialogActions
      * @var boolean
      */
     protected static $draggable = TRUE;
+
+    /**
+     * The positioning type.
+     *
+     * Valid values: fixed, absolute.
+     * Default is absolute.
+     *
+     * @var string
+     */
+    protected static $position = 'absolute';
 
 
     /**
@@ -142,8 +152,10 @@ class GUIDialogActions
         $settings['resizable'] = Util::getArrayIndex($settings, 'resizable', TRUE);
         $settings['draggable'] = Util::getArrayIndex($settings, 'draggable', TRUE);
 
+        $positionClass = ' '.$class.'-position-'.Util::getArrayIndex($settings, 'position', self::$position);
+
         // Top section.
-        echo '<div class="'.$class.'" id="'.$id.'">';
+        echo '<div class="'.$class.$positionClass.'" id="'.$id.'">';
         echo '<div class="'.$class.'-top">';
         echo '<div class="'.$class.'-title">'.Util::getArrayIndex($settings, 'title', '').'</div>';
         echo '<div class="'.$class.'-subTitle">'.Util::getArrayIndex($settings, 'subTitle', '').'</div>';
