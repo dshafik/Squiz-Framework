@@ -14,6 +14,7 @@
     <setting name="minHeight">500</setting>
     <setting name="width">400</setting>
     <setting name="height">500</setting>
+    <setting name="position">fixed</setting>
     <setting name="content">
         <content>
             <div class="Help-controls">

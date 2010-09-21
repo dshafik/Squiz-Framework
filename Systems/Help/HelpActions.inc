@@ -80,14 +80,21 @@ class HelpActions
      *
      * @var string
      */
-     private static $_generalArticlesFilePath = NULL;
+    private static $_generalArticlesFilePath = NULL;
 
     /**
      * Widget id and class references for glossary terms.
      *
      * @var string
      */
-     private static $_widgetReferences = NULL;
+    private static $_widgetReferences = NULL;
+
+    /**
+     * List of general terms that appear in all glossary index pages.
+     *
+     * @var array
+     */
+    private static $_generalGlossaryTerms = array();
 
 
     /**
@@ -576,6 +583,11 @@ class HelpActions
                              'title' => $glossaryTitle,
                             );
             self::_addGlossaryToIndex($fileName, $glossaryInfo);
+
+            // Is it a general term?
+            if ($term->getAttribute('general') === 'true') {
+                self::$_generalGlossaryTerms[$glossaryTitle] = $fileName;
+            }
 
             if (file_exists($destFile) === TRUE) {
                 throw new ChannelException(sprintf(_('Duplicate glossary term found in: %s and id: %s (May be in parent glossary file?)'), $glossaryFile, $glossaryid));
@@ -1302,6 +1314,8 @@ class HelpActions
      */
     private static function _createGlossaryIndexPage(array $glossaryTerms, $systemName, $templateName=NULL)
     {
+        // Include the general terms in the list.
+        $glossaryTerms = array_merge($glossaryTerms, self::$_generalGlossaryTerms);
         ksort($glossaryTerms);
 
         $letters     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
