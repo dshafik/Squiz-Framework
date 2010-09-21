@@ -436,7 +436,7 @@ class SquizSuiteActions
             $msg['xml']         = $xml;
             $msg['con_request'] = 1;
         } else {
-            $msg['_enc']            = $xml;
+            $msg['_enc']            = array('xml' => $xml);
             $msg['_pubKeySystemid'] = $targetid;
         }
 
@@ -488,6 +488,16 @@ class SquizSuiteActions
             $message['_format'] = $format;
             $message['_system'] = $system;
             $message['_action'] = $action;
+            if (is_array($message['_enc']) === TRUE) {
+                $message['_enc']['matrix'] = array();
+                if (isset($productInfo['connection']['username']) === TRUE) {
+                        $message['_enc']['matrix']['username'] = $productInfo['connection']['username'];
+                }
+
+                if (isset($productInfo['connection']['upassword']) === TRUE) {
+                        $message['_enc']['matrix']['password'] = $productInfo['connection']['password'];
+                }
+            }//end if
         } else {
             // Everybody else.
             $apiURL  = rtrim($apiURL, '/');
@@ -1092,8 +1102,6 @@ class SquizSuiteActions
                          'update_type',
                          'update_value',
                         );
-            $xml      = Security::getRequestData('_enc', NULL, FALSE, 'post');
-            $xml      = html_entity_decode($xml);
             $message  = self::_parseSuiteXML($xml, $required);
 
             $systemid    = $message['system_id'];
@@ -1139,7 +1147,8 @@ class SquizSuiteActions
     private static function _getDecryptedXML()
     {
         include_once 'Libs/Security/Security.inc';
-        $xml = Security::getRequestData('_enc', NULL, FALSE, 'post');
+        $enc = Security::getRequestData('_enc', array(), FALSE, 'post');
+        $xml = Util::getArrayIndex($enc, 'xml', array());
         if ($xml === NULL) {
             $errMsg = 'Non encrypted message received.';
             throw new ChannelException($errMsg);
