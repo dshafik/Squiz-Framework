@@ -433,6 +433,8 @@ var GUI = new function()
             } else if (_modifiedTemplates[widget] === true) {
                 delete _modifiedTemplates[widget];
             }
+
+            this.fireModifiedCallbacks(widget, state);
         } else {
             // It's an object, hence we believe this is a widget.
             if (state === true) {
