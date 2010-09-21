@@ -429,7 +429,6 @@ class SquizSuiteActions
         self::_createSuiteMessageDOM($dom, $msgType, $options);
         $xml = $dom->saveXML();
 
-
         // Do not encrypt suiteConnect message. In fact, it can not encrypt as
         // the current system does not know the public key of the destined system.
         $msg = array();
@@ -485,12 +484,12 @@ class SquizSuiteActions
         }
 
         if (self::_isMatrixSystem($targetid) === TRUE) {
-            // Matrix needs a special case to handle
+            // Matrix needs a special case to handle.
             $message['_format'] = $format;
             $message['_system'] = $system;
             $message['_action'] = $action;
         } else {
-            // Everybody else
+            // Everybody else.
             $apiURL  = rtrim($apiURL, '/');
             $apiURL .= '/'.$format;
             $apiURL .= '/'.$system;
@@ -969,7 +968,7 @@ class SquizSuiteActions
                         $options
                     );
                 }
-            }
+            }//end if
 
             $response = 'ok';
             return $response;
@@ -1868,6 +1867,7 @@ class SquizSuiteActions
      *
      * @since  4.0.0
      * @return mixed
+     * @throws ChannelException If the user in not a super user.
      */
     public static function saveSquizSuiteScreen(array $data)
     {
