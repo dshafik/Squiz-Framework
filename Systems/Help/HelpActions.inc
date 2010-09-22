@@ -348,15 +348,18 @@ class HelpActions
             return self::_getSearchResultsPage($wordList, $originalWordsList);
         }
 
-        $words = implode('|', $wordList);
+        $words    = implode('|', $wordList);
+        $sedWords = implode('\|', $wordList);
 
         // Search articles and glossary file contents.
-        $cmd            = 'grep -liE ".*('.$words.').*" '.$docsDir.'* | grep -E ".*/(article|glossary)-.*"';
+        $cmd = 'grep -iE ".*('.$words.').*" '.$docsDir.'* | sed -n -e "s/<[^>]*>//g" -e "/'.$sedWords.'/p" | awk -F : \'{print $1}\' | uniq | grep -E ".*/(article|glossary)-.*"';
+
         $contentResults = array();
         exec($cmd, $contentResults);
 
         // Search articles and glossary file names.
-        $cmd       = 'find '.$docsDir.' -regextype posix-egrep -iregex ".*/(article|glossary)-.*('.$words.').*" -print';
+        $cmd = 'find '.$docsDir.' -regextype posix-egrep -iregex ".*/(article|glossary)-.*('.$words.').*" -print';
+
         $fileNames = array();
         exec($cmd, $fileNames);
 
@@ -364,6 +367,7 @@ class HelpActions
         foreach ($contentResults as $filePath) {
             $matches    = array();
             $contents   = file_get_contents($filePath);
+            $contents   = strip_tags($contents);
             $numMatches = preg_match_all('/.*\b('.$words.').*/imU', $contents, $matches);
             $numWords   = str_word_count($contents);
             $score      = ((ceil($numMatches / ($numWords * 100)) * 2) + $numMatches);
