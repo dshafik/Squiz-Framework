@@ -236,6 +236,82 @@ class HelpActions
 
 
     /**
+     * Returns info about the glossary term for specified element ids and/or class names.
+     *
+     * If a glossary term is found then the return value will be in following format:
+     *    termid|matched-element-id|matched-element-className
+     * And if there is no match then a message is returned.
+     *
+     * @param array $ids        List of DOMElement ids.
+     * @param array $classNames List of DOMElement class names.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function findArticleForElement(array $ids, array $classNames)
+    {
+        $docsDir      = Help::getDocsDirectory();
+        $glossaryid   = NULL;
+        $matchedId    = NULL;
+        $matchedClass = NULL;
+
+        // Need to search each id individually so that we get the most relevant result.
+        foreach ($ids as $index => $id) {
+            if (empty($id) === FALSE) {
+                $cmd            = 'grep -liE ".*elemid=\"'.$id.'\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+                $contentResults = array();
+                exec($cmd, $contentResults);
+                if (empty($contentResults) === FALSE) {
+                    // Found the term.
+                    $glossaryid = basename(str_replace('.html', '', $contentResults[0]));
+                    $matchedId  = $id;
+                    break;
+                }
+            }
+
+            $className = Util::getArrayIndex($classNames, $index, '');
+            if (empty($className) === TRUE) {
+                continue;
+            }
+
+            // Search for the class names.
+            $cmd            = 'grep -liE ".*elemclass=\".*'.$className.'.*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+            $contentResults = array();
+            exec($cmd, $contentResults);
+            if (empty($contentResults) === FALSE) {
+                // Found the term.
+                $glossaryid   = basename(str_replace('.html', '', $contentResults[0]));
+                $matchedClass = $className;
+                break;
+            } else {
+                // Search for each class name individually.
+                $pipedClasses   = str_replace(' ', '|', $className);
+                $cmd            = 'grep -liE ".*elemclass=\".*('.$pipedClasses.').*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+                $contentResults = array();
+                exec($cmd, $contentResults);
+                if (empty($contentResults) === FALSE) {
+                    // Found the term.
+                    $glossaryid   = basename(str_replace('.html', '', $contentResults[0]));
+                    $matchedClass = $className;
+                    break;
+                }
+            }
+        }
+
+        if ($glossaryid === NULL) {
+            return _('Not found');
+        }
+
+        $resultStr = $glossaryid.'|'.$matchedId.'|'.$matchedClass;
+
+        return $resultStr;
+
+    }//end findArticleForElement()
+
+
+    /**
      * Searches docs and returns the results as a sarch result page.
      *
      * @param string  $searchString String to search for (space separated).
@@ -274,11 +350,12 @@ class HelpActions
 
         $words = implode('|', $wordList);
 
-        // Search articles and glossary file names.
+        // Search articles and glossary file contents.
         $cmd            = 'grep -liE ".*('.$words.').*" '.$docsDir.'* | grep -E ".*/(article|glossary)-.*"';
         $contentResults = array();
         exec($cmd, $contentResults);
 
+        // Search articles and glossary file names.
         $cmd       = 'find '.$docsDir.' -regextype posix-egrep -iregex ".*/(article|glossary)-.*('.$words.').*" -print';
         $fileNames = array();
         exec($cmd, $fileNames);
@@ -539,8 +616,8 @@ class HelpActions
 
                 // Inside the H1 element we need to add the element locator.
                 if ($importedNode->tagName === 'h1') {
-                    $importedNode->removeAttribute('elemid');
-                    $importedNode->removeAttribute('elemclass');
+                    //$importedNode->removeAttribute('elemid');
+                    //$importedNode->removeAttribute('elemclass');
                     $elemLocator = self::_createElementLocator(
                         $termDoc,
                         $term->getAttribute('elemid'),

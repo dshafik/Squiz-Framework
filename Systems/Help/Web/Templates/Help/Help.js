@@ -213,6 +213,180 @@ var Help = new function()
         }
     };
 
+    this.picker = function() {
+        var self = this;
+        dfx.addEvent(document, 'keypress.Help_finder', function(e) {
+            if (e.keyCode === 27) {
+                // If ESC key then cancel find.
+                dfx.removeEvent(document, 'keypress.Help_finder');
+                dfx.removeEvent(document, 'mousedown.Help_finder');
+            }
+        });
+
+        dfx.addEvent(document, 'mousedown.Help_finder', function(e) {
+            var target = dfx.getMouseEventTarget(e);
+            dfx.removeEvent(document, 'keypress.Help_finder');
+            /*
+                Note: We need to prevent all events on the target element
+                and its parents (due to event bubbling) firing so that when
+                the element is clicked event functions are not called.
+
+                To do this we need to access JQuery's internal data :(
+                First we remove the events from the elements and then
+                add them back on mouseup event.
+            */
+
+            var target       = dfx.getMouseEventTarget(e);
+            var parents      = dfx.getParents(target);
+            var parentEvents = _removeEvents(parents);
+            var targetEvents = _removeEvents([target]);
+
+            dfx.addEvent(document, 'mouseup.Help_finder', function() {
+                setTimeout(function() {
+                    _addElemEvents(parentEvents);
+                    _addElemEvents(targetEvents);
+                }, 150);
+
+                dfx.removeEvent(document, 'mouseup.Help_finder');
+            });
+
+            // Ignore if the clicked element is the "find" button.
+            dfx.removeEvent(document, 'mousedown.Help_finder');
+
+            var elemInfos = _getIds(parents);
+            if (target.id) {
+                elemInfos.ids.unshift(target.id);
+            }
+
+            if (target.className) {
+                elemInfos.classNames.unshift(target.className);
+            }
+
+            // Send the ids of target and parents to Help system to find
+            // an article.
+            var params = {
+                ids: dfx.jsonEncode(elemInfos.ids),
+                classNames: dfx.jsonEncode(elemInfos.classNames)
+            };
+
+            GUI.sendRequest('Help', 'findArticleForElement', params, function(result) {
+                var resultParts = result.split('|');
+                if (resultParts.length !== 3) {
+                    // No results.
+                    alert(result);
+                } else {
+                    var pageid = resultParts[0];
+                    Help.pointer.pointTo(resultParts[1], resultParts[2]);
+                    Help.loadPage(pageid);
+                }
+            }, 'raw');
+
+            dfx.preventDefault(e);
+            dfx.stopPropagation(e);
+            return false;
+        });
+    };
+
+    /**
+     * Removes mouse events from specified elements.
+     *
+     * When the Help picker is used the events on clicked element and its parents
+     * will need to be disabled. To do this we need to reset the onclick, etc.
+     * attributes and store the original values in an array. Same must be done for
+     * events added via DfxJSLib (jQuery).
+     *
+     * @param {Array} elements Array of DOMElement's.
+     *
+     * @return {Array} Array of elements and their events.
+     */
+    var _removeEvents = function(elements) {
+        var events = {
+            elements: [],
+            dfxEvents: [],
+            browserEvents: []
+        };
+
+        var eventTypes      = ['onmousedown', 'onmouseup', 'onclick'];
+        var eventTypesCount = eventTypes.length;
+
+        var ln = elements.length;
+        for (var i = 0; i < ln; i++) {
+            var element = elements[i];
+            if (element.tagName.toLowerCase() === 'body') {
+                break;
+            }
+
+            var es = null;
+            if (element.tagName.toLowerCase() === 'label') {
+                // Special case: label tag, remove event on actual input.
+                var elem = dfx.getId(element.htmlFor);
+                if (elem) {
+                    es = jQuery.data(dfx.getId(element.htmlFor), 'events');
+                    if (es) {
+                        events.elements.push(dfx.getId(element.htmlFor));
+                        events.dfxEvents.push(es);
+                        jQuery.data(dfx.getId(element.htmlFor), 'events', {});
+                    }
+                }
+            } else {
+                var jqueryEvents = jQuery.data(element, 'events');
+                if (jqueryEvents) {
+                    // Reset the jQuery events for this element.
+                    jQuery.data(element, 'events', {});
+                }
+
+                // Also remove browser based events (e.g. elem.onclick).
+                var browserEvents = {};
+                for (var j = 0; j < eventTypesCount; j++) {
+                    var eventType = eventTypes[j];
+                    var eventStr  = element[eventType];
+                    if (eventStr) {
+                        browserEvents[eventType] = eventStr;
+
+                        // Set the attribute to nothing.
+                        element[eventType] = '';
+                    }
+                }
+
+                events.elements.push(element);
+                events.dfxEvents.push(jqueryEvents);
+                events.browserEvents.push(browserEvents);
+            }//end if
+        }//end for
+
+        return events;
+    };
+
+    var _addElemEvents = function(events) {
+        var ln = events.elements.length;
+        for (var i = 0; i < ln; i++) {
+            if (events.dfxEvents[i]) {
+                // Add the jQuery events.
+                jQuery.data(events.elements[i], 'events', events.dfxEvents[i]);
+            }
+
+            // Add the browser based events.
+            dfx.foreach(events.browserEvents[i], function(eventType) {
+                events.elements[i][eventType] = events.browserEvents[i][eventType];
+            });
+        }
+    };
+
+    var _getIds = function(elements) {
+        var elemInfos = {
+            ids: [],
+            classNames: []
+        };
+
+        var ln = elements.length;
+        for (var i = 0; i < ln; i++) {
+            elemInfos.ids.push(elements[i].id);
+            elemInfos.classNames.push(elements[i].className);
+        }
+
+        return elemInfos;
+    };
+
     this.glossary = function() {
         this.loadGlossaryPage();
     };
@@ -279,10 +453,6 @@ var Help = new function()
                 return;
             }
 
-            /*if (elem.scrollIntoView) {
-                elem.scrollIntoView(false);
-            }*/
-
             // Get element coords.
             var rect = dfx.getBoundingRectangle(elem);
 
@@ -316,8 +486,13 @@ var Help = new function()
             var bounceHeight = 20;
             var scroll       = dfx.getScrollCoords();
 
+            // Scroll in to view if not visible.
+            if (elem.scrollIntoView && (rect.y1 < scroll.y || rect.y1 > scroll.y + winDim.height)) {
+                elem.scrollIntoView(false);
+            }
+
             // Try to position the pointer.
-            if ((rect.y1 - pointerH + bounceHeight) > scroll.y) {
+            if ((rect.y1 - pointerH - bounceHeight) > scroll.y) {
                 // Arrow direction down.
                 this.showPointer(elem, 'down');
             } else if ((rect.y2 + pointerH) < (winDim.height - scroll.y)) {
