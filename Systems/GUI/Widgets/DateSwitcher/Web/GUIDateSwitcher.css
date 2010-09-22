@@ -152,4 +152,43 @@
 
 .GUIDateSwitcher .date-popup {
     display: none;
+    width: 154px;
+    position: relative;
+    left: 25px;
+    z-index: 5000;
+    border: 1px solid white;
+    background-color: black;
+    padding: 1px;
+    margin: 1px;
+}
+
+.GUIDateSwitcher .date-popup.expanded {
+    display: block;
+}
+
+.GUIDateSwitcher .date-popup .one-month-overlay {
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    line-height: 26px;
+    border: 1px solid #666;
+    margin: 1.5px;
+    color: white;
+    text-align: center;
+}
+
+.GUIDateSwitcher .date-popup .three-month-overlay {
+    width: 148px;
+    height: 26px;
+    border: 1px solid #666;
+    margin: 1.5px;
+    position: absolute;
+}
+
+.GUIDateSwitcher .date-popup .six-month-overlay {
+    width: 148px;
+    height: 57px;
+    border: 1px solid #666;
+    margin: 1.5px;
+    position: absolute;
 }

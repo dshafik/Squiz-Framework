@@ -93,7 +93,15 @@ class GUIDateSwitcherActions
         echo '</li>';
         echo '<li class="next-period '.$forClass.'-next disabled"><a href=""><span></span></a></li>';
         echo '</ul>';
-        echo '<div class="date-popup"></div>';
+        echo '<div class="date-popup">';
+
+        for ($month = 0; $month <= 11; $month++) {
+            echo '<span class="month-block">';
+            echo date('M', strtotime('2010-01-01 +'.$month.' months'));
+            echo '</span>';
+        }//end for
+
+        echo '</div>';
         echo '</div>';
 
         return $settings;

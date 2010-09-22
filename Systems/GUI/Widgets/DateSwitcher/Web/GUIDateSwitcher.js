@@ -45,6 +45,23 @@ GUIDateSwitcher.prototype = {
         }
 
         this.months = this.settings.months;
+        this.addEvents();
+    },
+
+    addEvents: function() {
+        var self = this;
+
+        var widget     = dfx.getId(this.id);
+        var currentBtn = dfx.getClass('current-period', widget)[0];
+        var currentA   = dfx.getTag('A', currentBtn)[0];
+        dfx.addEvent(currentA, 'click', function() {
+            var widget    = dfx.getId(self.id);
+            var currentBtn = dfx.getClass('current-period', widget)[0];
+            var datePopup = dfx.getClass('date-popup', widget)[0];
+            dfx.toggleClass(datePopup, 'expanded');
+            dfx.toggleClass(currentBtn, 'selected');
+            return false;
+        });
     },
 
     setMonths: function(months) {
