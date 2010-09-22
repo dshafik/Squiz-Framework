@@ -52,7 +52,7 @@ GUIDateSwitcher.prototype = {
     },
 
     setStartDate: function(date) {
-        selt.startDate = date;
+        this.startDate = date;
     },
 
     getValue: function() {
