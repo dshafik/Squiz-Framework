@@ -488,7 +488,7 @@ class SquizSuiteActions
             $message['_format'] = $format;
             $message['_system'] = $system;
             $message['_action'] = $action;
-            if ($system !== 'SquizSuite' && $action !== 'suiteConnect') {
+            if ($action !== 'suiteConnect') {
                 // Only set the username/password if the _enc array isset.
                 if (isset($message['_enc']) === FALSE || is_array($message['_enc']) === TRUE) {
                     if (isset($message['_pubKeySystemid']) === FALSE) {
@@ -518,8 +518,8 @@ class SquizSuiteActions
             $apiURL .= '/'.$format;
             $apiURL .= '/'.$system;
             $apiURL .= '/'.$action;
-            if ($system === 'SquizSuite' && strpos($action, 'suiteConnect') !== 0) {
-                // Set the encryption for all requests except suiteConnect*,
+            if ($action !== 'suiteConnect') {
+                // Set the encryption for all requests except suiteConnect,
                 // so the target system treats this request as a superuser.
                 if (isset($message['_enc']) === FALSE) {
                     $message['_enc'] = array();
