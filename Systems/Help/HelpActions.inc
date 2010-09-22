@@ -260,6 +260,7 @@ class HelpActions
         // Need to search each id individually so that we get the most relevant result.
         foreach ($ids as $index => $id) {
             if (empty($id) === FALSE) {
+                $id             = preg_replace('/[^a-z0-9_-\s]/i', '', $id);
                 $cmd            = 'grep -liE ".*elemid=\"'.$id.'\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
                 $contentResults = array();
                 exec($cmd, $contentResults);
@@ -272,6 +273,7 @@ class HelpActions
             }
 
             $className = Util::getArrayIndex($classNames, $index, '');
+            $className = preg_replace('/[^a-z0-9_-\s]/i', '', $className);
             if (empty($className) === TRUE) {
                 continue;
             }
@@ -298,7 +300,7 @@ class HelpActions
                     break;
                 }
             }
-        }
+        }//end foreach
 
         if ($glossaryid === NULL) {
             return _('Not found');
@@ -620,8 +622,6 @@ class HelpActions
 
                 // Inside the H1 element we need to add the element locator.
                 if ($importedNode->tagName === 'h1') {
-                    //$importedNode->removeAttribute('elemid');
-                    //$importedNode->removeAttribute('elemclass');
                     $elemLocator = self::_createElementLocator(
                         $termDoc,
                         $term->getAttribute('elemid'),
@@ -793,6 +793,16 @@ class HelpActions
             $screenTitle = trim($screenTitleTags->item(0)->nodeValue);
         }
 
+        // Check if this System should be shown in the menu.
+        $showInMenu = FALSE;
+        if ($isSystemIndexPage === TRUE) {
+            $showInMenu     = TRUE;
+            $showInMenuTags = $doc->getElementsByTagName('show-in-menu');
+            if ($showInMenuTags->length > 0 && $showInMenuTags->item(0)->nodeValue === 'false') {
+                $showInMenu = FALSE;
+            }
+        }
+
         // Save the file in data dir.
         $dataDir  = Help::getDocsDirectory();
         $destFile = '';
@@ -812,6 +822,7 @@ class HelpActions
                         'showIn'      => $showIn,
                         'summary'     => $summary,
                         'screenTitle' => $screenTitle,
+                        'showInMenu'  => $showInMenu,
                        );
         self::_addArticleToIndex($idPrefix.$articleid, $articleInfo, $isIndexPage);
 
@@ -1256,15 +1267,8 @@ class HelpActions
                                          'template'    => array(),
                                          'summary'     => '',
                                          'screenTitle' => '',
+                                         'showInMenu'  => TRUE,
                                         );
-        }
-
-        if (empty($info['screenTitle']) === FALSE) {
-            self::$_docsInfo[$system]['screenTitle'] = $info['screenTitle'];
-        }
-
-        if (empty($info['summary']) === FALSE) {
-            self::$_docsInfo[$system]['summary'] = $info['summary'];
         }
 
         // Id of the glossary term is the title so that it can be sorted later on.
@@ -1290,10 +1294,22 @@ class HelpActions
                 self::$_docsInfo[$system]['template'][$template]['article'][$showin][$id] = $info;
             }
 
-            if (empty($info['summary']) === FALSE) {
+            if ($isIndexPage === TRUE && empty($info['summary']) === FALSE) {
                 self::$_docsInfo[$system]['template'][$template]['summary'] = $info['summary'];
             }
         } else {
+            if ($isIndexPage === TRUE && empty($info['screenTitle']) === FALSE) {
+                self::$_docsInfo[$system]['screenTitle'] = $info['screenTitle'];
+            }
+
+            if ($isIndexPage === TRUE && empty($info['summary']) === FALSE) {
+                self::$_docsInfo[$system]['summary'] = $info['summary'];
+            }
+
+            if ($isIndexPage === TRUE && $info['showInMenu'] === FALSE) {
+                self::$_docsInfo[$system]['showInMenu'] = FALSE;
+            }
+
             // Base system.
             foreach ($info['showIn'] as $showin) {
                 if (isset(self::$_docsInfo[$system]['article'][$showin]) === FALSE) {
@@ -1642,6 +1658,11 @@ class HelpActions
 
             $systemInfos[$systemName] = array('title' => $systemTitle);
 
+            if ($docsInfo['showInMenu'] === FALSE) {
+                // Not shown in the menu so continue.
+                continue;
+            }
+
             // Small icon for the system.
             $iconURL = '/__web/Systems/'.$systemName.'/Web/sm_'.strtolower($systemName).'_icon.png';
 
@@ -1651,7 +1672,7 @@ class HelpActions
             $html .= '<a href="javascript:'.$href.'">'.$systemTitle.'</a>';
             $html .= '<div class="Help-systemsMenu-selectedIcon"></div>';
             $html .= '</li>';
-        }
+        }//end foreach
 
         $html .= '</ul></div>';
 
