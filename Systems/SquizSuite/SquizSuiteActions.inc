@@ -1784,6 +1784,11 @@ class SquizSuiteActions
                             'value' => $product['connection']['url'],
                             'size'  => 45,
                            );
+
+            if (strpos($product['status'], 'pending') === 0) {
+                $setting['disabled'] = TRUE;
+            }
+
             $colContent  = '<div class="SquizSuiteScreen-productDetailWrap">';
             $colContent .= '<strong>API URL</strong><br />';
             $colContent .= GUI::createWidget('squizSuite-'.$product['systemid'].'-apiURL', 'GUITextBox', $setting);
