@@ -40,9 +40,27 @@ GUIGraphBar.prototype = {
 
         dfx.foreach(rows, function(idx) {
             dfx.addEvent(rows[idx], 'mouseover', function(evt) {
-                dfx.addClass(this, 'hover');
+                if (dfx.hasClass(this, 'hover') === false) {
+                    dfx.addClass(this, 'hover');
+                    
+                    // Position the row's tooltip correctly.
+                    var tooltip = dfx.getClass('tooltip', rows[idx])[0];                    
+                    var left = dfx.getElementCoords(tooltip).x;
+                    var right = dfx.getWindowDimensions().width - left;
+                    
+                    if (left < 10) {
+                        // Allow 10px breathing space on the left.
+                        dfx.removeClass(tooltip, 'arrowPosition-topMid');
+                        dfx.addClass(tooltip, 'arrowPosition-topLeft');
+                    } else if (right < 234) {
+                        // 234px = 200px tooltip width + 16px of padding
+                        //         + 8px of margin
+                        //         + 10px for breathing space from the right edge.
+                        dfx.removeClass(tooltip, 'arrowPosition-topMid');
+                        dfx.addClass(tooltip, 'arrowPosition-topRight');
+                    }
+                }
             });
-
             dfx.addEvent(rows[idx], 'mouseout', function(evt) {
                 dfx.removeClass(this, 'hover');
             });

@@ -17,12 +17,15 @@
 }
 
 .GUIGraphBar-inner-list {
-    display: inline-block;
     position: absolute;
     list-style: none;
     white-space: nowrap;
     padding: 0;
     margin: 0;
+    display: block;
+    top: 0;
+    vertical-align: bottom;
+    z-index: 2;
 }
 
 ul.GUIGraphBar-data-row {
@@ -285,4 +288,54 @@ ul.GUIGraphBar-data-row ul {
 .GUIGraphBar .tooltip tr:last-child td {
     border-bottom: none;
     padding-bottom: 0;
+}
+
+.GUIGraphBar .tick-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.GUIGraphBar .tick-line {
+    height: 0;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    z-index: 1;    
+}
+
+.GUIGraphBar .tick-line.x-axis {
+    border-top: 1px solid #BBB;
+    z-index: 3;
+}
+
+.GUIGraphBar .tick-line.major {
+    border-top: 1px solid #E1E1E1;    
+}
+
+.GUIGraphBar .tick-line.major {
+    border-top: 1px solid #E1E1E1;    
+}
+
+.GUIGraphBar .tick-line.minor {
+    border-top: 1px solid #F3F3F3;
+}
+
+.GUIGraphBar .tick-value {
+    color: #888;
+    font-size: 11px;
+    position: absolute;
+    z-index: 1;
+}
+
+.GUIGraphBar .tick-value.left-align {
+    left: 0;
+}
+
+.GUIGraphBar .tick-value.right-align {
+    right: 0;
 }

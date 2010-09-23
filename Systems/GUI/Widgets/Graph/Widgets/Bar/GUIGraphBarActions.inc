@@ -447,9 +447,7 @@ class GUIGraphBarActions
             $listWidth = '100%';
         }
 
-        echo '<ul class="'.$class.'-inner-list" style="position: absolute; ';
-        echo 'display: block; width: '.$listWidth.'; top: 0; right: '.$listRight.';';
-        echo ' height: '.$height.'px; vertical-align: bottom; z-index: 2">';
+        echo '<ul class="'.$class.'-inner-list" style="width: '.$listWidth.'; right: '.$listRight.'; height: '.$height.'px;">';
 
         $rowNumber = 0;
         foreach ($data as $dataRow) {
@@ -689,36 +687,30 @@ class GUIGraphBarActions
 
         // Draw the ticks.
         if ($tick !== NULL) {
-            echo '<div style="z-index: 1; display: block; position: absolute; top: 0;';
-            echo 'right: 0; width: 100%; height: 100%; z-index: 1">';
+            echo '<div class="tick-overlay">';
 
             if ($tick['minor'] !== 'none') {
                 for ($i = $maxValue; $i > 0; $i -= $tick['minor']) {
-                    echo '<div style="border-top: 1px solid #F3F3F3; height: 0; top: ';
-                    echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
-                    echo 'px; width: 100%; position: absolute; z-index: 1"></div>';
+                    // Positions of major tick line and value.
+                    $tickLineTop  = round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
+                    
+                    echo '<div class="tick-line minor" style="top: '.$tickLineTop.'px"></div>';                    
                 }
             }
 
             for ($i = $maxValue; $i > 0; $i -= $tick['major']) {
                 $valueStr = sprintf($tick['format'], $i);
+                
+                // Positions of major tick line and value.
+                $tickLineTop  = round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
+                $tickValueTop = ($tickLineTop + 2);
 
-                echo '<div style="border-top: 1px solid #E1E1E1; height: 0; top: ';
-                echo round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
-                echo 'px; width: 100%; position: absolute; z-index: 1"></div>';
-
-                echo '<div style="color: #888; font-size: 11px; left: 0; top: ';
-                echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
-                echo 'px; position: absolute; z-index: 1">'.$valueStr.'</div>';
-
-                echo '<div style="color: #888; font-size: 11px; right: 0; top: ';
-                echo (2 + round($maxBarHeight * (($maxValue - $i) / ($maxValue))));
-                echo 'px; position: absolute; z-index: 1">'.$valueStr.'</div>';
+                echo '<div class="tick-line major" style="top: '.$tickLineTop.'px"></div>';
+                echo '<div class="tick-value left-align" style="top: '.$tickValueTop.'px">'.$valueStr.'</div>';
+                echo '<div class="tick-value right-align" style="top: '.$tickValueTop.'px">'.$valueStr.'</div>';
             }
 
-            echo '<div style="border-top: 1px solid #bbb; height: 0; top: ';
-            echo $maxBarHeight.'px; width: 100%; position: absolute; z-index: 3"></div>';
-
+            echo '<div class="tick-line x-axis" style="top: '.$maxBarHeight.'px"></div>';
             echo '</div>';
         }//end if
 
