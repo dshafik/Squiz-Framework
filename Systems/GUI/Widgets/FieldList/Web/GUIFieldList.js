@@ -78,7 +78,7 @@ GUIFieldList.prototype = {
 			};
 
 			/**
-			 * Handle typing in a new row.
+			 * Handle focusing in a new row.
 			 *
 			 * The crucial for handling this in a keypress state is that the existing
 			 * "new row" text box must become the "existing row" text box of the newly
@@ -94,7 +94,7 @@ GUIFieldList.prototype = {
 			 *
 			 * @return {Boolean}
 			 */
-			var handleNewRowKeypress = function() {
+			var handleNewRowFocus = function() {
 				var listObj = dfx.getId(self.id);
 				var newRow  = dfx.getParents(this)[0];
 
@@ -105,40 +105,21 @@ GUIFieldList.prototype = {
 
 				// Clone the row, and remove any "deleted" attribute from it so it
 				// begins "active".
-				var rowClone = dfx.cloneNode(lastRow)[0];
+				var rowClone = dfx.cloneNode(lastRow, false)[0];
 				dfx.removeClass(rowClone, 'extraRow');
 
 				// Move the "new row" input box into the cloned row, then remove its
 				// existing input box.
 				var clonedRowTb = dfx.getTag('input', rowClone)[0];
-				dfx.insertAfter(clonedRowTb, this);
-				dfx.remove(clonedRowTb);
 
 				// Set the appropriate random ID of the new row.
-				var cloneId = self.id + '-new_' + dfx.getUniqueId();
-				this.id     = cloneId + '-value';
+				var cloneId    = self.id + '-new_' + dfx.getUniqueId();
+				clonedRowTb.id = cloneId + '-value';
+				dfx.addEvent(clonedRowTb, 'keypress', handleExistingRowKeypress);
 
-				// Add the new row to the list, and set the appropriate ID.
-				// Then (re-)give the focus to the textbox so the user can
-				// continue typing.
 				dfx.append(listObj, rowClone);
 				rowClone.id = cloneId;
-				this.focus();
-
-				// Now make a new "add new row" text box.
-				var newTb   = dfx.cloneNode(this, false)[0];
-				newTb.value = '';
-				newTb.id    = newRowName;
-
-				// Pass this event handler onto the new, new row textbox.
-				// Now give this event to the new "add new row" box, and change this to
-				// use the existing row function instead.
-				dfx.addEvent(newTb, 'keypress', handleNewRowKeypress);
-				dfx.removeEvent(this, 'keypress', handleNewRowKeypress);
-				dfx.addEvent(this, 'keypress', handleExistingRowKeypress);
-
-				// And add it.
-				dfx.append(newRowParent, newTb);
+				clonedRowTb.focus();
 
 				// Finally, set the dirty flag for the widget.
 				GUI.setModified(self, true);
@@ -146,7 +127,7 @@ GUIFieldList.prototype = {
 				return true;
 			};
 
-			dfx.addEvent(newRowTb, 'keypress', handleNewRowKeypress);
+			dfx.addEvent(newRowTb, 'focus', handleNewRowFocus);
 
 			var inputs = dfx.getTag('input', listObj);
 			dfx.addEvent(inputs, 'keypress', handleExistingRowKeypress);
