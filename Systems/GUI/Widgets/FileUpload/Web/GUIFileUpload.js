@@ -46,6 +46,9 @@ function GUIFileUpload(id, settings)
 
     this.uploadFinished = false;
 
+    // Add itemSelected widget event.
+    GUI.addWidgetEvent(this, 'change');
+
     this.init();
 
 }
@@ -54,6 +57,10 @@ GUIFileUpload.prototype = {
     init: function()
     {
         var self = this;
+
+        dfx.addEvent(this.inputField, 'change', function(e) {
+            self.fireChangeCallbacks(self.inputField.value, e);
+        });
 
         this.uploadForm.onsubmit = function() {
             dfx.addClass(self.uploadForm, 'hidden');
