@@ -249,6 +249,43 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the current system ID.
+     *
+     * @return string
+     */
+    public static function getSystemId()
+    {
+        $currProduct = SquizSuite::getCurrentProduct();
+        return $currProduct['systemid'];
+
+    }//end getSystemId()
+
+
+    /**
+     * Returns the attribute of the product.
+     *
+     * @param string $systemid System ID of the product.
+     * @param string $attrName Attriute name to get.
+     *
+     * @return mixed
+     */
+    public static function getProductAttribute($systemid, $attrName)
+    {
+        $product = SquizSuite::getProduct($systemid);
+        if (empty($product) === FALSE) {
+            if (array_key_exists($attrName, $product) === TRUE) {
+                return $product[$attrName];
+            } else if (array_key_exists($attrName, $product['connection']) === TRUE) {
+                return $product['connection'][$attrName];
+            }
+        }
+
+        return NULL;
+
+    }//end getProductAttribute()
+
+
+    /**
      * Return the current product details.
      *
      * @return array
@@ -1780,10 +1817,10 @@ class SquizSuiteActions
                       );
 
             // Product Details Row.
-            $setting     = array(
-                            'value' => $product['connection']['url'],
-                            'size'  => 45,
-                           );
+            $setting = array(
+                        'value' => $product['connection']['url'],
+                        'size'  => 45,
+                       );
 
             if (strpos($product['status'], 'pending') === 0) {
                 $setting['disabled'] = TRUE;
