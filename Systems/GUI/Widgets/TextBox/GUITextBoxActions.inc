@@ -74,11 +74,11 @@ class GUITextBoxActions
     protected static $type = 'text';
 
     /**
-     * Checked field for 'checkbox' type.
+     * Disabled field for 'checkbox' type.
      *
      * @var string
      */
-    protected static $checked = FALSE;
+    protected static $disabled = FALSE;
 
     /**
      * If TRUE then the input box will have the focus.
@@ -140,9 +140,9 @@ class GUITextBoxActions
         // The input field.
         echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength;
 
-        $checked = Util::getArrayIndex($settings, 'checked', self::$checked);
-        if ($checked === TRUE && $type === 'checkbox') {
-            echo ' checked';
+        $disabled = Util::getArrayIndex($settings, 'disabled', self::$disabled);
+        if ($disabled === TRUE) {
+            echo ' disabled="disabled"';
         }
 
         echo ' />';
