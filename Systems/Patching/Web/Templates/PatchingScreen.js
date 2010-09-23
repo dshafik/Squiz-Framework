@@ -23,7 +23,7 @@
 
 var PatchingPatchingScreen = new function()
 {
-    _patchingSettingsDiv = null;
+    var _patchingSettingsDiv = null;
 
     this.initScreen = function(data) {
         var self = this;
@@ -42,6 +42,22 @@ var PatchingPatchingScreen = new function()
             dfx.removeClass(cancelWrap, 'hidden');
             dfx.addClass(activWrap, 'hidden');
         }
+    };
+
+    this.changeActivationID = function() {
+        dfx.addClass(dfx.getId('PatchingScreen-systemidWrap'), 'hidden');
+        dfx.removeClass(dfx.getId('PatchingScreen-newActivationTextWrap'), 'hidden');
+
+        dfx.addClass(dfx.getId('PatchingScreen-changeIdBtnWrap'), 'hidden');
+        dfx.removeClass(dfx.getId('PatchingScreen-cancel-changeIdBtnWrap'), 'hidden');
+    };
+
+    this.cancelNewActivationID = function() {
+        dfx.removeClass(dfx.getId('PatchingScreen-systemidWrap'), 'hidden');
+        dfx.addClass(dfx.getId('PatchingScreen-newActivationTextWrap'), 'hidden');
+
+        dfx.removeClass(dfx.getId('PatchingScreen-changeIdBtnWrap'), 'hidden');
+        dfx.addClass(dfx.getId('PatchingScreen-cancel-changeIdBtnWrap'), 'hidden');
     };
 
 }

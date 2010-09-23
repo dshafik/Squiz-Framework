@@ -2,6 +2,7 @@
     overflow: hidden;
 }
 
+/* System ID section */
 .PatchingScreen-activateWrap.hidden {
     display: none;
 }
@@ -10,8 +11,40 @@
     overflow: hidden;
 }
 
+.PatchingScreen-activateWrap button.hidden {
+    display: none;
+}
+
 .PatchingScreen-idTextFieldWrap.hidden {
     display: none;
+}
+
+#PatchingScreen-systemidWrap {
+    line-height: 22px;
+}
+
+#PatchingScreen-changeIdBtn {
+    margin: 0 0 0 62px;
+}
+
+#PatchingScreen-cancelChangeBtn {
+    margin: 0 0 0 65px;
+}
+
+#PatchingScreen-checkAsapBtn {
+    float: right;
+}
+
+div.PatchingScreen-activateWrap span.PatchingScreen-lastUpdatedString {
+    float: right;
+}
+
+div.PatchingScreen-activateWrap span.PatchingScreen-subscriptionInfo {
+    float: right;
+}
+
+#PatchingScreen-notifyUpdates {
+    float: right;
 }
 
 div.PatchingScreen-activateWrap span {

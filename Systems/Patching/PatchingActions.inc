@@ -694,6 +694,51 @@ class PatchingActions
 
 
     /**
+     * Gets the last updated time.
+     *
+     * @return string
+     */
+    public static function getLastUpdatedTime()
+    {
+        include_once 'Libs/String/String.inc';
+        $lastUpdated = 'N/A';
+        $config      = Patching::getPatchingConfig();
+        if ($config['last_updated'] !== 0) {
+            $lastUpdated = String::easyDatetime($config['last_updated']);
+        }
+
+        return $lastUpdated;
+
+    }//end getLastUpdatedTime()
+
+
+    /**
+     * Returns the rows for new updates tale.
+     *
+     * @return array
+     */
+    public static function getNewUpdateRows()
+    {
+        $rows = array();
+        return $rows;
+
+    }//end getNewUpdateRows()
+
+
+    /**
+     * Returns the rows for installed updates tale.
+     *
+     * @return array
+     */
+    public static function getInstalledUpdateRows()
+    {
+        $rows = array();
+        return $rows;
+
+    }//end getInstalledUpdateRows()
+
+
+    /**
      * Sends "New patch available" notification email, 1 email per patch.
      *
      * @param array $names List of new patch names.
@@ -978,7 +1023,6 @@ class PatchingActions
      */
     private static function _wsSendMessage($url, $serviceType, array $ops, $enc=TRUE)
     {
-        Channels::includeSystem('API');
         Channels::includeSystem('SquizSuite');
         $currProduct  = SquizSuite::getProduct();
         $updateServer = self::_getUpdateServer();
@@ -995,12 +1039,11 @@ class PatchingActions
             $msg['options']     = json_encode($ops);
         }
 
-        Channels::includeSystem('API');
         $format = 'json';
         $system = 'SquizUpdate';
         $action = 'updateService';
-        $result = API::sendCURLAPIRequest(
-            $updateServer['connection']['url'],
+        $result = SquizSuite::sendRequest(
+            $updateServer['systemid'],
             $format,
             $system,
             $action,
