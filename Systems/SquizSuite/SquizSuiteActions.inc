@@ -829,26 +829,45 @@ class SquizSuiteActions
             // The systemid already exists?
             $product = SquizSuite::getProduct($systemid);
             if (empty($product) === FALSE) {
-                // Is the status Live already?
-                if ($product['status'] === 'live') {
-                    $errMsg = 'The requested system is already registered.';
-                    throw new ChannelException($errMsg);
-                }
-
-                // The systemid exists and it's not live yet. But make sure
-                // it doesn't have URL or certificate yet before we accept the
-                // connection request. Or not, anyone can re-write the existing
-                // system's URL or certificate with their own!
-                if (array_key_exists('url', $product['connection']) === FALSE
-                    && array_key_exists('cert', $product['connection']) === FALSE
+                if ($product['status'] === 'live'
+                    && $product['connection']['url'] === $systemUrl
+                    && $product['connection']['cert'] === $certificate
+                    && $product['connection']['name'] === $systemName
                 ) {
-                    $product['connection']['url']  = $systemUrl;
-                    $product['connection']['cert'] = $certificate;
-                    SquizSuite::updateProduct($systemid, 'connection', $product['connection']);
+                    // Okay. The exact system already exists and it's even live.
+                    // Why the suiteConnect request comes again?
+                    // Try to ping the sender.
+                    $pingRes = SquizSuite::sendMessage($systemid, 'suitePing');
+                    if (strpos($pingRes['result'], '<?xml') !== 0) {
+                        // Ping didn't even reach the sender's URL.
+                        // Something went wrong.
+                        $errMsg = 'The requested system is already registered.';
+                        throw new ChannelException($errMsg);
+                    } else {
+                        if ($pingRes['curlInfo']['http_code'] === 200) {
+                            // The (supposed to be) sender might not be the sender.
+                            // The current ping message worked file.
+                            // Do not accept this request.
+                            $errMsg = 'The requested system is already registered.';
+                            throw new ChannelException($errMsg);
+                        }
+                    }
                 } else {
-                    $errMsg = 'The requested system can not be accepted.';
-                    throw new ChannelException($errMsg);
-                }
+                    // The systemid exists and it's not live yet. But make sure
+                    // it doesn't have URL or certificate yet before we accept the
+                    // connection request. Or not, anyone can re-write the existing
+                    // system's URL or certificate with their own!
+                    if (array_key_exists('url', $product['connection']) === FALSE
+                        && array_key_exists('cert', $product['connection']) === FALSE
+                    ) {
+                        $product['connection']['url']  = $systemUrl;
+                        $product['connection']['cert'] = $certificate;
+                        SquizSuite::updateProduct($systemid, 'connection', $product['connection']);
+                    } else {
+                        $errMsg = 'The requested system can not be accepted.';
+                        throw new ChannelException($errMsg);
+                    }
+                }//end if
             } else {
                 $connection         = array();
                 $connection['url']  = $systemUrl;
@@ -1023,24 +1042,30 @@ class SquizSuiteActions
             if ($productInfo['status'] === 'pending approval') {
                 SquizSuite::updateProduct($systemid, 'status', 'live');
 
-                // The final acknowlegement has been received.
-                // Send the list of my connected products for syncing.
-                $allProducts = SquizSuite::getAllProducts();
-                foreach ($allProducts as $product) {
-                    if ($product['current'] === TRUE
-                        || $product['systemid'] === $systemid
-                        || $product['status'] !== 'live'
-                    ) {
-                        continue;
-                    }
+                // Update product shouldn't get involved with this.
+                $currProduct = SquizSuite::getCurrentProduct();
+                if ($currProduct['type'] !== 'Squiz Update'
+                    && $productInfo['type'] !== 'Squiz Update'
+                ) {
+                    // The final acknowlegement has been received.
+                    // Send the list of my connected products for syncing.
+                    $allProducts = SquizSuite::getAllProducts();
+                    foreach ($allProducts as $product) {
+                        if ($product['current'] === TRUE
+                            || $product['systemid'] === $systemid
+                            || $product['status'] !== 'live'
+                        ) {
+                            continue;
+                        }
 
-                    $options  = array('sync_direction' => 'one');
-                    $response = SquizSuite::sendMessage(
-                        $product['systemid'],
-                        'suiteProductSync',
-                        $options
-                    );
-                }
+                        $options  = array('sync_direction' => 'one');
+                        $response = SquizSuite::sendMessage(
+                            $product['systemid'],
+                            'suiteProductSync',
+                            $options
+                        );
+                    }
+                }//end if
             }//end if
 
             $response = 'ok';
@@ -1760,16 +1785,26 @@ class SquizSuiteActions
 
             $systemid = $product['systemid'];
 
+            $productName = _('Unknown');
+            if (array_key_exists('name', $product['connection']) === FALSE) {
+                $productName .= ' ('.$product['systemid'].')';
+            }
+
+            $productUrl = '';
+            if (array_key_exists('url', $product['connection']) === TRUE) {
+                $productUrl = $product['connection']['url'];
+            }
+
             // Product Type Icon.
             $typeC    = str_replace(' ', '', $product['type']);
             $typeIcon = '<div class="SquizSuiteScreen-productIconWrap '.$typeC.'">&nbsp;</div>';
 
             // Product Name.
             if ($product['status'] === 'pending approval' || $product['status'] === 'pending') {
-                $name  = 'Unknown';
+                $name  = _('Unknown').' ('.$product['systemid'].')';
                 $name .= '<span class="SquizSuiteScreen-productExpander" rowid="'.$count.'">&nbsp;</span>';
             } else {
-                $name  = $product['connection']['name'];
+                $name  = $productName;
                 $name .= '<span class="SquizSuiteScreen-productExpander" rowid="'.$count.'">&nbsp;</span>';
             }
 
@@ -1799,6 +1834,7 @@ class SquizSuiteActions
 
                 default:
                     // No default status.
+                    $statusC = 'pending';
                 break;
             }//end switch
 
@@ -1817,10 +1853,10 @@ class SquizSuiteActions
                       );
 
             // Product Details Row.
-            $setting = array(
-                        'value' => $product['connection']['url'],
-                        'size'  => 45,
-                       );
+            $setting     = array(
+                            'value' => $productUrl,
+                            'size'  => 45,
+                           );
 
             if (strpos($product['status'], 'pending') === 0) {
                 $setting['disabled'] = TRUE;
@@ -2143,16 +2179,22 @@ class SquizSuiteActions
                     $retVal = $exceptionDom->nodeValue;
                 }
             } else {
-                // Now sync both of systems.
-                $options  = array('sync_direction' => 'broadcast');
-                $response = SquizSuite::sendMessage(
-                    $systemid,
-                    'suiteProductSync',
-                    $options
-                );
+                $currProduct   = SquizSuite::getCurrentProduct();
+                $targetProduct = SquizSuite::getProduct($systemid);
+                if ($currProduct['type'] !== 'Squiz Update'
+                    && $targetProduct['type'] !== 'Squiz Update'
+                ) {
+                    // Update product shouldn't get involved with this.
+                    $options  = array('sync_direction' => 'broadcast');
+                    $response = SquizSuite::sendMessage(
+                        $systemid,
+                        'suiteProductSync',
+                        $options
+                    );
+                }
 
                 $retVal = TRUE;
-            }
+            }//end if
         }//end if
 
         return $retVal;
