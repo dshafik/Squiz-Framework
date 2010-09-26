@@ -94,6 +94,22 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the public key of the current product.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function getPublicKey()
+    {
+        $product = SquizSuite::getCurrentProduct();
+        return $product['connection']['cert'];
+
+    }//end getPublicKey()
+
+
+    /**
      * Returns TRUE if the user doesnt have permission to get product summary.
      *
      * @return boolean
@@ -1532,8 +1548,11 @@ class SquizSuiteActions
         }
 
         $encrypted = SquizSuite::decryptData($encrypted, $password);
-
-        if ($encrypted !== FALSE) {
+        if ($encrypted === FALSE) {
+            // @codingStandardsIgnoreStart
+            $_POST['_enc'] = FALSE;
+            // @codingStandardsIgnoreEnd
+        } else if ($encrypted !== FALSE) {
             // @codingStandardsIgnoreStart
             $encrypted     = json_decode($encrypted, TRUE);
             $_POST['_enc'] = $encrypted;
