@@ -1824,7 +1824,7 @@ class GUIActions
         $buttonOpts = array(
                        'value'  => _('Return to screen'),
                        'colour' => 'Dark',
-                       'click'  => 'GUI.hideOverlay()',
+                       'click'  => 'GUI.dequeueOverlay(\'warning\')',
                       );
 
         $content .= GUI::createWidget('GUI-save-returnButton', 'GUIButton', $buttonOpts);

@@ -198,7 +198,7 @@ GUIDialog.prototype = {
 
     open: function()
     {
-        GUI.showOverlay();
+        GUI.queueOverlay();
         document.body.appendChild(this.elem);
 
     },
@@ -206,7 +206,7 @@ GUIDialog.prototype = {
     close: function(clickedElement)
     {
         dfx.remove(this.elem);
-        GUI.hideOverlay();
+        GUI.dequeueOverlay('normal');
 
     },
 

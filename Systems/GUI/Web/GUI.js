@@ -29,6 +29,13 @@ var GUI = new function()
     var _publicDirName     = 'Web';
     var _modifiedWidgets   = {};
     var _modifiedTemplates = {};
+    var _queuedOverlays    = {
+        error: [],
+        warning: [],
+        saved: [],
+        loading: [],
+        normal: []
+    };
     var _reverting         = false;
     this.widgetTemplates   = {};
     this.templateLineage   = [];
@@ -213,9 +220,9 @@ var GUI = new function()
         sfapi.post(system, action, params, function(data) {
             if (!data || data.exception) {
                 // Show error message.
-                GUI.showOverlay({
+                GUI.queueOverlay({
                     icon: 'error',
-                    content: '<p>' + data.exception + '</p><br /><a href="javascript:GUI.hideOverlay();">Close</a>'
+                    content: '<p>' + data.exception + '</p><br /><a href="javascript:GUI.dequeueOverlay(\'error\');">Close</a>'
                 });
             } else if (callback) {
                 callback.call(this, data);
@@ -273,7 +280,7 @@ var GUI = new function()
         };
 
         if (options && options.modal === true) {
-            GUI.showOverlay();
+            GUI.queueOverlay();
         }
 
         if ((options) && (options.targetElement)) {
@@ -308,7 +315,7 @@ var GUI = new function()
 
     this.save = function() {
         // Show loader.
-        GUI.showOverlay({
+        GUI.queueOverlay({
             icon: 'loading',
             content: 'Saving...'
         });
@@ -358,12 +365,13 @@ var GUI = new function()
         GUI.sendRequest('GUI', 'saveTemplateData', params, function(data) {
             if (!data.result) {
                 // TODO: Failed to save. Invalid result, most likely a PHP error.
-            } else if (data.result.errors ){
+            } else if (data.result.errors) {
                 // Send the errors to template.
-                self.showOverlay({
+                self.queueOverlay({
                     icon: 'warning',
                     content: data.result.errorList
                 });
+                self.dequeueOverlay('loading');
             } else if (data.result.success) {
                 dfx.foreach(data.result.success, function(templateKey) {
                     var retVal = data.result.success[templateKey];
@@ -390,12 +398,13 @@ var GUI = new function()
                     }
 
                     // Show saved icon for a second.
-                    self.showOverlay({
+                    self.queueOverlay({
                         icon: 'saved',
                         content: 'Save Complete'
                     });
+                    self.dequeueOverlay('loading');
                     setTimeout(function() {
-                        self.hideOverlay();
+                        self.dequeueOverlay('saved');
                     }, 1000);
                 });
             } else {
@@ -448,6 +457,38 @@ var GUI = new function()
     };
 
     /**
+     * Displays the specified message to user or developer.
+     *
+     * @param string type    The type of the message. Valid values are "user", "developer".
+     * @param string message The message to display.
+     * @param string level   The message level. Valid valus are "warning", "error".
+     *
+     * @return void
+     */
+    this.message = function(type, message, level) {
+        switch (type) {
+            case 'developer':
+                if (window.console) {
+                    if (level === 'warning' && window.console.warn) {
+                        console.warn(message);
+                    } else if (window.console.error) {
+                        console.error(message);
+                    }
+                }
+            break;
+
+            case 'user':
+                // TODO: Show the message box to user.
+                alert(message);
+            break;
+
+            default:
+                // Ignore.
+            break;
+        }
+    };
+
+    /**
      * Displays an overlay on top of every element on the screen or elements inside specified element.
      *
      * @param {object}  [options] List of options for the overlay. Options:
@@ -458,7 +499,7 @@ var GUI = new function()
      *
      * @returns {void}
      */
-    this.showOverlay = function(options, target) {
+    var _showOverlay = function(options, target) {
         if (!target) {
             target = document.body;
         }
@@ -500,43 +541,64 @@ var GUI = new function()
         target.appendChild(overlay);
     };
 
-    this.hideOverlay = function() {
+    var _hideOverlay = function() {
         var elem = dfx.getId('GUI-overlay');
         if (elem) {
             dfx.remove(elem);
         }
     };
 
-    /**
-     * Displays the specified message to user or developer.
-     *
-     * @param string type    The type of the message. Valid values are "user", "developer".
-     * @param string message The message to display.
-     * @param string level   The message level. Valid valus are "warning", "error".
-     *
-     * @return void
-     */
-    this.message = function(type, message, level) {
-        switch (type) {
-            case 'developer':
-                if (window.console) {
-                    if (level === 'warning' && window.console.warn) {
-                        console.warn(message);
-                    } else if (window.console.error) {
-                        console.error(message);
-                    }
-                }
-            break;
+    var _showCurrentOverlay = function() {
+        var currentOverlay = null;
 
-            case 'user':
-                // TODO: Show the message box to user.
-                alert(message);
-            break;
+        for (i in _queuedOverlays) {
+            var thisQueue = _queuedOverlays[i];
 
-            default:
-                // Ignore.
-            break;
+            if (thisQueue.length > 0) {
+                // Get the front of the queue.
+                currentOverlay = thisQueue[0];
+                break;
+            }
+        }//end for
+
+        if (currentOverlay === null) {
+            _hideOverlay();
+        } else {
+            _showOverlay(currentOverlay.options, currentOverlay.target);
         }
+    };
+
+    this.queueOverlay = function(options, target) {
+        options = options || {};
+
+        var type = options.icon;
+        if (!type) {
+            type = 'normal';
+        }
+
+        if (!target) {
+            target = document.body;
+        }
+
+        var overlay = {
+            options: options,
+            target: target
+        };
+
+        _queuedOverlays[type].push(overlay);
+        _showCurrentOverlay();
+    };
+
+    this.dequeueOverlay = function(type) {
+        if (type === null) {
+            type = 'normal';
+        }
+
+        if (_queuedOverlays[type].length > 0) {
+            _queuedOverlays[type].shift();
+        }//end for
+
+        _showCurrentOverlay();
     };
 
     this.addWidgetEvent(this, 'modified');
