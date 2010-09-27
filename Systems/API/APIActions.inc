@@ -65,6 +65,18 @@ class APIActions
 
 
     /**
+     * Return API request URL suffix.
+     *
+     * @return string
+     */
+    public static function getAPISuffix()
+    {
+        return self::$_serviceWebPath;
+
+    }//end getAPISuffix()
+
+
+    /**
      * Send POST API request to the destinated system.
      *
      * It sends API request via POST to the destined system.
@@ -78,7 +90,7 @@ class APIActions
      */
     public static function sendCURLAPIRequest($url, array $msg, $userAgent='')
     {
-        $ch  = curl_init();
+        $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
@@ -298,7 +310,7 @@ class APIActions
      */
     public static function getRealURL($url)
     {
-        $serviceStartPos = strpos($url, '/'.self::$_serviceWebPath.'/');
+        $serviceStartPos = strpos($url, '/'.API::getAPISuffix().'/');
         if ($serviceStartPos === FALSE) {
             return $url;
         }
@@ -326,7 +338,7 @@ class APIActions
         $url = Web::getCurrentURL();
 
         // Confirm the URL includes the service suffix.
-        $serviceStartPos = strpos($url, '/'.self::$_serviceWebPath.'/');
+        $serviceStartPos = strpos($url, '/'.API::getAPISuffix().'/');
         if ($serviceStartPos === FALSE) {
             return FALSE;
         }
@@ -351,10 +363,10 @@ class APIActions
             $action = $serviceParts[1];
         } else if (count($serviceParts) === 3) {
             $formatTypes = array(
-                        'xml',
-                        'json',
-                        'raw',
-                       );
+                            'xml',
+                            'json',
+                            'raw',
+                           );
 
             $format = strtolower($serviceParts[0]);
             if (in_array($format, $formatTypes) === FALSE) {
@@ -549,10 +561,10 @@ class APIActions
      */
     private static function _sendJSONResponse(array $responseContent)
     {
-        require_once 'Libs/Util/Util.inc';
+        include_once 'Libs/Util/Util.inc';
         header('Content-type: application/json');
 
-        $attrs  = array();
+        $attrs = array();
         foreach ($responseContent as $field => $value) {
             if ($field === 'result') {
                 continue;
@@ -869,7 +881,7 @@ class APIActions
     {
         include_once 'Libs/Web/Web.inc';
         $url     = Web::getCurrentURL();
-        $pattern = '(\/'.self::$_serviceWebPath.'$|\/'.self::$_serviceWebPath.'\/)';
+        $pattern = '(\/'.API::getAPISuffix().'$|\/'.API::getAPISuffix().'\/)';
         $result  = preg_match($pattern, $url, $matches);
         if ($result === 1) {
             return TRUE;
