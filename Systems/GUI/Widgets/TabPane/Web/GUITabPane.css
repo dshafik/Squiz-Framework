@@ -1,0 +1,44 @@
+.GUITabPane-top {
+    list-style: none;
+    overflow: hidden;
+    background-color: #FFF;
+    background-image: -moz-linear-gradient(center top , #FFF 15%, #E3E3E3 100%);
+}
+
+.GUITabPane-tab {
+    display: inline;
+    overflow: hidden;
+}
+
+.GUITabPane-tab.first a {
+    margin-left: 15px;
+}
+
+.GUITabPane-tab a {
+    text-decoration: none;
+    display: block;
+    float: left;
+    line-height: 24px;
+    outline: none;
+    padding: 0 20px;
+    background-color: #F8F8F8;
+    background-image: -moz-linear-gradient(center top , #F8F8F8 15%, #BEBEBE 100%);
+    border: 1px solid #CCC;
+    -moz-border-radius: 5px 5px 0 0;
+    color: #000;
+    margin-right: 5px;
+    border-bottom: none;
+}
+
+.GUITabPane-tab.active a {
+    background-color: #FFF;
+    background-image: none;
+}
+
+.GUITabPane-tabContent {
+    display: none;
+}
+
+.GUITabPane-tabContent.active {
+    display: block;
+}
