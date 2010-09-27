@@ -411,7 +411,11 @@ class APIActions
 
         // Action parameters can come from '_enc' field if
         // system key encryption is being used.
-        $encrypted = Security::getRequestData('_enc', $default, FALSE, 'post');
+        $encrypted = Security::getRequestData('_enc', $default, NULL, 'post');
+        if ($encrypted === FALSE) {
+            return FALSE;
+        }
+
         foreach ($arguments as $param) {
             $value = Security::getRequestData(
                 $param['name'],
