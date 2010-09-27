@@ -329,4 +329,7 @@
             </setting>
        </widget>
     </div>
+    <dataProvider action="Patching::getUpToDateInitCode">
+        <arg></arg>
+    </dataProvider>
 </div>

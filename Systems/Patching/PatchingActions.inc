@@ -662,12 +662,13 @@ class PatchingActions
         include_once 'Libs/Util/Util.inc';
         $config    = Patching::getPatchingConfig();
         $lastCheck = Util::getArrayIndex($config, 'sub_last_checked', 0);
+        $expired   = _('EXPIRED');
         if ($lastCheck === 0 || (time() - $lastCheck > 3600)) {
             // It is time to check again.
             $res = Patching::wsCheckSubscription();
             if (is_array($res) === FALSE) {
                 // No subscription.
-                return 'EXPIRED';
+                return $expired;
             }
         }
 
@@ -677,18 +678,18 @@ class PatchingActions
         if ($expiry !== 0 && $current !== 0) {
             $remain = (strtotime($expiry) - strtotime($current));
             if ($remain <= 0) {
-                return 'EXPIRED';
+                return $expired;
             }
 
             $days = (int) floor(($remain / 86400));
             if ($days === 0 || $days === 1) {
-                return '1 day';
+                return _('1 day');
             } else {
-                return $days.' days';
+                return _($days.' days');
             }
         }
 
-        return 'EXPIRED';
+        return $expired;
 
     }//end getSubscriptionInfo()
 
@@ -1113,6 +1114,11 @@ class PatchingActions
                 $enc
             );
 
+            // Request failed.
+            if ($result['curlInfo']['http_code'] !== 200) {
+                return FALSE;
+            }
+
             $result = json_decode($result['result'], TRUE);
             $status = $result['result']['status'];
             switch ($status) {
@@ -1186,6 +1192,12 @@ class PatchingActions
             $ops,
             $enc
         );
+
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
         switch ($status) {
@@ -1310,6 +1322,12 @@ class PatchingActions
             $ops,
             $enc
         );
+
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
         switch ($status) {
@@ -1373,6 +1391,11 @@ class PatchingActions
             $enc
         );
 
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
         return TRUE;
 
     }//end wsNotifyApplied()
@@ -1403,6 +1426,11 @@ class PatchingActions
             $ops,
             $enc
         );
+
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
 
         return TRUE;
 
@@ -1446,6 +1474,11 @@ class PatchingActions
                 $enc
             );
 
+            // Request failed.
+            if ($result['curlInfo']['http_code'] !== 200) {
+                return FALSE;
+            }
+
             $result = json_decode($result['result'], TRUE);
             if ($result['result']['status'] === 'OK') {
                 $filename      = $result['result']['filename'];
@@ -1480,7 +1513,11 @@ class PatchingActions
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
-        $result   = Patching::wsCheckSubscription();
+        $result = Patching::wsCheckSubscription();
+        if ($result === FALSE) {
+            return FALSE;
+        }
+
         $services = Util::getArrayIndex($result, 'services', '');
         $services = explode(';', $services);
         if (is_array($services) === TRUE && in_array('Mini Backup', $services) === TRUE) {
@@ -1513,6 +1550,12 @@ class PatchingActions
             $ops,
             $enc
         );
+
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
 
@@ -1549,6 +1592,12 @@ class PatchingActions
         $enc    = TRUE;
         $msg    = self::_wsMsgTemplate('ReleaseStatus', $ops, $enc);
         $result = self::_wsSendMessage($updateServer['connection']['url'], $msg);
+
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
 
@@ -1624,6 +1673,11 @@ class PatchingActions
             $enc
         );
 
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
         switch ($status) {
@@ -1668,6 +1722,12 @@ class PatchingActions
             $ops,
             $enc
         );
+
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
         $result = json_decode($result['result'], TRUE);
         $status = $result['result']['status'];
 
@@ -1685,6 +1745,20 @@ class PatchingActions
         return array();
 
     }//end wsGetBugzilla()
+
+
+    /**
+     * Returns the JS code to initialise the Roles Screen.
+     *
+     * @return string
+     */
+    public static function getUpToDateInitCode()
+    {
+        $data = array();
+        $data = json_encode($data);
+        return '<script>PatchingPatchingScreen.initScreen('.$data.');</script>';
+
+    }//end getUpToDateInitCode()
 
 
     /**

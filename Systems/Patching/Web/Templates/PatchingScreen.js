@@ -24,11 +24,14 @@
 var PatchingPatchingScreen = new function()
 {
     var _patchingSettingsDiv = null;
+    var _notifyToggleBtn     = null;
 
     this.initScreen = function(data) {
         var self = this;
 
         _patchingSettingsDiv = dfx.getId('patchingSettings');
+        _notifyToggleBtn     = GUI.getWidget('PatchingScreen-notifyUpdates');
+
         GUI.setModified(this, true);
     };
 
