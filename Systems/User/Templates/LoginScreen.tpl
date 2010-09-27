@@ -11,7 +11,7 @@
             <p><text>Enter your username and password to log in</text></p>
             <div class="form-top"> </div>
             <form id="loginForm" action="" method="post" onsubmit="return UserLoginScreen.submit();">
-                <p id="LoginError" class="error"> </p>
+                <p id="LoginError" class="error">&nbsp;</p>
                 <label for="loginName-input"><text>Username</text></label>
                 <widget type="GUI/TextBox" id="loginName">
                     <setting name="focus">true</setting>
