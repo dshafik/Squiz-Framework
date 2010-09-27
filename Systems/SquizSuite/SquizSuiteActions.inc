@@ -1804,9 +1804,9 @@ class SquizSuiteActions
 
             $systemid = $product['systemid'];
 
-            $productName = _('Unknown');
-            if (array_key_exists('name', $product['connection']) === FALSE) {
-                $productName .= ' ('.$product['systemid'].')';
+            $productName = _('Unknown').' ('.$product['systemid'].')';
+            if (array_key_exists('name', $product['connection']) === TRUE) {
+                $productName = $product['connection']['name'];
             }
 
             $productUrl = '';
