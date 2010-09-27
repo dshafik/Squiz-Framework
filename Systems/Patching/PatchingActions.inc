@@ -1762,6 +1762,52 @@ class PatchingActions
 
 
     /**
+     * Returns the rows for Update Notification section.
+     *
+     * @return array
+     */
+    public static function getUpdateNotificationRows()
+    {
+        $rows = array();
+
+        $config      = Patching::getPatchingConfig();
+        $recipients  = $config['recipient'];
+        $noRecipient = TRUE;
+        if (empty($recipients) === FALSE) {
+            $noRecipient = FALSE;
+        }
+
+        // Notification Toggle button.
+        $toggleBtnRow = '<div class="PatchingScreen-activateWrap"><span>'._('Notify of New Updates').'</span>%s</div>';
+        $toggleBtn    = GUI::createWidget(
+            'PatchingScreen-notifyUpdates',
+            'GUIToggleButton',
+            array()
+        );
+
+
+        $rows[] = sprintf($toggleBtnRow, $toggleBtn);
+        $rows[] = '<div style="background-color: red; padding: 3px;"><strong>TODO: Once the user system is finalised, finish this!</strong></div>';
+
+        // Notification Add New User button.
+        $addNewBtnRow = '<div class="PatchingScreen-activateWrap"><span>'._('Notify of New Updates').'</span>%s</div>';
+        $addNewBtn    = GUI::createWidget(
+            'PatchingScreen-addNewUser',
+            'GUIButton',
+            array(
+                'value' => _('Add Users'),
+                'click' => 'PatchingPatchingScreen.addNotificationUser()',
+            )
+        );
+
+        $rows[] = sprintf($addNewBtnRow, $addNewBtn);
+
+        return $rows;
+
+    }//end getUpdateNotificationRows()
+
+
+    /**
      * Save the SuperUsers screen settings.
      *
      * @param array $data Settings to save.

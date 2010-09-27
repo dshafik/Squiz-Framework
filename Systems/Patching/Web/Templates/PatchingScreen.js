@@ -23,21 +23,31 @@
 
 var PatchingPatchingScreen = new function()
 {
-    var _patchingSettingsDiv = null;
-    var _notifyToggleBtn     = null;
+    var _patchingSettingsWdgt = null;
+    var _patchingSettingsDiv  = null;
+    var _notifyToggleBtn      = null;
 
     this.initScreen = function(data) {
         var self = this;
 
-        _patchingSettingsDiv = dfx.getId('patchingSettings');
-        _notifyToggleBtn     = GUI.getWidget('PatchingScreen-notifyUpdates');
+        this._patchingSettingsDiv = GUI.getWidget('patchingSettings');
+        this._patchingSettingsDiv = dfx.getId('patchingSettings');
+        this._notifyToggleBtn     = GUI.getWidget('PatchingScreen-notifyUpdates');
+
+        this._notifyToggleBtn.addToggleOnCallback(function() {
+            alert("TODO: Once the user system is finalised, finish this!");
+        });
+
+        this._notifyToggleBtn.addToggleOffCallback(function() {
+            alert("TODO: Once the user system is finalised, finish this!");
+        });
 
         GUI.setModified(this, true);
     };
 
     this.toggleActivation = function() {
-        var activWrap  = dfx.getClass('PatchingScreen-activateWrap', _patchingSettingsDiv)[0];
-        var cancelWrap = dfx.getClass('PatchingScreen-idTextFieldWrap', _patchingSettingsDiv)[0];
+        var activWrap  = dfx.getClass('PatchingScreen-activateWrap', this._patchingSettingsDiv)[0];
+        var cancelWrap = dfx.getClass('PatchingScreen-idTextFieldWrap', this._patchingSettingsDiv)[0];
         if (dfx.hasClass(activWrap, 'hidden') === true) {
             dfx.removeClass(activWrap, 'hidden');
             dfx.addClass(cancelWrap, 'hidden');
@@ -61,6 +71,10 @@ var PatchingPatchingScreen = new function()
 
         dfx.removeClass(dfx.getId('PatchingScreen-changeIdBtnWrap'), 'hidden');
         dfx.addClass(dfx.getId('PatchingScreen-cancel-changeIdBtnWrap'), 'hidden');
+    };
+
+    this.addNotificationUser = function() {
+        alert("TODO: Once the user system is finalised, finish this!");
     };
 
 }

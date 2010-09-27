@@ -214,33 +214,7 @@
                         <updateNotification>
                             <label><text>Update Notification</text></label>
                             <items>
-                                <value>
-                                    <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[
-                                                        <div class="PatchingScreen-activateWrap"><span>Notify of New Updates</span>%s</div>
-                                                    ]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg>
-                                                    <widget type="GUI/ToggleButton" id="PatchingScreen-notifyUpdates">
-                                                        <!--dataProvider action="Cron::getCronInterval">
-                                                            <arg>daily-min</arg>
-                                                        </dataProvider-->
-                                                    </widget>
-                                                </arg>
-                                            </args>
-                                        </text>
-                                    </content>
-                                </value>
-                                <value>
-                                    <content>
-                                        <text>Row 2</text>
-                                    </content>
-                                </value>
+                                <dataProvider action="Patching::getUpdateNotificationRows" />
                             </items>
                         </updateNotification>
                     </else>

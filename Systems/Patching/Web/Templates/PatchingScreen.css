@@ -35,6 +35,10 @@
     float: right;
 }
 
+#PatchingScreen-addNewUser {
+    float: right;
+}
+
 div.PatchingScreen-activateWrap span.PatchingScreen-lastUpdatedString {
     float: right;
 }
