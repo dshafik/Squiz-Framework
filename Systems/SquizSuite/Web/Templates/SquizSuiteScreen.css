@@ -39,24 +39,28 @@
     color: #000;
     background-color: #E7F1FF;
     border-bottom: 1px solid #DFDEDE;
+    width: 47px;
 }
 
 #squizSuite-connectedProduct-box th.th-currName {
     color: #5F5F5F;
     background-color: #FFF;
     border-bottom: 1px solid #DFDEDE;
+    width: 378px;
 }
 
 #squizSuite-connectedProduct-box th.th-currStatusIcon {
     color: #000;
     background-color: #F5F5F5;
     border-bottom: 1px solid #DFDEDE;
+    width: 67px;
 }
 
 #squizSuite-connectedProduct-box th.th-currSummary {
     color: #5F5F5F;
     background-color: #FFF;
     border-bottom: 1px solid #DFDEDE;
+    width: 406px;
 }
 
 #squizSuite-connectedProduct-box th.th-delIcon {
