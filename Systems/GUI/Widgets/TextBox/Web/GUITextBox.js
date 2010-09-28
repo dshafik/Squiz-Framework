@@ -110,6 +110,15 @@ GUITextBox.prototype = {
     {
         this.textBox.select();
 
+    },
+
+    revert: function()
+    {
+        var widgetElement = dfx.getId(this.id);
+        var textBox       = dfx.getClass('input', widgetElement)[0];
+        textBox.value     = this.settings.value;
+        GUI.setModified(this, false);
+
     }
 
 }
