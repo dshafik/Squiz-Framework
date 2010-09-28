@@ -45,6 +45,11 @@ function GUISelect(id, settings)
 GUISelect.prototype = {
     init: function()
     {
+        // If the selected array is not an array, then make it one.
+        if (!this.settings.selected.length) {
+            this.settings.selected = [this.settings.selected];
+        }
+
         var self      = this;
         var selectBox = dfx.getId(this.id);
 
@@ -67,10 +72,7 @@ GUISelect.prototype = {
 
         dfx.addEvent(selectBox, 'change', function(e) {
             var newValue = this.getSelectedItems();
-            self.setValue(newValue);
-
-            // Fire itemSelected widget event when a new value is selected.
-            self.fireChangeCallbacks(newValue, e);
+            self.setValue(newValue, e);
         });
 
     },
@@ -81,15 +83,46 @@ GUISelect.prototype = {
 
     },
 
-    setValue: function(newValue)
+    setValue: function(newValue, domEvent)
     {
+        // If programmatic change, pass a null event.
+        domEvent = domEvent || null;
+
+        var selectBox = dfx.getId(this.id);
+
+        selectBox.setSelectedItems = function(selected) {
+            if (typeof selected !== 'object') {
+                selected = [selected];
+            }
+
+            var len = this.options.length;
+            for (var i = 0; i < len; i++) {
+                var option = this.options[i];
+
+                if (selected.inArray(option.value)) {
+                    option.selected = true;
+                } else {
+                    option.selected = false;
+                }
+            }
+        }
+
         var self = this;
 
         if (self.currentValue !== newValue) {
             self.currentValue = newValue;
+            selectBox.setSelectedItems(newValue);
             GUI.setModified(self, true);
+
+            self.fireChangeCallbacks(newValue, domEvent);
         }
 
+    },
+
+    revert: function()
+    {
+        this.setValue(this.settings.selected);
+        GUI.setModified(self, false);
     }
 
 };
