@@ -37,6 +37,7 @@ var PatchingPatchingScreen = new function()
         this._patchingSettingsDiv = dfx.getId('patchingSettings');
         this._notifyToggleBtn     = GUI.getWidget('PatchingScreen-notifyUpdates');
 
+        // User notification toggle button.
         this._notifyToggleBtn.addToggleOnCallback(function() {
             alert("TODO: Once the user system is finalised, finish this!");
         });
@@ -46,8 +47,8 @@ var PatchingPatchingScreen = new function()
         });
 
         // Attach expander events.
-        this._updateBoxDiv       = dfx.getId('updatesBox');
-        var expanders = dfx.getClass('PatchingScreen-expander', this._updateBoxDiv);
+        this._updateBoxDiv = dfx.getId('updatesBox');
+        var expanders      = dfx.getClass('PatchingScreen-expander', this._updateBoxDiv);
         dfx.foreach(expanders, function(idx) {
             dfx.addEvent(expanders[idx], 'click', function(e) {
                 dfx.removeClass(
@@ -60,6 +61,7 @@ var PatchingPatchingScreen = new function()
             return true;
         });
 
+        // Schedule new update toggle button.
         this._newUpdatesTableDiv = dfx.getId('newUpdates-table');
         this._scheduleUpdateWdgt = GUI.getWidget('PatchingScreen-schedulePatch');
         if (this._scheduleUpdateWdgt) {

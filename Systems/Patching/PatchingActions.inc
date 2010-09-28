@@ -1815,7 +1815,15 @@ class PatchingActions
                                      'colContent' => $scheduleMsg,
                                     ),
                       );
-        }
+        } else {
+            $noPatMsg = _('No updates are available');
+            $rows[]   = array(
+                         'patchId' => array(
+                                       'colspan'    => 4,
+                                       'colContent' => $noPatMsg,
+                                      ),
+                        );
+        }//end if
 
         $expander = '<span class="PatchingScreen-expander">&nbsp;</span>';
         foreach ($patches as $patch) {
@@ -1964,8 +1972,6 @@ class PatchingActions
      */
     public static function getInstalledUpdateRows()
     {
-        $rows = array();
-        Channels::includeSystem('GUI');
         $rows      = array();
         $installed = TRUE;
         $patches   = Patching::getPatches($installed);
