@@ -63,6 +63,28 @@
         </where>
       </select>
     </primary>
+    <alternate>
+      <assert-true data="installed">
+        <select>
+          <fields>
+            <field table="patching" column="name" />
+            <field table="patching" column="patched" />
+            <field table="patching" column="userid" />
+          </fields>
+          <from>
+            <table>patching</table>
+          </from>
+          <where>
+            <not-null>
+              <field table="patching" column="patched"/>
+            </not-null>
+          </where>
+          <order-by direction="DESC">
+            <field column="patched" table="patching" />
+          </order-by>
+        </select>
+      </assert-true>
+    </alternate>
   </query>
 
   <query id="getPendingPatches">

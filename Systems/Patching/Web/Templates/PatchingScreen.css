@@ -88,3 +88,77 @@ div.PatchingScreen-activateWrap span {
     overflow: hidden;
     padding: 8px 5px 8px 8px;
 }
+
+/* New Updates Table */
+#newUpdates-table td {
+    vertical-align: top;
+}
+
+#newUpdates-table td.col-patchId {
+    width: 140px;
+}
+
+#newUpdates-table td.col-summary {
+    width: 600px;
+}
+
+.PatchingScreen-summary {
+    position: relative;
+}
+
+span.PatchingScreen-expander {
+    cursor: pointer;
+    display: block;
+    height: 14px;
+    left: 550px;
+    position: absolute;
+    top: 0;
+    width: 14px;
+}
+
+.PatchingScreen-scheduleMsg {
+    float: left;
+    margin: 7px 10px 0 0;
+}
+
+.PatchingScreen-summary span.PatchingScreen-expander {
+    background: url(../../../SquizSuite/Web/Templates/expander.png) no-repeat scroll 0 0px transparent;
+}
+
+.PatchingScreen-summary.full span.PatchingScreen-expander {
+    background: url(../../../SquizSuite/Web/Templates/expander.png) no-repeat scroll 0 -14px transparent;
+}
+
+.PatchingScreen-summary.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+.PatchingScreen-scheduled {
+    background: url(tick.png) no-repeat scroll 0 0 transparent;
+    height: 19px;
+    padding: 3px 0 0 27px;
+}
+
+.PatchingScreen-scheduled.not {
+    background-image: url(cross.png);
+}
+
+#PatchingScreen-schedulePatch {
+    float: left;
+    width: 110px;
+}
+
+.PatchingScreen-scheduleDatePicker {
+    float: left;
+    margin-top: 6px;
+}
+
+.PatchingScreen-scheduleDatePicker.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+.PatchingScreen-scheduleDatePicker select {
+    margin-right: 5px;
+}

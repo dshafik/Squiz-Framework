@@ -26,6 +26,8 @@ var PatchingPatchingScreen = new function()
     var _patchingSettingsWdgt = null;
     var _patchingSettingsDiv  = null;
     var _notifyToggleBtn      = null;
+    var _newUpdatesTableDiv   = null;
+    var _scheduleUpdateWdgt   = null;
 
     this.initScreen = function(data) {
         var self = this;
@@ -41,6 +43,33 @@ var PatchingPatchingScreen = new function()
         this._notifyToggleBtn.addToggleOffCallback(function() {
             alert("TODO: Once the user system is finalised, finish this!");
         });
+
+        // Attach expander events.
+        this._newUpdatesTableDiv = dfx.getId('newUpdates-table');
+        var expanders = dfx.getClass('PatchingScreen-expander', this._newUpdatesTableDiv);
+        dfx.foreach(expanders, function(idx) {
+            dfx.addEvent(expanders[idx], 'click', function(e) {
+                dfx.removeClass(
+                    dfx.getClass('hidden', expanders[idx].parentNode.parentNode)[0],
+                    'hidden'
+                );
+                dfx.addClass(expanders[idx].parentNode, 'hidden');
+            });
+
+            return true;
+        });
+
+        this._scheduleUpdateWdgt = GUI.getWidget('PatchingScreen-schedulePatch');
+        if (this._scheduleUpdateWdgt) {
+            var datePickerWrap = dfx.getClass('PatchingScreen-scheduleDatePicker', this._newUpdatesTableDiv)[0];
+            this._scheduleUpdateWdgt.addToggleOnCallback(function() {
+                dfx.removeClass(datePickerWrap, 'hidden');
+            });
+
+            this._scheduleUpdateWdgt.addToggleOffCallback(function() {
+                dfx.addClass(datePickerWrap, 'hidden');
+            });
+        }
 
         GUI.setModified(this, true);
     };

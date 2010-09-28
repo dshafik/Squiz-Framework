@@ -257,9 +257,17 @@ class PatchingActions
         $dataDir   = BaseSystem::getDataDir('Patching');
         $targetDir = $dataDir.'/'.$name;
         $command   = 'cp '.$targetDir.'/patch_note.txt ';
-        $command  .= $dataDir.'/'.$name.'_note.txt';
+
+        $notePath = $dataDir.'/'.$name.'_note.txt';
+        $command .= $notePath;
+
         exec($command);
         exec('rm -rf '.$targetDir);
+
+        include_once 'Libs/String/String.inc';
+        $patchNote = file_get_contents($notePath);
+        $summary   = String::ellipsisize($patchNote, 350);
+        file_put_contents($dataDir.'/'.$name.'_summary.txt', $summary);
 
     }//end _extractPatchNote()
 
@@ -277,22 +285,20 @@ class PatchingActions
      */
     public static function getPatchNote($name, $getSummary=FALSE)
     {
-        $res       = '';
-        $dataDir   = BaseSystem::getDataDir('Patching');
-        $targetDir = $dataDir.'/'.$name;
-        if (is_dir($targetDir) === TRUE) {
-            $filename = $targetDir.'/patch_note';
-            if ($getSummary === TRUE) {
-                $filename .= '_summary';
-            }
+        $note    = '';
+        $dataDir = BaseSystem::getDataDir('Patching');
 
-            $filename .= '.txt';
-            if (file_exists($filename) === TRUE) {
-                $res = file_get_contents($filename);
-            }
+        if ($getSummary === TRUE) {
+            $filename = $dataDir.'/'.$name.'_summary.txt';
+        } else {
+            $filename = $dataDir.'/'.$name.'_note.txt';
         }
 
-        return $res;
+        if (file_exists($filename) === TRUE) {
+            $note = file_get_contents($filename);
+        }
+
+        return $note;
 
     }//end getPatchNote()
 
@@ -307,8 +313,12 @@ class PatchingActions
      */
     public static function registerPatch($name, $sha1)
     {
-        Channels::includeSystem('Authentication');
-        $userid = Authentication::getCurrentUserid();
+        Channels::includeSystem('User');
+        $userid = User::getCurrentUserid();
+        if ($userid === NULL) {
+            $userid = 0;
+        }
+
         Channels::addToBasket('userid', $userid);
 
         try {
@@ -421,9 +431,11 @@ class PatchingActions
     /**
      * Get the all downloaded patches, scheduled or not scheduled.
      *
+     * @param boolean $installed TRUE to get the installed patches.
+     *
      * @return array
      */
-    public static function getPatches()
+    public static function getPatches($installed=FALSE)
     {
         $baseQuery = DAL::getDALQuery('Patching', 'getPatches', 'Assoc');
         $patches   = DAL::executeDALQuery($baseQuery);
@@ -711,32 +723,6 @@ class PatchingActions
         return $lastUpdated;
 
     }//end getLastUpdatedTime()
-
-
-    /**
-     * Returns the rows for new updates tale.
-     *
-     * @return array
-     */
-    public static function getNewUpdateRows()
-    {
-        $rows = array();
-        return $rows;
-
-    }//end getNewUpdateRows()
-
-
-    /**
-     * Returns the rows for installed updates tale.
-     *
-     * @return array
-     */
-    public static function getInstalledUpdateRows()
-    {
-        $rows = array();
-        return $rows;
-
-    }//end getInstalledUpdateRows()
 
 
     /**
@@ -1183,7 +1169,6 @@ class PatchingActions
             }
         }
 
-        Channels::includeSystem('Message');
         $ops    = array('currentRevision' => $config['revision']);
         $enc    = TRUE;
         $result = self::_wsSendMessage(
@@ -1211,6 +1196,7 @@ class PatchingActions
                 // Check the existing (downloaded) patches.
                 $toDownload   = array();
                 $validPatches = array();
+                include_once 'Libs/Web/Email.inc';
                 foreach ($patches as $patchInfo) {
                     if (array_key_exists($patchInfo['to'], $updates) === FALSE) {
                         // The downloaded patch is no longer valid.
@@ -1222,8 +1208,7 @@ class PatchingActions
                                 // TODO: Body needs to be fixed.
                                 $subject = 'Invalid Patch has been removed';
                                 $body    = $patchInfo['name'].' is no longer valid, so it has been removed.';
-                                Message::addMessage($config['recipient'], $subject, $body, NULL, array('title' => 'Up to Date Notification'));
-                                Message::sendMessages();
+                                Email::sendHtmlEmail($config['recipient'], $subject, $body);
                             }
                         }
                     } else {
@@ -1238,8 +1223,7 @@ class PatchingActions
                                     // TODO: Body needs to be fixed.
                                     $subject = 'The scheduled patch has been re-downloaded';
                                     $body    = $patchInfo['name'].' is no longer valid, so it has been redownloaded and unscheduled.';
-                                    Message::addMessage($config['recipient'], $subject, $body, NULL, array('title' => 'Up to Date Notification'));
-                                    Message::sendMessages();
+                                    Email::sendHtmlEmail($config['recipient'], $subject, $body);
                                 }
                             }
                         } else {
@@ -1271,16 +1255,13 @@ class PatchingActions
                         if ($config['notify'] === TRUE) {
                             $subject = 'New MySource Mini update available';
                             $body    = self::_getNewPatchMessageBody($subject, $patchName);
-                            Message::addMessage($config['recipient'], $subject, $body, NULL, array('title' => 'Up to Date Notification'));
-                            Message::sendMessages();
+                            Email::sendHtmlEmail($config['recipient'], $subject, $body);
                         }
                     } else {
                         if ($config['notify'] === TRUE) {
-                            // TODO: Body needs to be fixed.
                             $subject = 'Downloading the Patch has been FAILED';
                             $body    = $patchInfo['name'].' is no longer valid, so it has been removed.';
-                            Message::addMessage($config['recipient'], $subject, $body, NULL, array('title' => 'Up to Date Notification'));
-                            Message::sendMessages();
+                            Email::sendHtmlEmail($config['recipient'], $subject, $body);
                         }
                     }//end if
                 }//end foreach
@@ -1768,6 +1749,7 @@ class PatchingActions
      */
     public static function getUpdateNotificationRows()
     {
+        Channels::includeSystem('GUI');
         $rows = array();
 
         $config      = Patching::getPatchingConfig();
@@ -1785,7 +1767,6 @@ class PatchingActions
             array()
         );
 
-
         $rows[] = sprintf($toggleBtnRow, $toggleBtn);
         $rows[] = '<div style="background-color: red; padding: 3px;"><strong>TODO: Once the user system is finalised, finish this!</strong></div>';
 
@@ -1795,8 +1776,8 @@ class PatchingActions
             'PatchingScreen-addNewUser',
             'GUIButton',
             array(
-                'value' => _('Add Users'),
-                'click' => 'PatchingPatchingScreen.addNotificationUser()',
+             'value' => _('Add Users'),
+             'click' => 'PatchingPatchingScreen.addNotificationUser()',
             )
         );
 
@@ -1805,6 +1786,188 @@ class PatchingActions
         return $rows;
 
     }//end getUpdateNotificationRows()
+
+
+    /**
+     * Returns the rows for new updates tale.
+     *
+     * @return array
+     */
+    public static function getNewUpdateRows()
+    {
+        Channels::includeSystem('GUI');
+        $rows    = array();
+        $patches = Patching::getPatches();
+
+        if (empty($patches) === FALSE) {
+            $scheduleMsg  = '<div class="PatchingScreen-scheduleMsg">'._('Schedule installation of updates').'</div>';
+            $scheduleMsg .= GUI::createWidget(
+                'PatchingScreen-schedulePatch',
+                'GUIToggleButton',
+                array()
+            );
+
+            $scheduleMsg .= self::_getScheduleTimePicker(time());
+
+            $rows[] = array(
+                       'patchId' => array(
+                                     'colspan'    => 4,
+                                     'colContent' => $scheduleMsg,
+                                    ),
+                      );
+        }
+
+        $expander = '<span class="PatchingScreen-expander">&nbsp;</span>';
+        foreach ($patches as $patch) {
+            $summary  = '<div class="PatchingScreen-summary">';
+            $summary .= nl2br(Patching::getPatchNote($patch['name'], TRUE)).$expander.'</div>';
+            $summary .= '<div class="PatchingScreen-summary full hidden">';
+            $summary .= nl2br(Patching::getPatchNote($patch['name'])).$expander.'</div>';
+
+            if ($patch['scheduled'] === NULL) {
+                $scheduled = '<div class="PatchingScreen-scheduled not">'._('Not Sceduled').'</div>';
+            } else {
+                $scheduled = '<div class="PatchingScreen-scheduled">'._('Sceduled').'</div>';
+            }
+
+            $rows[] = array(
+                       'patchId'    => $patch['name'],
+                       'summary'    => $summary,
+                       'scheduledT' => $scheduled,
+                      );
+        }
+
+        return $rows;
+
+    }//end getNewUpdateRows()
+
+
+    /**
+     * Create a date input field combo for user to schedule a patch run time.
+     *
+     * Prefills with the closest time, or based on the cron frequency settings.
+     * If daily, hour and minute cannot be set.
+     *
+     * @param integer $time The previously scheduled patch time.
+     *
+     * @return object
+     */
+    private static function _getScheduleTimePicker($time)
+    {
+        Channels::includeSystem('GUI');
+        Channels::includeSystem('Cron');
+        $content      = '<div class="PatchingScreen-scheduleDatePicker hidden">';
+        $cronTypes    = Cron::getCronTypes();
+        $cronJob      = Cron::getCronJob('Patching', 'PatchingCron.inc');
+        $cronSettings = array();
+        foreach ($cronTypes as $type) {
+            if ($type['typeid'] === $cronJob['interval']) {
+                $cronSettings = $type;
+            }
+        }
+
+        if ($time === 0) {
+            $time = time();
+        }
+
+        $today    = getdate();
+        $selected = array();
+
+        $selected['day']   = ($today['mday'] - 1);
+        $selected['month'] = ($today['mon'] - 1);
+        $selected['year']  = $today['year'];
+        $selected['hour']  = ($today['hours'] - 1);
+        $selected['min']   = ($today['minutes'] - 1);
+
+        $days     = range(1, 31);
+        $content .= GUI::createWidget(
+            'PatchingScreen-scheduleDay',
+            'GUISelect',
+            array(
+             'options'  => $days,
+             'selected' => $selected['day'],
+            )
+        );
+
+        include_once 'Libs/Util/Util.inc';
+        $content .= GUI::createWidget(
+            'PatchingScreen-scheduleMonth',
+            'GUISelect',
+            array(
+             'options'  => Util::getMonthsString(),
+             'selected' => $selected['month'],
+            )
+        );
+
+        $years    = range($today['year'], ($today['year'] + 5));
+        $yearsOps = array();
+        foreach ($years as $year) {
+            $yearsOps[$year] = $year;
+        }
+
+        $content .= GUI::createWidget(
+            'PatchingScreen-scheduleYear',
+            'GUISelect',
+            array(
+             'options'  => $yearsOps,
+             'selected' => $selected['year'],
+            )
+        );
+
+        // Work out what to print based on the cron type.
+        $parts = explode(' ', $cronSettings['condition']);
+        $min   = $parts[0];
+        $hour  = $parts[1];
+        if ($cronSettings['typeid'] === 'daily') {
+            // Daily, show what time the script will run.
+            $content .= $hour.':'.$min.'</div>';
+            return $content;
+        } else {
+            $hours    = range(0, 23);
+            $content .= GUI::createWidget(
+                'PatchingScreen-scheduleHour',
+                'GUISelect',
+                array(
+                 'options'  => $hours,
+                 'selected' => $selected['hour'],
+                )
+            );
+
+            if ($cronSettings['typeid'] === 'hourly') {
+                // Hourly, let user set hour, show minute.
+                $content .= ':'.$min;
+            } else if ($cronSettings['typeid'] === 'frequent') {
+                // Frequently, let user set hour and min.
+                $mins     = range(0, 59);
+                $content .= ':'.GUI::createWidget(
+                    'PatchingScreen-scheduleMin',
+                    'GUISelect',
+                    array(
+                     'options'  => $mins,
+                     'selected' => $selected['hour'],
+                    )
+                );
+            }//end if
+
+            $content .= '</div>';
+        }//end if
+
+        return $content;
+
+    }//end _getScheduleTimePicker()
+
+
+    /**
+     * Returns the rows for installed updates tale.
+     *
+     * @return array
+     */
+    public static function getInstalledUpdateRows()
+    {
+        $rows = array();
+        return $rows;
+
+    }//end getInstalledUpdateRows()
 
 
     /**
