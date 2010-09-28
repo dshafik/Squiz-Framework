@@ -601,6 +601,52 @@ class Util
     }//end encodeJson()
 
 
+    /**
+     * Return the list of month names.
+     *
+     * @param boolean $short TRUE it will return the shortened month name.
+     *
+     * @return array
+     */
+    public static function getMonthString($short=FALSE)
+    {
+        if ($short === FALSE) {
+            $months = array(
+                       _('January'),
+                       _('February'),
+                       _('March'),
+                       _('April'),
+                       _('May'),
+                       _('June'),
+                       _('July'),
+                       _('August'),
+                       _('September'),
+                       _('October'),
+                       _('November'),
+                       _('December'),
+                      );
+        } else {
+            $months = array(
+                       _('Jan'),
+                       _('Feb'),
+                       _('Mar'),
+                       _('Apr'),
+                       _('May'),
+                       _('Jun'),
+                       _('Jul'),
+                       _('Aug'),
+                       _('Sep'),
+                       _('Oct'),
+                       _('Nov'),
+                       _('Dec'),
+                      );
+        }//end if
+
+        return $months;
+
+    }//end getMonthString()
+
+
 }//end class
 
 ?>
