@@ -28,6 +28,7 @@ var PatchingPatchingScreen = new function()
     var _notifyToggleBtn      = null;
     var _newUpdatesTableDiv   = null;
     var _scheduleUpdateWdgt   = null;
+    var _updateBoxDiv         = null;
 
     this.initScreen = function(data) {
         var self = this;
@@ -45,8 +46,8 @@ var PatchingPatchingScreen = new function()
         });
 
         // Attach expander events.
-        this._newUpdatesTableDiv = dfx.getId('newUpdates-table');
-        var expanders = dfx.getClass('PatchingScreen-expander', this._newUpdatesTableDiv);
+        this._updateBoxDiv       = dfx.getId('updatesBox');
+        var expanders = dfx.getClass('PatchingScreen-expander', this._updateBoxDiv);
         dfx.foreach(expanders, function(idx) {
             dfx.addEvent(expanders[idx], 'click', function(e) {
                 dfx.removeClass(
@@ -59,6 +60,7 @@ var PatchingPatchingScreen = new function()
             return true;
         });
 
+        this._newUpdatesTableDiv = dfx.getId('newUpdates-table');
         this._scheduleUpdateWdgt = GUI.getWidget('PatchingScreen-schedulePatch');
         if (this._scheduleUpdateWdgt) {
             var datePickerWrap = dfx.getClass('PatchingScreen-scheduleDatePicker', this._newUpdatesTableDiv)[0];

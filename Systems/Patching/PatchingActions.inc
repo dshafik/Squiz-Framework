@@ -1965,6 +1965,26 @@ class PatchingActions
     public static function getInstalledUpdateRows()
     {
         $rows = array();
+        Channels::includeSystem('GUI');
+        $rows      = array();
+        $installed = TRUE;
+        $patches   = Patching::getPatches($installed);
+
+        $expander = '<span class="PatchingScreen-expander">&nbsp;</span>';
+        foreach ($patches as $patch) {
+            $summary  = '<div class="PatchingScreen-summary">';
+            $summary .= nl2br(Patching::getPatchNote($patch['name'], TRUE)).$expander.'</div>';
+            $summary .= '<div class="PatchingScreen-summary full hidden">';
+            $summary .= nl2br(Patching::getPatchNote($patch['name'])).$expander.'</div>';
+
+            include_once 'Libs/String/String.inc';
+            $rows[] = array(
+                       'patchId'    => $patch['name'],
+                       'summary'    => $summary,
+                       'installedT' => String::easyDateTime(strtotime($patch['patched'])),
+                      );
+        }
+
         return $rows;
 
     }//end getInstalledUpdateRows()

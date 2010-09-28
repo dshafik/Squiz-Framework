@@ -102,6 +102,19 @@ div.PatchingScreen-activateWrap span {
     width: 600px;
 }
 
+/* Installed Updates Table */
+#installedUpdates-table td {
+    vertical-align: top;
+}
+
+#installedUpdates-table td.col-patchId {
+    width: 140px;
+}
+
+#installedUpdates-table td.col-summary {
+    width: 600px;
+}
+
 .PatchingScreen-summary {
     position: relative;
 }
