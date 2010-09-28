@@ -1894,7 +1894,7 @@ class PatchingActions
             'PatchingScreen-scheduleMonth',
             'GUISelect',
             array(
-             'options'  => Util::getMonthsString(),
+             'options'  => Util::getMonthString(),
              'selected' => $selected['month'],
             )
         );
