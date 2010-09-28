@@ -92,42 +92,31 @@ class GUISelectActions
     {
         $id       = $settings['widget']['id'];
         $class    = $settings['widget']['type'];
-        $selected = Util::getArrayIndex($settings, 'selected');
+        $selected = Util::getArrayIndex($settings, 'selected', NULL);
         $options  = Util::getArrayIndex($settings, 'options', array());
-        $depths   = array();
+        self::_paintItems($options, $selected);
 
-        while (count($options) > 0) {
-            reset($options);
-            $optionKey = key($options);
-            $option    = array_shift($options);
+    }//end paintItems()
 
-            if (count($depths) === 0) {
-                $depth = 0;
-            } else {
-                $depthEl = array_pop($depths);
-                $depth   = $depthEl[0];
 
-                if ($depthEl[1] > 1) {
-                    $depthEl[1]--;
-                    $depths[] = $depthEl;
-                }
-            }//end if
-
-            // If this is an array, store the depths of the next elements so we
-            // know when to switch back to the next lower level.
-            // Then add the sub elements to the start of the options so we know
-            // to work with them first. Ignore the key provided.
+    /**
+     * Recursively paint option items.
+     *
+     * @param array   $options  List of options to paint.
+     * @param mixed   $selected Selected option value.
+     * @param integer $depth    Recursion depth.
+     *
+     * @return void
+     */
+    private static function _paintItems($options, $selected, $depth=0)
+    {
+        foreach ($options as $key => $option) {
             if (is_array($option) === TRUE) {
-                $newLength = (count($depths) + count($option));
-                $depths[]  = array(
-                              ($depth + 1),
-                              count($option),
-                             );
-                $options   = ($option + $options);
+                self::_paintItems($option, $selected, ($depth + 1));
             } else {
-                echo '<option value="'.$optionKey.'"';
+                echo '<option value="'.$key.'"';
 
-                if ($selected === $optionKey) {
+                if ($selected === $key) {
                     echo ' selected="selected"';
                 }
 
@@ -139,10 +128,10 @@ class GUISelectActions
                 }
 
                 echo $option.'</option>';
-            }//end if
-        }//end while
+            }
+        }//end foreach
 
-    }//end paintItems()
+    }//end _paintItems()
 
 
 }//end class
