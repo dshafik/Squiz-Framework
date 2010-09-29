@@ -1,11 +1,13 @@
+<var name="systemName"><dataProvider action="SquizSuite::getProductTitle" /></var>
+<var name="systemLogo"><dataProvider action="SquizSuite::getProductLogo" /></var>
 <html>
 <head>
-    <title><text>Login</text> - Squiz Analytics</title>
+    <title><text>Login</text> - {systemName}</title>
 </head>
 <body class="LoginScreen">
     <div id="LoginScreen-content">
         <div class="LoginScreen-titlebar">
-            <img src="/__web/Systems/SquizAnalytics/Web/logo.png" />
+            <img src="{systemLogo}" />
         </div>
         <div class="LoginScreen-main">
             <p><text>Enter your username and password to log in</text></p>
