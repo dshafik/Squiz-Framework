@@ -161,7 +161,10 @@ class GUIActions
         }
 
         // Need to wrap content.
+        // and declare &nbsp for templates containing a &nbsp.
+        $declare   = '[ <!ENTITY nbsp "&#160;"> ]>';
         $contents  = self::$_docType;
+        $contents  = str_replace('>', $declare, $contents);
         $contents .= '<gui_root_element>'.$fileCont.'</gui_root_element>';
 
         $tpl = new DOMDocument('1.0');
@@ -344,6 +347,9 @@ class GUIActions
         $xmlContent = str_replace('<gui_root_element>', '', $xmlContent);
         $xmlContent = str_replace('</gui_root_element>', '', $xmlContent);
 
+        // Remove the &nbsp declaration from the DTD, as most browser do not implement this.
+        $xmlContent = str_replace(" [\n<!ENTITY nbsp \"&#160;\">\n]>", '>', $xmlContent);
+
         $htmlCont = XML::xmlToXHTML($xmlContent);
 
         // If <head> element exists, insert API token hidden input field
@@ -396,14 +402,14 @@ class GUIActions
     /**
      * Replace variable keywords in parsed HTML content.
      *
-     * @param string $content The HTML content to search.
-     * @param bool   $echo    If TRUE, variable is echo'd. Otherwise var is printed.
+     * @param string  $content The HTML content to search.
+     * @param boolean $echo    If TRUE, variable is echo'd. Otherwise var is printed.
      *
      * @return string
      */
     private static function _replaceVarKeywords($content, $echo=TRUE)
     {
-        if ($echo == TRUE) {
+        if ($echo === TRUE) {
             $callback = '_replaceVarKeywordsEchoCallback';
         } else {
             $callback = '_replaceVarKeywordsCallback';
@@ -444,7 +450,7 @@ class GUIActions
 
         return $code;
 
-    }//end _replaceVarKeywordsCallback()
+    }//end _replaceVarKeywordsEchoCallback()
 
 
     /**
@@ -1341,9 +1347,11 @@ class GUIActions
                     case 'if':
                         $php .= ' ('.$condition.' === TRUE) {'."\n";
                     break;
+
                     case 'if-not':
                         $php .= ' ('.$condition.' === FALSE) {'."\n";
                     break;
+
                     default:
                         $php .= " {\n";
                     break;
@@ -1447,7 +1455,8 @@ class GUIActions
             $php = self::_parseTag($firstChild, $varName);
         } else {
             // Just a text node.
-            return $varName." = '".str_replace("'", "\'", $var->nodeValue)."';";
+            $textNode = $varName." = '".str_replace("'", "\'", $var->nodeValue)."';";
+            return $textNode;
         }
 
         self::$_templateVariablesCode .= $php;
@@ -2005,15 +2014,15 @@ class GUIActions
         ) {
             ob_start('ob_gzhandler');
 
-            header('Content-type: text/css; charset: UTF-8');
-            header('Cache-Control: must-revalidate');
+                header('Content-type: text/css; charset: UTF-8');
+                header('Cache-Control: must-revalidate');
 
-            $now     = time();
-            $expires = date('D, j M Y 00:00:00', ($now + 86400));
-            header('Expires: '.$expires);
-            header('Last-Modified: '.$modified);
+                $now     = time();
+                $expires = date('D, j M Y 00:00:00', ($now + 86400));
+                header('Expires: '.$expires);
+                header('Last-Modified: '.$modified);
 
-            echo file_get_contents(dirname(__FILE__).'/web/'.$filename);
+                echo file_get_contents(dirname(__FILE__).'/web/'.$filename);
         } else {
             header('X-Sendfile: '.$path);
             if ($filename === 'mysource.jgz' || $filename === 'dfx.jgz') {
