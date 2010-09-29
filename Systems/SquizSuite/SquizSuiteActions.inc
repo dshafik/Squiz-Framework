@@ -74,6 +74,44 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the name of this product.
+     *
+     * Other systems need to refine this channel
+     * to provide their own data.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function getProductTitle()
+    {
+        $title = 'Squiz Framework';
+        return $title;
+
+    }//end getProductTitle()
+
+
+    /**
+     * Returns the logo of this product.
+     *
+     * Other systems need to refine this channel
+     * to provide their own logo.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function getProductLogo()
+    {
+        $logoPath = '/__web/Systems/GUI/Widgets/Toolbar/Web/logo.png';
+        return $logoPath;
+
+    }//end getProductLogo()
+
+
+    /**
      * Returns the summary of this product.
      *
      * Other systems need to plug in this channel
