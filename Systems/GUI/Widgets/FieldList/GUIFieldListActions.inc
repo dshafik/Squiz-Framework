@@ -127,14 +127,26 @@ class GUIFieldListActions
 		}
 
 		if ($allowAdd === TRUE) {
-			$settings['items']['__new'] = '';
+		    // Create a base "extra row" that will be copied when we need to create
+		    // a new row. This is needed because otherwise we won't know what to do
+		    // if we start with an empty items list.
+			echo '<li class="existingRow extraRow" id="'.$id.'-__new">';
+			if ($sortable === TRUE) {
+				echo '<span class="'.$class.' dragHandle" title="'.$sortTitle.'"></span>';
+			}
+
+			if ($allowDelete === TRUE) {
+				echo '<span class="'.$class.' deleteIcon" title="'.$deleteTitle.'"></span>';
+			}
+
+            $fieldName = $id.'-__new-value';
+            echo '<div class="editableItem">';
+            echo '<input type="text" id="'.$fieldName.'" value="" />';
+            echo '</div>';
+			echo '</li>';
 		}
 
 		foreach ($settings['items'] as $itemIndex => $item) {
-			if ($itemIndex === '__new') {
-				$extraClasses .= ' extraRow';
-			}
-
 			echo '<li class="existingRow'.$extraClasses.'" id="'.$id.'-'.$itemIndex.'">';
 			if ($sortable === TRUE) {
 				echo '<span class="'.$class.' dragHandle" title="'.$sortTitle.'"></span>';
@@ -159,7 +171,9 @@ class GUIFieldListActions
 
 		echo '</ul>';
 
-		// If we're allowed to add a row, give an extra row.
+		// If we're allowed to add a row, give an "Add new row..." invitation.
+		// Note that this never gets typed into - when the text box gets the focus,
+		// a copy of the "extra row" gets created and focus is given to that instead.
 		if (($editable === TRUE) && ($allowAdd === TRUE)) {
 			echo '<div class="'.$class.'-newRow'.$extraClasses.'">';
 			if ($sortable === TRUE) {

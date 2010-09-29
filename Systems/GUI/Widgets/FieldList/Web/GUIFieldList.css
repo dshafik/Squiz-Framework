@@ -47,6 +47,7 @@
 	background: url(delete_recover.png) left top no-repeat;
 	margin: 6px 2px 0px 10px;
 	cursor: pointer;
+	border: none;
 }
 
 .GUIFieldList-right li.deleted {

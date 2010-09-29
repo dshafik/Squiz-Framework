@@ -25,6 +25,7 @@ function GUIFieldList(id, settings)
 {
 	this.id       = id;
 	this.settings = settings;
+
 	this.init();
 
 }
@@ -53,16 +54,6 @@ GUIFieldList.prototype = {
 			// Name of the "add new row" textbox.
 			var newRowName = this.id + '-list-item-add';
 			var newRowTb   = dfx.getId(newRowName);
-
-			/**
-			 * Handle typing in an existing row.
-			 *
-			 * @return {Boolean}
-			 */
-			var handleExistingRowKeypress = function() {
-				GUI.setModified(self, true);
-				return true;
-			};
 
 			/**
 			 * Handle toggling the deleted state of a row.
@@ -115,7 +106,14 @@ GUIFieldList.prototype = {
 				// Set the appropriate random ID of the new row.
 				var cloneId    = self.id + '-new_' + dfx.getUniqueId();
 				clonedRowTb.id = cloneId + '-value';
-				dfx.addEvent(clonedRowTb, 'keypress', handleExistingRowKeypress);
+				dfx.addEvent(clonedRowTb, 'keypress', function() {
+				    self.handleExistingRowKeypress.call(self);
+				});
+
+				var deleteIcon = dfx.getClass('deleteIcon', rowClone);
+				dfx.addEvent(deleteIcon, 'click', function(e) {
+				    self.handleToggleDelete.call(self, e.currentTarget);
+				});
 
 				dfx.append(listObj, rowClone);
 				rowClone.id = cloneId;
@@ -130,13 +128,17 @@ GUIFieldList.prototype = {
 			dfx.addEvent(newRowTb, 'focus', handleNewRowFocus);
 
 			var inputs = dfx.getTag('input', listObj);
-			dfx.addEvent(inputs, 'keypress', handleExistingRowKeypress);
+			dfx.addEvent(inputs, 'keypress', function() {
+                self.handleExistingRowKeypress.call(self);
+            });
 		}
 
 		// Setup deletion events.
 		if (this.settings.allowDelete === true) {
 			var deleteIcons = dfx.getClass('deleteIcon', listObj);
-			dfx.addEvent(deleteIcons, 'click', handleToggleDelete);
+			dfx.addEvent(deleteIcons, 'click', function(e) {
+                self.handleToggleDelete.call(self, e.currentTarget);
+            });
 		}
 	},
 
@@ -219,6 +221,100 @@ GUIFieldList.prototype = {
 		return value;
 	},
 
+	setValue: function(newValue)
+	{
+	    var listObj = dfx.getId(this.id);
+	    var self    = this;
 
+	    if (newValue !== this.getValue()) {
+            // Remove all existing rows except the extra row.
+            var rows = dfx.find(listObj, 'li').not('.extraRow');
+            dfx.remove(rows);
+
+            var extraRow = dfx.getClass('extraRow', listObj)[0];
+
+            for (i = 0; i < newValue.order.length; i++) {
+                var key     = newValue.order[i];
+                var value   = newValue.values[key];
+                var deleted = newValue.deleted.inArray(key);
+
+                // Clone the row, and remove the extra row class from it.
+                var rowClone = dfx.cloneNode(extraRow, false)[0];
+                dfx.removeClass(rowClone, 'extraRow');
+
+                if (deleted === true) {
+                    dfx.addClass(rowClone, 'deleted');
+                }
+
+                // Move the "new row" input box into the cloned row, then remove its
+                // existing input box.
+                var clonedRowTb = dfx.getTag('input', rowClone)[0];
+
+                // Set the appropriate random ID of the new row.
+                var cloneId    = this.id + '-' + key;
+                rowClone.id    = cloneId;
+                clonedRowTb.id = cloneId + '-value';
+
+                dfx.addEvent(clonedRowTb, 'keypress', function() {
+				    self.handleExistingRowKeypress.call(self);
+				});
+
+				var deleteIcon = dfx.getClass('deleteIcon', rowClone);
+				dfx.addEvent(deleteIcon, 'click', function(e) {
+				    self.handleToggleDelete.call(self, e.currentTarget);
+				});
+
+                clonedRowTb.value = value;
+
+                dfx.append(listObj, rowClone);
+            }//end for
+
+            // Finally, set the dirty flag for the widget.
+            GUI.setModified(self, true);
+        }//end if
+	},
+
+	setItems: function(items)
+	{
+	    var value = {
+	        values: {},
+	        order: [],
+	        deleted: []
+	    };
+
+	    if (items instanceof Array === true) {
+	        for (var i = 0; i < items.length; i++) {
+	            value.values[i.toString()] = items[i];
+	            value.order.push(i.toString());
+	        }
+	    } else {
+	        for (var i in items) {
+	            value.values[i] = items[i];
+	            value.order.push(i);
+	        }
+	    }
+
+	    this.setValue(value);
+	},
+
+	revert: function()
+	{
+	    this.setItems(this.settings.items);
+	    GUI.setModified(this, false);
+	},
+
+	handleExistingRowKeypress: function()
+	{
+	    GUI.setModified(this, true);
+        return true;
+	},
+
+    handleToggleDelete: function(icon) {
+        var row = dfx.getParents(icon)[0];
+        dfx.toggleClass(row, 'deleted');
+        GUI.setModified(this, true);
+
+        return true;
+    }
 
 };
