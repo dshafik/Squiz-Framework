@@ -152,7 +152,7 @@
                                             <value>
                                                 <content>
                                                     <text><![CDATA[
-                                                        <div class="PatchingScreen-activateWrap"><span>%s</span>%s</div>
+                                                        <div class="PatchingScreen-activateWrap"><span class="PatchingScreen-nextCheckString">%s</span>%s</div>
                                                     ]]></text>
                                                 </content>
                                             </value>
@@ -163,7 +163,7 @@
                                                 <arg>
                                                     <widget type="GUI/Button" id="PatchingScreen-checkAsapBtn">
                                                         <setting name="value"><text>Check ASAP</text></setting>
-                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.checkAsapBtn()]]></setting>
+                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.checkUpdateASAP()]]></setting>
                                                     </widget>
                                                 </arg>
                                             </args>

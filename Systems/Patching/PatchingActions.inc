@@ -566,6 +566,9 @@ class PatchingActions
      * Default check interval in patch config is one hour.
      *
      * @return string
+     *
+     * @api            write
+     * @api-permission superuser
      */
     public static function getNextUpdateCheckTime()
     {
@@ -2024,7 +2027,7 @@ class PatchingActions
         }
 
         if (isset($result['errors']) === FALSE) {
-            $result = array('success' => TRUE);
+            $result = array('success' => $result);
         }
 
         return $result;

@@ -29,6 +29,7 @@ var PatchingPatchingScreen = new function()
     var _newUpdatesTableDiv   = null;
     var _scheduleUpdateWdgt   = null;
     var _updateBoxDiv         = null;
+    var _asapCheckBtnWdgt     = null;
 
     this.initScreen = function(data) {
         var self = this;
@@ -104,6 +105,19 @@ var PatchingPatchingScreen = new function()
 
         dfx.removeClass(dfx.getId('PatchingScreen-changeIdBtnWrap'), 'hidden');
         dfx.addClass(dfx.getId('PatchingScreen-cancel-changeIdBtnWrap'), 'hidden');
+    };
+
+    this.checkUpdateASAP = function() {
+        var self   = this;
+        var params = {};
+        GUI.sendRequest('Patching', 'getNextUpdateCheckTime', params, function(data) {
+            var text = dfx.getClass(
+                'PatchingScreen-nextCheckString',
+                self._patchingSettingsDiv
+            )[0];
+
+            dfx.setHtml(text, data.result);
+        });
     };
 
     this.addNotificationUser = function() {
