@@ -83,6 +83,10 @@ GUIToggleButton.prototype = {
             dfx.addClass(optNo, 'selected');
 
             // finish, fire event
+            if (self.settings.toggleAction) {
+                eval(self.settings.toggleAction);
+            }
+
             self.fireToggleOffCallbacks();
         });
     },
@@ -102,6 +106,10 @@ GUIToggleButton.prototype = {
             dfx.removeClass(optNo, 'selected');
 
             // finish, fire event
+            if (self.settings.toggleAction) {
+                eval(self.settings.toggleAction);
+            }
+
             self.fireToggleOnCallbacks();
         });
     },

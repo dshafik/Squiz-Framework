@@ -37,13 +37,20 @@ class GUIToggleButtonActions
      */
     protected static $value = FALSE;
 
+    /**
+     * JS function that will be called when toggled.
+     *
+     * @var string
+     */
+    protected static $toggleAction = NULL;
+
 
     /**
      * Prints this widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return void
+     * @return array
      */
     public static function paint(array $settings)
     {
