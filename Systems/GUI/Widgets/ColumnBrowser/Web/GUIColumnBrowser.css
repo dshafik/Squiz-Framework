@@ -75,6 +75,7 @@
     border-bottom: 1px solid #CCC;
     background-color: #FFF;
     margin-right: 14px;
+    cursor: default;
 }
 
 .GUIColumnBrowser-column.level-0,

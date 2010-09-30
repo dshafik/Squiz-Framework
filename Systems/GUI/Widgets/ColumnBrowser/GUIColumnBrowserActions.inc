@@ -133,13 +133,17 @@ class GUIColumnBrowserActions
         echo '<div id="'.$id.'" class="'.$class.'">';
         echo '<div id="'.$id.'" class="'.$class.'-columnWrapper">';
 
+        $firstCardClass = ' visible';
+
         foreach (self::$_columns as $level => $colCards) {
             // Print the column div which will contain multiple "cards".
             echo '<div class="'.$class.'-column level-'.$level.'">';
             foreach ($colCards as $cardid => $cardInfo) {
-                echo '<div class="'.$class.'-column-card" parentid="'.$cardid.'" parentTitle="'.$cardInfo['title'].'">';
+                echo '<div class="'.$class.'-column-card'.$firstCardClass.'" parentid="'.$cardid.'" parentTitle="'.$cardInfo['title'].'">';
                 echo $cardInfo['content'];
                 echo '</div>';
+
+                $firstCardClass = '';
             }
 
             echo '</div>';
@@ -197,12 +201,13 @@ class GUIColumnBrowserActions
     /**
      * Prints a single column item.
      *
-     * @param array $itemInfo Array containing id, itemContent (and children) info.
-     * @param array $settings Widget settings.
+     * @param array   $itemInfo Array containing id, itemContent (and children) info.
+     * @param array   $settings Widget settings.
+     * @param boolean $selected If TRUE then item will be marked as selected.
      *
      * @return void
      */
-    public static function paintItem(array $itemInfo, array $settings)
+    public static function paintItem(array $itemInfo, array $settings, $selected=FALSE)
     {
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'].'-item';
@@ -222,7 +227,17 @@ class GUIColumnBrowserActions
             $buttonClass .= ' '.$class.'-button';
         }
 
-        echo '<div itemid="'.$itemid.'" class="'.$class.$buttonClass.'" childcount="'.$childCount.'">';
+        $selectedClass = '';
+        if ($selected === TRUE) {
+            $selectedClass = ' selected';
+        }
+
+        $content = trim($content);
+        if (empty($content) === TRUE) {
+            $content = '&nbsp;';
+        }
+
+        echo '<div itemid="'.$itemid.'" class="'.$class.$buttonClass.$selectedClass.'" childcount="'.$childCount.'">';
         echo '<div class="'.$class.'-content'.$buttonClass.'">';
         echo $content;
         echo '</div>';
@@ -243,8 +258,9 @@ class GUIColumnBrowserActions
      * @param string $parentid The id of the parent.
      *
      * @return string
+     * @throws ChannelException If the channel setting is invalid.
      *
-     * @api read
+     * @api            read
      * @api-permission public
      */
     public static function getChildrenContents(array $settings, $parentid)
@@ -285,6 +301,85 @@ class GUIColumnBrowserActions
         return $contents;
 
     }//end getChildrenContents()
+
+
+    /**
+     * Returns the contents of specifed lineage.
+     *
+     * @param array $settings Settings of the widget.
+     * @param array $lineage  Lienage to expand to.
+     *
+     * @return string
+     * @throws ChannelException If the channel setting is invalid.
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function reloadContents(array $settings, array $lineage=array())
+    {
+        $actionInfo = Util::getArrayIndex($settings, 'dynamicDataProvider', NULL);
+        if ($actionInfo === NULL) {
+            return NULL;
+        }
+
+        // Get system and method.
+        $system = Util::getArrayIndex($actionInfo, 'system', NULL);
+        $method = Util::getArrayIndex($actionInfo, 'method', NULL);
+        if ($system === NULL || $method === NULL) {
+            return NULL;
+        }
+
+        // Check if channel is callable.
+        Channels::includeSystem('API');
+        $api = API::getAPI($system, $method);
+        if ($api === FALSE) {
+            throw new ChannelException(_('Specified channel is invalid'));
+        }
+
+        $contents       = '';
+        $level          = 0;
+        $childSelection = NULL;
+        $total          = count($lineage);
+        foreach ($lineage as $parentid) {
+            $items = API::executeRequest($system, $method, array($parentid), $api['options']);
+
+            if (empty($items) === TRUE) {
+                return '&nbsp;';
+            }
+
+            if ($level < $total) {
+                $childSelection = $lineage[($level + 1)];
+            }
+
+            // Wrappers.
+            $contents .= '<div class="GUIColumnBrowser-column level-'.($level++).' visible';
+            if ($level === ($total - 1)) {
+                $contents .= ' active';
+            }
+
+            $contents .= '">';
+
+            $contents .= '<div class="GUIColumnBrowser-column-card visible" parentid="'.$parentid.'">';
+
+            ob_start();
+                foreach ($items as $item) {
+                    $selected = FALSE;
+                    if ((string) $childSelection === (string) $item['id']) {
+                        $selected = TRUE;
+                    }
+
+                    GUIColumnBrowser::paintItem($item, $settings, $selected);
+                }
+
+                $contents .= ob_get_contents();
+            ob_end_clean();
+
+            $contents .= '</div></div>';
+        }//end foreach
+
+        return $contents;
+
+    }//end reloadContents()
 
 
 }//end class

@@ -21,6 +21,14 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
+ /**
+  * Column Browser widget.
+  *
+  * @param {string} id       ID of the widget.
+  * @param {object} settings Settings for this widget.
+  *
+  * @constructor
+  */
 function GUIColumnBrowser(id, settings)
 {
     this.id       = id;
@@ -128,7 +136,7 @@ GUIColumnBrowser.prototype = {
 
     },
 
-    showChildren: function(parentElement)
+    showChildren: function(parentElement, forceReload)
     {
         var parentid   = dfx.attr(parentElement, 'itemid');
         var childCount = dfx.attr(parentElement, 'childcount');
@@ -140,7 +148,7 @@ GUIColumnBrowser.prototype = {
         var lookupClass = 'GUIColumnBrowser-column level-' + (parentLevel + 1);
 
         var childColumnElement = dfx.getClass(lookupClass, this.elem);
-        if (childColumnElement && childColumnElement.length > 0) {
+        if (forceReload !== true && childColumnElement && childColumnElement.length > 0) {
             childColumnElement = childColumnElement[0];
             // Now find the card that needs to be shown.
             var cards = dfx.getClass('GUIColumnBrowser-column-card', childColumnElement);
@@ -259,17 +267,31 @@ GUIColumnBrowser.prototype = {
 
     },
 
-    getLineage: function()
+    getLineage: function(asArray)
     {
         var selectedItems = dfx.getClass('GUIColumnBrowser-column-card visible', this.elem);
         var sln           = selectedItems.length;
-        var lineage       = {};
+        var lineage       = null;
+        if (asArray === true) {
+            lineage = [];
+        } else {
+            lineage = {};
+        }
 
         for (var i = 0; i < sln; i++) {
-            var selected    = selectedItems[i];
-            var itemid      = dfx.attr(selected, 'parentid');
-            var title       = dfx.attr(selected, 'parentTitle');
-            lineage[itemid] = title;
+            var selected = selectedItems[i];
+            var itemid   = dfx.attr(selected, 'parentid');
+            var title    = dfx.attr(selected, 'parentTitle');
+
+            if (!itemid) {
+                itemid = null;
+            }
+
+            if (asArray === true) {
+                lineage.push(itemid);
+            } else {
+                lineage[itemid] = title;
+            }
         }
 
         return lineage;
@@ -279,6 +301,55 @@ GUIColumnBrowser.prototype = {
     lineageItemClicked: function(itemid, index)
     {
         this.selectItem(itemid, index);
+
+    },
+
+    getSelectedElements: function()
+    {
+        var col = dfx.getClass('GUIColumnBrowser-column active', this.elem);
+
+        // Now find the selected elements.
+        var selectedElems = dfx.getClass('GUIColumnBrowser-item selected', col);
+
+        return selectedElems;
+
+    },
+
+    getValue: function()
+    {
+        var selectedElems = this.getSelectedElements();
+        var sln           = selectedElems.length;
+        var selection     = [];
+        for (var i = 0; i < sln; i++) {
+            selection.push(dfx.attr(selectedElems[i], 'itemid'));
+        }
+
+        return selection;
+
+    },
+
+    /**
+     * Reloads the current selection's parent.
+     */
+    reload: function()
+    {
+        var params = {
+            settings: dfx.jsonEncode(this.settings),
+            lineage: dfx.jsonEncode(this.getLineage(true))
+        };
+
+        var self = this;
+        GUI.sendRequest('GUIColumnBrowser', 'reloadContents', params, function(contents) {
+            var wrapper = dfx.getClass('GUIColumnBrowser-columnWrapper', self.elem)[0];
+            dfx.empty(wrapper);
+            dfx.setHtml(wrapper, contents);
+
+            var slectedElems = self.getSelectedElements();
+            if (slectedElems.length > 0) {
+                self.itemClicked(slectedElems[0]);
+            }
+
+        }, 'raw');
 
     }
 
