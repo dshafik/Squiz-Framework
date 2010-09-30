@@ -1,0 +1,250 @@
+.UserManagerScreen-userManager-item {
+    height: 100%;
+    background: url(../userType-icons.png) no-repeat 100% 0;
+    font-size: 15px;
+}
+
+.UserManagerScreen-userManager-item-icon {
+    vertical-align: top;
+}
+
+.UserManagerScreen-userManager-item-title {
+    padding-left: 15px;
+    padding-top: 15px;
+    font-weight: bold;
+    color: #444;
+}
+
+.UserManagerScreen-userManager-item-subTitle {
+    color: #666;
+    padding-left: 15px;
+}
+
+.GUIColumnBrowser-item-button.selected .UserManagerScreen-userManager-item-title,
+.GUIColumnBrowser-item-button.selected .UserManagerScreen-userManager-item-subTitle {
+    color: #FFF;
+}
+
+.GUIColumnBrowser-item-button.selected .UserManagerScreen-userManager-item {
+    background-position: 100% -76px;
+}
+
+#UserManagerScreen #userManager-assetBrowser {
+    height: 350px;
+}
+
+#UserManagerScreen #userManager-box {
+    width: 70%;
+    float: left;
+}
+
+#UserManagerScreen #userManager-editPane {
+    width: 320px;
+    float: left;
+    background-color: #EEE;
+    border: 1px solid #CCC;
+    height: 394px;
+    overflow: auto;
+}
+
+/* Right Panel styles */
+.UserManagerScreen-editFolder-childUserDetails,
+.UserManagerScreen-editFolder-childGroupDetails,
+.UserManagerScreen-editUserGroup-childUserDetails,
+.UserManagerScreen-editUserGroup-childGroupDetails {
+    border-top: 1px solid #CCCCCC;
+    font-weight: bold;
+    line-height: 22px;
+    margin: 0 15px;
+    padding: 8px 0;
+}
+
+.UserManagerScreen-editFolder-childUserDetails,
+.UserManagerScreen-editUserGroup-childUserDetails {
+    border-bottom: 1px solid #CCC;
+}
+
+.UserManagerScreen-editFolder-childUserDetails .UserManagerScreen-editFolder-assetIcon,
+.UserManagerScreen-editFolder-childGroupDetails .UserManagerScreen-editFolder-assetIcon,
+.UserManagerScreen-editUserGroup-childUserDetails .UserManagerScreen-editUserGroup-assetIcon,
+.UserManagerScreen-editUserGroup-childGroupDetails .UserManagerScreen-editUserGroup-assetIcon {
+    background: url(../icon_user_s.png) no-repeat 0 0;
+    height: 22px;
+    width: 36px;
+    float: left;
+}
+
+.UserManagerScreen-editFolder-childGroupDetails .UserManagerScreen-editFolder-assetIcon,
+.UserManagerScreen-editUserGroup-childGroupDetails .UserManagerScreen-editUserGroup-assetIcon {
+    background-image: url(../icon_userGroup_s.png);
+}
+
+.UserManagerScreen-editUser-top,
+.UserManagerScreen-editFolder-top,
+.UserManagerScreen-editUserGroup-top {
+    height: 65px;
+    line-height: 65px;
+    margin: 15px;
+    margin-top: 10px;
+    padding-left: 80px;
+    background: url(../icon_userGroup_m.png) no-repeat 0 0;
+}
+
+.UserManagerScreen-editUser-top {
+    background-image: url(../icon_user_m.png);
+}
+
+.UserManagerScreen-editUser-top h2,
+.UserManagerScreen-editFolder-top h2,
+.UserManagerScreen-editUserGroup-top h2 {
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.UserManagerScreen-editFolder-childUserDetails .GUIButton,
+.UserManagerScreen-editFolder-childGroupDetails .GUIButton,
+.UserManagerScreen-editUserGroup-childUserDetails .GUIButton,
+.UserManagerScreen-editUserGroup-childGroupDetails .GUIButton {
+    float: right;
+    margin-left: 5px;
+}
+
+.UserManagerScreen-editUserGroup-editGroupName {
+    margin: 15px;
+    margin-top: 0;
+}
+
+.UserManagerScreen-editUserGroup-parentGroups h5,
+.UserManagerScreen-editUserGroup-editGroupName h5 {
+    margin-bottom: 5px;
+}
+
+.UserManagerScreen-editUserGroup-parentGroups {
+    margin: 15px;
+}
+
+.UserManagerScreen-editUserGroup-addToOtherGroup {
+    text-align: center;
+}
+
+/* Create User Panel */
+#UserManagerScreen-editUserGroup-createUser {
+    border-top: 1px solid #DDD;
+    margin: 15px;
+    line-height: 22px;
+    padding: 15px 0;
+    margin-bottom: 0;
+}
+
+#UserManagerScreen-editUserGroup-createUser label {
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.UserManagerScreen-editUserGroup-createUser-col-left {
+    float: left;
+    width: 50%;
+}
+
+.UserManagerScreen-editUserGroup-createUser-top {
+    margin-bottom: 15px;
+}
+
+.UserManagerScreen-editUserGroup-createUser-top .UserManagerScreen-editUserGroup-assetIcon {
+    background: url(../icon_user_s.png) no-repeat 0 0;
+    height: 22px;
+    width: 36px;
+    float: left;
+}
+
+#UserManagerScreen-editUserGroup-cancelCreateUser {
+    float: right;
+}
+
+/* Edit Exisiting User Panel */
+#UserManagerScreen-editUser-editExistingUser {
+    margin: 0 15px;
+    line-height: 22px;
+    padding: 0;
+}
+
+#UserManagerScreen-editUser-editExistingUser label {
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.UserManagerScreen-editUser-editExistingUser-col-left {
+    float: left;
+    width: 50%;
+}
+
+.UserManagerScreen-editUser-editExistingUser-top {
+    margin-bottom: 15px;
+}
+
+.UserManagerScreen-editUser-editExistingUser-top .UserManagerScreen-editUserGroup-assetIcon {
+    background: url(../icon_user_s.png) no-repeat 0 0;
+    height: 22px;
+    width: 36px;
+    float: left;
+}
+
+#UserManagerScreen-editUser-existingUser-username {
+    float: left;
+    margin-right: 20px;
+}
+
+#UserManagerScreen-editUser-editExistingUser-resetPasswordBox {
+    clear: left;
+}
+
+.UserManagerScreen-editUser-status {
+    margin: 10px 0;
+}
+
+.UserManagerScreen-editUser-status-header {
+    background-color: #49b662;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#49b662), to(#00641e));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #49b662, #00641e);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#49b662, endColorstr=#00641e);
+    color: #FFF;
+    border: 1px solid #118D3A;
+    font-size: 13px;
+    font-weight: bold;
+    height: 32px;
+    line-height: 31px;
+}
+
+.UserManagerScreen-editUser-status-header-icon {
+    margin: 0 10px;
+    height: 100%;
+    width: 22px;
+    background: url(/__web/Systems/GUI/Web/tick.png) no-repeat 0 50%;
+    float: left;
+}
+
+.UserManagerScreen-editUser-status-header.Inactive {
+    background-color: #BC4646;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#BC4646), to(#5B1313));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #BC4646, #5B1313);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#BC4646, endColorstr=#5B1313);
+    border: 1px solid #9A4F4E;
+}
+
+.UserManagerScreen-editUser-status-header.Inactive .UserManagerScreen-editUser-status-header-icon {
+    background-image: url(/__web/Systems/GUI/Web/cross.png);
+}
+
+.UserManagerScreen-editUser-status-content {
+    border: 1px solid #CCC;
+    border-top: none;
+    line-height: 34px;
+    height: 35px;
+    padding-left: 50px;
+    padding-top: 3px;
+}
+
+.UserManagerScreen-editUser-status-content span {
+    float: left;
+    margin-right: 20px;
+}

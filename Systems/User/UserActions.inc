@@ -58,13 +58,17 @@ class UserActions
      *
      * @return integer
      * @throws ChannelException If the user fails to create.
+     *
+     * @api write
+     * @api-permission superuser
      */
     public static function createUser(
         $username,
         $firstName,
         $lastName,
         $email,
-        $password
+        $password,
+        array $userGroups=array()
     ) {
         try {
             DAL::beginTransaction();
@@ -80,6 +84,9 @@ class UserActions
             Attribute::setAttributeValue($userid, 'first_name', $firstName);
             Attribute::setAttributeValue($userid, 'last_name', $lastName);
             Attribute::setAttributeValue($userid, 'password', Security::hashUserPassword($password));
+
+            User::addUsersToGroups(array($userid), $userGroups);
+
             DAL::commit();
         } catch (Exception $e) {
             $msg  = 'Failed to create a new user.'."\n";
@@ -270,6 +277,32 @@ class UserActions
         return $groupids;
 
     }//end getUserGroups()
+
+
+    /**
+     * Adds user to given user groups.
+     *
+     * @param string $userids    Id of the user.
+     * @param array  $userGroups Array of user group assetids.
+     *
+     * @return boolean
+     *
+     * @api            write
+     * @api-permission superuser
+     */
+    public static function addUsersToGroups(array $userids, array $userGroups)
+    {
+        Channels::includeSystem('Linking');
+        foreach ($userids as $userid) {
+            foreach ($userGroups as $userGroupid) {
+                // TODO: Add a check to make sure that its a valid usergroup.
+                Linking::createLink($userGroupid, $userid);
+            }
+        }
+
+        return TRUE;
+
+    }//end addUsersToGroups()
 
 
     /**
@@ -583,6 +616,199 @@ class UserActions
 
 
     /**
+     * Create a new users folder with specified name.
+     *
+     * Returns the assetid of the new folder.
+     *
+     * @param string $title    The title of the folder.
+     * @param string $subTitle The sub title of the folder.
+     *
+     * @return string
+     * @throws ChannelException If the folder cannot be created.
+     */
+    public static function createUsersFolder($title, $subTitle)
+    {
+        $folderid = NULL;
+        try {
+            DAL::beginTransaction();
+            Channels::includeSystem('Asset');
+            Channels::includeSystem('Attribute');
+            Channels::includeSystem('Linking');
+
+            $folderid = Asset::create('folder');
+            Attribute::setAttributeValue($folderid, 'name', $title);
+
+            $userFolders = array();
+            $cacheFile   = BaseSystem::getDataDir('User').'/folders.inc';
+            if (file_exists($cacheFile) === TRUE) {
+                include $cacheFile;
+            }
+
+            $userFolders[$folderid] = array(
+                                                  'title'    => $title,
+                                                  'subTitle' => $subTitle,
+                                                 );
+
+            include_once 'Libs/FileSystem/FileSystem.inc';
+            $content = '<?php $usersFolder = '.var_export($userFolders, TRUE).' ?>';
+            FileSystem::filePutContents($cacheFile, $content);
+
+            DAL::commit();
+        } catch (Exception $e) {
+            DAL::rollback();
+
+            $msg  = _('Failed to create a user folder.')."\n";
+            $msg .= $e->getMessage();
+            throw new ChannelException($msg);
+        }
+
+        return $folderid;
+
+    }//end createUsersFolder()
+
+
+    /**
+     * Edit specified users folder's name.
+     *
+     * @param string $folderid Asset id of a user folder.
+     * @param string $title    The title of the folder.
+     * @param string $subTitle The sub title of the folder.
+     *
+     * @return void
+     * @throws ChannelException If the folder cannot be edited.
+     */
+    public static function editUsersFolder($folderid, $title, $subTitle)
+    {
+        $cacheFile = BaseSystem::getDataDir('User').'/folders.inc';
+        if (file_exists($cacheFile) === FALSE) {
+            throw new ChannelException(_('There are no user folders in the system'));
+        }
+
+        include $cacheFile;
+
+        if (isset($userFolders[$folderid]) === FALSE) {
+            throw new ChannelException(_('User folder does not exist'));
+        }
+
+        try {
+            DAL::beginTransaction();
+            Channels::includeSystem('Attribute');
+            Attribute::setAttributeValue($folderid, 'name', $title);
+
+            $userFolders[$folderid] = array(
+                                       'title'    => $title,
+                                       'subTitle' => $subTitle,
+                                      );
+
+            $content = '<?php $usersFolder = '.var_export($userFolders, TRUE).' ?>';
+            FileSystem::filePutContents($cacheFile, $content);
+
+            DAL::commit();
+        } catch (Exception $e) {
+            DAL::rollback();
+
+            $msg  = _('Failed to update user folder.')."\n";
+            $msg .= $e->getMessage();
+            throw new ChannelException($msg);
+        }
+
+    }//end editUsersFolder()
+
+
+    /**
+     * Remove specified users folder.
+     *
+     * @param string $folderid Asset id of a user folder.
+     *
+     * @return void
+     */
+    public static function removeUsersFolder($folderid)
+    {
+        Channels::includeSystem('Linking');
+        Linking::trashAsset($folderid);
+
+    }//end removeUsersFolder()
+
+
+    /**
+     * Returns the list of user folders and their information.
+     *
+     * @param boolean $idsOnly If TRUE then the array will have assetids only.
+     *
+     * @return array
+     */
+    public static function getUsersFolders($idsOnly=FALSE)
+    {
+        $usersFolder = array();
+        $cacheFile   = BaseSystem::getDataDir('User').'/folders.inc';
+
+        if (file_exists($cacheFile) === TRUE) {
+            include $cacheFile;
+        }
+
+        if ($idsOnly === TRUE) {
+            $usersFolder = array_keys($usersFolder);
+        }
+
+        return $usersFolder;
+
+    }//end getUsersFolders()
+
+
+    /**
+     * Register a new asset type editing template .
+     *
+     * @param string $assetType      Type of a user asset.
+     * @param string $templateSystem System the template belongs to.
+     * @param array  $templateName   Name of the template file.
+     *
+     * @return void
+     */
+    public static function addEditTemplate($assetType, $templateSystem, $templateName)
+    {
+        $editTemplates = array();
+        $cacheFile     = BaseSystem::getDataDir('User').'/editTemplates.inc';
+        if (file_exists($cacheFile) === TRUE) {
+            include $cacheFile;
+        }
+
+        $editTemplates[$assetType] = array(
+                                      'system'   => $templateSystem,
+                                      'template' => $templateName,
+                                     );
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        $content = '<?php $editTemplates = '.var_export($editTemplates, TRUE).' ?>';
+        FileSystem::filePutContents($cacheFile, $content);
+
+    }//end addEditTemplate()
+
+
+    public static function getEditTemplate($assetType)
+    {
+        $cacheFile = BaseSystem::getDataDir('User').'/editTemplates.inc';
+        if (file_exists($cacheFile) === FALSE) {
+            return FALSE;
+        }
+
+        include $cacheFile;
+
+        $contents = FALSE;
+        if (isset($editTemplates[$assetType]) === TRUE) {
+            Channels::includeSystem('GUI');
+            $info = $editTemplates[$assetType];
+            ob_start();
+            GUI::printTemplate($info['system'], $info['template']);
+            $contents = ob_get_contents();
+            ob_end_clean();
+        }
+
+        return $contents;
+
+    }//end getEditTemplate()
+
+
+    /**
      * Returns the list of rows for the Super Users table.
      *
      * @return array
@@ -605,6 +831,121 @@ class UserActions
         return $list;
 
     }//end getSuperUsersList()
+
+
+    /**
+     * Returns the child assets for specified parent asset.
+     *
+     * @param string $parentid The parent assetid.
+     *
+     * @return array
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function getChildren($parentid=NULL)
+    {
+        include_once 'Libs/Security/Security.inc';
+        $jsSettings = Security::getRequestData('templateOptions', NULL, TRUE);
+        if ($jsSettings !== NULL) {
+            $parentid = Util::getArrayIndex($jsSettings, 'parentid', $parentid);
+        }
+
+        Channels::includeSystem('Permission');
+        Channels::includeSystem('Linking');
+
+        $userFolders = array();
+        $children    = array();
+        if ($parentid === NULL && $jsSettings === NULL) {
+            // List the User folders.
+            $userFolders = User::getUsersFolders();
+            foreach ($userFolders as $folderid => $info) {
+                if (Permission::hasPermission($folderid, 'asset.read.content') === FALSE) {
+                    continue;
+                }
+
+                $children[] = $folderid;
+            }
+        } else {
+            // Check read permission here incase the function is called by another system
+            // (e.g. by a dataProvider).
+            if (Permission::hasPermission($parentid, 'asset.read.content') === FALSE) {
+                return array();
+            }
+
+            Channels::includeSystem('Linking');
+            $children = DAL::getAssoc(Linking::getImmediateChildren($parentid, FALSE), 0);
+        }
+
+        $data = array();
+
+        Channels::includeSystem('Attribute');
+
+        Channels::includeSystem('Asset');
+        $types = Asset::getTypeOfAsset($children);
+
+        foreach ($children as $child) {
+            $iconPath = '/__web/Systems/User/Web/icon_'.$types[$child].'_s.png';
+
+            // If this child is a user folder then get info from userFolders array.
+            $class = 'UserManagerScreen';
+            if (isset($userFolders[$child]) === TRUE) {
+                $itemContent  = '<div class="'.$class.'-userManager-item">';
+                $itemContent .= '<div class="'.$class.'-userManager-item-title">'.$userFolders[$child]['title'].'</div>';
+                $itemContent .= '<div class="'.$class.'-userManager-item-subTitle">'.$userFolders[$child]['subTitle'].'</div>';
+                $itemContent .= '</div>';
+                $item = array(
+                         'id'          => $child,
+                         'title'       => $userFolders[$child]['title'],
+                         'itemContent' => $itemContent,
+                         'isButton'    => TRUE,
+                        );
+            } else {
+                $name = Attribute::getAttributeValue($child, 'name').' '.Attribute::getAttributeValue($child, 'last_name');
+                $item = array(
+                         'id'          => $child,
+                         'title'       => $name,
+                         'itemContent' => '<img class="'.$class.'-userManager-item-icon" src="'.$iconPath.'" />'.$name,
+                        );
+            }
+
+            // Get number of kids.
+            $childKids          = DAL::getAssoc(Linking::getImmediateChildren($child, FALSE), 0);
+            $item['childCount'] = count($childKids);
+
+            $data[] = $item;
+        }
+
+        return $data;
+
+    }//end getChildren()
+
+
+    /**
+     * Loads the asset type edit template for the specified assetid.
+     *
+     * This method is used by the UserManager template.
+     *
+     * @param string $assetid ID of the asset thats being edited.
+     *
+     * @return void
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function loadUserManagerEditContents($assetid)
+    {
+        Channels::includeSystem('Asset');
+        $assetType        = Asset::getTypeOfAsset($assetid);
+        $templateContents = User::getEditTemplate($assetType);
+
+        if ($templateContents === FALSE) {
+            $templateContents = 'Failed to load template';
+        }
+
+        return $templateContents;
+
+    }//end loadUserManagerEditContents()
 
 
     /**
@@ -648,6 +989,7 @@ class UserActions
      *
      * @since  4.0.0
      * @return mixed
+     * @throws ChannelException If the active user is not a super user.
      */
     public static function saveSuperUsersScreen(array $data)
     {
@@ -701,6 +1043,80 @@ class UserActions
         return $retVal;
 
     }//end saveSuperUsersScreen()
+
+
+    /**
+     * Returns user group information for the requested user group.
+     *
+     * Values are used in the editUsetGroup template.
+     *
+     * @return array
+     */
+    public static function getUserGroupInfoForTemplate()
+    {
+        $info = array();
+
+        include_once 'Libs/Security/Security.inc';
+        $assetid = Security::getRequestData('assetid', NULL, FALSE, 'post');
+
+        if ($assetid === NULL) {
+            return $info;
+        }
+
+        // Get group name.
+        Channels::includeSystem('Attribute');
+        Channels::includeSystem('Asset');
+        Channels::includeSystem('Linking');
+
+        $name     = Attribute::getAttributeValue($assetid, 'name');
+        $children = DAL::getAssoc(Linking::getImmediateChildren($assetid, FALSE), 0);
+        $types    = Asset::getTypeOfAsset($children);
+
+        $info['name']            = $name;
+        $info['childGroupCount'] = 0;
+        $info['childUserCount']  = 0;
+
+        foreach ($types as $type) {
+            if ($type === 'userGroup') {
+                $info['childGroupCount']++;
+            } else if ($type === 'user') {
+                $info['childUserCount']++;
+            }
+        }
+
+        $info['parentGroups'] = array();
+
+        return $info;
+
+    }//end getUserGroupInfoForTemplate()
+
+
+    /**
+     * Returns user group information for the requested user group.
+     *
+     * Values are used in the editUsetGroup template.
+     *
+     * @return array
+     */
+    public static function getUserInfoForTemplate()
+    {
+        $info = array();
+
+        include_once 'Libs/Security/Security.inc';
+        $assetid = Security::getRequestData('assetid', NULL, FALSE, 'post');
+
+        if ($assetid === NULL) {
+            return $info;
+        }
+
+        $info = User::getUserById($assetid);
+
+        // TODO: How do we know if user is active? Publishing system needed?
+        $info['status'] = TRUE;
+
+        return $info;
+
+    }//end getUserInfoForTemplate()
 
 
 }//end class
