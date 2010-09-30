@@ -39,6 +39,7 @@ function GUITextBox(id, settings)
 
     GUI.addWidgetEvent(this, 'keyPress');
     GUI.addWidgetEvent(this, 'keyUp');
+    GUI.addWidgetEvent(this, 'focus');
 
 }
 
@@ -55,6 +56,7 @@ GUITextBox.prototype = {
 
         dfx.addEvent(textBox, 'focus', function() {
             dfx.addClass(textBox, 'selected');
+            self.fireFocusCallbacks();
         });
 
         var value = textBox.value;
