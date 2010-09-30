@@ -89,14 +89,14 @@ class GUIBoxActions
         $class = $settings['widget']['type'];
 
         include_once 'Libs/Util/Util.inc';
-        $borderLeft  = Util::getArrayIndex($settings, 'borderLeft', 'true');
-        $borderRight = Util::getArrayIndex($settings, 'borderRight', 'true');
+        $borderLeft  = Util::getArrayIndex($settings, 'borderLeft', TRUE);
+        $borderRight = Util::getArrayIndex($settings, 'borderRight', TRUE);
 
-        if ($borderLeft === 'false') {
+        if ($borderLeft === FALSE) {
             $borderClass = ' noLeftBorder';
         }
 
-        if ($borderRight === 'false') {
+        if ($borderRight === FALSE) {
             $borderClass .= ' noRightBorder';
         }
 
