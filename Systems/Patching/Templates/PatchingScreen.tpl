@@ -27,56 +27,34 @@
                             <items>
                                 <value>
                                     <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[
-                                                        <div class="PatchingScreen-activateWrap"><span>Demo System</span>%s</div>
-                                                        <div class="PatchingScreen-idTextFieldWrap hidden">%s %s</div>
-                                                    ]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg>
-                                                    <widget type="GUI/Button" id="PatchingScreen-activateDemoBtn">
-                                                        <setting name="value"><text>Activate Demo</text></setting>
-                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.toggleActivation()]]></setting>
-                                                    </widget>
-                                                </arg>
-                                                <arg>
-                                                    <widget type="GUI/TextBox" id="PatchingScreen-activateIdText">
-                                                        <setting name="size">12</setting>
-                                                        <setting name="maxlength">50</setting>
-                                                    </widget>
-                                                </arg>
-                                                <arg>
-                                                    <widget type="GUI/Button" id="PatchingScreen-cancelActivationBtn">
-                                                        <setting name="value"><text>Cancel</text></setting>
-                                                        <setting name="colour">Dark</setting>
-                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.toggleActivation()]]></setting>
-                                                    </widget>
-                                                </arg>
-                                            </args>
-                                        </text>
+                                        <div class="PatchingScreen-activateWrap">
+                                            <span><text>Demo System</text></span>
+                                            <widget type="GUI/Button" id="PatchingScreen-activateDemoBtn">
+                                                <setting name="value"><text>Activate Demo</text></setting>
+                                                <setting name="click"><![CDATA[PatchingPatchingScreen.toggleActivation()]]></setting>
+                                            </widget>
+                                        </div>
+                                        <div class="PatchingScreen-idTextFieldWrap hidden">
+                                            <widget type="GUI/TextBox" id="PatchingScreen-activateIdText">
+                                                <setting name="size">12</setting>
+                                                <setting name="maxlength">50</setting>
+                                            </widget>
+                                            <widget type="GUI/Button" id="PatchingScreen-cancelActivationBtn">
+                                                <setting name="value"><text>Cancel</text></setting>
+                                                <setting name="colour">Dark</setting>
+                                                <setting name="click"><![CDATA[PatchingPatchingScreen.toggleActivation()]]></setting>
+                                            </widget>
+                                        </div>
                                     </content>
                                 </value>
                                 <value>
                                     <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[<div class="PatchingScreen-demoWarningWrap">
-                                                        <span class="PatchingScreen-demoWarning-icon">&nbsp;</span>
-                                                        <span class="PatchingScreen-demoWarning-text">%s</span>
-                                                    </div>]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg>
-                                                    <text>Your system is currently running in demonstration mode. As a result all automatic updating features are disabled until you activate your system</text>
-                                                </arg>
-                                            </args>
-                                        </text>
+                                        <div class="PatchingScreen-demoWarningWrap">
+                                            <span class="PatchingScreen-demoWarning-icon">&nbsp;</span>
+                                            <span class="PatchingScreen-demoWarning-text">
+                                                <text>Your system is currently running in demonstration mode. As a result all automatic updating features are disabled until you activate your system</text>
+                                            </span>
+                                        </div>
                                     </content>
                                 </value>
                             </items>
@@ -90,54 +68,32 @@
                             <items>
                                 <value>
                                     <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[
-                                                        <div id="PatchingScreen-systemidWrap" class="PatchingScreen-activateWrap">%s</div>
-                                                        <div id="PatchingScreen-newActivationTextWrap" class="PatchingScreen-activateWrap hidden">%s</div>
-                                                    ]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg><dataProvider action="SquizSuite::getSystemId" /></arg>
-                                                <arg>
-                                                    <widget type="GUI/TextBox" id="PatchingScreen-newActivationIdText">
-                                                        <setting name="size">30</setting>
-                                                        <setting name="maxlength">50</setting>
-                                                        <setting name="inline">true</setting>
-                                                    </widget>
-                                                </arg>
-                                            </args>
-                                        </text>
+                                        <div id="PatchingScreen-systemidWrap" class="PatchingScreen-activateWrap">
+                                            <dataProvider action="SquizSuite::getSystemId" />
+                                        </div>
+                                        <div id="PatchingScreen-newActivationTextWrap" class="PatchingScreen-activateWrap hidden">
+                                            <widget type="GUI/TextBox" id="PatchingScreen-newActivationIdText">
+                                                <setting name="size">30</setting>
+                                                <setting name="maxlength">50</setting>
+                                                <setting name="inline">true</setting>
+                                            </widget>
+                                        </div>
                                     </content>
                                 </value>
                                 <value>
                                     <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[
-                                                        <div id="PatchingScreen-changeIdBtnWrap" class="PatchingScreen-activateWrap">%s</div>
-                                                        <div id="PatchingScreen-cancel-changeIdBtnWrap" class="PatchingScreen-activateWrap hidden">%s</div>
-                                                    ]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg>
-                                                    <widget type="GUI/Button" id="PatchingScreen-changeIdBtn">
-                                                        <setting name="value"><text>Change ID</text></setting>
-                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.changeActivationID()]]></setting>
-                                                    </widget>
-                                                </arg>
-                                                <arg>
-                                                    <widget type="GUI/Button" id="PatchingScreen-cancelChangeBtn">
-                                                        <setting name="value"><text>Cancel</text></setting>
-                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.cancelNewActivationID()]]></setting>
-                                                    </widget>
-                                                </arg>
-                                            </args>
-                                        </text>
+                                        <div id="PatchingScreen-changeIdBtnWrap" class="PatchingScreen-activateWrap">
+                                            <widget type="GUI/Button" id="PatchingScreen-changeIdBtn">
+                                                <setting name="value"><text>Change ID</text></setting>
+                                                <setting name="click"><![CDATA[PatchingPatchingScreen.changeActivationID()]]></setting>
+                                            </widget>
+                                        </div>
+                                        <div id="PatchingScreen-cancel-changeIdBtnWrap" class="PatchingScreen-activateWrap hidden">
+                                            <widget type="GUI/Button" id="PatchingScreen-cancelChangeBtn">
+                                                <setting name="value"><text>Cancel</text></setting>
+                                                <setting name="click"><![CDATA[PatchingPatchingScreen.cancelNewActivationID()]]></setting>
+                                            </widget>
+                                        </div>
                                     </content>
                                 </value>
                             </items>
@@ -148,64 +104,35 @@
                             <items>
                                 <value>
                                     <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[
-                                                        <div class="PatchingScreen-activateWrap"><span class="PatchingScreen-nextCheckString">%s</span>%s</div>
-                                                    ]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg>
-                                                    <dataProvider action="Patching::getNextUpdateCheckTime" />
-                                                </arg>
-                                                <arg>
-                                                    <widget type="GUI/Button" id="PatchingScreen-checkAsapBtn">
-                                                        <setting name="value"><text>Check ASAP</text></setting>
-                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.checkUpdateASAP()]]></setting>
-                                                    </widget>
-                                                </arg>
-                                            </args>
-                                        </text>
+                                        <div class="PatchingScreen-activateWrap">
+                                            <span class="PatchingScreen-nextCheckString">
+                                                <dataProvider action="Patching::getNextUpdateCheckTime" />
+                                            </span>
+                                            <widget type="GUI/Button" id="PatchingScreen-checkAsapBtn">
+                                                <setting name="value"><text>Check ASAP</text></setting>
+                                                <setting name="click"><![CDATA[PatchingPatchingScreen.checkUpdateASAP()]]></setting>
+                                            </widget>
+                                        </div>
                                     </content>
                                 </value>
                                 <value>
                                     <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[
-                                                        <div class="PatchingScreen-activateWrap">
-                                                            <span>Last Updated</span>
-                                                            <span class="PatchingScreen-lastUpdatedString">%s</span>
-                                                        </div>
-                                                    ]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg><dataProvider action="Patching::getLastUpdatedTime" /></arg>
-                                            </args>
-                                        </text>
+                                        <div class="PatchingScreen-activateWrap">
+                                            <span><text>Last Updated</text></span>
+                                            <span class="PatchingScreen-lastUpdatedString">
+                                                <dataProvider action="Patching::getLastUpdatedTime" />
+                                            </span>
+                                        </div>
                                     </content>
                                 </value>
                                 <value>
                                     <content>
-                                        <text>
-                                            <value>
-                                                <content>
-                                                    <text><![CDATA[
-                                                        <div class="PatchingScreen-activateWrap">
-                                                            <span>Update Subscription</span>
-                                                            <span class="PatchingScreen-subscriptionInfo">%s</span>
-                                                        </div>
-                                                    ]]></text>
-                                                </content>
-                                            </value>
-                                            <args>
-                                                <arg><dataProvider action="Patching::getSubscriptionInfo" /></arg>
-                                            </args>
-                                        </text>
+                                        <div class="PatchingScreen-activateWrap">
+                                            <span>Update Subscription</span>
+                                            <span class="PatchingScreen-subscriptionInfo">
+                                                <dataProvider action="Patching::getSubscriptionInfo" />
+                                            </span>
+                                        </div>
                                     </content>
                                 </value>
                             </items>
