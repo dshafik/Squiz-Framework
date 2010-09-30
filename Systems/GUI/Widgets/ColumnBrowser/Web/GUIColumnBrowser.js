@@ -36,6 +36,8 @@ function GUIColumnBrowser(id, settings)
 
     this.init();
 
+    GUI.addWidgetEvent(this, 'itemClicked');
+
 }
 
 GUIColumnBrowser.prototype = {
@@ -121,6 +123,8 @@ GUIColumnBrowser.prototype = {
         if (this._lineageWidget) {
             this._lineageWidget.setLineage(this.getLineage());
         }
+
+        this.fireItemClickedCallbacks(dfx.attr(itemElement, 'itemid'), dfx.attr(itemElement, 'childcount'), itemElement);
 
     },
 

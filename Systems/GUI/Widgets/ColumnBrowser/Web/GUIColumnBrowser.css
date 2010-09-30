@@ -45,6 +45,16 @@
     position: relative;
 }
 
+.GUIColumnBrowser-item-button .GUIColumnBrowser-item-content {
+    height: 76px;
+    line-height: 20px;
+    background-color: #F7F7F7;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F7F7F7), to(#BEBEBE));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #F7F7F7, #BEBEBE);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F7F7F7, endColorstr=#BEBEBE);
+    font-size: 14px;
+}
+
 .GUIColumnBrowser-item-childCount {
     position: absolute;
     right: 0;
@@ -79,6 +89,13 @@
 
 .GUIColumnBrowser-column .GUIColumnBrowser-item.selected .GUIColumnBrowser-item-content {
     background-color: #C5DCFE;
+}
+
+.GUIColumnBrowser-column.active .GUIColumnBrowser-item.GUIColumnBrowser-item-button.selected .GUIColumnBrowser-item-content,
+.GUIColumnBrowser-column .GUIColumnBrowser-item.GUIColumnBrowser-item-button.selected .GUIColumnBrowser-item-content {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4273CD), to(#172D65));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #4273CD, #172D65);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#4273CD, endColorstr=#172D65);
 }
 
 .GUIColumnBrowser-column.active .GUIColumnBrowser-item.selected .GUIColumnBrowser-item-content {

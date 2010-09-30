@@ -78,7 +78,8 @@ class GUIColumnBrowserActions
      *        'id'          => 'itemid',
      *        'title'       => 'title of the item for lineage widgets',
      *        'itemContent' => 'The item content',
-     *        'childCount'  => 123
+     *        'childCount'  => 123,
+     *        'isButton'    => FALSE, // Optional, if TRUE then item will appear as a button.
      *       ),
      * ).
      *
@@ -210,17 +211,23 @@ class GUIColumnBrowserActions
         $content    = Util::getArrayIndex($itemInfo, 'itemContent', '');
         $children   = Util::getArrayIndex($itemInfo, 'children', array());
         $childCount = Util::getArrayIndex($itemInfo, 'childCount', NULL);
+        $isButton   = Util::getArrayIndex($itemInfo, 'isButton', FALSE);
 
         if ($childCount === NULL && empty($children) === TRUE) {
             $childCount = count($children);
         }
 
-        echo '<div itemid="'.$itemid.'" class="'.$class.'" childcount="'.$childCount.'">';
-        echo '<div class="'.$class.'-content">';
+        $buttonClass = '';
+        if ($isButton === TRUE) {
+            $buttonClass .= ' '.$class.'-button';
+        }
+
+        echo '<div itemid="'.$itemid.'" class="'.$class.$buttonClass.'" childcount="'.$childCount.'">';
+        echo '<div class="'.$class.'-content'.$buttonClass.'">';
         echo $content;
         echo '</div>';
 
-        if ($childCount > 0) {
+        if ($childCount > 0 && $isButton === FALSE) {
             echo '<div class="'.$class.'-childCount"><span>'.$childCount.'</span></div>';
         }
 
