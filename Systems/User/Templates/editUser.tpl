@@ -1,4 +1,4 @@
-<var name="className"><content>UserManagerScreen-editUser</content></var>
+<var name="className"><content>UserManagerScreen</content></var>
 <var name="userInfo"><dataProvider action="User::getUserInfoForTemplate" /></var>
 <var name="userStatus">
   <content>
@@ -14,30 +14,33 @@
 </var>
 
 <div id="{className}">
-    <div class="{className}-top">
+    <div class="{className}-editUser-top">
         <h2>{userInfo:first_name} {userInfo:last_name}</h2>
     </div>
-    <div id="UserManagerScreen-editUser-editExistingUser">
-        <div class="{className}-editExistingUser-col-left">
+    <div id="UserManagerScreen-editUser">
+        <div class="{className}-col-left">
             <label for="UserManagerScreen-editUser-existingUser-firstName-input"><text>First Name</text></label>
             <widget type="GUI/TextBox" id="UserManagerScreen-editUser-existingUser-firstName">
                 <setting name="size">17</setting>
                 <setting name="value">{userInfo:first_name}</setting>
             </widget>
         </div>
-        <div class="{className}-editExistingUser-col-right">
+        <div class="{className}-col-right">
             <label for="UserManagerScreen-editUser-existingUser-lastName-input"><text>Last Name</text></label>
             <widget type="GUI/TextBox" id="UserManagerScreen-editUser-existingUser-lastName">
                 <setting name="size">17</setting>
                 <setting name="value">{userInfo:last_name}</setting>
             </widget>
         </div>
+
+        <div class="{className}-fieldGap"></div>
         <label for="UserManagerScreen-editUser-existingUser-email-input"><text>Email</text></label>
         <widget type="GUI/TextBox" id="UserManagerScreen-editUser-existingUser-email">
             <setting name="size">38</setting>
             <setting name="value">{userInfo:email}</setting>
         </widget>
 
+        <div class="{className}-fieldGap"></div>
         <div class="{className}-status">
             <div class="{className}-status-header {userStatus}">
                 <div class="{className}-status-header-icon"></div>
@@ -52,11 +55,12 @@
             </div>
         </div>
 
+        <div class="{className}-fieldGap"></div>
         <div>
             <label for="UserManagerScreen-editUser-existingUser-username-input"><text>Username</text></label>
         </div>
         <widget type="GUI/TextBox" id="UserManagerScreen-editUser-existingUser-username">
-            <setting name="size">17</setting>
+            <setting name="size">21</setting>
             <setting name="value">{userInfo:username}</setting>
         </widget>
         <widget type="GUI/Button" id="UserManagerScreen-editUser-resetPassword">
@@ -66,14 +70,15 @@
         </widget>
 
         <div id="{className}-editExistingUser-resetPasswordBox" style="display:none;">
+            <div class="{className}-fieldGap"></div>
             <label for="UserManagerScreen-editUser-existingUser-password-input"><text>Password</text></label>
             <widget type="GUI/Password" id="UserManagerScreen-editUser-existingUser-password" />
         </div>
 
         <div class="{className}-addToOtherGroup">
-            <widget type="GUI/Button" id="UserManagerScreen-editUser-existingUser-createButton">
-                <setting name="value"><text>Create User</text></setting>
-                <setting name="click">UserUserManagerScreen.editExistingUser();</setting>
+            <widget type="GUI/Button" id="UserManagerScreen-addToAnotherGroup">
+                <setting name="value"><text>Add to another Group</text></setting>
+                <setting name="click">UserUserManagerScreen.addToOtherGroup();</setting>
             </widget>
         </div>
     </div>

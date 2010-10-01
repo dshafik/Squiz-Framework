@@ -38,44 +38,54 @@
     float: left;
 }
 
+#UserManagerScreen {
+    position: relative;
+}
+
 #UserManagerScreen #userManager-editPane {
     width: 320px;
-    float: left;
     background-color: #EEE;
     border: 1px solid #CCC;
     height: 394px;
     overflow: auto;
+    -moz-box-shadow: -10px 1px 17px -5px #999;
+    -moz-border-radius: 0 9px 9px 0;
+    border-top-right-radius: 9px;
+    border-bottom-right-radius: 9px;
+    position: absolute;
+    left: 70%
 }
 
 /* Right Panel styles */
-.UserManagerScreen-editFolder-childUserDetails,
-.UserManagerScreen-editFolder-childGroupDetails,
-.UserManagerScreen-editUserGroup-childUserDetails,
-.UserManagerScreen-editUserGroup-childGroupDetails {
-    border-top: 1px solid #CCCCCC;
-    font-weight: bold;
-    line-height: 22px;
-    margin: 0 15px;
-    padding: 8px 0;
+.UserManagerScreen-fieldGap {
+    height: 10px;
 }
 
-.UserManagerScreen-editFolder-childUserDetails,
-.UserManagerScreen-editUserGroup-childUserDetails {
+.UserManagerScreen-childUserDetails,
+.UserManagerScreen-childGroupDetails {
+    font-weight: bold;
+    line-height: 32px;
     border-bottom: 1px solid #CCC;
 }
 
-.UserManagerScreen-editFolder-childUserDetails .UserManagerScreen-editFolder-assetIcon,
-.UserManagerScreen-editFolder-childGroupDetails .UserManagerScreen-editFolder-assetIcon,
-.UserManagerScreen-editUserGroup-childUserDetails .UserManagerScreen-editUserGroup-assetIcon,
-.UserManagerScreen-editUserGroup-childGroupDetails .UserManagerScreen-editUserGroup-assetIcon {
-    background: url(../icon_user_s.png) no-repeat 0 0;
-    height: 22px;
+#UserManagerScreen-infoSection,
+#UserManagerScreen-createSection {
+    border-top: 1px solid #DDD;
+}
+
+#UserManagerScreen-createSection {
+    display: none;
+}
+
+.UserManagerScreen-childUserDetails .UserManagerScreen-assetIcon,
+.UserManagerScreen-childGroupDetails .UserManagerScreen-assetIcon {
+    background: url(../icon_user_s.png) no-repeat 50% 50%;
+    height: 32px;
     width: 36px;
     float: left;
 }
 
-.UserManagerScreen-editFolder-childGroupDetails .UserManagerScreen-editFolder-assetIcon,
-.UserManagerScreen-editUserGroup-childGroupDetails .UserManagerScreen-editUserGroup-assetIcon {
+.UserManagerScreen-childGroupDetails .UserManagerScreen-assetIcon {
     background-image: url(../icon_userGroup_s.png);
 }
 
@@ -101,34 +111,36 @@
     font-weight: normal;
 }
 
-.UserManagerScreen-editFolder-childUserDetails .GUIButton,
-.UserManagerScreen-editFolder-childGroupDetails .GUIButton,
-.UserManagerScreen-editUserGroup-childUserDetails .GUIButton,
-.UserManagerScreen-editUserGroup-childGroupDetails .GUIButton {
+.UserManagerScreen-childUserDetails .GUIButton,
+.UserManagerScreen-childGroupDetails .GUIButton {
     float: right;
     margin-left: 5px;
+    margin-top: 5px;
 }
 
-.UserManagerScreen-editUserGroup-editGroupName {
-    margin: 15px;
-    margin-top: 0;
+.UserManagerScreen-editGroupName {
+    margin-bottom: 15px;
 }
 
-.UserManagerScreen-editUserGroup-parentGroups h5,
-.UserManagerScreen-editUserGroup-editGroupName h5 {
+.UserManagerScreen-parentGroups h5,
+.UserManagerScreen-editGroupName h5 {
     margin-bottom: 5px;
 }
 
-.UserManagerScreen-editUserGroup-parentGroups {
-    margin: 15px;
+.UserManagerScreen-parentGroups {
+    margin: 15px 0;
 }
 
-.UserManagerScreen-editUserGroup-addToOtherGroup {
+.UserManagerScreen-addToOtherGroup {
     text-align: center;
 }
 
 /* Create User Panel */
-#UserManagerScreen-editUserGroup-createUser {
+#UserManagerScreen-createUser-wrapper {
+    margin: 15px;
+}
+
+.UserManagerScreen-createUser-main {
     border-top: 1px solid #DDD;
     margin: 15px;
     line-height: 22px;
@@ -136,65 +148,52 @@
     margin-bottom: 0;
 }
 
-#UserManagerScreen-editUserGroup-createUser label {
+#userManager-editPane label {
     font-weight: bold;
     font-size: 11px;
 }
 
-.UserManagerScreen-editUserGroup-createUser-col-left {
+.UserManagerScreen-col-left {
     float: left;
     width: 50%;
 }
 
-.UserManagerScreen-editUserGroup-createUser-top {
+.UserManagerScreen-createUser-top {
     margin-bottom: 15px;
+    line-height: 32px;
+    padding-top: 10px;
 }
 
-.UserManagerScreen-editUserGroup-createUser-top .UserManagerScreen-editUserGroup-assetIcon {
-    background: url(../icon_user_s.png) no-repeat 0 0;
-    height: 22px;
+.UserManagerScreen-createUser-top .UserManagerScreen-assetIcon {
+    background: url(../icon_user_s.png) no-repeat 50% 50%;
+    height: 32px;
     width: 36px;
     float: left;
 }
 
-#UserManagerScreen-editUserGroup-cancelCreateUser {
+#UserManagerScreen-createGroup .UserManagerScreen-createUser-top .UserManagerScreen-assetIcon {
+    background-image: url(../icon_userGroup_s.png);
+}
+
+#UserManagerScreen-cancelCreateUserGroup,
+#UserManagerScreen-cancelCreateUser {
     float: right;
+    margin-top: 6px;
 }
 
 /* Edit Exisiting User Panel */
-#UserManagerScreen-editUser-editExistingUser {
+#UserManagerScreen-editUser {
     margin: 0 15px;
     line-height: 22px;
     padding: 0;
 }
 
-#UserManagerScreen-editUser-editExistingUser label {
-    font-weight: bold;
-    font-size: 11px;
-}
-
-.UserManagerScreen-editUser-editExistingUser-col-left {
-    float: left;
-    width: 50%;
-}
-
-.UserManagerScreen-editUser-editExistingUser-top {
-    margin-bottom: 15px;
-}
-
-.UserManagerScreen-editUser-editExistingUser-top .UserManagerScreen-editUserGroup-assetIcon {
-    background: url(../icon_user_s.png) no-repeat 0 0;
-    height: 22px;
-    width: 36px;
-    float: left;
-}
-
 #UserManagerScreen-editUser-existingUser-username {
     float: left;
-    margin-right: 20px;
+    margin-right: 10px;
 }
 
-#UserManagerScreen-editUser-editExistingUser-resetPasswordBox {
+#UserManagerScreen-editExistingUser-resetPasswordBox {
     clear: left;
 }
 
@@ -202,7 +201,7 @@
     margin: 10px 0;
 }
 
-.UserManagerScreen-editUser-status-header {
+.UserManagerScreen-status-header {
     background-color: #49b662;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#49b662), to(#00641e));
     background-image: -moz-linear-gradient(0% 0% -90deg, #49b662, #00641e);
@@ -215,7 +214,7 @@
     line-height: 31px;
 }
 
-.UserManagerScreen-editUser-status-header-icon {
+.UserManagerScreen-status-header-icon {
     margin: 0 10px;
     height: 100%;
     width: 22px;
@@ -223,7 +222,7 @@
     float: left;
 }
 
-.UserManagerScreen-editUser-status-header.Inactive {
+.UserManagerScreen-status-header.Inactive {
     background-color: #BC4646;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#BC4646), to(#5B1313));
     background-image: -moz-linear-gradient(0% 0% -90deg, #BC4646, #5B1313);
@@ -231,11 +230,11 @@
     border: 1px solid #9A4F4E;
 }
 
-.UserManagerScreen-editUser-status-header.Inactive .UserManagerScreen-editUser-status-header-icon {
+.UserManagerScreen-status-header.Inactive .UserManagerScreen-status-header-icon {
     background-image: url(/__web/Systems/GUI/Web/cross.png);
 }
 
-.UserManagerScreen-editUser-status-content {
+.UserManagerScreen-status-content {
     border: 1px solid #CCC;
     border-top: none;
     line-height: 34px;
@@ -244,7 +243,7 @@
     padding-top: 3px;
 }
 
-.UserManagerScreen-editUser-status-content span {
+.UserManagerScreen-status-content span {
     float: left;
     margin-right: 20px;
 }

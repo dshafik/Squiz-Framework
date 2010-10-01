@@ -105,21 +105,29 @@ class UserActions
      *
      * Returns the asset ID of the new group.
      *
-     * @param string $name Name of user group.
+     * @param string $name   Name of user group.
+     * @param string $parent Asset ID of the parent group/folder.
      *
      * @return integer
      * @throws ChannelException If the group fails to create.
+     *
+     * @api write
+     * @api-permission superuser
      */
-    public static function createUserGroup($name)
+    public static function createUserGroup($name, $parent)
     {
         try {
             DAL::beginTransaction();
             Channels::includeSystem('Asset');
             Channels::includeSystem('Attribute');
+            Channels::includeSystem('Linking');
             include_once 'Libs/Security/Security.inc';
 
-            $userid = Asset::create('userGroup');
-            Attribute::setAttributeValue($userid, 'name', $name);
+            $groupid = Asset::create('userGroup');
+            Attribute::setAttributeValue($groupid, 'name', $name);
+
+            // Link it under specified parent.
+            Linking::createLink($parent, $groupid);
             DAL::commit();
         } catch (Exception $e) {
             $msg  = 'Failed to create a new user.'."\n";
@@ -128,7 +136,7 @@ class UserActions
             throw new ChannelException($msg);
         }
 
-        return $userid;
+        return $groupid;
 
     }//end createUserGroup()
 
@@ -890,9 +898,13 @@ class UserActions
             // If this child is a user folder then get info from userFolders array.
             $class = 'UserManagerScreen';
             if (isset($userFolders[$child]) === TRUE) {
+                $title     = explode(' ', $userFolders[$child]['title']);
+                $mainTitle = array_shift($title);
+                $subTitle  = implode(' ', $title);
+
                 $itemContent  = '<div class="'.$class.'-userManager-item">';
-                $itemContent .= '<div class="'.$class.'-userManager-item-title">'.$userFolders[$child]['title'].'</div>';
-                $itemContent .= '<div class="'.$class.'-userManager-item-subTitle">'.$userFolders[$child]['subTitle'].'</div>';
+                $itemContent .= '<div class="'.$class.'-userManager-item-title">'.$mainTitle.'</div>';
+                $itemContent .= '<div class="'.$class.'-userManager-item-subTitle">'.$subTitle.'</div>';
                 $itemContent .= '</div>';
                 $item = array(
                          'id'          => $child,
@@ -901,7 +913,7 @@ class UserActions
                          'isButton'    => TRUE,
                         );
             } else {
-                $name = Attribute::getAttributeValue($child, 'name').' '.Attribute::getAttributeValue($child, 'last_name');
+                $name = Attribute::getAttributeValue($child, 'name');
                 $item = array(
                          'id'          => $child,
                          'title'       => $name,
