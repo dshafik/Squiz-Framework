@@ -12,6 +12,8 @@
 }
 
 #squizSuite-connectedProduct-box div.SquizSuiteScreen-productDetailWrap {
+    float: left;
+    position: relative;
     padding-left: 15px;
 }
 
@@ -245,7 +247,7 @@ span.SquizSuiteScreen-newProductHeadDesc {
     color: #9C9B9B;
 }
 
-/* Peddning Approval */
+/* Pending Approval */
 span.SquizSuiteScreen-pendingApprovalMsg {
     color: #5F5F5F;
     display: block;

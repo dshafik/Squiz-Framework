@@ -1910,19 +1910,50 @@ class SquizSuiteActions
                       );
 
             // Product Details Row.
-            $setting     = array(
-                            'value' => $productUrl,
-                            'size'  => 45,
-                           );
+            $setting = array(
+                        'value' => $productUrl,
+                        'size'  => 40,
+                       );
 
             if (strpos($product['status'], 'pending') === 0) {
                 $setting['disabled'] = TRUE;
             }
 
             $colContent  = '<div class="SquizSuiteScreen-productDetailWrap">';
-            $colContent .= '<strong>API URL</strong><br />';
+            $colContent .= '<strong>'._('API URL').'</strong><br />';
             $colContent .= GUI::createWidget('squizSuite-'.$product['systemid'].'-apiURL', 'GUITextBox', $setting);
             $colContent .= '</div>';
+            if ($product['type'] === 'Squiz Matrix') {
+                $username = '';
+                if (array_key_exists('username', $product['connection']) === TRUE) {
+                    $username = $product['connection']['username'];
+                }
+
+                $password = '';
+                if (array_key_exists('password', $product['connection']) === TRUE) {
+                    $password = $product['connection']['password'];
+                }
+
+                // Add an extra username/password for Matrix connections.
+                $usernameSetting = array(
+                                    'value' => $username,
+                                    'size'  => 15,
+                                   );
+                $passwordSetting = array(
+                                    'value' => $password,
+                                    'size'  => 15,
+                                    'type'  => 'password',
+                                   );
+
+                $colContent .= '<div class="SquizSuiteScreen-productDetailWrap">';
+                $colContent .= '<strong>'._('Username').'</strong><br />';
+                $colContent .= GUI::createWidget('squizSuite-'.$product['systemid'].'-username', 'GUITextBox', $usernameSetting);
+                $colContent .= '</div>';
+                $colContent .= '<div class="SquizSuiteScreen-productDetailWrap">';
+                $colContent .= '<strong>'._('Password').'</strong><br />';
+                $colContent .= GUI::createWidget('squizSuite-'.$product['systemid'].'-password', 'GUITextBox', $passwordSetting);
+                $colContent .= '</div>';
+            }//end if
 
             $rows[] = array(
                        'currTypeIcon' => array(
@@ -2068,7 +2099,7 @@ class SquizSuiteActions
 
             // Save the connected system form fields.
             default:
-                $retVal = self::_saveSquizSquiteScreen($data);
+                $retVal = self::_saveSquizSuiteScreen($data);
                 if (is_string($retVal) === TRUE) {
                     $retVal = array('errors' => $retVal);
                 }
@@ -2092,7 +2123,7 @@ class SquizSuiteActions
      * @since  4.0.0
      * @return mixed
      */
-    private static function _saveSquizSquiteScreen(array $data)
+    private static function _saveSquizSuiteScreen(array $data)
     {
         include_once 'Libs/Util/Util.inc';
         $retVal = TRUE;
@@ -2109,6 +2140,35 @@ class SquizSuiteActions
                 SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
             }
         }
+
+        // Save Usernames and Passwords for Matrix products.
+        $products = SquizSuite::getAllProducts();
+        foreach ($products as $p) {
+            if ($p['type'] !== 'Squiz Matrix') {
+                // Not Matrix continue...
+                continue;
+            }
+
+            $systemid     = $p['systemid'];
+            $upConnection = $p['connection'];
+            $newUsername  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-username', NULL);
+            $newPassword  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-password', NULL);
+            if ($newUsername !== NULL
+                && (array_key_exists('username', $p['connection']['username']) === FALSE
+                || $newUsername !== $p['connection']['username'])
+            ) {
+                $upConnection['username'] = $newUsername;
+                SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+            }
+
+            if ($newPassword !== NULL
+                && (array_key_exists('password', $p['connection']['password']) === FALSE
+                || $newPassword !== $p['connection']['password'])
+            ) {
+                $upConnection['password'] = $newPassword;
+                SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+            }
+        }//end foreach
 
         // Deleted Product Connection.
         $templateData    = Util::getArrayIndex($data, 'templateData', array());
@@ -2128,6 +2188,13 @@ class SquizSuiteActions
             }
 
             $response = SquizSuite::sendMessage($url, 'suiteConnect');
+
+            if ($response['curlInfo']['http_code'] === 404) {
+                // This may be a Matrix connection if a 404 is received, try again.
+                $url      = substr($url, 0, -6);
+                $response = SquizSuite::sendMessage($url, 'suiteConnect');
+            }
+
             if ($response['curlInfo']['http_code'] !== 200) {
                 $retVal = _($response['curlInfo']['http_code'].' response returned.');
             } else {
@@ -2172,7 +2239,7 @@ class SquizSuiteActions
 
         return $retVal;
 
-    }//end _saveSquizSquiteScreen()
+    }//end _saveSquizSuiteScreen()
 
 
     /**
