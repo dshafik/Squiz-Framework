@@ -1179,7 +1179,9 @@ class PatchingActions
     private static function _wsActivateInstall($systemid)
     {
         Channels::includeSystem('SquizSuite');
-        $currProduct = SquizSuite::getCurrentProduct();
+        $updateServer   = self::_getUpdateServer();
+        $currProduct    = SquizSuite::getCurrentProduct();
+        $patchingConfig = Patching::getPatchingConfig();
         SquizSuite::updateProduct(
             $currProduct['systemid'],
             'systemid',
