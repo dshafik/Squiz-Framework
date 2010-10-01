@@ -157,8 +157,8 @@ class GUIFileUploadActions
      *
      * @return boolean
      *
-     * @api           read
-     * @api-privilege public
+     * @api            write
+     * @api-permission superuser
      */
     public static function processFileUpload()
     {
@@ -187,8 +187,8 @@ class GUIFileUploadActions
      *
      * @return integer
      *
-     * @api           read
-     * @api-privilege public
+     * @api            read
+     * @api-permission superuser
      */
     public static function getFileUploadProgress($progKey)
     {
