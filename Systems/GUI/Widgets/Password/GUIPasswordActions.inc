@@ -94,6 +94,7 @@ class GUIPasswordActions
         echo '</div>';
 
         echo '<div class="'.$class.'-matchText">'.$matchStrs[0].'</div>';
+        echo '</div>';
 
         return $settings;
 
