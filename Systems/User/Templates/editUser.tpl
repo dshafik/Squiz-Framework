@@ -60,7 +60,7 @@
             <label for="UserManagerScreen-editUser-existingUser-username-input"><text>Username</text></label>
         </div>
         <widget type="GUI/TextBox" id="UserManagerScreen-editUser-existingUser-username">
-            <setting name="size">21</setting>
+            <setting name="size">17</setting>
             <setting name="value">{userInfo:username}</setting>
         </widget>
         <widget type="GUI/Button" id="UserManagerScreen-editUser-resetPassword">
@@ -75,10 +75,26 @@
             <widget type="GUI/Password" id="UserManagerScreen-editUser-existingUser-password" />
         </div>
 
+
+        <div class="{className}-parentGroups">
+            <h5><text>Belongs to Groups :</text></h5>
+            <widget type="GUI/List" id="UserManagerScreen-parentsList">
+                <setting name="items">
+                    <dataProvider action="User::getUserGroupsData" />
+                </setting>
+                <setting name="sortable">true</setting>
+                <setting name="allowDelete">true</setting>
+                <setting name="itemsGenerator">
+                    <system>User</system>
+                    <action>getUserGroupData</action>
+                </setting>
+            </widget>
+        </div>
+
         <div class="{className}-addToOtherGroup">
             <widget type="GUI/Button" id="UserManagerScreen-addToAnotherGroup">
                 <setting name="value"><text>Add to another Group</text></setting>
-                <setting name="click">UserUserManagerScreen.addToOtherGroup();</setting>
+                <setting name="click">UserUserManagerScreen.addToGroups();</setting>
             </widget>
         </div>
     </div>

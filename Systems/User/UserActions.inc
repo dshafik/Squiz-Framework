@@ -1131,6 +1131,60 @@ class UserActions
     }//end getUserInfoForTemplate()
 
 
+    /**
+     * Returns item data for user group list widgets in templates.
+     *
+     * @param array $groups Array of user group asset ids.
+     *
+     * @return array
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function getUserGroupsData(array $groups=array())
+    {
+        if (empty($groups) === TRUE) {
+            include_once 'Libs/Security/Security.inc';
+            $assetid = Security::getRequestData('assetid', NULL, FALSE, 'post');
+            $groups  = User::getUserGroups($assetid);
+        }
+
+        $data     = array();
+        $iconPath = '/__web/Systems/User/Web/icon_userGroup_s.png';
+        foreach ($groups as $groupid) {
+            $data[$groupid] = User::getUserGroupData($groupid);
+        }
+
+        return $data;
+
+    }//end getUserGroupsData()
+
+
+    /**
+     * Returns item data for user group list widgets in templates.
+     *
+     * @param string $groupid A user group asset id.
+     *
+     * @return array
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function getUserGroupData($groupid)
+    {
+        Channels::includeSystem('Attribute');
+
+        $iconPath = '/__web/Systems/User/Web/icon_userGroup_s.png';
+        $name     = Attribute::getAttributeValue($groupid, 'name');
+        $data     = array(
+                     'itemContent' => '<div class="UserManagerScreen-listItem"><img src="'.$iconPath.'" /> '.$name.'</div>',
+                    );
+
+        return $data;
+
+    }//end getUserGroupsData()
+
+
 }//end class
 
 ?>

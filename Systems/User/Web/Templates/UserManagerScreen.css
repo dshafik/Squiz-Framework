@@ -53,7 +53,8 @@
     border-top-right-radius: 9px;
     border-bottom-right-radius: 9px;
     position: absolute;
-    left: 70%
+    left: 70%;
+    z-index: 1;
 }
 
 /* Right Panel styles */
@@ -246,4 +247,13 @@
 .UserManagerScreen-status-content span {
     float: left;
     margin-right: 20px;
+}
+
+.UserManagerScreen-listItem {
+    line-height: 30px;
+    height: 30px;
+}
+
+.UserManagerScreen-listItem img {
+    vertical-align: top;
 }

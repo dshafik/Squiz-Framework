@@ -135,38 +135,47 @@ var UserUserManagerScreen = new function()
     };
 
     this.addExistingUserGroup = function() {
-        var options = {
-            modal: true
-        };
+        _showAssetPicker(function(selection) {
+            if (selection.length <= 0) {
+                return;
+            }
 
-        // TODO: Get users folder id.
-        var templateSettings = {
-            rootNode: 1
-        };
+            var browserWidget = GUI.getWidget('userManager-assetBrowser');
+            var params = {
+                userids: dfx.jsonEncode(selection),
+                userGroups: dfx.jsonEncode(browserWidget.getValue())
+            };
 
-        var self = this;
-        GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, function() {
-            GUI.getWidget('AssetPicker').setSelectAssetsCallback(function(selection) {
-                if (selection.length <= 0) {
-                    return;
+            GUI.sendRequest('User', 'addUsersToGroups', params, function(response) {
+                if (response && response.result) {
+                    browserWidget.reload();
                 }
-
-                var browserWidget = GUI.getWidget('userManager-assetBrowser');
-                var params = {
-                    userids: dfx.jsonEncode(selection),
-                    userGroups: dfx.jsonEncode(browserWidget.getValue())
-                };
-
-                GUI.sendRequest('User', 'addUsersToGroups', params, function(response) {
-                    if (response && response.result) {
-                        browserWidget.reload();
-                    }
-                });
-
             });
-        }, options);
+        });
 
     };
+
+    this.addToGroups = function() {
+        _showAssetPicker(function(userids) {
+           if (userids.length <= 0) {
+               return;
+           }
+
+           var groupsList = GUI.getWidget('UserManagerScreen-parentsList');
+           if (!groupsList) {
+               return;
+           }
+
+           var itemsData = {};
+           dfx.foreach(userids, function(i) {
+               itemsData[userids[i]] = userids[i];
+           });
+
+           groupsList.generateItems(itemsData);
+
+        });
+
+    },
 
     this.resetPassword = function() {
         var elem   = dfx.getId('UserManagerScreen-editExistingUser-resetPasswordBox');
@@ -188,6 +197,23 @@ var UserUserManagerScreen = new function()
 
     this.getValue = function() {
         console.info(111);
+    };
+
+    var _showAssetPicker = function(callback) {
+        var options = {
+            modal: true
+        };
+
+        // TODO: Get users folder id.
+        var templateSettings = {
+            rootNode: 1
+        };
+
+        var self = this;
+        GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, function() {
+            GUI.getWidget('AssetPicker').setSelectAssetsCallback(callback);
+        }, options);
+
     };
 
 };

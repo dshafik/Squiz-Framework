@@ -38,6 +38,17 @@
 
             <div class="{className}-parentGroups">
                 <h5><text>Belongs to Groups :</text></h5>
+                <widget type="GUI/List" id="UserManagerScreen-parentsList">
+                    <setting name="items">
+                        <dataProvider action="User::getUserGroupsData" />
+                    </setting>
+                    <setting name="sortable">true</setting>
+                    <setting name="allowDelete">true</setting>
+                    <setting name="itemsGenerator">
+                        <system>User</system>
+                        <action>getUserGroupData</action>
+                    </setting>
+                </widget>
             </div>
             <div class="{className}-addToOtherGroup">
                 <widget type="GUI/Button" id="UserManagerScreen-editUserGroup-addToGroup">
@@ -116,45 +127,5 @@
                 </div>
             </div><!-- end Create User Group Section -->
         </div>
-
-       <!-- <div id="UserManagerScreen-editUserGroup-createUser" style="display:none;">
-            <div class="{className}-createUser-top">
-                <div class="{className}-assetIcon"></div><text>Create New User</text>
-                <widget type="GUI/Button" id="UserManagerScreen-editUserGroup-cancelCreateUser">
-                    <setting name="value"><text>Cancel</text></setting>
-                    <setting name="colour">Light</setting>
-                    <setting name="click">UserUserManagerScreen.cancelCreateUser();</setting>
-                </widget>
-            </div>
-            <div class="{className}-createUser-col-left">
-                <label for="UserManagerScreen-editUserGroup-newUser-firstName-input"><text>First Name</text></label>
-                <widget type="GUI/TextBox" id="UserManagerScreen-editUserGroup-newUser-firstName">
-                    <setting name="size">17</setting>
-                </widget>
-            </div>
-            <div class="{className}-createUser-col-right">
-                <label for="UserManagerScreen-editUserGroup-newUser-lastName-input"><text>Last Name</text></label>
-                <widget type="GUI/TextBox" id="UserManagerScreen-editUserGroup-newUser-lastName">
-                    <setting name="size">17</setting>
-                </widget>
-            </div>
-            <label for="UserManagerScreen-editUserGroup-newUser-email-input"><text>Email</text></label>
-            <widget type="GUI/TextBox" id="UserManagerScreen-editUserGroup-newUser-email">
-                <setting name="size">38</setting>
-            </widget>
-
-            <label for="UserManagerScreen-editUserGroup-newUser-username-input"><text>Username</text></label>
-            <widget type="GUI/TextBox" id="UserManagerScreen-editUserGroup-newUser-username" />
-
-            <label for="UserManagerScreen-editUserGroup-newUser-password-input"><text>Password</text></label>
-            <widget type="GUI/Password" id="UserManagerScreen-editUserGroup-newUser-password" />
-
-            <div class="{className}-addToOtherGroup">
-                <widget type="GUI/Button" id="UserManagerScreen-editUserGroup-newUser-createButton">
-                    <setting name="value"><text>Create User</text></setting>
-                    <setting name="click">UserUserManagerScreen.createUser();</setting>
-                </widget>
-            </div>
-        </div>-->
     </div>
 </div>
