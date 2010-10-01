@@ -491,8 +491,10 @@ class APIActions
                 if (isset($responseContent['exception']) === TRUE) {
                     echo $responseContent['exception'];
                 } else {
-                    if (isset($responseContent['contentType']) === TRUE) {
-                        header('Content-Type: '.$responseContent['contentType']);
+                    if (isset($responseContent['contentType']) === TRUE
+                        && empty($responseContent['contentType']) === FALSE
+                    ) {
+                        header('Content-Type: '.$responseContent['contentType'][0]);
                     }
 
                     echo $responseContent['result'];
