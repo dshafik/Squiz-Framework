@@ -1073,74 +1073,198 @@ class PatchingActions
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
-        if ($updateServer['status'] === 'pending') {
-            // Never contacted the update server.
-            // Or failed to establish the connection.
-            $patchingConfig             = Patching::getPatchingConfig();
-            $patchingConfig['revision'] = Patching::getCurrentRevision();
+        // Are we de-activating the system?
+        $deactivate = FALSE;
+        $demoids    = array(
+                       'cms_demo',
+                       'analytics_demo',
+                       'search_demo',
+                       'update_demo',
+                      );
+        if (in_array($systemid, $demoids) === TRUE) {
+            $deactivate = TRUE;
+        }
 
-            // Set my own systemid with the new one.
-            Channels::includeSystem('SquizSuite');
-            $currProduct = SquizSuite::getCurrentProduct();
-            $oriSysId    = $currProduct['systemid'];
+        Channels::includeSystem('SquizSuite');
+        $currProduct = SquizSuite::getCurrentProduct();
+        if ($deactivate === TRUE
+            && in_array($currProduct['systemid'], $demoids) === TRUE
+        ) {
+            // Nothing to de-activate. It's never been activated.
+            return FALSE;
+        }
+
+        if ($deactivate === TRUE) {
+            // De-activate the system.
             SquizSuite::updateProduct(
                 $currProduct['systemid'],
                 'systemid',
                 $systemid
             );
 
-            $enc    = FALSE;
-            $ops    = array(
-                       'systemURL'  => $currProduct['connection']['url'],
-                       'systemName' => $currProduct['connection']['name'],
-                       'version'    => $patchingConfig['revision'],
-                       'cert'       => $currProduct['connection']['cert'],
-                      );
-            $result = self::_wsSendMessage(
-                $updateServer['connection']['url'],
-                'ActivateInstall',
-                $ops,
-                $enc
-            );
+            $patchingConfig             = Patching::getPatchingConfig();
+            $patchingConfig['systemid'] = $systemid;
+            Channels::includeSystem('SystemConfig');
+            SystemConfig::setConfig('Patching', $patchingConfig);
+            return TRUE;
+        }
 
-            // Request failed.
-            if ($result['curlInfo']['http_code'] !== 200) {
-                return FALSE;
+        // Never contacted the update server.
+        // Or failed to establish the connection.
+        $patchingConfig             = Patching::getPatchingConfig();
+        $patchingConfig['revision'] = Patching::getCurrentRevision();
+
+        // Set my own systemid with the new one first.
+        // We will revert this back if something goes wrong.
+        Channels::includeSystem('SquizSuite');
+        $currProduct = SquizSuite::getCurrentProduct();
+        $oriSysId    = $currProduct['systemid'];
+        SquizSuite::updateProduct(
+            $currProduct['systemid'],
+            'systemid',
+            $systemid
+        );
+
+        // IMPORTANT: Set the update server to be live if it was pending.
+        // To be able to send ActivateInstall message successfully,
+        // it's essential that the product and the update server is
+        // already connected! As SquizUpdate::updateService() call is only
+        // super-user accessible, without live connection, the request won't
+        // pass the permission check.
+        if ($updateServer['status'] === 'pending') {
+            $result = self::_wsActivateUpdate($updateServer);
+            if ($result === FALSE) {
+                return $result;
             }
-
-            $result = json_decode($result['result'], TRUE);
-            $status = $result['result']['status'];
-            switch ($status) {
-                case 'OK':
-                    // Set the update server to be live.
-                    SquizSuite::updateProduct(
-                        $updateServer['systemid'],
-                        'status',
-                        'live'
-                    );
-
-                    // Set patching config.
-                    $patchingConfig             = Patching::getPatchingConfig();
-                    $patchingConfig['systemid'] = $systemid;
-                    Channels::includeSystem('SystemConfig');
-                    SystemConfig::setConfig('Patching', $patchingConfig);
-                    return TRUE;
-                break;
-
-                case 'ERR_ALREADY_ACTIVATED':
-                default:
-                    SquizSuite::updateProduct(
-                        $systemid,
-                        'systemid',
-                        $oriSysId
-                    );
-                break;
-            }//end switch
         }//end if
+
+        $status = self::_wsActivateInstall($systemid);
+        if ($status === FALSE) {
+            // Something went wrong.
+            SquizSuite::updateProduct($systemid, 'systemid', $oriSysId);
+            return $status;
+        }
+
+        switch ($status) {
+            case 'OK':
+                // Set patching config.
+                $patchingConfig['systemid'] = $systemid;
+                Channels::includeSystem('SystemConfig');
+                SystemConfig::setConfig('Patching', $patchingConfig);
+                return TRUE;
+            break;
+
+            case 'ERR_ALREADY_ACTIVATED':
+            default:
+                SquizSuite::updateProduct(
+                    $systemid,
+                    'systemid',
+                    $oriSysId
+                );
+            break;
+        }//end switch
 
         return FALSE;
 
     }//end wsActivateInstall()
+
+
+    /**
+     * Send ActivateInstall message.
+     *
+     * @param string $systemid
+     *
+     * @return mixed
+     */
+    private static function _wsActivateInstall($systemid)
+    {
+        Channels::includeSystem('SquizSuite');
+        $currProduct = SquizSuite::getCurrentProduct();
+        SquizSuite::updateProduct(
+            $currProduct['systemid'],
+            'systemid',
+            $systemid
+        );
+
+        $enc    = TRUE;
+        $ops    = array(
+                   'systemURL'  => $currProduct['connection']['url'],
+                   'systemName' => $currProduct['connection']['name'],
+                   'version'    => $patchingConfig['revision'],
+                   'cert'       => $currProduct['connection']['cert'],
+                  );
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'ActivateInstall',
+            $ops,
+            $enc
+        );
+
+        // Request failed.
+        if ($result['curlInfo']['http_code'] !== 200) {
+            return FALSE;
+        }
+
+        $result = json_decode($result['result'], TRUE);
+        $status = $result['result']['status'];
+        return $status;
+
+    }//end _wsActivateInstall()
+
+
+    /**
+     * Finish the connection sequence with Update server.
+     *
+     * This action is only called before activating the product
+     * if the update server is in a pending status.
+     * Before we send any message to the update server, it requires
+     * the connected live suite connection established before hand.
+     *
+     * @return boolean
+     */
+    private static function _wsActivateUpdate($updateServer)
+    {
+        Channels::includeSystem('SquizSuite');
+        Channels::includeSystem('API');
+        $response = SquizSuite::sendMessage($updateServer['connection']['url'], 'suiteConnect');
+        $response = $response['result'];
+        if (strpos($response, '<?xml') !== 0) {
+            return FALSE;
+        } else {
+            $dom = new DomDocument();
+            $dom->loadXML($response);
+
+            $responseDom = $dom->getElementsByTagName('result')->item(0);
+            $response    = API::getResponseFromXMLDom($responseDom);
+            if ($response !== 'ok') {
+                return FALSE;
+            }
+        }
+
+        $response = SquizSuite::sendMessage($updateServer['systemid'], 'suiteConnectAckAck');
+        $response = $response['result'];
+        if (strpos($response, '<?xml') !== 0) {
+            return FALSE;
+        } else {
+            $dom = new DomDocument();
+            $dom->loadXML($response);
+
+            $responseDom = $dom->getElementsByTagName('result')->item(0);
+            $response    = API::getResponseFromXMLDom($responseDom);
+            if ($response !== 'ok') {
+                return FALSE;
+            }
+        }
+
+        SquizSuite::updateProduct(
+            $updateServer['systemid'],
+            'status',
+            'live'
+        );
+
+        return TRUE;
+
+    }//end _wsActivateUpdate()
 
 
     /**
@@ -2012,13 +2136,20 @@ class PatchingActions
         include_once 'Libs/Util/Util.inc';
         $result = array();
 
-        $activationID = Util::getArrayIndex(
+        $activationID = trim(Util::getArrayIndex(
             $data,
             'PatchingScreen-activateIdText',
             ''
-        );
+        ));
 
-        $activationID = trim($activationID);
+        if (empty($activationID) === TRUE) {
+            $activationID = trim(Util::getArrayIndex(
+                $data,
+                'PatchingScreen-newActivationIdText',
+                ''
+            ));
+        }
+
         if (empty($activationID) === FALSE) {
             $result = Patching::wsActivateInstall($activationID);
             if ($result === FALSE) {
