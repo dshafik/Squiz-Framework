@@ -124,4 +124,7 @@ var PatchingPatchingScreen = new function()
         alert("TODO: Once the user system is finalised, finish this!");
     };
 
+    this.saved = function(retval) {
+        GUI.reloadTemplate('Patching:PatchingScreen');
+    };
 }
