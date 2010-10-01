@@ -251,4 +251,8 @@ var SquizSuiteSquizSuiteScreen = new function()
         return data;
     };
 
+    this.saved = function(retval) {
+        GUI.reloadTemplate('SquizSuite:SquizSuiteScreen');
+    };
+
 }
