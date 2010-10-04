@@ -110,6 +110,23 @@ class GUIActions
      */
     private static $_templateSettings = array();
 
+    /**
+     * List of browser types that are valid for the GUI system.
+     *
+     * Used to include browser specific CSS files.
+     *
+     * @var array
+     */
+    private static $_browserTypes = array(
+                                     'chrome'  => NULL,
+                                     'firefox' => NULL,
+                                     'msie7'   => 'msie',
+                                     'msie8'   => 'msie',
+                                     'msie9'   => 'msie',
+                                     'msie'    => NULL,
+                                     'safari'  => NULL,
+                                    );
+
 
     /**
      * Includes the template PHP file.
@@ -220,14 +237,27 @@ class GUIActions
         $url        = str_replace($root, '', $guiPath.'/DfxJSLib/mysource.js');
         $jsFiles[0] = '/'.$url;
 
+        $allCSSFiles = array('all' => array());
         foreach ($cssFiles as $index => $file) {
             $url = str_replace($root, '', $file);
-            $cssFiles[$index] = $url;
+
+            foreach (self::$_browserTypes as $bType => $parent) {
+                if (strpos(basename($file), '.'.$bType.'.') !== FALSE) {
+                    if (isset($browserSpecificCSS[$bType]) === FALSE) {
+                        $allCSSFiles[$bType] = array();
+                    }
+
+                    $allCSSFiles[$bType][] = $url;
+                    continue(2);
+                }
+            }
+
+            $allCSSFiles['all'][] = $url;
         }
 
         if ($minified === FALSE) {
             GUI::setJSIncludes($jsFiles);
-            GUI::setCSSIncludes($cssFiles);
+            GUI::setCSSIncludes($allCSSFiles);
         }
 
         sort($templateDirs);
@@ -327,6 +357,8 @@ class GUIActions
         $phpNode = $tplDoc->createProcessingInstruction('php', $resetCurrTemplateCode);
         $tplDoc->appendChild($phpNode);
 
+        $cssCode = '';
+
         // Now add the dependent files to the HEAD tag, if it exists.
         $head = $tplDoc->getElementsByTagName('head');
         if ($head->length !== 0) {
@@ -336,10 +368,22 @@ class GUIActions
                 GUI::addJS(NULL, $jsInclude, $head);
             }
 
-            foreach (self::$_cssIncludes as $cssInclude) {
-                GUI::addCSS(NULL, $cssInclude, $head);
+            // Include main CSS.
+            $cssCode .= self::_getCSSIncludeCode('all');
+            $cssCode .= "\n<?php \n";
+            $cssCode .= "Channels::includeSystem('GUI'); \n";
+            $cssCode .= '$_gui_browserType = GUI::getBrowserType();'."\n";
+            $cssCode .= 'switch ($_gui_browserType) {'."\n";
+            foreach (self::$_browserTypes as $browserType => $parentType) {
+                $cssCode .= 'case \''.$browserType."':\n";
+                $cssCode .= ' ?>';
+                $cssCode .= self::_getCSSIncludeCode($browserType)."\n";
+                $cssCode .= '<?php ';
+                $cssCode .= "break;\n";
             }
-        }
+
+            $cssCode .= "}\n?>";
+        }//end if
 
         include_once 'Libs/XML/XML.inc';
         $xmlContent = $tplDoc->saveXML();
@@ -352,9 +396,12 @@ class GUIActions
 
         $htmlCont = XML::xmlToXHTML($xmlContent);
 
-        // If <head> element exists, insert API token hidden input field
-        // for the interface to work.
         if ($head->length !== 0) {
+            // Put the CSS inclusion including browser specific CSS code.
+            $htmlCont = str_replace('</head>', $cssCode.'</head>', $htmlCont);
+
+            // The <head> element exists, insert API token hidden input field
+            // for the interface to work.
             $replacement  = '<body>'."\n";
             $replacement .= '<?php '."\n";
             $replacement .= 'Channels::includeSystem(\'User\');'."\n";
@@ -1601,6 +1648,36 @@ class GUIActions
 
 
     /**
+     * Returns HTML CSS include string.
+     *
+     * @param string $browserType Type of the browser.
+     *
+     * @return string
+     */
+    private static function _getCSSIncludeCode($browserType)
+    {
+        $css = '';
+        if ($browserType === NULL
+            || isset(self::$_cssIncludes[$browserType]) === FALSE
+        ) {
+            return $css;
+        }
+
+        // Get parent browser's CSS.
+        $css .= self::_getCSSIncludeCode(self::$_browserTypes[$browserType]);
+
+        // Current browser's CSS.
+        foreach (self::$_cssIncludes[$browserType] as $cssFile) {
+            $url  = '/__web/'.$cssFile;
+            $css .= '<link rel="stylesheet" type="text/css" href="'.$url.'" />';
+        }
+
+        return $css;
+
+    }//end _getCSSIncludeCode()
+
+
+    /**
      * Returns the system name from a given template file path.
      *
      * @param string $tplFilePath File path of the template file.
@@ -1726,6 +1803,28 @@ class GUIActions
         return $retVal;
 
     }//end callStatic()
+
+
+    /**
+     * Returns the browser type that is known by the GUI system.
+     *
+     * @see    self::$_browserTypes
+     * @return mixed
+     */
+    public static function getBrowserType()
+    {
+        if (isset($_SERVER['HTTP_USER_AGENT']) === TRUE) {
+            $uAgent = str_replace(' ', '', strtolower($_SERVER['HTTP_USER_AGENT']));
+            foreach (self::$_browserTypes as $type => $parent) {
+                if (strpos($uAgent, $type) !== FALSE) {
+                    return $type;
+                }
+            }
+        }
+
+        return NULL;
+
+    }//end getBrowserType()
 
 
     /**
