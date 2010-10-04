@@ -58,6 +58,7 @@ echo '4. Installing SQL functions';
 Install::installSqlFunctions($systemNames);
 echoDone();
 
+exit;
 
 /**
  * Echo done function.

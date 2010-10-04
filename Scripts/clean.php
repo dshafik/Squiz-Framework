@@ -89,8 +89,13 @@ Install::prepareDataDir($rootdir, $url);
 echoDone();
 
 echo '10. Rebaking system';
-system('/usr/bin/php '.$rootdir.'/Scripts/rebake.php >> /dev/null 2>&1');
-echoDone();
+system('/usr/bin/php '.$rootdir.'/Scripts/rebake.php >> /dev/null 2>&1', $retVal);
+if ($retVal === 0) {
+    echoDone();
+} else {
+    echoFail();
+    exit();
+}
 
 echo '11. Running system install methods';
 Install::runSystemInstallMethods($systemNames);
@@ -172,6 +177,18 @@ function echoDone()
     echo exec('echo -en "\033[54G"; echo -n "[ " ; echo -en "\033[0;32mDone" ; tput sgr0 ; echo " ]"')."\n";
 
 }//end echoDone()
+
+
+/**
+ * Echo fail function.
+ *
+ * @return void
+ */
+function echoFail()
+{
+    echo exec('echo -en "\033[54G"; echo -n "[ " ; echo -en "\033[0;31mFAIL" ; tput sgr0 ; echo " ]"')."\n";
+
+}//end echoFail()
 
 
 /**
