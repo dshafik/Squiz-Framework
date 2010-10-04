@@ -30,7 +30,7 @@
 }
 
 #UserManagerScreen #userManager-assetBrowser {
-    height: 350px;
+    height: 500px;
 }
 
 #UserManagerScreen #userManager-box {
@@ -46,7 +46,7 @@
     width: 320px;
     background-color: #EEE;
     border: 1px solid #CCC;
-    height: 394px;
+    height: 544px;
     overflow: auto;
     -moz-box-shadow: -10px 1px 17px -5px #999;
     -moz-border-radius: 0 9px 9px 0;

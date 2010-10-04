@@ -1,7 +1,7 @@
 <var name="className"><content>UserManagerScreen</content></var>
 <var name="groupInfo"><dataProvider action="User::getUserGroupInfoForTemplate" /></var>
 
-<div id="{className}-editFolder">
+<div id="{className}-editor" assetType="folder">
     <div class="{className}-editFolder-top">
         <h2>{groupInfo:name}</h2>
     </div>

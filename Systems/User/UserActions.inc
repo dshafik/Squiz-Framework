@@ -50,16 +50,17 @@ class UserActions
      *
      * Returns an userid.
      *
-     * @param string $username  Username for the user.
-     * @param string $firstName First name of the user.
-     * @param string $lastName  Last name of the user.
-     * @param string $email     Email of the user.
-     * @param string $password  Plain text password of the user.
+     * @param string $username   Username for the user.
+     * @param string $firstName  First name of the user.
+     * @param string $lastName   Last name of the user.
+     * @param string $email      Email of the user.
+     * @param string $password   Plain text password of the user.
+     * @param array  $userGroups Array of user groups that new user belongs to.
      *
      * @return integer
      * @throws ChannelException If the user fails to create.
      *
-     * @api write
+     * @api            write
      * @api-permission superuser
      */
     public static function createUser(
@@ -111,7 +112,7 @@ class UserActions
      * @return integer
      * @throws ChannelException If the group fails to create.
      *
-     * @api write
+     * @api            write
      * @api-permission superuser
      */
     public static function createUserGroup($name, $parent)
@@ -273,14 +274,21 @@ class UserActions
     /**
      * Return the list of user groups which the given user belongs to.
      *
-     * @param float $userid Userid to check.
+     * @param string  $userid            Userid to check.
+     * @param boolean $directParentsOnly If TRUE then only the direct parents will be
+     *                                   returned.
      *
      * @return array
      */
-    public static function getUserGroups($userid)
+    public static function getUserGroups($userid, $directParentsOnly=FALSE)
     {
         Channels::includeSystem('Linking');
-        $parentQ  = Linking::getParents($userid, 0, 65525, array('userGroup'));
+        if ($directParentsOnly === FALSE) {
+            $parentQ = Linking::getParents($userid, 0, 65525, array('userGroup'));
+        } else {
+            $parentQ = Linking::getImmediateParents($userid, NULL, array('userGroup'));
+        }
+
         $groupids = DAL::getAssoc($parentQ, 0);
         return $groupids;
 
@@ -290,8 +298,8 @@ class UserActions
     /**
      * Adds user to given user groups.
      *
-     * @param string $userids    Id of the user.
-     * @param array  $userGroups Array of user group assetids.
+     * @param array $userids    Id of the user.
+     * @param array $userGroups Array of user group assetids.
      *
      * @return boolean
      *
@@ -641,7 +649,6 @@ class UserActions
             DAL::beginTransaction();
             Channels::includeSystem('Asset');
             Channels::includeSystem('Attribute');
-            Channels::includeSystem('Linking');
 
             $folderid = Asset::create('folder');
             Attribute::setAttributeValue($folderid, 'name', $title);
@@ -653,9 +660,9 @@ class UserActions
             }
 
             $userFolders[$folderid] = array(
-                                                  'title'    => $title,
-                                                  'subTitle' => $subTitle,
-                                                 );
+                                       'title'    => $title,
+                                       'subTitle' => $subTitle,
+                                      );
 
             include_once 'Libs/FileSystem/FileSystem.inc';
             $content = '<?php $usersFolder = '.var_export($userFolders, TRUE).' ?>';
@@ -668,7 +675,7 @@ class UserActions
             $msg  = _('Failed to create a user folder.')."\n";
             $msg .= $e->getMessage();
             throw new ChannelException($msg);
-        }
+        }//end try
 
         return $folderid;
 
@@ -701,6 +708,7 @@ class UserActions
         try {
             DAL::beginTransaction();
             Channels::includeSystem('Attribute');
+            include_once 'Libs/FileSystem/FileSystem.inc';
             Attribute::setAttributeValue($folderid, 'name', $title);
 
             $userFolders[$folderid] = array(
@@ -718,7 +726,7 @@ class UserActions
             $msg  = _('Failed to update user folder.')."\n";
             $msg .= $e->getMessage();
             throw new ChannelException($msg);
-        }
+        }//end try
 
     }//end editUsersFolder()
 
@@ -768,7 +776,7 @@ class UserActions
      *
      * @param string $assetType      Type of a user asset.
      * @param string $templateSystem System the template belongs to.
-     * @param array  $templateName   Name of the template file.
+     * @param string $templateName   Name of the template file.
      *
      * @return void
      */
@@ -792,6 +800,13 @@ class UserActions
     }//end addEditTemplate()
 
 
+    /**
+     * Returns the asset type editing template contents.
+     *
+     * @param string $assetType Asset type that is being edited.
+     *
+     * @return string
+     */
     public static function getEditTemplate($assetType)
     {
         $cacheFile = BaseSystem::getDataDir('User').'/editTemplates.inc';
@@ -806,8 +821,8 @@ class UserActions
             Channels::includeSystem('GUI');
             $info = $editTemplates[$assetType];
             ob_start();
-            GUI::printTemplate($info['system'], $info['template']);
-            $contents = ob_get_contents();
+                GUI::printTemplate($info['system'], $info['template']);
+                $contents = ob_get_contents();
             ob_end_clean();
         }
 
@@ -919,14 +934,14 @@ class UserActions
                          'title'       => $name,
                          'itemContent' => '<img class="'.$class.'-userManager-item-icon" src="'.$iconPath.'" />'.$name,
                         );
-            }
+            }//end if
 
             // Get number of kids.
             $childKids          = DAL::getAssoc(Linking::getImmediateChildren($child, FALSE), 0);
             $item['childCount'] = count($childKids);
 
             $data[] = $item;
-        }
+        }//end foreach
 
         return $data;
 
@@ -940,7 +955,7 @@ class UserActions
      *
      * @param string $assetid ID of the asset thats being edited.
      *
-     * @return void
+     * @return string
      *
      * @api            read
      * @api-permission superuser
@@ -1146,7 +1161,7 @@ class UserActions
         if (empty($groups) === TRUE) {
             include_once 'Libs/Security/Security.inc';
             $assetid = Security::getRequestData('assetid', NULL, FALSE, 'post');
-            $groups  = User::getUserGroups($assetid);
+            $groups  = User::getUserGroups($assetid, TRUE);
         }
 
         $data     = array();
@@ -1182,7 +1197,153 @@ class UserActions
 
         return $data;
 
-    }//end getUserGroupsData()
+    }//end getUserGroupData()
+
+
+    /**
+     * Save the UserManager screen settings.
+     *
+     * @param array $data Settings to save.
+     *
+     * @since  4.0.0
+     * @return mixed
+     * @throws ChannelException If the active user is not a super user.
+     */
+    public static function saveUserManagerScreen(array $data)
+    {
+        Channels::includeSystem('User');
+        if (User::isSystemAdministrator() === FALSE) {
+            throw new ChannelException(_('You must be a super user to access this screen'));
+        }
+
+        $errors  = array();
+        $tplData = Util::getArrayIndex($data, 'templateData', NULL);
+        if ($tplData === NULL) {
+            $errors[] = _('Failed to save');
+            return $errors;
+        }
+
+        try {
+            DAL::beginTransaction();
+            $assetType = Util::getArrayIndex($tplData, 'assetType');
+            $assetid   = Util::getArrayIndex($tplData, 'assetid');
+
+            if (empty($assetid) === FALSE) {
+                $assetid = array_shift($assetid);
+            }
+
+            Channels::includeSystem('Attribute');
+            switch ($assetType) {
+                case 'user':
+                    // Save user details.
+                    $attributes = array(
+                                   'first_name',
+                                   'last_name',
+                                   'email',
+                                   'username',
+                                  );
+
+                    foreach ($attributes as $attrName) {
+                        $newValue = Util::getArrayIndex($tplData, $attrName, NULL);
+                        $current  = Attribute::getAttributeValue($assetid, $attrName);
+                        if ($newValue !== NULL && $current !== $newValue) {
+                            Attribute::setAttributeValue($assetid, $attrName, $newValue);
+                        }
+                    }
+
+                    // Update user password.
+                    $password = Util::getArrayIndex($tplData, 'password');
+                    if (empty($password) === FALSE) {
+                        include_once 'Libs/Security/Security.inc';
+                        Attribute::setAttributeValue(
+                            $assetid,
+                            'password',
+                            Security::hashUserPassword($password)
+                        );
+                    }
+
+                    // Update parent groups.
+                    $parents = Util::getArrayIndex($tplData, 'parents', array());
+                    self::_saveAssetParentGroups($assetid, $parents);
+                break;
+
+                case 'userGroup':
+                    // Update group name.
+                    $newValue = Util::getArrayIndex($tplData, 'name', NULL);
+                    $current  = Attribute::getAttributeValue($assetid, 'name');
+                    if ($newValue !== NULL && $current !== $newValue) {
+                        Attribute::setAttributeValue($assetid, 'name', $newValue);
+                    }
+
+                    // Update parent groups.
+                    $parents = Util::getArrayIndex($tplData, 'parents', array());
+                    self::_saveAssetParentGroups($assetid, $parents);
+                break;
+
+                default:
+                    // Ignore rest of the asset types.
+                break;
+            }//end switch
+
+            DAL::commit();
+        } catch (ChannelException $e) {
+            DAL::rollBack();
+            $errors[] = _('Failed to update');
+            error_log(print_r($e->getMessage(), 1));
+        }//end try
+
+        $retVal = TRUE;
+        if (empty($errors) === FALSE) {
+            $retVal = array('errors' => $errors);
+        } else {
+            $retVal = array('success' => TRUE);
+        }
+
+        return $retVal;
+
+    }//end saveUserManagerScreen()
+
+
+    /**
+     * Updates the user groups that the specified asset belongs to.
+     *
+     * @param string $assetid Asset ID of a user or a user group.
+     * @param array  $parents The parents information from List widget.
+     *
+     * @return void
+     */
+    private static function _saveAssetParentGroups($assetid, array $parents)
+    {
+        if (empty($parents) === TRUE) {
+            return;
+        }
+
+        Channels::includeSystem('Linking');
+
+        // Update parent groups.
+        $currentGroups = User::getUserGroups($assetid, TRUE);
+        $removedGroups = Util::getArrayIndex($parents, 'removed');
+        foreach ($removedGroups as $groupid => $tmp) {
+            if (in_array($groupid, $currentGroups) === TRUE) {
+                Linking::deleteLink($groupid, $assetid);
+            }
+        }
+
+        // Add the new groups.
+        $items = Util::getArrayIndex($parents, 'items', array());
+        foreach ($items as $itemid => $tmp) {
+            if (strpos($itemid, 'new_') === 0) {
+                $parts      = explode('_', $itemid);
+                $newGroupid = $parts[1];
+                if ($newGroupid !== $assetid
+                    && in_array($newGroupid, $currentGroups) === FALSE
+                ) {
+                    Linking::createLink($newGroupid, $assetid);
+                }
+            }
+        }
+
+    }//end _saveAssetParentGroups()
 
 
 }//end class

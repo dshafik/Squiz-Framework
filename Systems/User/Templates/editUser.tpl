@@ -13,7 +13,7 @@
   </content>
 </var>
 
-<div id="{className}">
+<div id="{className}-editor" assetType="user">
     <div class="{className}-editUser-top">
         <h2>{userInfo:first_name} {userInfo:last_name}</h2>
     </div>
@@ -48,7 +48,7 @@
             </div>
             <div class="{className}-status-content">
                 <span><text>Active Account</text></span>
-                <widget type="GUI/ToggleButton" id="UserManagerScreen-editUser-toggleStatus">
+                <widget type="GUI/ToggleButton" id="UserManagerScreen-editUser-existingUser-toggleStatus">
                     <setting name="toggleAction">UserUserManagerScreen.toggleUserStatus();</setting>
                     <setting name="value">{userInfo:status}</setting>
                 </widget>
@@ -82,7 +82,6 @@
                 <setting name="items">
                     <dataProvider action="User::getUserGroupsData" />
                 </setting>
-                <setting name="sortable">true</setting>
                 <setting name="allowDelete">true</setting>
                 <setting name="itemsGenerator">
                     <system>User</system>

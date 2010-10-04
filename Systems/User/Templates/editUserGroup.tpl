@@ -1,7 +1,7 @@
 <var name="className"><content>UserManagerScreen</content></var>
 <var name="groupInfo"><dataProvider action="User::getUserGroupInfoForTemplate" /></var>
 
-<div id="{className}">
+<div id="{className}-editor" assetType="userGroup">
     <div class="{className}-editUserGroup-top">
         <h2>{groupInfo:name}</h2>
     </div>
@@ -42,7 +42,6 @@
                     <setting name="items">
                         <dataProvider action="User::getUserGroupsData" />
                     </setting>
-                    <setting name="sortable">true</setting>
                     <setting name="allowDelete">true</setting>
                     <setting name="itemsGenerator">
                         <system>User</system>
@@ -53,6 +52,7 @@
             <div class="{className}-addToOtherGroup">
                 <widget type="GUI/Button" id="UserManagerScreen-editUserGroup-addToGroup">
                     <setting name="value"><text>Add to another Group</text></setting>
+                    <setting name="click">UserUserManagerScreen.addToGroups();</setting>
                 </widget>
             </div>
         </div>

@@ -23,8 +23,7 @@
 
 var UserUserManagerScreen = new function()
 {
-    this.init = function()
-    {
+    this.init = function() {
         // Add the itemClicked event call back for the column browser.
         var browser = GUI.getWidget('userManager-assetBrowser');
         if (browser) {
@@ -33,7 +32,6 @@ var UserUserManagerScreen = new function()
                 _loadEditContents(itemid);
             });
         }
-
     };
 
     var _loadEditContents = function(assetid) {
@@ -42,7 +40,6 @@ var UserUserManagerScreen = new function()
         };
 
         GUI.loadContent('User', 'loadUserManagerEditContents', dfx.getId('userManager-editPane'), params);
-
     };
 
     this.cancelCreate = function() {
@@ -76,7 +73,6 @@ var UserUserManagerScreen = new function()
                 browserWidget.reload();
             }
         });
-
     };
 
     this.createNewUserGroup = function() {
@@ -118,7 +114,7 @@ var UserUserManagerScreen = new function()
                 }
 
                 var browserWidget = GUI.getWidget('userManager-assetBrowser');
-                var params = {
+                var params        = {
                     userids: dfx.jsonEncode(selection),
                     userGroups: dfx.jsonEncode(browserWidget.getValue())
                 };
@@ -128,10 +124,8 @@ var UserUserManagerScreen = new function()
                         browserWidget.reload();
                     }
                 });
-
             });
         }, options);
-
     };
 
     this.addExistingUserGroup = function() {
@@ -141,7 +135,7 @@ var UserUserManagerScreen = new function()
             }
 
             var browserWidget = GUI.getWidget('userManager-assetBrowser');
-            var params = {
+            var params        = {
                 userids: dfx.jsonEncode(selection),
                 userGroups: dfx.jsonEncode(browserWidget.getValue())
             };
@@ -152,7 +146,6 @@ var UserUserManagerScreen = new function()
                 }
             });
         });
-
     };
 
     this.addToGroups = function() {
@@ -168,13 +161,11 @@ var UserUserManagerScreen = new function()
 
            var itemsData = {};
            dfx.foreach(userids, function(i) {
-               itemsData[userids[i]] = userids[i];
+               itemsData['new_' + userids[i]] = userids[i];
            });
 
            groupsList.generateItems(itemsData);
-
         });
-
     },
 
     this.resetPassword = function() {
@@ -192,11 +183,52 @@ var UserUserManagerScreen = new function()
         } else {
             dfx.addClass(header, 'Inactive');
         }
-
     };
 
     this.getValue = function() {
-        console.info(111);
+        // Depending on which asset type is selected get the widget values.
+        var editorPanel = dfx.getId('UserManagerScreen-editor');
+        if (!editorPanel) {
+            return;
+        }
+
+        var idPrefix  = 'UserManagerScreen';
+        var saveData  = {};
+        var assetType = dfx.attr(editorPanel, 'assetType');
+        var assetid   = GUI.getWidget('userManager-assetBrowser').getValue();
+
+        saveData.assetType = assetType;
+        saveData.assetid   = assetid
+
+        switch (assetType) {
+            case 'user':
+                idPrefix           += '-editUser-existingUser';
+                saveData.first_name = GUI.getWidget(idPrefix + '-firstName').getValue();
+                saveData.last_name  = GUI.getWidget(idPrefix + '-lastName').getValue();
+                saveData.email      = GUI.getWidget(idPrefix + '-email').getValue();
+                saveData.username   = GUI.getWidget(idPrefix + '-username').getValue();
+                saveData.status     = GUI.getWidget(idPrefix + '-toggleStatus').getValue();
+                saveData.parents    = GUI.getWidget('UserManagerScreen-parentsList').getValue();
+                saveData.password   = GUI.getWidget(idPrefix + '-password').getValue();
+            break;
+
+            case 'userGroup':
+                idPrefix        += '-editUserGroup';
+                saveData.name    = GUI.getWidget(idPrefix + '-groupName').getValue();
+                saveData.parents = GUI.getWidget('UserManagerScreen-parentsList').getValue();
+            break;
+
+            default:
+                GUI.message('developer', 'Failed to get asset type from editor panel', 'warning');
+                return null;
+            break;
+        }//end switch
+
+        return saveData;
+    };
+
+    this.saved = function() {
+        GUI.getWidget('userManager-assetBrowser').reload();
     };
 
     var _showAssetPicker = function(callback) {
@@ -213,7 +245,6 @@ var UserUserManagerScreen = new function()
         GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, function() {
             GUI.getWidget('AssetPicker').setSelectAssetsCallback(callback);
         }, options);
-
     };
 
 };
