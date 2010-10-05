@@ -1,0 +1,332 @@
+<?xml version="1.0"?>
+<queries system="Configuration">
+  <query id="addAttribute">
+    <primary>
+      <insert>
+        <fields table="configuration">
+          <field>attributeid</field>
+          <field>asset_type</field>
+          <field>attribute_type</field>
+          <field>data_source</field>
+          <field>initial_val</field>
+          <field>default_val</field>
+          <field>is_unique</field>
+          <field>required</field>
+          <field>assetid</field>
+        </fields>
+        <values>
+          <value column="attributeid">:attributeid</value>
+          <value column="asset_type">:assetType</value>
+          <value column="attribute_type">:attributeType</value>
+          <value column="data_source">:dataSource</value>
+          <value column="initial_val">:initialVal</value>
+          <value column="default_val">:defaultVal</value>
+          <value column="is_unique">:isUnique</value>
+          <value column="required">:required</value>
+          <value column="assetid">:assetid</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+  <query id="attributeExists">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="attributeid"/>
+        </fields>
+        <from>
+          <table>configuration</table>
+        </from>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getAttributeInfo">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="attributeid"/>
+          <field table="configuration" column="asset_type"/>
+          <field table="configuration" column="attribute_type"/>
+          <field table="configuration" column="data_source"/>
+          <field table="configuration" column="is_unique"/>
+          <field table="configuration" column="initial_val"/>
+          <field table="configuration" column="default_val"/>
+          <field table="configuration" column="required"/>
+          <field table="configuration" column="assetid"/>
+        </fields>
+        <from>
+          <table>configuration</table>
+        </from>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getAttributeInfoUsingAssetid">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="attributeid"/>
+          <field table="configuration" column="asset_type"/>
+          <field table="configuration" column="attribute_type"/>
+          <field table="configuration" column="data_source"/>
+          <field table="configuration" column="is_unique"/>
+          <field table="configuration" column="initial_val"/>
+          <field table="configuration" column="default_val"/>
+          <field table="configuration" column="required"/>
+          <field table="configuration" column="assetid"/>
+        </fields>
+        <from>
+          <table>asset</table>
+        </from>
+        <joins>
+          <join>
+            <field table="asset" column="typeid"/>
+            <field table="configuration" column="asset_type"/>
+          </join>
+        </joins>
+        <where>
+          <equal table="asset" column="assetid">:assetid</equal>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getAttributesByAssetType">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="attributeid"/>
+        </fields>
+        <from>
+          <table>configuration</table>
+        </from>
+        <where>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getAttributesByType">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="attributeid"/>
+        </fields>
+        <from>
+          <table>configuration</table>
+        </from>
+        <where>
+          <equal table="configuration" column="attribute_type">:attributeType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getAttributeDataSourcesByAssetid">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="data_source"/>
+          <field table="configuration" column="attributeid"/>
+          <field table="configuration" column="attribute_type"/>
+        </fields>
+        <from>
+          <table>asset</table>
+        </from>
+        <joins>
+          <join>
+            <field table="asset" column="typeid"/>
+            <field table="configuration" column="asset_type"/>
+          </join>
+        </joins>
+        <where>
+          <equal table="asset" column="assetid">:assetid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="getAttributeDataSourceByAssetid">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="data_source"/>
+        </fields>
+        <from>
+          <table>asset</table>
+        </from>
+        <joins>
+          <join>
+            <field table="asset" column="typeid"/>
+            <field table="configuration" column="asset_type"/>
+          </join>
+        </joins>
+        <where>
+          <equal table="asset" column="assetid">:assetid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="setAttributeUniqueness">
+    <primary>
+      <update>
+        <fields table="configuration">
+          <field>is_unique</field>
+        </fields>
+        <values>
+          <value column="is_unique">:unique</value>
+        </values>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="updateAttributeInitialValue">
+    <primary>
+      <update>
+        <fields table="configuration">
+          <field>initial_val</field>
+        </fields>
+        <values>
+          <value column="initial_val">:newValue</value>
+        </values>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="setAttributeDataSource">
+    <primary>
+      <update>
+        <fields table="configuration">
+          <field>data_source</field>
+        </fields>
+        <values>
+          <value column="data_source">:newDataSource</value>
+        </values>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="getAttributeDataSource">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="data_source"/>
+        </fields>
+        <from>
+          <table>configuration</table>
+        </from>
+        <where>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="removeAttribute">
+    <primary>
+      <delete>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </delete>
+    </primary>
+  </query>
+  <query id="updateAttributeType">
+    <primary>
+      <update>
+        <fields table="configuration">
+          <field>attribute_type</field>
+        </fields>
+        <values>
+          <value column="attribute_type">:newDataType</value>
+        </values>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="updateAttributeAssetType">
+    <primary>
+      <update>
+        <fields table="configuration">
+          <field>asset_type</field>
+        </fields>
+        <values>
+          <value column="asset_type">:newAssetType</value>
+        </values>
+        <where>
+          <equal table="configuration" column="attributeid">:attributeid</equal>
+          <equal table="configuration" column="asset_type">:assetType</equal>
+        </where>
+      </update>
+    </primary>
+  </query>
+  <query id="dropAttributeTable">
+    <primary>
+      <drop table="configuration"/>
+    </primary>
+  </query>
+  <query id="batchGetAttributeDataSource">
+    <primary>
+      <select distinct="true">
+        <fields>
+          <field table="configuration" column="data_source"/>
+          <field table="configuration" column="attributeid"/>
+          <field table="configuration" column="attribute_type"/>
+        </fields>
+        <from>
+          <table>configuration</table>
+        </from>
+        <where>
+          <in table="configuration" column="asset_type">
+            <value>:assetTypes</value>
+          </in>
+          <in table="configuration" column="attributeid">
+            <value>:attributeids</value>
+          </in>
+        </where>
+      </select>
+    </primary>
+  </query>
+  <query id="batchGetAttributeInfo">
+    <primary>
+      <select>
+        <fields>
+          <field table="configuration" column="attributeid"/>
+          <field table="configuration" column="asset_type"/>
+          <field table="configuration" column="attribute_type"/>
+          <field table="configuration" column="data_source"/>
+          <field table="configuration" column="is_unique"/>
+          <field table="configuration" column="initial_val"/>
+          <field table="configuration" column="default_val"/>
+          <field table="configuration" column="required"/>
+          <field table="configuration" column="assetid"/>
+        </fields>
+        <from>
+          <table>configuration</table>
+        </from>
+        <where>
+          <in table="configuration" column="attributeid">:attributeids</in>
+          <equal table="attribute" column="asset_type">:assetType</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+</queries>

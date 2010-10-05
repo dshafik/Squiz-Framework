@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<schema system="ConfigurationDataSource">
+  <udts>
+    <udt-import system="Asset">ASSETID</udt-import>
+    <udt-import system="Configuration">ATTRIBUTEID</udt-import>
+  </udts>
+  <tables>
+    <table name="configuration_array">
+      <columns>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="CLOB" allow-null="true">value</column>
+        <column type="BOOLEAN" allow-null="false">is_default</column>
+      </columns>
+      <constraints>
+        <primary-key name="config_array_pk">
+          <column>assetid</column>
+          <column>attributeid</column>
+        </primary-key>
+        <foreign-key name="config_array_fk1" foreign-table="asset" on-delete="CASCADE">
+          <column references="assetid">assetid</column>
+        </foreign-key>
+      </constraints>
+    </table>
+    <table name="configuration_boolean">
+      <columns>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="BOOLEAN" allow-null="false">value</column>
+        <column type="BOOLEAN" allow-null="false">is_default</column>
+      </columns>
+      <constraints>
+        <primary-key name="config_boolean_pk">
+          <column>assetid</column>
+          <column>attributeid</column>
+        </primary-key>
+        <foreign-key name="config_boolean_fk1" foreign-table="asset" on-delete="CASCADE">
+          <column references="assetid">assetid</column>
+        </foreign-key>
+      </constraints>
+    </table>
+  </tables>
+</schema>

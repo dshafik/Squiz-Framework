@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+    <runner>
+      <required>yes</required>
+      <method>replaceContext</method>
+      <parameters>
+        <parameter>oldContext</parameter>
+        <parameter>newContext</parameter>
+        <parameter>assetid</parameter>
+      </parameters>
+      <action listen="before">Context::replaceContext</action>
+      <fatal>yes</fatal>
+    </runner>
+  </plugs>
+</system>

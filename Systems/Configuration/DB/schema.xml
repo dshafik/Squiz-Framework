@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<schema system="Configuration">
+  <udts>
+    <udt type="VARCHAR" size="50">ATTRIBUTEID</udt>
+    <udt-import system="Asset">ASSETID</udt-import>
+    <udt-import system="Asset">TYPEID</udt-import>
+  </udts>
+  <tables>
+    <table name="configuration">
+      <columns>
+        <column type="ATTRIBUTEID" allow-null="false">attributeid</column>
+        <column type="ASSETID" allow-null="false">assetid</column>
+        <column type="TYPEID" allow-null="false">asset_type</column>
+        <column type="VARCHAR" size="50" allow-null="false">attribute_type</column>
+        <column type="VARCHAR" size="50" allow-null="false">data_source</column>
+        <column type="CLOB" allow-null="true">initial_val</column>
+        <column type="CLOB" allow-null="true">default_val</column>
+        <column type="BOOLEAN" allow-null="false">is_unique</column>
+        <column type="BOOLEAN" allow-null="false">required</column>
+      </columns>
+      <indexes>
+        <index name="configuration_assetid_idx">
+          <column>assetid</column>
+        </index>
+        <index name="configuration_asset_type_idx">
+          <column>asset_type</column>
+        </index>
+      </indexes>
+      <constraints>
+        <primary-key name="configuration_pk">
+          <column>attributeid</column>
+          <column>asset_type</column>
+          <column>assetid</column>
+        </primary-key>
+        <foreign-key name="configuration_fk1" foreign-table="asset_type" on-delete="CASCADE">
+          <column references="typeid">asset_type</column>
+        </foreign-key>
+      </constraints>
+    </table>
+  </tables>
+</schema>
