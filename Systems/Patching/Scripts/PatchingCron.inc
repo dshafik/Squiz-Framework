@@ -40,19 +40,9 @@ class PatchingCron implements CronScript
     {
         // Include everything we will potentially run here.
         // To make sure that old code is executed for this instance.
-        //@codingStandardsIgnoreStart
         include_once 'Libs/FileSystem/FileSystem.inc';
-        Channels::includeSystem('Help');
-        Channels::includeSystem('Log');
         Channels::includeSystem('Patching');
         Channels::includeSystem('SystemConfig');
-        Channels::includeSystem('SystemConfigSplashScreenWidget');
-        Channels::includeSystem('Wizard');
-        //@codingStandardsIgnoreEnd
-
-        // Let it get the up-to-date Bugzilla login info and update the file.
-        Channels::includeSystem('Bugzilla');
-        Bugzilla::writeBugzillaLoginInfo();
 
         // Find the first scheduled patch and apply it.
         $config  = Patching::getPatchingConfig();
@@ -113,16 +103,15 @@ class PatchingCron implements CronScript
         }
 
         SystemConfig::setConfig('Patching', $config);
-
-        // Tells debian where to get operating system updates from.
-        $ws          = SystemConfig::getConfig('PatchingWebService');
-        $sourcesList = $ws['sourcesList'];
-        $status      = Patching::wsReleaseStatus();
-
-        if ($status === 'GA') {
-            @FileSystem::filePutContents($sourcesList, 'deb http://aptrepo-stable.squiz.net/ stable main');
-        } else {
-            @FileSystem::filePutContents($sourcesList, 'deb http://aptrepo-beta.squiz.net/ stable main');
+        $status = Patching::wsReleaseStatus();
+        if ($status !== FALSE
+            && $status !== 'ERR_NO_UPDATE_SERVER_CONFIGURED'
+        ) {
+            if ($status === 'GA') {
+                @FileSystem::filePutContents($sourcesList, 'deb http://aptrepo-stable.squiz.net/ stable main');
+            } else {
+                @FileSystem::filePutContents($sourcesList, 'deb http://aptrepo-beta.squiz.net/ stable main');
+            }
         }
 
         // Issues a system reboot command if required.
@@ -203,19 +192,6 @@ class PatchingCron implements CronScript
         $cachedCss = glob($rootDir.'/web/Skins/defaultSkin/*.css');
         foreach ($cachedCss as $file) {
             unlink($file);
-        }
-
-        // Re-generate Help documentation.
-        file_put_contents($patchResultPath, '[Re-generate Help documentation]'."\n", FILE_APPEND);
-        Channels::includeSystem('Help');
-        Help::createDocumentation();
-
-        // Update the *_create_wizard.xml file for asset type wizards.
-        file_put_contents($patchResultPath, '[Remove *_create_wizard.xml files.]'."\n", FILE_APPEND);
-        Channels::includeSystem('Wizard');
-        $wPath = Wizard::getWizardsPath();
-        foreach (glob($wPath.'/*php') as $phpWizardFile) {
-            unlink($phpWizardFile);
         }
 
         // Clear Firefox cache.
