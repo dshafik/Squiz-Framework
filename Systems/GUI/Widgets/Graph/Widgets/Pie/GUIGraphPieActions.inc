@@ -44,6 +44,21 @@ class GUIGraphPieActions
     protected static $size;
 
     /**
+     * Background style.
+     *
+     * This is offered for Webkit browsers that cannot handle SVGs in OBJECT tags
+     * with a transparent background. (Firefox handles it okay, but cannot handle
+     * SVGs in IMG tags - which gives transparent backgrounds in Webkit - until
+     * Fx4.0. C'est la vie.)
+     *
+     * Styles are defined in the CSS file as "background-*" styles, including a
+     * transparent style if that is really necessary. Default is a white background.
+     *
+     * @var string
+     */
+    protected static $background;
+
+    /**
      * Data ring configuration.
      *
      * Each ring is defined from inner ring to outer ring, with the following
@@ -111,6 +126,9 @@ class GUIGraphPieActions
         // same size.
         $size = (int) Util::getArrayIndex($settings, 'size');
 
+        // Background style.
+        $bgStyle = Util::getArrayIndex($settings, 'background', 'white');
+
         // Border settings.
         $border = Util::getArrayIndex($settings, 'border');
         if (is_array($border) === FALSE) {
@@ -136,7 +154,7 @@ class GUIGraphPieActions
             echo '<?xml version="1.0" encoding="utf-8" ?>';
             echo '<?xml-stylesheet href="/__web/'.GUI::getSystemWebPath('GUIGraphPie').'/GUIGraphPie.css" type="text/css" ?>';
 
-            echo '<svg:svg xmlns:svg="http://www.w3.org/2000/svg" class="GUIGraphPie"';
+            echo '<svg:svg xmlns:svg="http://www.w3.org/2000/svg" class="GUIGraphPie background-'.$bgStyle.'"';
             echo ' viewBox="'.(-$radius).' '.(-$radius);
             echo ' '.($radius * 2).' '.($radius * 2).'">'."\n";
 

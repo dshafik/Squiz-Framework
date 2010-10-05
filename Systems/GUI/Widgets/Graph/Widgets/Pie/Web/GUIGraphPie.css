@@ -41,3 +41,15 @@
 .GUIGraphPie .colour-white {
     fill: #FFF;
 }
+
+.GUIGraphPie.background-white {
+    background-color: #FFF;
+}
+
+.GUIGraphPie.background-grey {
+    background-color: #DDD;
+}
+
+.GUIGraphPie.background-none {
+    background: transparent;
+}
