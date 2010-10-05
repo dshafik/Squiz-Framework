@@ -95,6 +95,16 @@ GUIColumnBrowser.prototype = {
 
     selectItem: function(itemid, columnIndex)
     {
+        if (columnIndex === -1) {
+            // Last visible column.
+            var visibleColumns = dfx.getClass('GUIColumnBrowser-column visible', this.elem);
+            if (visibleColumns.length > 0) {
+                columnIndex = (visibleColumns.length - 1);
+            } else {
+                return;
+            }
+        }
+
         // First find the relevant column.
         var lookupClass = 'GUIColumnBrowser-column level-' + columnIndex;
         var columnElem  = dfx.getClass(lookupClass, this.elem);
@@ -333,6 +343,8 @@ GUIColumnBrowser.prototype = {
      */
     reload: function()
     {
+        var selected = this.getValue();
+
         var params = {
             settings: dfx.jsonEncode(this.settings),
             lineage: dfx.jsonEncode(this.getLineage(true))
@@ -344,11 +356,10 @@ GUIColumnBrowser.prototype = {
             dfx.empty(wrapper);
             dfx.setHtml(wrapper, contents);
 
-            var slectedElems = self.getSelectedElements();
-            if (slectedElems.length > 0) {
-                self.itemClicked(slectedElems[0]);
+            if (selected.length > 0) {
+                selected = selected.shift();
+                self.selectItem(selected, -1);
             }
-
         }, 'raw');
 
     }
