@@ -1,0 +1,5 @@
+<config_vars>
+ <config id="status" type="Boolean" unique="f" required="t" default_val="true" assetid="0">
+  <initial_value>TRUE</initial_value>
+ </config>
+</config_vars>

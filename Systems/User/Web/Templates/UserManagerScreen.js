@@ -176,7 +176,7 @@ var UserUserManagerScreen = new function()
     };
 
     this.toggleUserStatus = function() {
-        var status = GUI.getWidget('UserManagerScreen-editUser-toggleStatus').getValue();
+        var status = GUI.getWidget('UserManagerScreen-editUser-existingUser-toggleStatus').getValue();
         var header = dfx.getClass('UserManagerScreen-status-header')[0];
         if (status === true) {
             dfx.removeClass(header, 'Inactive');

@@ -88,6 +88,10 @@ class UserActions
 
             User::addUsersToGroups(array($userid), $userGroups);
 
+            // Set account to active by default.
+            Channels::includeSystem('Configuration');
+            Configuration::setAttributeValue($userid, 'status', TRUE);
+
             DAL::commit();
         } catch (Exception $e) {
             $msg  = 'Failed to create a new user.'."\n";
@@ -269,6 +273,22 @@ class UserActions
         return FALSE;
 
     }//end isMemberOf()
+
+
+    /**
+     * Returns TRUE if user account is active FALSE otherwise.
+     *
+     * @param string $userid Id of a user asset.
+     *
+     * @return boolean
+     */
+    public static function isUserActive($userid)
+    {
+        Channels::includeSystem('Configuration');
+        $status = Configuration::getAttributeValue($userid, 'status');
+        return $status;
+
+    }//end isUserActive()
 
 
     /**
@@ -928,7 +948,14 @@ class UserActions
                          'isButton'    => TRUE,
                         );
             } else {
-                $name = Attribute::getAttributeValue($child, 'name');
+                $name = '';
+                if (Asset::isTypeOf($child, 'user') === TRUE) {
+                    $name  =  Attribute::getAttributeValue($child, 'first_name');
+                    $name .= ' '.Attribute::getAttributeValue($child, 'last_name');
+                } else {
+                    $name = Attribute::getAttributeValue($child, 'name');
+                }
+
                 $item = array(
                          'id'          => $child,
                          'title'       => $name,
@@ -1138,8 +1165,7 @@ class UserActions
 
         $info = User::getUserById($assetid);
 
-        // TODO: How do we know if user is active? Publishing system needed?
-        $info['status'] = TRUE;
+        $info['status'] = User::isUserActive($assetid);
 
         return $info;
 
@@ -1265,6 +1291,17 @@ class UserActions
                     // Update parent groups.
                     $parents = Util::getArrayIndex($tplData, 'parents', array());
                     self::_saveAssetParentGroups($assetid, $parents);
+
+                    // User Status.
+                    $status = Util::getArrayIndex($tplData, 'status', NULL);
+                    if ($status !== NULL) {
+                        // Current status.
+                        Channels::includeSystem('Configuration');
+                        $current = Configuration::getAttributeValue($assetid, 'status');
+                        if ($current !== $status) {
+                            Configuration::setAttributeValue($assetid, 'status', $status);
+                        }
+                    }
                 break;
 
                 case 'userGroup':
