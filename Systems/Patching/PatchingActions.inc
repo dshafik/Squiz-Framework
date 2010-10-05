@@ -1282,7 +1282,7 @@ class PatchingActions
     public static function wsCheckForUpdates()
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
@@ -1418,7 +1418,7 @@ class PatchingActions
     public static function wsCheckSubscription()
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
@@ -1475,7 +1475,7 @@ class PatchingActions
     public static function wsNotifyApplied($new, $old, $msg='')
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
@@ -1519,7 +1519,7 @@ class PatchingActions
     public static function wsNotifyRestored()
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
@@ -1561,7 +1561,7 @@ class PatchingActions
     public static function wsDownloadUpdate(array $updates)
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
@@ -1619,7 +1619,7 @@ class PatchingActions
     public static function wsCheckPremiumSubscription()
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
@@ -1647,7 +1647,7 @@ class PatchingActions
     public static function wsGetAWSKeys()
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
@@ -1693,15 +1693,19 @@ class PatchingActions
     public static function wsReleaseStatus()
     {
         $updateServer = self::_getUpdateServer();
-        if ($updateServer === FALSE) {
+        if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
         // Check if need to check for update according to interval setting.
         $ops    = array();
         $enc    = TRUE;
-        $msg    = self::_wsMsgTemplate('ReleaseStatus', $ops, $enc);
-        $result = self::_wsSendMessage($updateServer['connection']['url'], $msg);
+        $result = self::_wsSendMessage(
+            $updateServer['connection']['url'],
+            'ReleaseStatus',
+            $ops,
+            $enc
+        );
 
         // Request failed.
         if ($result['curlInfo']['http_code'] !== 200) {
@@ -1709,6 +1713,7 @@ class PatchingActions
         }
 
         $result = json_decode($result['result'], TRUE);
+
         $status = $result['result']['status'];
 
         switch ($status) {
@@ -1722,7 +1727,7 @@ class PatchingActions
             break;
         }
 
-        return array();
+        return FALSE;
 
     }//end wsReleaseStatus()
 
