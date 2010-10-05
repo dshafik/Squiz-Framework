@@ -101,7 +101,7 @@ GUIColumnBrowser.prototype = {
             if (visibleColumns.length > 0) {
                 columnIndex = (visibleColumns.length - 1);
             } else {
-                return;
+                return false;
             }
         }
 
@@ -109,7 +109,7 @@ GUIColumnBrowser.prototype = {
         var lookupClass = 'GUIColumnBrowser-column level-' + columnIndex;
         var columnElem  = dfx.getClass(lookupClass, this.elem);
         if (columnElem.length === 0) {
-            return;
+            return false;
         }
 
         // Now find the specified item in that column and call the itemClicked function
@@ -120,9 +120,11 @@ GUIColumnBrowser.prototype = {
         for (var i = 0; i < iln; i++) {
             if (dfx.attr(items[i], 'itemid') === itemid) {
                 this.itemClicked(items[i]);
-                break;
+                return true;
             }
         }
+
+        return false;
 
     },
 
@@ -344,10 +346,11 @@ GUIColumnBrowser.prototype = {
     reload: function()
     {
         var selected = this.getValue();
+        var lineage  = this.getLineage(true);
 
         var params = {
             settings: dfx.jsonEncode(this.settings),
-            lineage: dfx.jsonEncode(this.getLineage(true))
+            lineage: dfx.jsonEncode(lineage)
         };
 
         var self = this;
@@ -358,7 +361,9 @@ GUIColumnBrowser.prototype = {
 
             if (selected.length > 0) {
                 selected = selected.shift();
-                self.selectItem(selected, -1);
+                while (self.selectItem(selected, -1) === false && lineage.length > 0) {
+                    selected = lineage.pop();
+                }
             }
         }, 'raw');
 

@@ -340,11 +340,12 @@ class GUIColumnBrowserActions
         $level          = 0;
         $childSelection = NULL;
         $total          = count($lineage);
+
         foreach ($lineage as $parentid) {
             $items = API::executeRequest($system, $method, array($parentid), $api['options']);
 
             if (empty($items) === TRUE) {
-                return '&nbsp;';
+                continue;
             }
 
             if ($level < $total) {
