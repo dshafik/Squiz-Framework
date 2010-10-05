@@ -340,6 +340,12 @@ class AssetActions
 
             self::_createAssetAttributes($typeid);
 
+            // Create configurations. for the asset type.
+            if (Channels::systemExists('Configuration') === TRUE) {
+                Channels::includeSystem('Configuration');
+                Configuration::installConfiguration($typeid);
+            }
+
             DAL::commit();
         } catch (DALException $e) {
             DAL::rollBack();
@@ -504,12 +510,12 @@ class AssetActions
      */
     public static function isTypeOf($assetid, $typeid)
     {
-        $typeCode = Asset::getTypes($assetid);
+        $typeCode = Asset::getTypeOfAsset($assetid);
         if ($typeCode === $typeid) {
             return TRUE;
         }
 
-        $typeAncestors = Asset::getTypeAncestors($typeCode);
+        $typeAncestors = Asset::getParentTypes($typeCode);
         foreach ($typeAncestors as $typeInfo) {
             if ($typeInfo['typeid'] === $typeid) {
                 return TRUE;
