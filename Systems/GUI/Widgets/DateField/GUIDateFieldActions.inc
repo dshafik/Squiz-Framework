@@ -126,7 +126,6 @@ class GUIDateFieldActions
 	                       'options'  => $monthOptions,
 	                       'selected' => (int) $dateParts[1],
 	                      );
-	    Debug::logDump($selectSettings);
 	    echo GUI::createWidget($widgetPrefix.'-month', 'GUISelect', $selectSettings);
 	    echo ' ';
 
