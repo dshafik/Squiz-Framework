@@ -82,3 +82,6 @@
     border-bottom-right-radius: 0;
     -moz-border-radius-bottomright: 0;
 }
+.GUIBox.GUIBox-faded {
+    opacity: 0.4;
+}
