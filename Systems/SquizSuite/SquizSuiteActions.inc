@@ -467,8 +467,6 @@ class SquizSuiteActions
         $suiteDir = BaseSystem::getDataDir('SquizSuite');
         openssl_pkey_export_to_file($keyGenerated, $suiteDir.'/privatekey.pem');
 
-        $pubKey = openssl_pkey_get_details($keyGenerated);
-
         $info = array(
                  'countryName'            => 'AU',
                  'stateOrProvinceName'    => 'NSW',
@@ -484,8 +482,6 @@ class SquizSuiteActions
         $cert = openssl_csr_sign($csr, NULL, $keyGenerated, (365 * 10));
         openssl_x509_export_to_file($cert, $suiteDir.'/system.crt');
         openssl_x509_export($cert, $certStr);
-
-        file_put_contents($suiteDir.'/publickey', $pubKey['key']);
 
         // Also update the current product connection information with public key in it.
         $currProduct['connection']['cert'] = $certStr;
