@@ -160,6 +160,15 @@ GUIDateField.prototype = {
             var month = this._monthWidget.getValue()[0];
             var year  = this._yearWidget.getValue()[0];
 
+            if (day < 10) {
+                day = '0' + day;
+            }
+
+            if (month < 10) {
+                month = '0' + month;
+            }
+
+            console.info(year + '-' + month + '-' + day);
             return (year + '-' + month + '-' + day);
         } else {
             return null;
@@ -173,9 +182,9 @@ GUIDateField.prototype = {
 
 	    this.changeEnabled = false;
 
-	    this._yearWidget.setValue([dateParts[0].toString()]);
-	    this._monthWidget.setValue([dateParts[1].toString()]);
-	    this._dayWidget.setValue([dateParts[2].toString()]);
+	    this._yearWidget.setValue([parseInt(dateParts[0], 10)]);
+	    this._monthWidget.setValue([parseInt(dateParts[1], 10)]);
+	    this._dayWidget.setValue([parseInt(dateParts[2], 10)]);
 
 	    // Now fire the event in one go.
 	    this.changeEnabled = oldCE;
