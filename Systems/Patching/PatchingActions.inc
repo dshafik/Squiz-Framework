@@ -1172,7 +1172,7 @@ class PatchingActions
     /**
      * Send ActivateInstall message.
      *
-     * @param string $systemid
+     * @param string $systemid Systemid to activate.
      *
      * @return mixed
      */
@@ -1222,9 +1222,11 @@ class PatchingActions
      * Before we send any message to the update server, it requires
      * the connected live suite connection established before hand.
      *
+     * @param array $updateServer Update product information.
+     *
      * @return boolean
      */
-    private static function _wsActivateUpdate($updateServer)
+    private static function _wsActivateUpdate(array $updateServer)
     {
         Channels::includeSystem('SquizSuite');
         Channels::includeSystem('API');
@@ -1869,8 +1871,9 @@ class PatchingActions
      */
     public static function getUpToDateInitCode()
     {
-        $data = array();
-        $data = json_encode($data);
+        $config = Patching::getPatchingConfig();
+        $data   = array('config' => $config);
+        $data   = json_encode($data);
         return '<script>PatchingPatchingScreen.initScreen('.$data.');</script>';
 
     }//end getUpToDateInitCode()
@@ -1886,23 +1889,31 @@ class PatchingActions
         Channels::includeSystem('GUI');
         $rows = array();
 
-        $config      = Patching::getPatchingConfig();
-        $recipients  = $config['recipient'];
-        $noRecipient = TRUE;
-        if (empty($recipients) === FALSE) {
-            $noRecipient = FALSE;
-        }
+        $config     = Patching::getPatchingConfig();
+        $recipients = $config['recipient'];
+        $notify     = $config['notify'];
 
         // Notification Toggle button.
         $toggleBtnRow = '<div class="PatchingScreen-activateWrap"><span>'._('Notify of New Updates').'</span>%s</div>';
         $toggleBtn    = GUI::createWidget(
             'PatchingScreen-notifyUpdates',
             'GUIToggleButton',
-            array()
+            array('value' => $notify)
         );
 
         $rows[] = sprintf($toggleBtnRow, $toggleBtn);
-        $rows[] = '<div style="background-color: red; padding: 3px;"><strong>TODO: Once the user system is finalised, finish this!</strong></div>';
+        Channels::includeSystem('User');
+        foreach ($recipients as $userid) {
+            $user = User::getUserById($userid);
+            $name = $user['first_name'].' '.$user['last_name'];
+            $row  = '<div class="PatchingScreen-notifyRow">';
+            $row .= '<div class="PatchingScreen-notifyUserIcon">[Icon]</div>';
+            $row .= '<div class="PatchingScreen-notifyName">'.$name.'</div>';
+            $row .= '<div class="PatchingScreen-notifyDelete" userid="'.$userid.'">&nbsp;</div>';
+            $row .= '</div>';
+
+            $rows[] = $row;
+        }//end foreach
 
         // Notification Add New User button.
         $addNewBtnRow = '<div class="PatchingScreen-activateWrap"><span>'._('Notify of New Updates').'</span>%s</div>';
@@ -2141,20 +2152,27 @@ class PatchingActions
     public static function savePatchingScreen(array $data)
     {
         include_once 'Libs/Util/Util.inc';
-        $result = array();
+        $result       = array();
+        $templateData = Util::getArrayIndex($data, 'templateData', array());
 
-        $activationID = trim(Util::getArrayIndex(
-            $data,
-            'PatchingScreen-activateIdText',
-            ''
-        ));
+        // Notification.
+        $notify = Util::getArrayIndex($data, 'PatchingScreen-notifyUpdates');
+        $deletedNotification = Util::getArrayIndex($templateData, 'deleteNotification');
+        $deletedNotification = array_keys($deletedNotification);
+        $addedNotification   = Util::getArrayIndex($templateData, 'addNotification');
+
+        Channels::includeSystem('SystemConfig');
+        $config = Patching::getPatchingConfig();
+        $config['notify']    = $notify;
+        $config['recipient'] = array_diff($config['recipient'], $deletedNotification);
+        $config['recipient'] = array_merge($config['recipient'], $addedNotification);
+        SystemConfig::setConfig('Patching', $config);
+
+        // Activation.
+        $activationID = trim(Util::getArrayIndex($data, 'PatchingScreen-activateIdText', ''));
 
         if (empty($activationID) === TRUE) {
-            $activationID = trim(Util::getArrayIndex(
-                $data,
-                'PatchingScreen-newActivationIdText',
-                ''
-            ));
+            $activationID = trim(Util::getArrayIndex($data, 'PatchingScreen-newActivationIdText', ''));
         }
 
         if (empty($activationID) === FALSE) {

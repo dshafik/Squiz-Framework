@@ -175,3 +175,31 @@ span.PatchingScreen-expander {
 .PatchingScreen-scheduleDatePicker select {
     margin-right: 5px;
 }
+
+.PatchingScreen-notifyRow {
+    overflow: hidden;
+}
+
+.PatchingScreen-notifyUserIcon {
+    float: left;
+}
+
+.PatchingScreen-notifyName {
+    float: left;
+}
+
+#patchingSettings .GUIScreenSettings-item.deleted {
+    background: url("/__web/Systems/GUI/Web/delete_overlay.png") repeat scroll 0 0 transparent;
+}
+
+.PatchingScreen-notifyDelete {
+    float: right;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    background: url("/__web/Systems/GUI/Web/delete.png") repeat scroll 0 0 transparent;
+}
+
+.PatchingScreen-notifyDelete.deleted {
+    background: url("/__web/Systems/GUI/Web/delete.png") repeat scroll 0 16px transparent;
+}

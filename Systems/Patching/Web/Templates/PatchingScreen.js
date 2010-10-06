@@ -30,21 +30,36 @@ var PatchingPatchingScreen = new function()
     var _scheduleUpdateWdgt   = null;
     var _updateBoxDiv         = null;
     var _asapCheckBtnWdgt     = null;
+    var _config = {};
 
     this.initScreen = function(data) {
-        var self = this;
+        var self     = this;
+        this._config = data.config;
 
         this._patchingSettingsDiv = GUI.getWidget('patchingSettings');
         this._patchingSettingsDiv = dfx.getId('patchingSettings');
         this._notifyToggleBtn     = GUI.getWidget('PatchingScreen-notifyUpdates');
 
-        // User notification toggle button.
-        this._notifyToggleBtn.addToggleOnCallback(function() {
-            alert("TODO: Once the user system is finalised, finish this!");
-        });
+        this._deleteNotificationUser = {};
+        this._addNotificationUser    = [];
 
-        this._notifyToggleBtn.addToggleOffCallback(function() {
-            alert("TODO: Once the user system is finalised, finish this!");
+        // Remove the user from the notification list.
+        var delNotifyBtns = dfx.getClass('PatchingScreen-notifyDelete', this._patchingSettingsDiv);
+        dfx.foreach(delNotifyBtns, function(idx) {
+            dfx.addEvent(delNotifyBtns[idx], 'click', function(e) {
+                var userid = delNotifyBtns[idx].getAttribute('userid');
+                if (dfx.hasClass(delNotifyBtns[idx], 'deleted') === true) {
+                    dfx.removeClass(delNotifyBtns[idx], 'deleted');
+                    dfx.removeClass(delNotifyBtns[idx].parentNode.parentNode, 'deleted');
+                    self._deleteNotificationUser[userid] = false;
+                } else {
+                    dfx.addClass(delNotifyBtns[idx], 'deleted');
+                    dfx.addClass(delNotifyBtns[idx].parentNode.parentNode, 'deleted');
+                    self._deleteNotificationUser[userid] = true;
+                }
+            });
+
+            return true;
         });
 
         // Attach expander events.
@@ -121,10 +136,49 @@ var PatchingPatchingScreen = new function()
     };
 
     this.addNotificationUser = function() {
-        alert("TODO: Once the user system is finalised, finish this!");
+        var options = {
+            modal: true
+        };
+
+        // TODO: Use project asset etc..
+        var templateSettings = {
+            rootNode: 2
+        };
+
+        var self = this;
+        GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, function() {
+            GUI.getWidget('AssetPicker').setSelectAssetsCallback(function(selection) {
+                self.addSelectedUsers(selection);
+            });
+        }, options);
+    };
+
+    this.addSelectedUsers = function(users) {
+        var self = this;
+        dfx.foreach(users, function(idx) {
+            var userid = parseInt(users[idx]);
+            if (dfx.inArray(userid, self._config.recipient) === false
+                && dfx.inArray(userid, self._addNotificationUser) === false
+            ) {
+                alert('New user added. Insert a new row to the notificationlist.');
+                self._addNotificationUser.push(userid);
+            }
+
+            return true;
+        });
+    };
+
+    this.getValue = function() {
+        var data = {
+            'deleteNotification' : this._deleteNotificationUser,
+            'addNotification' : this._addNotificationUser
+        };
+
+        return data;
     };
 
     this.saved = function(retval) {
         GUI.reloadTemplate('Patching:PatchingScreen');
     };
+
 }
