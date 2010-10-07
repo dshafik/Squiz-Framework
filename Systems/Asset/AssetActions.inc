@@ -119,14 +119,30 @@ class AssetActions
             return FALSE;
         }
 
-        $id = (int) DAL::executeOne('Asset', 'assetExists');
-        if ($id === (int) $assetid) {
-            return TRUE;
+        if (Asset::isAssetid($assetid) === TRUE) {
+            $id = (int) DAL::executeOne('Asset', 'assetExists');
+            if ($id === (int) $assetid) {
+                return TRUE;
+            }
         }
 
         return FALSE;
 
     }//end exists()
+
+
+    /**
+     * Returns TRUE if the specified string is a valid assetid format.
+     *
+     * @param string $assetid Asset ID string.
+     *
+     * @return boolean
+     */
+    public static function isAssetid($assetid)
+    {
+        return is_numeric($assetid);
+
+    }//end isAssetid()
 
 
     /**
