@@ -96,13 +96,21 @@ class GUIAssetPickerActions
 
         $data = array();
 
+        Channels::includeSystem('Asset');
         Channels::includeSystem('Attribute');
+        $assetTypes = Asset::getTypeOfAsset($children);
+        $iconPaths  = array();
         foreach ($children as $child) {
-            $name = Attribute::getAttributeValue($child, 'first_name').' '.Attribute::getAttributeValue($child, 'last_name');
+            $assetType = $assetTypes[$child];
+            if (isset($iconPaths[$assetType]) === FALSE) {
+                $iconPaths[$assetType] = Asset::getTypeIconPath($assetTypes[$child]);
+            }
+
+            $name = Attribute::getAttributeValue($child, 'name');
             $item = array(
                      'id'          => $child,
                      'title'       => $name,
-                     'itemContent' => '[icon] '.$name,
+                     'itemContent' => '<img src="'.$iconPaths[$assetType].'" /> '.$name,
                     );
 
             // Get number of kids.

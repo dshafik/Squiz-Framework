@@ -95,11 +95,11 @@ GUIColumnBrowser.prototype = {
 
     selectItem: function(itemid, columnIndex)
     {
-        if (columnIndex === -1) {
+        if (columnIndex < 0) {
             // Last visible column.
             var visibleColumns = dfx.getClass('GUIColumnBrowser-column visible', this.elem);
-            if (visibleColumns.length > 0) {
-                columnIndex = (visibleColumns.length - 1);
+            if (visibleColumns.length >= (columnIndex * -1)) {
+                columnIndex = (visibleColumns.length + columnIndex);
             } else {
                 return false;
             }
@@ -361,8 +361,10 @@ GUIColumnBrowser.prototype = {
 
             if (selected.length > 0) {
                 selected = selected.shift();
-                while (self.selectItem(selected, -1) === false && lineage.length > 0) {
-                    selected = lineage.pop();
+                if (self.selectItem(selected, -1) === false && self.selectItem(selected, -2) === false) {
+                    while (self.selectItem(selected, -1) === false && lineage.length > 0) {
+                        selected = lineage.pop();
+                    }
                 }
             }
         }, 'raw');
