@@ -96,14 +96,14 @@
 
 .UserManagerScreen-childUserDetails .UserManagerScreen-assetIcon,
 .UserManagerScreen-childGroupDetails .UserManagerScreen-assetIcon {
-    background: url(../icon_user_s.png) no-repeat 50% 50%;
+    background: url(../../AssetTypes/User/Web/icon_user_s.png) no-repeat 50% 50%;
     height: 32px;
     width: 36px;
     float: left;
 }
 
 .UserManagerScreen-childGroupDetails .UserManagerScreen-assetIcon {
-    background-image: url(../icon_userGroup_s.png);
+    background-image: url(../../AssetTypes/UserGroup/Web/icon_userGroup_s.png);
 }
 
 .UserManagerScreen-editUser-top,
@@ -114,11 +114,11 @@
     margin: 15px;
     margin-top: 10px;
     padding-left: 80px;
-    background: url(../icon_userGroup_m.png) no-repeat 0 0;
+    background: url(../../AssetTypes/UserGroup/Web/icon_userGroup_m.png) no-repeat 0 0;
 }
 
 .UserManagerScreen-editUser-top {
-    background-image: url(../icon_user_m.png);
+    background-image: url(../../AssetTypes/User/Web/icon_user_m.png);
 }
 
 .UserManagerScreen-editUser-top h2,
@@ -182,14 +182,14 @@
 }
 
 .UserManagerScreen-createUser-top .UserManagerScreen-assetIcon {
-    background: url(../icon_user_s.png) no-repeat 50% 50%;
+    background: url(../../AssetTypes/User/Web/icon_user_s.png) no-repeat 50% 50%;
     height: 32px;
     width: 36px;
     float: left;
 }
 
 #UserManagerScreen-createGroup .UserManagerScreen-createUser-top .UserManagerScreen-assetIcon {
-    background-image: url(../icon_userGroup_s.png);
+    background-image: url(../../AssetTypes/UserGroup/Web/icon_userGroup_s.png);
 }
 
 #UserManagerScreen-cancelCreateUserGroup,

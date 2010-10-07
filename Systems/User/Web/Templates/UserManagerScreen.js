@@ -23,10 +23,12 @@
 
 var UserUserManagerScreen = new function()
 {
-    var _screenData = {};
+    var _usersFolderid = 0;
+    var _screenData    = {};
 
     this.init = function(data) {
-        _screenData = data;
+        _usersFolderid = data.usersFolderid;
+        _screenData    = data.editTemplates;
 
         // Add the itemClicked event call back for the column browser.
         var browser = GUI.getWidget('userManager-assetBrowser');
@@ -82,7 +84,7 @@ var UserUserManagerScreen = new function()
 
         var details = {
             name: GUI.getWidget('UserManagerScreen-newGroup-groupName').getValue(),
-            parent: dfx.jsonEncode(browserWidget.getValue())
+            parents: dfx.jsonEncode(browserWidget.getValue())
         };
 
         GUI.sendRequest('User', 'createUserGroup', details, function(response) {
@@ -206,9 +208,8 @@ var UserUserManagerScreen = new function()
             modal: true
         };
 
-        // TODO: Get users folder id.
         var templateSettings = {
-            rootNode: 1
+            rootNode: _usersFolderid
         };
 
         var self = this;

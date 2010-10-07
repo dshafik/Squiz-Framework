@@ -12,7 +12,7 @@
                 <div class="{className}-assetIcon"></div> : {groupInfo:childUserCount}
                 <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
                     <setting name="value"><text>+ New</text></setting>
-                    <setting name="click">UserUserManagerScreen.showCreatePanel('createUser');</setting>
+                    <setting name="click">UserUserManagerScreen.showCreatePanel('createUser')</setting>
                 </widget>
                 <widget type="GUI/Button" id="UserManagerScreen-addExistingUser">
                     <setting name="value"><text>+ Existing</text></setting>
@@ -23,7 +23,7 @@
                 <div class="{className}-assetIcon"></div> : {groupInfo:childGroupCount}
                 <widget type="GUI/Button" id="UserManagerScreen-addNewGroup">
                     <setting name="value"><text>+ New</text></setting>
-                    <setting name="click">UserUserManagerScreen.showCreatePanel('createGroup');</setting>
+                    <setting name="click">UserUserManagerScreen.showCreatePanel('createGroup')</setting>
                 </widget>
                 <widget type="GUI/Button" id="UserManagerScreen-addExistingGroup">
                     <setting name="value"><text>+ Existing</text></setting>

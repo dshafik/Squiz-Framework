@@ -110,8 +110,8 @@ class UserActions
      *
      * Returns the asset ID of the new group.
      *
-     * @param string $name   Name of user group.
-     * @param string $parent Asset ID of the parent group/folder.
+     * @param string $name    Name of user group.
+     * @param mixed  $parents Asset ID(s) of the parent group/folder.
      *
      * @return integer
      * @throws ChannelException If the group fails to create.
@@ -119,7 +119,7 @@ class UserActions
      * @api            write
      * @api-permission superuser
      */
-    public static function createUserGroup($name, $parent)
+    public static function createUserGroup($name, $parents)
     {
         try {
             DAL::beginTransaction();
@@ -131,8 +131,12 @@ class UserActions
             $groupid = Asset::create('userGroup');
             Attribute::setAttributeValue($groupid, 'name', $name);
 
-            // Link it under specified parent.
-            Linking::createLink($parent, $groupid);
+            $parents = (array) $parents;
+            foreach ($parents as $parent) {
+                // Link it under specified parent.
+                Linking::createLink($parent, $groupid);
+            }
+
             DAL::commit();
         } catch (Exception $e) {
             $msg  = 'Failed to create a new user.'."\n";
@@ -939,7 +943,7 @@ class UserActions
         $types = Asset::getTypeOfAsset($children);
 
         foreach ($children as $child) {
-            $iconPath = '/__web/Systems/User/Web/icon_'.$types[$child].'_s.png';
+            $iconPath = Asset::getTypeIconPath($types[$child]);
 
             // If this child is a user folder then get info from usersFolder array.
             $class = 'UserManagerScreen';
@@ -1420,13 +1424,19 @@ class UserActions
      */
     public static function getUserManagerScreenData()
     {
+        $data          = array();
         $editTemplates = array();
         $cacheFile     = BaseSystem::getDataDir('User').'/editTemplates.inc';
         if (file_exists($cacheFile) === TRUE) {
             include $cacheFile;
         }
 
-        return json_encode($editTemplates);
+        $path = BaseSystem::getDataDir('User').'/usersFolderid.inc';
+
+        $data['usersFolderid']   = (int) file_get_contents($path);
+        $data['editTemplates'] = $editTemplates;
+
+        return json_encode($data);
 
     }//end getUserManagerScreenData()
 
