@@ -1,9 +1,9 @@
 .LDAPUserManagerScreen .UserManagerScreen-editFolder-top {
-    background-image: url(icon_ldap_m.png);
+    background-image: url(../AssetTypes/LDAPConnection/Web/icon_LDAPConnection_m.png);
 }
 
 .LDAPUserManagerScreen .UserManagerScreen-childUserDetails .UserManagerScreen-assetIcon {
-    background-image: url(icon_ldap_s.png);
+    background-image: url(../AssetTypes/LDAPConnection/Web/icon_LDAPConnection_s.png);
 }
 
 .LDAPUserManagerScreen .UserManagerScreen-childUserDetails {
