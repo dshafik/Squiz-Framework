@@ -28,6 +28,11 @@
     float: right;
 }
 
+label.GUI-requiredField {
+    background: url(required_yes.png) no-repeat 100% 50%;
+    padding-right: 17px;
+}
+
 /* Delete overlay */
 .GUI-delete {
     width: 16px;
