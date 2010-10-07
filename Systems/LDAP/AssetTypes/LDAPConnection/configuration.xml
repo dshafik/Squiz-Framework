@@ -1,0 +1,14 @@
+<config_vars>
+ <config id="details" type="Array" unique="f" required="t" default_val="" assetid="0">
+  <initial_value></initial_value>
+ </config>
+ <config id="userAttributes" type="Array" unique="f" required="t" default_val="" assetid="0">
+  <initial_value></initial_value>
+ </config>
+ <config id="groupAttributes" type="Array" unique="f" required="t" default_val="" assetid="0">
+  <initial_value></initial_value>
+ </config>
+ <config id="uniqueIdSettings" type="Array" unique="f" required="t" default_val="" assetid="0">
+  <initial_value></initial_value>
+ </config>
+</config_vars>

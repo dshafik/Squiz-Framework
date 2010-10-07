@@ -1,0 +1,7 @@
+<asset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="asset.xsd">
+       <type_code>LDAPConnection</type_code>
+       <name>LDAP Connection</name>
+       <category>Connections</category>
+       <parent_type>asset</parent_type>
+</asset>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<system>
+    <plugs>
+        <modifier>
+            <required>yes</required>
+            <method>createChildAsset</method>
+            <action>Linking::createLink</action>
+            <fatal>yes</fatal>
+            <parameters>
+                <parameter>parentid</parameter>
+                <parameter>childid</parameter>
+            </parameters>
+            <modify-parameters>
+                <parameter>childid</parameter>
+            </modify-parameters>
+        </modifier>
+    </plugs>
+</system>

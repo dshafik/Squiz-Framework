@@ -1,0 +1,29 @@
+.LDAPUserManagerScreen .UserManagerScreen-editFolder-top {
+    background-image: url(icon_ldap_m.png);
+}
+
+.LDAPUserManagerScreen .UserManagerScreen-childUserDetails .UserManagerScreen-assetIcon {
+    background-image: url(icon_ldap_s.png);
+}
+
+.LDAPUserManagerScreen .UserManagerScreen-childUserDetails {
+    border-bottom: none;
+}
+
+.LDAPUserManagerScreen .UserManagerScreen-createLDAPConnection-top {
+    line-height: 35px;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+#userManager-editPane .LDAPUserManagerScreen label {
+    font-weight: normal;
+}
+
+#LDAPUserManagerScreen-new-createConnection {
+    margin-bottom: 10px;
+}
+
+.LDAPUserManagerScreen .UserManagerScreen-col-left {
+    width: 58%;
+}

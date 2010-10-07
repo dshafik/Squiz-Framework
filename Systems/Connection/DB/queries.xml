@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<queries system="Connection">
+  <query id="getLocalid">
+    <primary>
+      <select>
+        <fields>
+          <field table="asset_connection" column="localid" />
+        </fields>
+        <from>
+          <table>asset_connection</table>
+        </from>
+        <where>
+          <equal table="asset_connection" column="connection">:connection</equal>
+          <equal table="asset_connection" column="remoteid">:remoteid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
+
+  <query id="addConnectionAsset">
+    <primary>
+      <insert>
+        <fields table="asset_connection">
+          <field>localid</field>
+          <field>connection</field>
+          <field>remoteid</field>
+          <field>connection_type</field>
+          <field>asset_type</field>
+        </fields>
+        <values>
+          <value column="localid">:localid</value>
+          <value column="connection">:connection</value>
+          <value column="remoteid">:remoteid</value>
+          <value column="connection_type">:connectionType</value>
+          <value column="asset_type">:assetType</value>
+        </values>
+      </insert>
+    </primary>
+  </query>
+</queries>
