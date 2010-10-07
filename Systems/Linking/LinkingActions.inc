@@ -138,7 +138,19 @@ class LinkingActions
         $activate=FALSE
     ) {
         if ($parentid === $childid) {
-            throw new ChannelException('Cannot link asset to itself');
+            throw new ChannelException(_('Cannot link asset to itself'));
+        }
+
+        // Check if parent and child is valid.
+        Channels::includeSystem('Asset');
+        if (Asset::exists($parentid) === FALSE) {
+            $msg = sprintf(_('Parent asset (%s) does not exist'), $parentid);
+            throw new ChannelException($msg);
+        }
+
+        if (Asset::exists($childid) === FALSE) {
+            $msg = sprintf(_('Child asset (%s) does not exist'), $childid);
+            throw new ChannelException($msg);
         }
 
         if ($sortOrder < 0) {
