@@ -23,7 +23,11 @@
 
 var UserUserManagerScreen = new function()
 {
-    this.init = function() {
+    var _screenData = {};
+
+    this.init = function(data) {
+        _screenData = data;
+
         // Add the itemClicked event call back for the column browser.
         var browser = GUI.getWidget('userManager-assetBrowser');
         if (browser) {
@@ -44,16 +48,8 @@ var UserUserManagerScreen = new function()
 
     this.cancelCreate = function() {
         // Hide the create containers.
-        dfx.hideElement(dfx.getId('UserManagerScreen-createSection'));
-        dfx.hideElement(dfx.getId('UserManagerScreen-createGroup'));
-        dfx.hideElement(dfx.getId('UserManagerScreen-createUser'));
+        dfx.hideElement(dfx.getClass('UserManagerScreen-createPanel'));
         dfx.showElement(dfx.getId('UserManagerScreen-infoSection'));
-    };
-
-    this.createNewUser = function() {
-        dfx.hideElement(dfx.getId('UserManagerScreen-infoSection'));
-        dfx.showElement(dfx.getId('UserManagerScreen-createSection'));
-        dfx.showElement(dfx.getId('UserManagerScreen-createUser'));
     };
 
     this.createUser = function() {
@@ -75,10 +71,10 @@ var UserUserManagerScreen = new function()
         });
     };
 
-    this.createNewUserGroup = function() {
+    this.showCreatePanel = function(panelName) {
         dfx.hideElement(dfx.getId('UserManagerScreen-infoSection'));
         dfx.showElement(dfx.getId('UserManagerScreen-createSection'));
-        dfx.showElement(dfx.getId('UserManagerScreen-createGroup'));
+        dfx.showElement(dfx.getId('UserManagerScreen-' + panelName));
     };
 
     this.createUserGroup = function() {
@@ -96,39 +92,7 @@ var UserUserManagerScreen = new function()
         });
     };
 
-    this.addExistingUser = function() {
-        var options = {
-            modal: true
-        };
-
-        // TODO: Get users folder id.
-        var templateSettings = {
-            rootNode: 1
-        };
-
-        var self = this;
-        GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, function() {
-            GUI.getWidget('AssetPicker').setSelectAssetsCallback(function(selection) {
-                if (selection.length <= 0) {
-                    return;
-                }
-
-                var browserWidget = GUI.getWidget('userManager-assetBrowser');
-                var params        = {
-                    userids: dfx.jsonEncode(selection),
-                    userGroups: dfx.jsonEncode(browserWidget.getValue())
-                };
-
-                GUI.sendRequest('User', 'addUsersToGroups', params, function(response) {
-                    if (response && response.result) {
-                        browserWidget.reload();
-                    }
-                });
-            });
-        }, options);
-    };
-
-    this.addExistingUserGroup = function() {
+    this.addExistingAsset = function() {
         _showAssetPicker(function(selection) {
             if (selection.length <= 0) {
                 return;
@@ -195,10 +159,7 @@ var UserUserManagerScreen = new function()
         var idPrefix  = 'UserManagerScreen';
         var saveData  = {};
         var assetType = dfx.attr(editorPanel, 'assetType');
-        var assetid   = GUI.getWidget('userManager-assetBrowser').getValue();
-
-        saveData.assetType = assetType;
-        saveData.assetid   = assetid
+        var assetid   = GUI.getWidget('userManager-assetBrowser').getValue().pop();
 
         switch (assetType) {
             case 'user':
@@ -219,10 +180,19 @@ var UserUserManagerScreen = new function()
             break;
 
             default:
-                GUI.message('developer', 'Failed to get asset type from editor panel', 'warning');
-                return null;
+                // Check if there is a implementer for this type.
+                if (!_screenData[assetType]) {
+                    GUI.message('developer', 'Failed to get asset type from editor panel', 'warning');
+                    return null;
+                } else {
+                    var objName = _screenData[assetType].jsObjectName;
+                    saveData    = window[objName].getValue(assetType);
+                }
             break;
         }//end switch
+
+        saveData.assetType = assetType;
+        saveData.assetid   = assetid;
 
         return saveData;
     };

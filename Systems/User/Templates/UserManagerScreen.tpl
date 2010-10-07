@@ -4,6 +4,8 @@
     </if-not>
 </condition>
 
+<var name="screenData"><dataProvider action="User::getUserManagerScreenData" /></var>
+
 <div id="UserManagerScreen">
     <widget type="GUI/Box" id="userManager-box">
         <setting name="title"><text>User Manager</text></setting>
@@ -26,7 +28,8 @@
     </widget>
     <div id="userManager-editPane"></div>
 </div>
+
 <script>
     /* Initialise the screen */
-    UserUserManagerScreen.init();
+    UserUserManagerScreen.init({screenData});
 </script>

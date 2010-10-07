@@ -656,13 +656,14 @@ class UserActions
      *
      * Returns the assetid of the new folder.
      *
-     * @param string $title    The title of the folder.
-     * @param string $subTitle The sub title of the folder.
+     * @param string $title          The title of the folder.
+     * @param string $templateSystem The system that owns the template.
+     * @param string $templateName   Name of the template file.
      *
      * @return string
      * @throws ChannelException If the folder cannot be created.
      */
-    public static function createUsersFolder($title, $subTitle)
+    public static function createUsersFolder($title, $templateSystem, $templateName)
     {
         $folderid = NULL;
         try {
@@ -673,19 +674,22 @@ class UserActions
             $folderid = Asset::create('folder');
             Attribute::setAttributeValue($folderid, 'name', $title);
 
-            $userFolders = array();
+            $usersFolder = array();
             $cacheFile   = BaseSystem::getDataDir('User').'/folders.inc';
             if (file_exists($cacheFile) === TRUE) {
                 include $cacheFile;
             }
 
-            $userFolders[$folderid] = array(
+            $usersFolder[$folderid] = array(
                                        'title'    => $title,
-                                       'subTitle' => $subTitle,
+                                       'template' => array(
+                                                      'system' => $templateSystem,
+                                                      'name'   => $templateName,
+                                                     ),
                                       );
 
             include_once 'Libs/FileSystem/FileSystem.inc';
-            $content = '<?php $usersFolder = '.var_export($userFolders, TRUE).' ?>';
+            $content = '<?php $usersFolder = '.var_export($usersFolder, TRUE).' ?>';
             FileSystem::filePutContents($cacheFile, $content);
 
             DAL::commit();
@@ -705,14 +709,15 @@ class UserActions
     /**
      * Edit specified users folder's name.
      *
-     * @param string $folderid Asset id of a user folder.
-     * @param string $title    The title of the folder.
-     * @param string $subTitle The sub title of the folder.
+     * @param string $folderid       Asset id of a user folder.
+     * @param string $title          The title of the folder.
+     * @param string $templateSystem The system that owns the template.
+     * @param string $templateName   Name of the template file.
      *
      * @return void
      * @throws ChannelException If the folder cannot be edited.
      */
-    public static function editUsersFolder($folderid, $title, $subTitle)
+    public static function editUsersFolder($folderid, $title, $templateSystem, $templateName)
     {
         $cacheFile = BaseSystem::getDataDir('User').'/folders.inc';
         if (file_exists($cacheFile) === FALSE) {
@@ -721,7 +726,7 @@ class UserActions
 
         include $cacheFile;
 
-        if (isset($userFolders[$folderid]) === FALSE) {
+        if (isset($usersFolder[$folderid]) === FALSE) {
             throw new ChannelException(_('User folder does not exist'));
         }
 
@@ -731,12 +736,15 @@ class UserActions
             include_once 'Libs/FileSystem/FileSystem.inc';
             Attribute::setAttributeValue($folderid, 'name', $title);
 
-            $userFolders[$folderid] = array(
+            $usersFolder[$folderid] = array(
                                        'title'    => $title,
-                                       'subTitle' => $subTitle,
+                                       'template' => array(
+                                                      'system' => $templateSystem,
+                                                      'name'   => $templateName,
+                                                     ),
                                       );
 
-            $content = '<?php $usersFolder = '.var_export($userFolders, TRUE).' ?>';
+            $content = '<?php $usersFolder = '.var_export($usersFolder, TRUE).' ?>';
             FileSystem::filePutContents($cacheFile, $content);
 
             DAL::commit();
@@ -797,10 +805,12 @@ class UserActions
      * @param string $assetType      Type of a user asset.
      * @param string $templateSystem System the template belongs to.
      * @param string $templateName   Name of the template file.
+     * @param string $jsObjectName   Name of the JS object that handles JS operations
+     *                               for the specified asset type.
      *
      * @return void
      */
-    public static function addEditTemplate($assetType, $templateSystem, $templateName)
+    public static function addEditTemplate($assetType, $templateSystem, $templateName, $jsObjectName=NULL)
     {
         $editTemplates = array();
         $cacheFile     = BaseSystem::getDataDir('User').'/editTemplates.inc';
@@ -809,8 +819,9 @@ class UserActions
         }
 
         $editTemplates[$assetType] = array(
-                                      'system'   => $templateSystem,
-                                      'template' => $templateName,
+                                      'system'       => $templateSystem,
+                                      'template'     => $templateName,
+                                      'jsObjectName' => $jsObjectName,
                                      );
 
         include_once 'Libs/FileSystem/FileSystem.inc';
@@ -827,7 +838,7 @@ class UserActions
      *
      * @return string
      */
-    public static function getEditTemplate($assetType)
+    public static function getTemplateForAssetType($assetType)
     {
         $cacheFile = BaseSystem::getDataDir('User').'/editTemplates.inc';
         if (file_exists($cacheFile) === FALSE) {
@@ -848,7 +859,7 @@ class UserActions
 
         return $contents;
 
-    }//end getEditTemplate()
+    }//end getTemplateForAssetType()
 
 
     /**
@@ -897,12 +908,12 @@ class UserActions
         Channels::includeSystem('Permission');
         Channels::includeSystem('Linking');
 
-        $userFolders = array();
+        $usersFolder = array();
         $children    = array();
         if ($parentid === NULL && $jsSettings === NULL) {
             // List the User folders.
-            $userFolders = User::getUsersFolders();
-            foreach ($userFolders as $folderid => $info) {
+            $usersFolder = User::getUsersFolders();
+            foreach ($usersFolder as $folderid => $info) {
                 if (Permission::hasPermission($folderid, 'asset.read.content') === FALSE) {
                     continue;
                 }
@@ -930,10 +941,10 @@ class UserActions
         foreach ($children as $child) {
             $iconPath = '/__web/Systems/User/Web/icon_'.$types[$child].'_s.png';
 
-            // If this child is a user folder then get info from userFolders array.
+            // If this child is a user folder then get info from usersFolder array.
             $class = 'UserManagerScreen';
-            if (isset($userFolders[$child]) === TRUE) {
-                $title     = explode(' ', $userFolders[$child]['title']);
+            if (isset($usersFolder[$child]) === TRUE) {
+                $title     = explode(' ', $usersFolder[$child]['title']);
                 $mainTitle = array_shift($title);
                 $subTitle  = implode(' ', $title);
 
@@ -943,14 +954,14 @@ class UserActions
                 $itemContent .= '</div>';
                 $item = array(
                          'id'          => $child,
-                         'title'       => $userFolders[$child]['title'],
+                         'title'       => $usersFolder[$child]['title'],
                          'itemContent' => $itemContent,
                          'isButton'    => TRUE,
                         );
             } else {
                 $name = '';
                 if (Asset::isTypeOf($child, 'user') === TRUE) {
-                    $name  =  Attribute::getAttributeValue($child, 'first_name');
+                    $name  = Attribute::getAttributeValue($child, 'first_name');
                     $name .= ' '.Attribute::getAttributeValue($child, 'last_name');
                 } else {
                     $name = Attribute::getAttributeValue($child, 'name');
@@ -990,11 +1001,23 @@ class UserActions
     public static function loadUserManagerEditContents($assetid)
     {
         Channels::includeSystem('Asset');
-        $assetType        = Asset::getTypeOfAsset($assetid);
-        $templateContents = User::getEditTemplate($assetType);
+        $usersFolders = User::getUsersFolders();
+
+        $templateContents = FALSE;
+        if (isset($usersFolders[$assetid]) === TRUE) {
+            Channels::includeSystem('GUI');
+            $template = $usersFolders[$assetid]['template'];
+            ob_start();
+                GUI::printTemplate($template['system'], $template['name']);
+                $templateContents = ob_get_contents();
+            ob_end_clean();
+        } else {
+            $assetType        = Asset::getTypeOfAsset($assetid);
+            $templateContents = User::getTemplateForAssetType($assetType);
+        }
 
         if ($templateContents === FALSE) {
-            $templateContents = 'Failed to load template';
+            $templateContents = _('Failed to load template');
         }
 
         return $templateContents;
@@ -1254,10 +1277,6 @@ class UserActions
             $assetType = Util::getArrayIndex($tplData, 'assetType');
             $assetid   = Util::getArrayIndex($tplData, 'assetid');
 
-            if (empty($assetid) === FALSE) {
-                $assetid = array_shift($assetid);
-            }
-
             Channels::includeSystem('Attribute');
             switch ($assetType) {
                 case 'user':
@@ -1318,7 +1337,19 @@ class UserActions
                 break;
 
                 default:
-                    // Ignore rest of the asset types.
+                    // Include asset type and check if has a saveUserManagerScreen
+                    // method.
+                    Channels::includeSystem('Asset');
+                    Asset::includeAsset($assetType);
+                    $method = array(
+                               ucfirst($assetType).'AssetType',
+                               'saveUserManagerScreen',
+                              );
+
+                    // Check if channel is callable then call it.
+                    if (is_callable($method) === TRUE) {
+                        call_user_func($method, $tplData);
+                    }
                 break;
             }//end switch
 
@@ -1326,7 +1357,6 @@ class UserActions
         } catch (ChannelException $e) {
             DAL::rollBack();
             $errors[] = _('Failed to update');
-            error_log(print_r($e->getMessage(), 1));
         }//end try
 
         $retVal = TRUE;
@@ -1381,6 +1411,24 @@ class UserActions
         }
 
     }//end _saveAssetParentGroups()
+
+
+    /**
+     * Returns the user manager screen data in JSON format.
+     *
+     * @return string
+     */
+    public static function getUserManagerScreenData()
+    {
+        $editTemplates = array();
+        $cacheFile     = BaseSystem::getDataDir('User').'/editTemplates.inc';
+        if (file_exists($cacheFile) === TRUE) {
+            include $cacheFile;
+        }
+
+        return json_encode($editTemplates);
+
+    }//end getUserManagerScreenData()
 
 
 }//end class

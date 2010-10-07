@@ -78,6 +78,22 @@
     display: none;
 }
 
+#userManager-editPane hr {
+    border: none;
+    border-top: 1px solid #DDD;
+    margin: 20px 0;
+}
+
+#userManager-editPane p {
+    color: #666;
+    font-size: 11px;
+    margin: 2px 0;
+}
+
+#userManager-editPane h2 {
+    font-size: 15px;
+}
+
 .UserManagerScreen-childUserDetails .UserManagerScreen-assetIcon,
 .UserManagerScreen-childGroupDetails .UserManagerScreen-assetIcon {
     background: url(../icon_user_s.png) no-repeat 50% 50%;
@@ -177,7 +193,7 @@
 }
 
 #UserManagerScreen-cancelCreateUserGroup,
-#UserManagerScreen-cancelCreateUser {
+#UserManagerScreen-cancelCreate {
     float: right;
     margin-top: 6px;
 }

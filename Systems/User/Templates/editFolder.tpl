@@ -12,32 +12,32 @@
                 <div class="{className}-assetIcon"></div> : {groupInfo:childUserCount}
                 <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
                     <setting name="value"><text>+ New</text></setting>
-                    <setting name="click">UserUserManagerScreen.createNewUser();</setting>
+                    <setting name="click">UserUserManagerScreen.showCreatePanel('createUser');</setting>
                 </widget>
                 <widget type="GUI/Button" id="UserManagerScreen-addExistingUser">
                     <setting name="value"><text>+ Existing</text></setting>
-                    <setting name="click">UserUserManagerScreen.addExistingUser();</setting>
+                    <setting name="click">UserUserManagerScreen.addExistingAsset();</setting>
                 </widget>
             </div>
             <div class="{className}-childGroupDetails">
                 <div class="{className}-assetIcon"></div> : {groupInfo:childGroupCount}
                 <widget type="GUI/Button" id="UserManagerScreen-addNewGroup">
                     <setting name="value"><text>+ New</text></setting>
-                    <setting name="click">UserUserManagerScreen.createNewUserGroup();</setting>
+                    <setting name="click">UserUserManagerScreen.showCreatePanel('createGroup');</setting>
                 </widget>
                 <widget type="GUI/Button" id="UserManagerScreen-addExistingGroup">
                     <setting name="value"><text>+ Existing</text></setting>
-                    <setting name="click">UserUserManagerScreen.addExistingUserGroup();</setting>
+                    <setting name="click">UserUserManagerScreen.addExistingAsset();</setting>
                 </widget>
             </div>
         </div>
 
-        <div id="{className}-createSection">
+        <div id="{className}-createSection" class="UserManagerScreen-createPanel">
             <!-- Create User Section -->
-            <div id="UserManagerScreen-createUser" style="display:none;">
+            <div id="UserManagerScreen-createUser" style="display:none;" class="UserManagerScreen-createPanel">
                 <div class="{className}-createUser-top">
                     <div class="{className}-assetIcon"></div><text>Create New User</text>
-                    <widget type="GUI/Button" id="UserManagerScreen-cancelCreateUser">
+                    <widget type="GUI/Button" id="UserManagerScreen-cancelCreate">
                         <setting name="value"><text>Cancel</text></setting>
                         <setting name="colour">Light</setting>
                         <setting name="click">UserUserManagerScreen.cancelCreate();</setting>
@@ -79,7 +79,7 @@
             </div><!-- end Create User Section -->
 
             <!-- Create User Group Section -->
-            <div id="UserManagerScreen-createGroup" style="display:none;">
+            <div id="UserManagerScreen-createGroup" style="display:none;" class="UserManagerScreen-createPanel">
                 <div class="{className}-createUser-top">
                     <div class="{className}-assetIcon"></div><text>Create New User Group</text>
                     <widget type="GUI/Button" id="UserManagerScreen-cancelCreateUserGroup">
