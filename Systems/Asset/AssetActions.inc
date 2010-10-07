@@ -664,16 +664,19 @@ class AssetActions
      * @param boolean $defaultToParent If TRUE and given type does not have an
      *                                 icon then first parent that has an icon
      *                                 is returned.
+     * @param boolean $asWebPath       If TRUE then web path is returned instead of
+     *                                 file path.
      *
      * @return string
      */
     public static function getTypeIconPath(
         $typeid,
         $size='small',
-        $defaultToParent=TRUE
+        $defaultToParent=TRUE,
+        $asWebPath=TRUE
     ) {
         $assetPath = Asset::getTypeDirPath($typeid);
-        $iconPath  = $assetPath.'/'.$typeid.'_'.$size.'.png';
+        $iconPath  = $assetPath.'/Web/icon_'.$typeid.'_'.$size[0].'.png';
         if ($defaultToParent === TRUE && file_exists($iconPath) === FALSE) {
             // File does not exist, return parent type's path.
             $parents = Asset::getParentTypes($typeid);
@@ -683,6 +686,7 @@ class AssetActions
                 $parentPath = Asset::getTypeIconPath(
                     $parent['typeid'],
                     $size,
+                    FALSE,
                     FALSE
                 );
 
@@ -697,6 +701,11 @@ class AssetActions
                 $iconPath = NULL;
             }
         }//end if
+
+        if ($asWebPath === TRUE && empty($iconPath) === FALSE) {
+            $root     = BaseSystem::getSystemRootPath();
+            $iconPath = str_replace($root, '/__web', $iconPath);
+        }
 
         return $iconPath;
 
