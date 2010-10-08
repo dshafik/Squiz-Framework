@@ -155,10 +155,17 @@ class GUIListActions
         $columnNames = Util::getArrayIndex($settings, 'columns', array());
 
         $rows = array();
-        foreach ($itemsData as $itemid => $data) {
-            $item = API::executeRequest($channel['system'], $channel['action'], array($itemsData[$itemid]), $api['options']);
-            self::paintItem($itemid, $item, $settings);
-        }
+
+        ob_start();
+            foreach ($itemsData as $itemid => $data) {
+                $item = API::executeRequest($channel['system'], $channel['action'], array($itemsData[$itemid]), $api['options']);
+                self::paintItem($itemid, $item, $settings);
+            }
+
+            $contents = ob_get_contents();
+        ob_end_clean();
+
+        return $contents;
 
     }//end generateItems()
 
