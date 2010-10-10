@@ -89,16 +89,63 @@ class ConnectionActions
         $parts = array();
         $pos   = strpos($remoteid, self::$_separator);
 
-        if ($pos === FALSE) {
+        if ($pos === FALSE && $pos !== 0) {
             return FALSE;
         }
 
         $parts['connection'] = substr($remoteid, 0, $pos);
         $parts['remoteid']   = substr($remoteid, ($pos + 1));
 
+        if (empty($parts['connection']) === TRUE) {
+            return FALSE;
+        }
+
         return $parts;
 
     }//end splitShadowid()
+
+
+    /**
+     * Returns the shadowid for a given connection and remoteid.
+     *
+     * @param string $connectionid The connection asset id.
+     * @param string $remoteid     Id of remote resource.
+     *
+     * @return string
+     */
+    public static function getShadowid($connectionid, $remoteid)
+    {
+        $shadowid = $connectionid.self::$_separator.$remoteid;
+        return $shadowid;
+
+    }//end getShadowid()
+
+
+    /**
+     * Returns the shadowid for a given local asset id.
+     *
+     * @param string $localAssetid Local (negative) asset ID.
+     *
+     * @return string
+     */
+    public static function getShadowidFromLocalid($localAssetid)
+    {
+        if ((int) $localAssetid >= 0) {
+            return NULL;
+        }
+
+        $query = DAL::getDALQuery('Connection', 'getAssetInfoByLocalid');
+        $info  = DAL::getAssoc($query);
+        if (empty($info) === TRUE) {
+            return NULL;
+        }
+
+        $info     = $info[0];
+        $shadowid = Connection::getShadowid($info['connection'], $info['remoteid']);
+
+        return $shadowid;
+
+    }//end getShadowidFromLocalid()
 
 
     /**
@@ -143,6 +190,10 @@ class ConnectionActions
 
         // Get the remote type.
         $assetType = call_user_func($method, $connection, $remoteid);
+
+        if (empty($assetType) === TRUE) {
+            throw new ChannelException(_('Invalid remote asset'));
+        }
 
         try {
             DAL::beginTransaction();

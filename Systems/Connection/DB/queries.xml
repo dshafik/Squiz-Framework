@@ -37,4 +37,23 @@
       </insert>
     </primary>
   </query>
+
+  <query id="getAssetInfoByLocalid">
+    <primary>
+      <select>
+        <fields>
+          <field table="asset_connection" column="connection" />
+          <field table="asset_connection" column="remoteid" />
+          <field table="asset_connection" column="connection_type" />
+          <field table="asset_connection" column="asset_type" />
+        </fields>
+        <from>
+          <table>asset_connection</table>
+        </from>
+        <where>
+          <equal table="asset_connection" column="localid">:localAssetid</equal>
+        </where>
+      </select>
+    </primary>
+  </query>
 </queries>
