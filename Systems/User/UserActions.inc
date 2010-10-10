@@ -143,7 +143,7 @@ class UserActions
             $msg .= $e->getMessage();
             DAL::rollback();
             throw new ChannelException($msg);
-        }
+        }//end try
 
         return $groupid;
 
@@ -306,14 +306,19 @@ class UserActions
      */
     public static function getUserGroups($userid, $directParentsOnly=FALSE)
     {
-        Channels::includeSystem('Linking');
-        if ($directParentsOnly === FALSE) {
-            $parentQ = Linking::getParents($userid, 0, 65525, array('userGroup'));
-        } else {
-            $parentQ = Linking::getImmediateParents($userid, NULL, array('userGroup'));
+        $groupids = array();
+        Channels::includeSystem('Asset');
+        if (Asset::isAssetid($userid) === TRUE) {
+            Channels::includeSystem('Linking');
+            if ($directParentsOnly === FALSE) {
+                $parentQ = Linking::getParents($userid, 0, 65525, array('userGroup'));
+            } else {
+                $parentQ = Linking::getImmediateParents($userid, NULL, array('userGroup'));
+            }
+
+            $groupids = DAL::getAssoc($parentQ, 0);
         }
 
-        $groupids = DAL::getAssoc($parentQ, 0);
         return $groupids;
 
     }//end getUserGroups()
@@ -938,7 +943,6 @@ class UserActions
         $data = array();
 
         Channels::includeSystem('Attribute');
-
         Channels::includeSystem('Asset');
         $types = Asset::getTypeOfAsset($children);
 
@@ -1217,8 +1221,7 @@ class UserActions
             $groups  = User::getUserGroups($assetid, TRUE);
         }
 
-        $data     = array();
-        $iconPath = '/__web/Systems/User/Web/icon_userGroup_s.png';
+        $data = array();
         foreach ($groups as $groupid) {
             $data[$groupid] = User::getUserGroupData($groupid);
         }
@@ -1240,9 +1243,10 @@ class UserActions
      */
     public static function getUserGroupData($groupid)
     {
+        Channels::includeSystem('Asset');
         Channels::includeSystem('Attribute');
 
-        $iconPath = '/__web/Systems/User/Web/icon_userGroup_s.png';
+        $iconPath = Asset::getTypeIconPath($groupid);
         $name     = Attribute::getAttributeValue($groupid, 'name');
         $data     = array(
                      'itemContent' => '<div class="UserManagerScreen-listItem"><img src="'.$iconPath.'" /> '.$name.'</div>',
@@ -1353,6 +1357,8 @@ class UserActions
                     // Check if channel is callable then call it.
                     if (is_callable($method) === TRUE) {
                         call_user_func($method, $tplData);
+                    } else {
+                        throw new ChannelException(_('Invalid asset type'));
                     }
                 break;
             }//end switch
@@ -1360,7 +1366,7 @@ class UserActions
             DAL::commit();
         } catch (ChannelException $e) {
             DAL::rollBack();
-            $errors[] = _('Failed to update');
+            $errors[] = _('Failed to save: '.$e->getMessage());
         }//end try
 
         $retVal = TRUE;
