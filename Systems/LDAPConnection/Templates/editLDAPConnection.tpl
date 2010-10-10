@@ -1,6 +1,6 @@
 <var name="ldapClassName"><content>LDAPUserManagerScreen</content></var>
 <var name="className"><content>UserManagerScreen</content></var>
-<var name="ldapInfo"><dataProvider action="LDAP::getConnectionInfo" /></var>
+<var name="ldapInfo"><dataProvider action="LDAPConnection::getConnectionInfo" /></var>
 
 <div id="{className}-editor" assetType="LDAPConnection" class="{ldapClassName}">
     <div class="{className}-editFolder-top">

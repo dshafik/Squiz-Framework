@@ -53,9 +53,9 @@ var UserUserManagerScreen_ldap = new function()
 
     this.createConnection = function() {
         var browserWidget = GUI.getWidget('userManager-assetBrowser');
-        var details       = _getValue(true);
+        var details       = _getValue('LDAPConnection', true);
 
-        GUI.sendRequest('LDAP', 'createConnection', details, function(response) {
+        GUI.sendRequest('LDAPConnection', 'createConnection', details, function(response) {
             if (!response.match(/^\d+$/)) {
                 //GUI.queueOverlay({
                 //    icon: 'warning',
@@ -68,31 +68,42 @@ var UserUserManagerScreen_ldap = new function()
     };
 
     this.getValue = function(assetType) {
-        return _getValue();
+        return _getValue(assetType);
     };
 
-    var _getValue = function(jsonEncode) {
+    var _getValue = function(assetType,jsonEncode) {
         var browserWidget = GUI.getWidget('userManager-assetBrowser');
         var idPrefix      = 'LDAPUserManagerScreen-new';
 
         var details = {
-            name: GUI.getWidget(idPrefix + '-name').getValue(),
-            parentAssetid: dfx.jsonEncode((browserWidget.getValue()).pop())
         };
 
-        dfx.foreach(_fields, function(groupName) {
-            if (!details[groupName]) {
-                details[groupName] = {};
-            }
+        switch (assetType) {
+            case 'LDAPUser':
+                details.assetid = dfx.jsonEncode((browserWidget.getValue()).pop());
+                details.parents = GUI.getWidget('UserManagerScreen-parentsList').getValue();
+            break;
 
-            dfx.foreach(_fields[groupName], function(fieldid) {
-                details[groupName][fieldid] = GUI.getWidget(idPrefix + '-' + fieldid).getValue();
-            });
+            case 'LDAPConnection':
+                details.name = GUI.getWidget(idPrefix + '-name').getValue();
+                details.parentAssetid = dfx.jsonEncode((browserWidget.getValue()).pop());
 
-            if (jsonEncode === true) {
-                details[groupName] = dfx.jsonEncode(details[groupName]);
-            }
-        });
+                dfx.foreach(_fields, function(groupName) {
+                    if (!details[groupName]) {
+                        details[groupName] = {};
+                    }
+
+                    dfx.foreach(_fields[groupName], function(fieldid) {
+                        details[groupName][fieldid] = GUI.getWidget(idPrefix + '-' + fieldid).getValue();
+                    });
+
+                    if (jsonEncode === true) {
+                        details[groupName] = dfx.jsonEncode(details[groupName]);
+                    }
+                });
+            break;
+
+        };
 
         return details;
     };

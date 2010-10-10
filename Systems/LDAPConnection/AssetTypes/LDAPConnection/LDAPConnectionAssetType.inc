@@ -58,8 +58,8 @@ class LDAPConnectionAssetType extends AssetAssetType
      */
     public static function saveUserManagerScreen(array $data)
     {
-        Channels::includeSystem('LDAP');
-        LDAP::updateConnection(
+        Channels::includeSystem('LDAPConnection');
+        LDAPConnection::updateConnection(
             $data['assetid'],
             $data['name'],
             $data['details'],
@@ -69,6 +69,26 @@ class LDAPConnectionAssetType extends AssetAssetType
         );
 
     }//end saveUserManagerScreen()
+
+
+
+    /**
+     * Returns the asset type for an LDAP id.
+     *
+     * Returns NULL if asset type cannot be determined.
+     *
+     * @param string $connectionid The LDAPConnection asset id.
+     * @param string $shadowid     Id of LDAP resource.
+     *
+     * @return string
+     */
+    public static function getRemoteAssetType($connectionid, $shadowid)
+    {
+        Channels::includeSystem('LDAPConnection');
+        $assetType = LDAPConnection::getRemoteAssetType($connectionid, $shadowid);
+        return $assetType;
+
+    }//end getRemoteAssetType()
 
 
 }//end class

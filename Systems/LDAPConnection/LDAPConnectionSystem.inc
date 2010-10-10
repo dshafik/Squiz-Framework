@@ -1,6 +1,6 @@
 <?php
 /**
- * LDAP System Class.
+ * LDAPConnection System Class.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
  *
  * @package    Framework
- * @subpackage LDAP
+ * @subpackage LDAPConnection
  * @author     Squiz Pty Ltd <products@squiz.net>
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
@@ -25,11 +25,11 @@
 require_once 'Systems/BaseSystem.inc';
 
 /**
- * LDAPSystem.
+ * LDAPConnectionSystem.
  *
  * Installs all local asset types for this system.*
  */
-class LDAPSystem extends BaseSystem
+class LDAPConnectionSystem extends BaseSystem
 {
 
 
@@ -58,10 +58,10 @@ class LDAPSystem extends BaseSystem
         $ldapConnectionsFolder = Asset::create('folder');
         Attribute::setAttributeValue($ldapConnectionsFolder, 'name', 'LDAP Connections');
 
-        $usersFolder = User::createUsersFolder(_('LDAP Connections'), 'LDAP', 'editFolder.tpl');
-        User::addEditTemplate('LDAPConnection', 'LDAP', 'editLDAPConnection.tpl', 'UserUserManagerScreen_ldap');
-        User::addEditTemplate('LDAPUser', 'LDAP', 'editLDAPUser.tpl', 'UserUserManagerScreen_ldap');
-        User::addEditTemplate('LDAPUserGroup', 'LDAP', 'editLDAPUserGroup.tpl', 'UserUserManagerScreen_ldap');
+        $usersFolder = User::createUsersFolder(_('LDAP Connections'), 'LDAPConnection', 'editFolder.tpl');
+        User::addEditTemplate('LDAPConnection', 'LDAPConnection', 'editLDAPConnection.tpl', 'UserUserManagerScreen_ldap');
+        User::addEditTemplate('LDAPUser', 'LDAPConnection', 'editLDAPUser.tpl', 'UserUserManagerScreen_ldap');
+        User::addEditTemplate('LDAPUserGroup', 'LDAPConnection', 'editLDAPUserGroup.tpl', 'UserUserManagerScreen_ldap');
 
     }//end install()
 

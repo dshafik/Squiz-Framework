@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+     <blocker>
+      <required>yes</required>
+      <method>getImmediateChildren</method>
+      <action>Linking::getImmediateChildren</action>
+      <parameters>
+        <parameter>parentid</parameter>
+        <parameter>withSortOrder</parameter>
+        <parameter>types</parameter>
+      </parameters>
+    </blocker>
+
+    <blocker>
+      <required>yes</required>
+      <method>getAttributeValue</method>
+      <action>Attribute::getAttributeValue</action>
+      <parameters>
+        <parameter>assetid</parameter>
+        <parameter>attributeid</parameter>
+      </parameters>
+    </blocker>
+
+    <blocker>
+      <required>yes</required>
+      <method>getTypeOfAsset</method>
+      <action>Asset::getTypeOfAsset</action>
+      <parameters>
+        <parameter>assetid</parameter>
+      </parameters>
+    </blocker>
+
+    <refiner>
+      <required>no</required>
+      <method>getUserGroups</method>
+      <action>User::getUserGroups</action>
+      <fatal>no</fatal>
+      <parameters>
+        <parameter>userid</parameter>
+        <parameter>retval</parameter>
+      </parameters>
+   </refiner>
+
+  </plugs>
+</system>
