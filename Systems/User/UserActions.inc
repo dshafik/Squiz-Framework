@@ -171,6 +171,7 @@ class UserActions
         $attributes   = Attribute::getAttributes(Asset::getTypeOfAsset($userid));
         $attributeids = array_keys($attributes);
         $userInfo     = Attribute::getAttributeValue($userid, $attributeids);
+
         return $userInfo;
 
     }//end getUserById()
@@ -899,8 +900,8 @@ class UserActions
         $list  = array();
         $users = User::getSuperUsers();
 
-        foreach ($users as $user) {
-            $list[$user['userid']] = User::getSuperUserTableColumns($user['userid']);
+        foreach ($users as $userid) {
+            $list[$userid] = User::getSuperUserTableColumns($userid);
         }
 
         // If there is only 1 user then they cannot be removed so do not show remove icon.
