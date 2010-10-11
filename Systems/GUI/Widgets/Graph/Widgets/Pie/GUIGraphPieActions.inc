@@ -185,7 +185,7 @@ class GUIGraphPieActions
         $params['_api_token'] = $userToken;
         $url = Web::appendQueryString($params, $url);
 
-        echo '<span class="GUIGraphPie-container">';
+        echo '<span class="GUIGraphPie-container" style="width: '.$size.'px; height: '.$size.'px;">';
         echo '<object data="'.$url.'"';
         echo ' style="width: '.$size.'px; height: '.$size.'px;"';
         echo ' type="image/svg+xml" id="'.$settings['widget']['id'].'">'."\n";
