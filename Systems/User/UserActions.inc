@@ -486,6 +486,8 @@ class UserActions
     /**
      * Process authentication requests.
      *
+     * Also handles logout action.
+     *
      * @return string
      *
      * @api            read
@@ -494,6 +496,16 @@ class UserActions
     public static function processAuthentication()
     {
         include_once 'Libs/Security/Security.inc';
+        $logoutAction = (boolean) Security::getRequestData('sq_logout', FALSE);
+        if ($logoutAction === TRUE) {
+            // Logout user then redirect to current URL without the sq_logout param.
+            User::logoutUser();
+            include_once 'Libs/Web/Web.inc';
+            $url = Web::getCurrentUrl(FALSE);
+            header('location: '.$url);
+            exit;
+        }
+
         $authAction = Security::getRequestData('auth_action', NULL, FALSE);
         if ($authAction !== NULL) {
             return self::_handleLoginFormRequest($authAction);
