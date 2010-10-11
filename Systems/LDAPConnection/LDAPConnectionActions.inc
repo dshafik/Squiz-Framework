@@ -732,6 +732,14 @@ class LDAPConnectionActions
     }//end getTypeOfAsset()
 
 
+    /**
+     * Returns user groups for an LDAP user.
+     *
+     * @param string $shadowid LDAP user id.
+     * @param mixed  $retVal   Return value of User::getUserGroups().
+     *
+     * @return array
+     */
     public static function getUserGroups($shadowid, $retVal)
     {
         Channels::includeSystem('Asset');
@@ -744,6 +752,146 @@ class LDAPConnectionActions
         return $retVal;
 
     }//end getUserGroups()
+
+
+    /**
+     * Disabled the password hashing if there are LDAP connections.
+     *
+     * If this method returns FALSE then password hashing will be disabled since
+     * this is a refiner plug to User::isPasswordHashingEnabled().
+     *
+     * @param boolean $retVal Return value of User::isPasswordHashingEnabled().
+     *
+     * @return boolean
+     */
+    public static function disablePasswordHashing($retVal)
+    {
+        if ($retVal === FALSE) {
+            return FALSE;
+        }
+
+        Channels::includeSystem('Asset');
+        $assets = Asset::getAssetsByType('LDAPConnection');
+        if (empty($assets) === TRUE) {
+            return $retVal;
+        }
+
+        return FALSE;
+
+    }//end disablePasswordHashing()
+
+
+    /**
+     * Refiner plug to User::loginUser().
+     *
+     * @param string  $username Username of the user to log in.
+     * @param string  $password Password of the user to log in.
+     * @param boolean $retVal   Return value of User::loginUser().
+     *
+     * @return boolean
+     */
+    public static function loginUser($username, $password, $retVal)
+    {
+        if ($retVal === TRUE) {
+            return $retVal;
+        }
+
+        // User::loginUser() method failed to login user so check LDAP connections.
+        Channels::includeSystem('Asset');
+        $assets = Asset::getAssetsByType('LDAPConnection');
+
+        foreach ($assets as $connectionid) {
+            $localUserid = LDAPConnection::authenticate(
+                $connectionid,
+                $username,
+                $password
+            );
+
+            if ($localUserid !== FALSE) {
+                Channels::includeSystem('Session');
+                Session::setSessionData(
+                    'User',
+                    'CurrentUserid',
+                    $localUserid
+                );
+
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+
+    }//end loginUser()
+
+
+    /**
+     * Returns TRUE if the specified user can login.
+     *
+     * @param float  $connectionid Connection assetid to use for login.
+     * @param string $username     Username for login.
+     * @param string $password     Password for login.
+     *
+     * @return boolean
+     */
+    public static function authenticate($connectionid, $username, $password)
+    {
+        include_once 'Libs/LDAP/LDAP.inc';
+        $attrs = LDAPConnection::getConnectionInfo($connectionid);
+        $field = Util::getArrayIndex($attrs['userAttributes'], 'uid');
+
+        // User defined authentication DN.
+        $authDN = Util::getArrayIndex($attrs['details'], 'authDN');
+        if ($authDN !== '') {
+            $basedn = $authDN;
+        } else {
+            $basedn = Util::getArrayIndex($attrs['details'], 'baseDN');
+        }
+
+        // User defined authentication filter.
+        $filter     = '('.$field.'='.$username.')';
+        $authFilter = self::_getConfigValue($connectionid, 'details', 'authFilter');
+        $authFilter = ltrim($authFilter, '(');
+        $authFilter = rtrim($authFilter, '(');
+        if ($authFilter !== '') {
+            $filter = '(&'.$filter.'('.$authFilter.'))';
+        }
+
+        $conn    = LDAPConnection::getConnection($connectionid);
+        $sr      = LDAP::search($conn, $basedn, $filter);
+        $entries = LDAP::getEntries($conn, $sr);
+        $data    = LDAP::getData($entries);
+
+        if ($data === FALSE || empty($data) === TRUE) {
+            // User not found with authentication filter.
+            return FALSE;
+        }
+
+        $user              = array_shift($data);
+        $user['assetType'] = self::_getAssetTypeFromObjectClass($user['objectclass']);
+        if ($user['assetType'] !== 'LDAPUser') {
+            // Entry found but it's not a user.
+            return FALSE;
+        }
+
+        // Try to authenticate through LDAP bridge.
+        $conn = LDAP::connectToLDAP(
+            Util::getArrayIndex($attrs['details'], 'host'),
+            Util::getArrayIndex($attrs['details'], 'port'),
+            Util::getArrayIndex($attrs['details'], 'bindDN'),
+            Util::getArrayIndex($attrs['details'], 'password')
+        );
+
+        $status = LDAP::connectAsUser($conn, $user['dn'], $password);
+        if ($status === TRUE) {
+            Channels::includeSystem('Connection');
+            $remoteid    = self::_getRemoteId($connectionid, $user);
+            $localUserid = Connection::createAsset($connectionid, $remoteid);
+            return $localUserid;
+        }
+
+        return FALSE;
+
+    }//end authenticate()
 
 
     /**
@@ -950,10 +1098,6 @@ class LDAPConnectionActions
      */
     private static function _getConfigValue($connectionid, $configType, $attributeid)
     {
-        //if ($attributeid === 'ou' || $attributeid === 'o') {
-        //    return $attributeid;
-        //}
-
         if (isset(self::$_attributeMap[$connectionid]) === FALSE) {
             self::$_attributeMap[$connectionid] = array();
         }

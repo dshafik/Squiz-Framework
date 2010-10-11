@@ -42,5 +42,27 @@
       </parameters>
    </refiner>
 
+   <refiner>
+      <required>yes</required>
+      <method>disablePasswordHashing</method>
+      <action>User::isPasswordHashingEnabled</action>
+      <fatal>yes</fatal>
+      <parameters>
+        <parameter>retval</parameter>
+      </parameters>
+   </refiner>
+
+   <refiner>
+      <required>yes</required>
+      <method>loginUser</method>
+      <action>User::loginUser</action>
+      <fatal>yes</fatal>
+      <parameters>
+        <parameter>username</parameter>
+        <parameter>password</parameter>
+        <parameter>retval</parameter>
+      </parameters>
+   </refiner>
+
   </plugs>
 </system>
