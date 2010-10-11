@@ -1,5 +1,7 @@
 <var name="systemName"><dataProvider action="SquizSuite::getProductTitle" /></var>
 <var name="systemLogo"><dataProvider action="SquizSuite::getProductLogo" /></var>
+<!--<var name="enableHashing"><dataProvider action="User::isPasswordHashingEnabled" /></var>-->
+
 <html>
 <head>
     <title><text>Login</text> - {systemName}</title>
@@ -33,6 +35,13 @@
             <div class="form-bottom"> </div>
         </div>
     </div>
-    <!-- TODO: use a dataProvider to initialise hashSettings etc. -->
+
+    <condition>
+        <if-not condition="User::isPasswordHashingEnabled()">
+            <content>
+                <script>UserLoginScreen.setHashing(false);</script>
+            </content>
+        </if-not>
+    </condition>
 </body>
 </html>

@@ -1,3 +1,26 @@
+/**
+ * JS Class for the User Login Screen.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program as the file license.txt. If not, see
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+ *
+ * @package    Framework
+ * @subpackage User
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
+ */
+
 var UserLoginScreen = new function()
 {
     this.hashEnabled = true;
@@ -68,13 +91,10 @@ var UserLoginScreen = new function()
                 }//end if
             });
         } else {
-            var browserInfo = dfx.browser();
             params.step     = 'req_auth';
             params.username = username;
             params.password = password;
-            params.bt       = browserInfo.type;
-            params.bv       = browserInfo.version;
-            dfx.post(window.location.href, params, _processLoginResponse);
+            GUI.sendRequest('User', 'processAuthentication', params, _processLoginResponse);
         }//end if
 
         return false;
@@ -100,6 +120,10 @@ var UserLoginScreen = new function()
         dfx.remove(spinner);
         dfx.setStyle(buttonSpan, 'visibility', 'visible');
         dfx.attr(button, 'disabled', false);
+    };
+
+    this.setHashing = function(enabled) {
+        this.hashEnabled = enabled;
     };
 
 };

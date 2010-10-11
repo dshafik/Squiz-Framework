@@ -382,8 +382,14 @@ class UserActions
         $challenge       = Session::getSessionData('User', $username);
         $passwordMatched = FALSE;
 
-        if (Security::validateUserPassword($password, $currPassword, $challenge) === TRUE) {
-            $passwordMatched = TRUE;
+        if (User::isPasswordHashingEnabled() === TRUE) {
+            if (Security::validateUserPassword($password, $currPassword, $challenge) === TRUE) {
+                $passwordMatched = TRUE;
+            }
+        } else {
+            if ($currPassword === Security::hashUserPassword($password)) {
+                $passwordMatched = TRUE;
+            }
         }
 
         if ($passwordMatched === TRUE) {
@@ -438,6 +444,18 @@ class UserActions
         return $userid;
 
     }//end getCurrentUserid()
+
+
+    /**
+     * Returns TRUE if password hashing is enabled.
+     *
+     * @return boolean
+     */
+    public static function isPasswordHashingEnabled()
+    {
+        return TRUE;
+
+    }//end isPasswordHashingEnabled()
 
 
     /**
@@ -1439,7 +1457,7 @@ class UserActions
 
         $path = BaseSystem::getDataDir('User').'/usersFolderid.inc';
 
-        $data['usersFolderid']   = (int) file_get_contents($path);
+        $data['usersFolderid'] = (int) file_get_contents($path);
         $data['editTemplates'] = $editTemplates;
 
         return json_encode($data);
