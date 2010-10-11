@@ -600,11 +600,14 @@ class LDAPConnectionActions
     public static function getAttributeValue($shadowid, $attributeid)
     {
         Channels::includeSystem('Asset');
+        $localAssetid = NULL;
         if (Asset::isAssetid($shadowid) === TRUE) {
             // This is a local asset but could be an LDAP asset that has a localid.
+            $localAssetid = $shadowid;
+
             Channels::includeSystem('Connection');
             $shadowid = Connection::getShadowidFromLocalid($shadowid);
-            if ($shadowid === NULL) {
+            if ($shadowid === NULL || $attributeid === 'last_login') {
                 return FALSE;
             }
         }
@@ -618,6 +621,8 @@ class LDAPConnectionActions
         $values      = array();
 
         foreach ($attributeid as $attrid) {
+            $value = '';
+
             switch ($attrid) {
                 case 'name':
                     $attr = '';
@@ -670,6 +675,14 @@ class LDAPConnectionActions
                 case 'email':
                     $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'mail');
                     $value = Util::getArrayIndex($asset, $attr, '');
+                break;
+
+                case 'last_login':
+                    // Last login only exists for LDAP users who has a local assetid.
+                    if ($localAssetid !== NULL) {
+                        Channels::includeSystem('Attribute');
+                        $value = Attribute::getAttributeValue($localAssetid, 'last_login');
+                    }
                 break;
 
                 default:
