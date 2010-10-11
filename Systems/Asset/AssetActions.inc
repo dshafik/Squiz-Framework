@@ -237,7 +237,7 @@ class AssetActions
      */
     public static function getAssetsByType($typeid)
     {
-        $assets = DAL::getAll(Asset::getAssetsByTypeQuery($typeid));
+        $assets = DAL::getAssoc(Asset::getAssetsByTypeQuery($typeid), 0);
         return $assets;
 
     }//end getAssetsByType()
