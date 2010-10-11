@@ -7,3 +7,11 @@
     float: right;
     margin: 0 10px 0 0;
 }
+
+#superUsersList img.assetTypeIcon {
+    vertical-align: middle;
+}
+
+#superUsersList .col-_remove {
+    width: 35px;
+}

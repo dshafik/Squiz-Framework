@@ -162,11 +162,6 @@ class UserActions
     public static function getUserById($userid)
     {
         Channels::includeSystem('Asset');
-        $userExists = Asset::exists($userid);
-        if ($userExists === FALSE) {
-            return NULL;
-        }
-
         Channels::includeSystem('Attribute');
         $attributes   = Attribute::getAttributes(Asset::getTypeOfAsset($userid));
         $attributeids = array_keys($attributes);
@@ -405,6 +400,35 @@ class UserActions
         return $passwordMatched;
 
     }//end loginUser()
+
+
+    /**
+     * Updates the user last_login attribute.
+     *
+     * This is a after runner plug to User::loginUser.
+     *
+     * @param boolean $success If TRUE then user was logged in.
+     *
+     * @return void
+     */
+    public static function userLoggedin($success)
+    {
+        if ($success !== TRUE) {
+            return;
+        }
+
+        Channels::includeSystem('Attribute');
+        $userid = User::getCurrentUserid();
+
+        if (empty($userid) === TRUE) {
+            return;
+        }
+
+        include_once 'Libs/String/String.inc';
+        $currTime = String::tsIso8601(time());
+        Attribute::setAttributeValue($userid, 'last_login', $currTime);
+
+    }//end userLoggedin()
 
 
     /**
@@ -1072,10 +1096,28 @@ class UserActions
         $currentUser = User::getCurrentUserid();
         $user        = User::getUserById($userid);
 
-        $columns = array();
-        $columns['user']      = $user['first_name'].' '.$user['last_name'].' ('.$user['username'].')';
-        $columns['email']     = $user['email'];
-        $columns['lastLogin'] = $user['last_login'];
+        Channels::includeSystem('Asset');
+        $assetType = Asset::getTypeOfAsset($userid);
+        $iconPath  = Asset::getTypeIconPath($assetType);
+
+        $userName  = '<img src="'.$iconPath.'" class="assetTypeIcon" title="#'.$userid.'" /> ';
+        $userName .= $user['first_name'].' '.$user['last_name'];
+        $userName .= ' ('.$user['username'].')';
+
+        $columns          = array();
+        $columns['user']  = $userName;
+        $columns['email'] = $user['email'];
+
+        include_once 'Libs/String/String.inc';
+        $lastLogin  = $user['last_login'];
+        $timestamp  = strtotime($lastLogin);
+        $lastLogin  = String::easyDatetime($timestamp);
+        $lastLogin .= sprintf(' (%s ago)', String::readableSeconds(time() - $timestamp));
+        if ((time() - $timestamp) > (3600 * 24 * 30)) {
+            $lastLogin = '<span style="color:red;">'.$lastLogin.'</span>';
+        }
+
+        $columns['lastLogin'] = $lastLogin;
 
         if ((string) $currentUser === (string) $userid) {
             // Do not show the remove icon for this row.

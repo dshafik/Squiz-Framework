@@ -8,5 +8,15 @@
       <fatal>no</fatal>
       <parameters/>
     </runner>
+
+    <runner>
+      <required>yes</required>
+      <method>userLoggedin</method>
+      <action listen="after">User::loginUser</action>
+      <fatal>no</fatal>
+      <parameters>
+        <parameter>retval</parameter>
+      </parameters>
+    </runner>
   </plugs>
 </system>
