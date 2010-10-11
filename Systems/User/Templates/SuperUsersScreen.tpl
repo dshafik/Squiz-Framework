@@ -4,6 +4,8 @@
     </if-not>
 </condition>
 
+<var name="screenData"><dataProvider action="User::getSuperUsersScreenData" /></var>
+
 <div id="SuperUsersScreen">
     <widget type="GUI/Box" id="superUsers-box">
         <setting name="title"><text>Super Users</text></setting>
@@ -49,3 +51,7 @@
         </setting>
     </widget>
 </div>
+<script>
+    /* Initialise the screen */
+    UserSuperUsersScreen.init({screenData});
+</script>

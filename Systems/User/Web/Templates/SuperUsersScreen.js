@@ -23,6 +23,12 @@
 
 var UserSuperUsersScreen = new function()
 {
+    var _screenData = null;
+
+    this.init = function(screenData) {
+        _screenData = screenData;
+    };
+
     this.addUser = function() {
         var options = {
             modal: true
@@ -30,7 +36,7 @@ var UserSuperUsersScreen = new function()
 
         // TODO: Use project asset etc..
         var templateSettings = {
-            rootNode: 2
+            rootNode: _screenData.usersFolderid
         };
 
         var self = this;

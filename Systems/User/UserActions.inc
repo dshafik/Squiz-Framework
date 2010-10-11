@@ -698,9 +698,14 @@ class UserActions
             DAL::beginTransaction();
             Channels::includeSystem('Asset');
             Channels::includeSystem('Attribute');
+            Channels::includeSystem('Linking');
 
             $folderid = Asset::create('folder');
             Attribute::setAttributeValue($folderid, 'name', $title);
+
+            // Link it under global users group.
+            $globalUsersFolder = User::getGlobalUsersFolderid();
+            Linking::createLink($globalUsersFolder, $folderid);
 
             $usersFolder = array();
             $cacheFile   = BaseSystem::getDataDir('User').'/folders.inc';
@@ -1464,6 +1469,50 @@ class UserActions
         return json_encode($data);
 
     }//end getUserManagerScreenData()
+
+
+    /**
+     * Returns the user manager screen data in JSON format.
+     *
+     * @return string
+     */
+    public static function getSuperUsersScreenData()
+    {
+        $path = BaseSystem::getDataDir('User').'/usersFolderid.inc';
+
+        $data['usersFolderid'] = (int) file_get_contents($path);
+
+        return json_encode($data);
+
+    }//end getSuperUsersScreenData()
+
+
+    /**
+     * Returns the asset id of the top level users folder.
+     *
+     * Global users folder will be created when this method is called the first time.
+     *
+     * @return integer
+     */
+    public static function getGlobalUsersFolderid()
+    {
+        $path = BaseSystem::getDataDir('User').'/usersFolderid.inc';
+        if (file_exists($path) === FALSE) {
+            // Create a global users folder.
+            Channels::includeSystem('Asset');
+            Channels::includeSystem('Attribute');
+            $folderid = Asset::create('folder');
+            Attribute::setAttributeValue($folderid, 'name', 'Users');
+
+            // Store the id.
+            $path = BaseSystem::getDataDir('User').'/usersFolderid.inc';
+            file_put_contents($path, $folderid);
+            return $folderid;
+        }
+
+        return (int) file_get_contents($path);
+
+    }//end getGlobalUsersFolderid()
 
 
 }//end class
