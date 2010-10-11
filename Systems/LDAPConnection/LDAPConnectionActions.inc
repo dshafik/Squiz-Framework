@@ -591,10 +591,11 @@ class LDAPConnectionActions
     /**
      * Get attribute value for remote asset.
      *
-     * @param string $shadowid    Shadow ID.
-     * @param string $attributeid Attribute id.
+     * @param string       $shadowid    Shadow ID.
+     * @param string|array $attributeid The attribute(s) to find.
      *
      * @return array
+     * @see    Attribute::getAttributeValue()
      */
     public static function getAttributeValue($shadowid, $attributeid)
     {
@@ -612,66 +613,78 @@ class LDAPConnectionActions
         $parts = Connection::splitShadowid($shadowid);
         $asset = self::_getEntry($shadowid);
 
-        switch ($attributeid) {
-            case 'name':
-                $attr = '';
-                // Get the settings for name attribute.
-                if ($asset['assetType'] === 'user') {
-                    $attr = self::_getConfigValue($parts['connection'], 'userAttributes', 'name');
-                } else if ($asset['assetType'] === 'userGroup') {
-                    $attr = self::_getConfigValue($parts['connection'], 'groupAttributes', 'groupName');
-                }
+        $isArray     = is_array($attributeid);
+        $attributeid = (array) $attributeid;
+        $values      = array();
 
-                // Try the name attribute setting first and 'cn', 'o', 'c', 'ou' and 'dn'
-                // if it's not found.
-                if (isset($asset[$attr]) === TRUE) {
-                    $value = $asset[$attr];
-                } else if (isset($asset['cn']) === TRUE) {
-                    $value = $asset['cn'];
-                } else if (isset($asset['o']) === TRUE) {
-                    $value = $asset['o'];
-                } else if (isset($asset['c']) === TRUE) {
-                    $value = $asset['c'];
-                } else if (isset($asset['ou']) === TRUE) {
-                    if (is_array($asset['ou']) === FALSE) {
-                        $value = $asset['ou'];
+        foreach ($attributeid as $attrid) {
+            switch ($attrid) {
+                case 'name':
+                    $attr = '';
+                    // Get the settings for name attribute.
+                    if ($asset['assetType'] === 'user') {
+                        $attr = self::_getConfigValue($parts['connection'], 'userAttributes', 'name');
+                    } else if ($asset['assetType'] === 'userGroup') {
+                        $attr = self::_getConfigValue($parts['connection'], 'groupAttributes', 'groupName');
                     }
-                } else {
-                    // Nothing suitable found, use DN.
+
+                    // Try the name attribute setting first and 'cn', 'o', 'c', 'ou' and 'dn'
+                    // if it's not found.
+                    if (isset($asset[$attr]) === TRUE) {
+                        $value = $asset[$attr];
+                    } else if (isset($asset['cn']) === TRUE) {
+                        $value = $asset['cn'];
+                    } else if (isset($asset['o']) === TRUE) {
+                        $value = $asset['o'];
+                    } else if (isset($asset['c']) === TRUE) {
+                        $value = $asset['c'];
+                    } else if (isset($asset['ou']) === TRUE) {
+                        if (is_array($asset['ou']) === FALSE) {
+                            $value = $asset['ou'];
+                        }
+                    } else {
+                        // Nothing suitable found, use DN.
+                        $value = $asset['dn'];
+                    }
+                break;
+
+                case 'dn':
                     $value = $asset['dn'];
-                }
-            break;
+                break;
 
-            case 'dn':
-                $value = $asset['dn'];
-            break;
+                case 'first_name':
+                    $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'givenname');
+                    $value = Util::getArrayIndex($asset, $attr, '');
+                break;
 
-            case 'first_name':
-                $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'givenname');
-                $value = Util::getArrayIndex($asset, $attr, '');
-            break;
+                case 'last_name':
+                    $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'sn');
+                    $value = Util::getArrayIndex($asset, $attr, '');
+                break;
 
-            case 'last_name':
-                $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'sn');
-                $value = Util::getArrayIndex($asset, $attr, '');
-            break;
+                case 'username':
+                    $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'uid');
+                    $value = Util::getArrayIndex($asset, $attr, '');
+                break;
 
-            case 'username':
-                $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'uid');
-                $value = Util::getArrayIndex($asset, $attr, '');
-            break;
+                case 'email':
+                    $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'mail');
+                    $value = Util::getArrayIndex($asset, $attr, '');
+                break;
 
-            case 'email':
-                $attr  = self::_getConfigValue($parts['connection'], 'userAttributes', 'mail');
-                $value = Util::getArrayIndex($asset, $attr, '');
-            break;
+                default:
+                    $value = '';
+                break;
+            }//end switch
 
-            default:
-                $value = '';
-            break;
-        }//end switch
+            $values[$attrid] = $value;
+        }//end foreach
 
-        return $value;
+        if ($isArray === FALSE && isset($values[$attributeid[0]]) === TRUE) {
+            return $values[$attributeid[0]];
+        }
+
+        return $values;
 
     }//end getAttributeValue()
 

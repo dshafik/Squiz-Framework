@@ -2,6 +2,6 @@
        xsi:noNamespaceSchemaLocation="asset.xsd">
        <type_code>LDAPUserGroup</type_code>
        <name>LDAP User Group</name>
-       <parent_type>asset</parent_type>
+       <parent_type>userGroup</parent_type>
        <category>User</category>
 </asset>
