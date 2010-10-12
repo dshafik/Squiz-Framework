@@ -127,6 +127,16 @@ class GUIActions
                                      'safari'  => NULL,
                                     );
 
+    /**
+     * Information about the cache tag that is being parsed.
+     *
+     * Its used to prevent widget initialisation code being printed when the content
+     * is cached.
+     *
+     * @var array
+     */
+    private static $_cacheTagInfo = array();
+
 
     /**
      * Includes the template PHP file.
@@ -604,6 +614,7 @@ class GUIActions
                      'text',
                      'dataProvider',
                      'condition',
+                     'cache',
                     );
 
         foreach ($tagNames as $tagName) {
@@ -717,7 +728,15 @@ class GUIActions
         $settingsCode = self::_getWidgetSettings($widget);
 
         if ($assignTo === NULL) {
-            self::$_templateInitCode .= $settingsCode;
+            if (empty(self::$_cacheTagInfo) === TRUE) {
+                self::$_templateInitCode .= $settingsCode;
+            } else {
+                $tplCacheCode  = 'if (GUI::templateCacheExists('.self::_printAttributeValue(self::$_cacheTagInfo['cacheKey']).', '.self::_printAttributeValue(self::$_cacheTagInfo['ttl']).') === FALSE) {';
+                $tplCacheCode .= $settingsCode;
+                $tplCacheCode .= '}';
+
+                self::$_templateInitCode .= $tplCacheCode;
+            }
         } else {
             $php .= $settingsCode;
         }
@@ -1049,6 +1068,10 @@ class GUIActions
 
             case 'var':
                 $php .= self::_parseVarTag($node);
+            break;
+
+            case 'cache':
+                $php .= self::_parseCacheTag($node);
             break;
 
             case 'content':
@@ -1519,6 +1542,210 @@ class GUIActions
         return '';
 
     }//end _parseVarTag()
+
+
+    /**
+     * Converts a given cache tag.
+     *
+     * Cache tags are used to cache whole or part of a template for a period of time
+     * or until an external system clears the cache.
+     *
+     * The cache tags cannot be nested and they require id and ttl attributes.
+     *
+     * @param DOMNode $node The cache tag to convert.
+     *
+     * @return string
+     * @throws ChannelException If the cache tag is invalid.
+     */
+    private static function _parseCacheTag(DOMNode $node)
+    {
+        $cacheKey = trim($node->getAttribute('id'));
+        $ttl      = trim($node->getAttribute('ttl'));
+
+        self::$_cacheTagInfo = array(
+                                'cacheKey' => $cacheKey,
+                                'ttl'      => $ttl,
+                               );
+
+        // Need to wrap content.
+        $domContent  = self::$_docType;
+        $domContent .= '<__tempContent></__tempContent>';
+
+        $temptpl = new DOMDocument('1.0');
+        $temptpl->loadXML($domContent);
+
+        $tempContentEl = $temptpl->getElementsByTagName('__tempContent')->item(0);
+
+        foreach ($node->childNodes as $contentChild) {
+            $importedNode = $temptpl->importNode($contentChild, TRUE);
+            $tempContentEl->appendChild($importedNode);
+        }
+
+        GUI::parseTemplate($tempContentEl);
+        $subTemplateStr = $temptpl->saveXML();
+
+        self::$_cacheTagInfo = array();
+
+        // Just get the content we want.
+        $subTemplateStr = str_replace(self::$_docType, '', $subTemplateStr);
+        $subTemplateStr = trim(str_replace('<?xml version="1.0"?>', '', $subTemplateStr));
+        $subTemplateStr = str_replace('<__tempContent>', '', $subTemplateStr);
+        $subTemplateStr = str_replace('</__tempContent>', '', $subTemplateStr);
+        $subTemplateStr = ' ?>'.$subTemplateStr.'<?php ';
+
+        if (strlen($cacheKey) === 0) {
+            throw new ChannelException(_('Cache tag requires an "id" attribute'));
+        } else if (strlen($ttl) === 0 || is_numeric($ttl) === FALSE || (int) $ttl < 0) {
+            $msg = _('Cache tag requires a "ttl" (Time To Live) attribute and must be in minutes. Use 0 to keep cache forever');
+            throw new ChannelException($msg);
+        }
+
+        $php  = '$_gui_cachedContent = GUI::loadTemplateCache('.self::_printAttributeValue($cacheKey).', '.self::_printAttributeValue($ttl).');'."\n";
+        $php .= 'if ($_gui_cachedContent !== NULL) {'."\n";
+        $php .= '   echo $_gui_cachedContent;'."\n";
+        $php .= '} else {'."\n";
+        $php .= "   // Create cache.\n";
+        $php .= "   ob_start();\n";
+        $php .= $subTemplateStr;
+        $php .= '   $_gui_cachedContent = ob_get_contents();'."\n";
+        $php .= '   GUI::saveTemplateCache('.self::_printAttributeValue($cacheKey).', $_gui_cachedContent);'."\n";
+        $php .= "   ob_end_clean();\n";
+        $php .= "   echo \$_gui_cachedContent;\n";
+        $php .= '}'."\n";
+
+        $tmpDoc      = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+        $phpCodeElem = $tmpDoc->getElementsByTagName('phpCode')->item(0);
+        $childCount  = $phpCodeElem->childNodes->length;
+
+        for ($i = 0; $i < $childCount; $i++) {
+            $tmpNode = $phpCodeElem->childNodes->item($i);
+            $newNode = $node->ownerDocument->importNode($tmpNode, TRUE);
+            $node->parentNode->insertBefore($newNode, $node);
+        }
+
+        $node->parentNode->removeChild($node);
+
+        return $php;
+
+    }//end _parseCacheTag()
+
+
+    /**
+     * Returns cached contents of a template.
+     *
+     * Returns NULL if there is no cached content or is expired.
+     *
+     * @param string  $cacheid Id of the cache file.
+     * @param integer $ttl     Time to live value in minutes, 0 for no expire time.
+     *
+     * @return mixed
+     */
+    public static function loadTemplateCache($cacheid, $ttl)
+    {
+        if (GUI::templateCacheExists($cacheid, $ttl) === TRUE) {
+            $cachePath = self::_getTemplateCachePath($cacheid);
+            $content   = file_get_contents($cachePath);
+            return $content;
+        }
+
+        return NULL;
+
+    }//end loadTemplateCache()
+
+
+    /**
+     * Saved the contens of a template in to a cache file.
+     *
+     * @param string $cacheid      Id of the cache file.
+     * @param string $cacheContent The content to cache.
+     *
+     * @return void
+     */
+    public static function saveTemplateCache($cacheid, $cacheContent)
+    {
+        $cachePath = self::_getTemplateCachePath($cacheid);
+        $dir       = dirname($cachePath);
+
+        if (file_exists($dir) === FALSE) {
+            include_once 'Libs/FileSystem/FileSystem.inc';
+            @FileSystem::mkdir($dir, 0755, TRUE);
+        }
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        FileSystem::filePutContents($cachePath, $cacheContent);
+
+    }//end saveTemplateCache()
+
+
+    /**
+     * Returns TRUE if the specified cache exists.
+     *
+     * @param string  $cacheid Id of the cache file.
+     * @param integer $ttl     Time to live value in minutes, 0 for no expire time.
+     *
+     * @return boolean
+     */
+    public static function templateCacheExists($cacheid, $ttl)
+    {
+        $cachePath = self::_getTemplateCachePath($cacheid);
+        if (file_exists($cachePath) === TRUE) {
+            if ((int) $ttl !== 0) {
+                // TTL in minutes.
+                $filemTime   = filemtime($cachePath);
+                $currentTime = time();
+
+                $timeDiff = floor((($currentTime - $filemTime) / 60));
+                if ($timeDiff < $ttl) {
+                    return TRUE;
+                }
+            }
+        }
+
+        return FALSE;
+
+    }//end templateCacheExists()
+
+
+    /**
+     * Returns the file path of the specified cache file.
+     *
+     * @param string $cacheid Id of the cache file.
+     *
+     * @return string
+     */
+    private static function _getTemplateCachePath($cacheid)
+    {
+        $currentTplKey = GUI::getCurrentTemplateKey();
+        $currentTplKey = str_replace('::', '-', $currentTplKey);
+        $basePath      = BaseSystem::getDataDir('GUI').'/tplCache';
+        $cachePath     = $basePath.'/'.$currentTplKey.'_'.$cacheid.'.tplc';
+        return $cachePath;
+
+    }//end _getTemplateCachePath()
+
+
+    /**
+     * Returns the attribute value after processing it for printing in PHP code.
+     *
+     * @param string $value The attribute value.
+     *
+     * @return string
+     */
+    private static function _printAttributeValue($value)
+    {
+        if (is_numeric($value) === TRUE) {
+            return $value;
+        }
+
+        $value = str_replace('{', '{{', $value);
+        $value = str_replace('}', '}}', $value);
+
+        $value = self::_replaceVarKeywords($value, FALSE);
+        $value = '"'.$value.'"';
+
+        return $value;
+
+    }//end _printAttributeValue()
 
 
     /**
