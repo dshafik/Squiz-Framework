@@ -137,6 +137,13 @@ class GUIActions
      */
     private static $_cacheTagInfo = array();
 
+    /**
+     * If TRUE then the template that is being baked is used for re-caching.
+     *
+     * @var boolean
+     */
+    private static $_isReCacheTemplate = FALSE;
+
 
     /**
      * Includes the template PHP file.
@@ -288,7 +295,10 @@ class GUIActions
 
                 $tplDoc = GUI::loadTemplate($file);
                 if ($tplDoc !== NULL) {
-                    GUI::bakeTemplate($systemName, str_replace('.tpl', '', basename($file)), $tplDoc);
+                    $templateName = str_replace('.tpl', '', basename($file));
+                    GUI::bakeTemplate($systemName, $templateName, $tplDoc);
+                    $tplDoc = GUI::loadTemplate($file);
+                    GUI::bakeTemplate($systemName, $templateName, $tplDoc, TRUE);
                 }
             }
         }//end foreach
@@ -301,39 +311,25 @@ class GUIActions
 
 
     /**
-     * Creates the widget settings file so that the list can be used during run time.
-     *
-     * @return void
-     */
-    private static function _createWidgetSettingsFile()
-    {
-        // Store the list of widget settings in a file so that they are accessible
-        // at runtime.
-        $widgetSettingsFile = BaseSystem::getDataDir('GUI').'/widgetSettings.inc';
-        $settingsContent    = '<';
-        $settingsContent   .= '?php $settings = ';
-        $settingsContent   .= var_export(self::$_widgetSettings, TRUE);
-        $settingsContent   .= '; ?';
-        $settingsContent   .= '>';
-
-        file_put_contents($widgetSettingsFile, $settingsContent);
-        chmod($widgetSettingsFile, 0755);
-
-    }//end _createWidgetSettingsFile()
-
-
-    /**
      * Bakes out the template's PHP file.
      *
-     * @param string  $systemName   Name of the system that owns the template.
-     * @param string  $templateName Name of the template.
-     * @param DOMNode $tplDoc       The HTML of the template as DOM object.
+     * @param string  $systemName        Name of the system that owns the template.
+     * @param string  $templateName      Name of the template.
+     * @param DOMNode $tplDoc            The HTML of the template as DOM object.
+     * @param boolean $isReCacheTemplate If TRUE then the baked out template is used
+     *                                   for re-caching templates, which does not
+     *                                   include If conditions, exceptions etc.
      *
      * @since  4.0.0
      * @return void
      */
-    public static function bakeTemplate($systemName, $templateName, DOMNode $tplDoc)
+    public static function bakeTemplate($systemName, $templateName, DOMNode $tplDoc, $isReCacheTemplate=FALSE)
     {
+        self::$_templateInitCode      = '';
+        self::$_templateVariablesCode = '';
+        self::$_isReCacheTemplate     = $isReCacheTemplate;
+        self::$_currentTemplateKey    = '';
+
         $tplKey = $systemName.'::'.$templateName;
 
         // TODO: We may need to use a stack for this.
@@ -351,8 +347,7 @@ class GUIActions
         $php .= self::_getVarCode().' = array();'."\n";
 
         // Add the PHP code to member var so that during parsing it can be updated.
-        self::$_templateInitCode      = $php;
-        self::$_templateVariablesCode = '';
+        self::$_templateInitCode = $php;
 
         // Parse the special tags in the template file.
         GUI::parseTemplate($tplDoc);
@@ -450,7 +445,18 @@ class GUIActions
         }
 
         // Write to data file.
-        $dest = $syDataPath.'/'.$templateName.'.tpl.php';
+        $dest = '';
+        if ($isReCacheTemplate !== TRUE) {
+            $dest = $syDataPath.'/'.$templateName.'.tpl.php';
+        } else {
+            $dir = BaseSystem::getDataDir('GUI').'/rebakeTemplates';
+            if (file_exists($dir) === FALSE) {
+                mkdir($dir, 0755, TRUE);
+            }
+
+            $dest = $dir.'/'.$systemName.'-'.$templateName.'.tpl.php';
+        }
+
         file_put_contents($dest, $htmlCont);
 
     }//end bakeTemplate()
@@ -728,7 +734,7 @@ class GUIActions
         $settingsCode = self::_getWidgetSettings($widget);
 
         if ($assignTo === NULL) {
-            if (empty(self::$_cacheTagInfo) === TRUE) {
+            if (empty(self::$_cacheTagInfo) === TRUE || self::$_isReCacheTemplate === TRUE) {
                 self::$_templateInitCode .= $settingsCode;
             } else {
                 $tplCacheCode  = 'if (GUI::templateCacheExists('.self::_printAttributeValue(self::$_cacheTagInfo['cacheKey']).', '.self::_printAttributeValue(self::$_cacheTagInfo['ttl']).') === FALSE) {';
@@ -738,7 +744,7 @@ class GUIActions
                 self::$_templateInitCode .= $tplCacheCode;
             }
         } else {
-            $php .= $settingsCode;
+             self::$_templateInitCode .= $settingsCode;
         }
 
         // Include widget system.
@@ -941,6 +947,28 @@ class GUIActions
         return $settings;
 
     }//end _getAvaiableSettingsForWidget()
+
+
+    /**
+     * Creates the widget settings file so that the list can be used during run time.
+     *
+     * @return void
+     */
+    private static function _createWidgetSettingsFile()
+    {
+        // Store the list of widget settings in a file so that they are accessible
+        // at runtime.
+        $widgetSettingsFile = BaseSystem::getDataDir('GUI').'/widgetSettings.inc';
+        $settingsContent    = '<';
+        $settingsContent   .= '?php $settings = ';
+        $settingsContent   .= var_export(self::$_widgetSettings, TRUE);
+        $settingsContent   .= '; ?';
+        $settingsContent   .= '>';
+
+        file_put_contents($widgetSettingsFile, $settingsContent);
+        chmod($widgetSettingsFile, 0755);
+
+    }//end _createWidgetSettingsFile()
 
 
     /**
@@ -1400,43 +1428,47 @@ class GUIActions
             if ($child->nodeType === XML_ELEMENT_NODE
                 && isset($tagTypes[$child->tagName]) === TRUE
             ) {
-                $condition = $child->getAttribute('condition');
+                if (self::$_isReCacheTemplate === FALSE) {
+                    $condition = $child->getAttribute('condition');
 
-                // Get the system name so we can include it.
-                list($systemName, $method) = explode('::', $condition);
-                if (empty($method) === FALSE) {
-                    $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
-                }
+                    // Get the system name so we can include it.
+                    list($systemName, $method) = explode('::', $condition);
+                    if (empty($method) === FALSE) {
+                        $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
+                    }
 
-                // Replace kewords.
-                $condition = self::_replaceVarKeywords($condition, FALSE);
+                    // Replace kewords.
+                    $condition = self::_replaceVarKeywords($condition, FALSE);
 
-                // Print the if, else block.
-                $php .= $tagTypes[$child->tagName];
+                    // Print the if, else block.
+                    $php .= $tagTypes[$child->tagName];
 
-                switch ($child->tagName) {
-                    case 'if':
-                        $php .= ' ('.$condition.' === TRUE) {'."\n";
-                    break;
+                    switch ($child->tagName) {
+                        case 'if':
+                            $php .= ' ('.$condition.' === TRUE) {'."\n";
+                        break;
 
-                    case 'if-not':
-                        $php .= ' ('.$condition.' === FALSE) {'."\n";
-                    break;
+                        case 'if-not':
+                            $php .= ' ('.$condition.' === FALSE) {'."\n";
+                        break;
 
-                    case 'if-null':
-                        $php .= ' ('.$condition.' === NULL) {'."\n";
-                    break;
+                        case 'if-null':
+                            $php .= ' ('.$condition.' === NULL) {'."\n";
+                        break;
 
-                    default:
-                        $php .= " {\n";
-                    break;
-                }
+                        default:
+                            $php .= " {\n";
+                        break;
+                    }
+                }//end if
 
                 foreach ($child->childNodes as $condChild) {
                     $php .= self::_parseTag($condChild, $assignTo);
                 }
 
-                $php .= "\n} ";
+                if (self::$_isReCacheTemplate === FALSE) {
+                    $php .= "\n} ";
+                }
             }//end if
         }//end foreach
 
@@ -1474,12 +1506,15 @@ class GUIActions
      */
     private static function _parseExceptionTag(DOMNode $node, $assignTo=NULL)
     {
-        foreach ($node->childNodes as $child) {
-            $php = self::_parseTag($child, '$_gui_exception');
-        }
+        $php = '';
+        if (self::$_isReCacheTemplate === FALSE) {
+            foreach ($node->childNodes as $child) {
+                $php = self::_parseTag($child, '$_gui_exception');
+            }
 
-        $php .= "\n";
-        $php .= 'throw new ChannelException($_gui_exception);';
+            $php .= "\n";
+            $php .= 'throw new ChannelException($_gui_exception);';
+        }
 
         if ($assignTo === NULL) {
             // Top level.
@@ -1600,18 +1635,25 @@ class GUIActions
             throw new ChannelException($msg);
         }
 
-        $php  = '$_gui_cachedContent = GUI::loadTemplateCache('.self::_printAttributeValue($cacheKey).', '.self::_printAttributeValue($ttl).');'."\n";
-        $php .= 'if ($_gui_cachedContent !== NULL) {'."\n";
-        $php .= '   echo $_gui_cachedContent;'."\n";
-        $php .= '} else {'."\n";
+        $php = '';
+        if (self::$_isReCacheTemplate === FALSE) {
+            $php .= '$_gui_cachedContent = GUI::loadTemplateCache('.self::_printAttributeValue($cacheKey).', '.self::_printAttributeValue($ttl).');'."\n";
+            $php .= 'if ($_gui_cachedContent !== NULL) {'."\n";
+            $php .= '   echo $_gui_cachedContent;'."\n";
+            $php .= '} else {'."\n";
+        }
+
         $php .= "   // Create cache.\n";
         $php .= "   ob_start();\n";
         $php .= $subTemplateStr;
         $php .= '   $_gui_cachedContent = ob_get_contents();'."\n";
         $php .= '   GUI::saveTemplateCache('.self::_printAttributeValue($cacheKey).', $_gui_cachedContent);'."\n";
         $php .= "   ob_end_clean();\n";
-        $php .= "   echo \$_gui_cachedContent;\n";
-        $php .= '}'."\n";
+
+        if (self::$_isReCacheTemplate === FALSE) {
+            $php .= "   echo \$_gui_cachedContent;\n";
+            $php .= '}'."\n";
+        }
 
         $tmpDoc      = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
         $phpCodeElem = $tmpDoc->getElementsByTagName('phpCode')->item(0);
@@ -1707,18 +1749,57 @@ class GUIActions
 
 
     /**
+     * Recaches the specified template.
+     *
+     * Other systems can call this method to re-cache templates, its up to the
+     * calling method to set the required template variables.
+     *
+     * Note that this function may throw exception when the template file is included.
+     *
+     * @param string $systemName   Name of the system that owns the template.
+     * @param string $templateName Name of the template (without the tpl extension).
+     *
+     * @return void
+     */
+    public static function reCacheTemplate($systemName, $templateName)
+    {
+        $dir  = BaseSystem::getDataDir('GUI').'/rebakeTemplates';
+        $path = $dir.'/'.$systemName.'-'.$templateName.'.tpl.php';
+
+        if (file_exists($path) === FALSE) {
+            // No re-cache template file.
+            return;
+        }
+
+        // Include the re-cache template file. These files contain calls to
+        // GUI::saveTemplateCache().
+        ob_start();
+            include $path;
+        ob_end_clean();
+
+    }//end reCacheTemplate()
+
+
+    /**
      * Returns the file path of the specified cache file.
      *
-     * @param string $cacheid Id of the cache file.
+     * @param string $cacheid      Id of the cache file.
+     * @param string $system       Name of the system that owns the template.
+     * @param string $templateName Name of the template file.
      *
      * @return string
      */
-    private static function _getTemplateCachePath($cacheid)
+    private static function _getTemplateCachePath($cacheid, $system=NULL, $templateName=NULL)
     {
-        $currentTplKey = GUI::getCurrentTemplateKey();
-        $currentTplKey = str_replace('::', '-', $currentTplKey);
-        $basePath      = BaseSystem::getDataDir('GUI').'/tplCache';
-        $cachePath     = $basePath.'/'.$currentTplKey.'_'.$cacheid.'.tplc';
+        if ($system === NULL && $templateName === NULL) {
+            $currentTplKey = GUI::getCurrentTemplateKey();
+            $currentTplKey = str_replace('::', '-', $currentTplKey);
+        } else {
+            $currentTplKey = $systemName.'-'.$templateName;
+        }
+
+        $basePath  = BaseSystem::getDataDir('GUI').'/tplCache';
+        $cachePath = $basePath.'/'.$currentTplKey.'_'.$cacheid.'.tplc';
         return $cachePath;
 
     }//end _getTemplateCachePath()
