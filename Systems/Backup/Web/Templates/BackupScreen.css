@@ -1,0 +1,8 @@
+#BackupScreen {
+    width: 1000px;
+    margin: 0 auto;
+}
+
+#BackupScreen p {
+    line-height: 22px;
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Cron script for Backup, keep daily backup for 1 week and replace.
+ * Cron script to keep a daily backup for 1 week before replacement.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as

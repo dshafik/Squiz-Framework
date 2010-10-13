@@ -32,37 +32,129 @@ class BackupActions
 
 
     /**
-     * Returns the contents of the widget (or in this case, template).
+     * Runs backup.sh, replace file if the one from previous week exists.
      *
-     * @param array  $settings The list of settings for this widget.
-     * @param string $tplFile  The template file to use.
+     * Naming convention for file: DayOfWeek_YYYY-MM-DD_HH-MM.tar.gz.
+     * Example: Thu_2010-10-13_14-03.tar.gz.
      *
-     * @return string
+     * @return void
      */
-    public static function getTemplateContent(array $settings=array(), $tplFile=NULL)
+    public static function createBackup()
     {
-        $content = '';
-        if ($tplFile !== NULL) {
-            $content = file_get_contents($tplFile);
+        // Make sure we have a backup script.
+        $script = dirname(__FILE__).'/Scripts/backup.sh';
+        if (file_exists($script) === FALSE) {
+            return;
         }
 
-        return $content;
+        // Remove the backup from the previous week.
+        $dayOfWeek = date('D');
+        $backups   = Backup::getBackups();
+        $dataDir   = BaseSystem::getDataDir('Backup');
+        if (in_array($dayOfWeek, array_keys($backups)) === TRUE) {
+            $file = $dataDir.'/'.$backups[$dayOfWeek]['name'].'.tar.gz';
+            unlink($file);
+        }
 
-    }//end getTemplateContent()
+        Backup::prepareBackup();
+
+        $name   = date('D_Y-m-d_H-i', time());
+        $target = $name.'.tar.gz';
+        exec($script.' '.Init::ROOT_DIR.' '.$dataDir.' '.$target);
+
+        Backup::afterBackup();
+
+    }//end createBackup()
 
 
     /**
-     * Prepare for baking.
+     * Returns information about backups that have been created.
      *
-     * @param DOMNode $htmlTpl The HTML content of the widget.
-     *
-     * @return DOMNode
+     * @return array
      */
-    public static function prepareBake(DOMNode $htmlTpl)
+    public static function getBackups()
     {
-        return $htmlTpl;
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        $dataDir = BaseSystem::getDataDir('Backup');
+        $backups = glob($dataDir.'/*.tar.gz');
+        $tmp     = array();
+        foreach ($backups as $file) {
+            $fileName  = basename($file, '.tar.gz');
+            $parts     = explode('_', $fileName);
+            $dayOfWeek = $parts[0];
+            $time      = explode('-', $parts[2]);
+            $date      = strtotime($parts[1].' '.$time[0].':'.$time[1]);
 
-    }//end prepareBake()
+            $tmp[$date] = array(
+                           'name' => $fileName,
+                           'dow'  => $dayOfWeek,
+                           'size' => FileSystem::readableSize($file),
+                          );
+        }
+
+        // Reverse sort by date, for nice display.
+        include_once 'Libs/String/String.inc';
+        $result = array();
+        krsort($tmp);
+        foreach ($tmp as $date => $info) {
+            $result[$info['dow']] = array(
+                                     'name'      => $info['name'],
+                                     'timestamp' => $date,
+                                     'date'      => date('D, ', $date).String::easyDatetime($date),
+                                     'size'      => $info['size'],
+                                    );
+        }
+
+        return $result;
+
+    }//end getBackups()
+
+
+    /**
+     * Returns a list of available backups.
+     *
+     * @return array
+     */
+    public static function getBackupList()
+    {
+        $backups = Backup::getBackups();
+
+        $list = array();
+        foreach ($backups as $day => $backup) {
+            $list[$day] = array(
+                           'date'    => $backup['date'],
+                           'size'    => $backup['size'],
+                           'actions' => '[download] [restore]',
+                          );
+        }
+
+        return $list;
+
+    }//end getBackupList()
+
+
+    /**
+     * Channel that runs before a backup is created.
+     *
+     * Systems can plug into this method to remove any old and unnecessary data.
+     *
+     * @return void
+     */
+    public static function prepareBackup()
+    {
+
+    }//end prepareBackup()
+
+
+    /**
+     * Channel that runs after a backup is created.
+     *
+     * @return void
+     */
+    public static function afterBackup()
+    {
+
+    }//end afterBackup()
 
 
 }//end class

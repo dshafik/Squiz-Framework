@@ -3,7 +3,7 @@
   <plugs />
   <cron_jobs>
     <cron_job script="BackupCron.inc" name="Backup" interval="daily">
-      <description>This job creates backups of your MySource Mini system. It is recommended that you run this job daily.</description>
+      <description>This job creates backups of your system. It is recommended that you run this job daily.</description>
     </cron_job>
   </cron_jobs>
 </system>
