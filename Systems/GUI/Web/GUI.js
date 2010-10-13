@@ -230,6 +230,13 @@ var GUI = new function()
         }, null, format);
     };
 
+    this.getRequestURL = function(system, action, params, format) {
+        var url = sfapi.createURL(system, action, format);
+        url     = dfx.addToQueryString(url, params);
+        url     = sfapi.attachTokenToURL(url);
+        return url;
+    };
+
     /**
      * Loads content in to the specified element or elementid.
      *
