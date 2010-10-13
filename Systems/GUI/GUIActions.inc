@@ -744,7 +744,7 @@ class GUIActions
                 self::$_templateInitCode .= $tplCacheCode;
             }
         } else {
-             self::$_templateInitCode .= $settingsCode;
+             $php .= $settingsCode;
         }
 
         // Include widget system.
