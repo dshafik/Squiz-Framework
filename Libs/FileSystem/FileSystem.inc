@@ -219,23 +219,16 @@ class FileSystem
     ) {
         // Set the content type header.
         $headers['Content-type'] = $mimeType;
-        $xSendFile               = FALSE;
+        $headers['X-Sendfile']           = $filePath;
+        $headers['x-lighttpd-send-file'] = $filePath;
 
-        Channels::includeSystem('SystemConfig');
-        $configs = SystemConfig::getConfig('FileAssets');
-        if ($configs['x-send-file'] === TRUE) {
-            $xSendFile                       = TRUE;
-            $headers['X-Sendfile']           = $filePath;
-            $headers['x-lighttpd-send-file'] = $filePath;
-        }
-
-        Channels::includeSystem('Editing');
-        if (Editing::isEditing() === FALSE) {
-            if (Channels::systemExists('Cache') === TRUE) {
-                $modTs = filemtime($filePath);
-                Channels::includeSystem('Cache');
-                Cache::sendCacheableHeaders($modTs);
-            }
+        if (Channels::systemExists('Editing') === TRUE
+            && Channels::systemExists('Cache') === TRUE
+        ) {
+            Channels::includeSystem('Editing');
+            Channels::includeSystem('Cache');
+            $modTs = filemtime($filePath);
+            Cache::sendCacheableHeaders($modTs);
         }
 
         if (headers_sent() === FALSE) {
@@ -244,13 +237,7 @@ class FileSystem
             }
         }
 
-        if ($xSendFile === TRUE) {
-            exit;
-        }
-
-        $contents = file_get_contents($filePath);
-        echo $contents;
-        return $contents;
+        exit;
 
     }//end serveFile()
 
