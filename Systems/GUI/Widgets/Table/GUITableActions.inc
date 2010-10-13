@@ -96,6 +96,13 @@ class GUITableActions
     protected static $allowDelete = FALSE;
 
     /**
+     * If TRUE then the rows will be numbered at the start of each row.
+     *
+     * @var boolean
+     */
+    protected static $rowNumbering = FALSE;
+
+    /**
      * Alternate row or column colours.
      *
      * Valid values are: rows, cols.
@@ -143,6 +150,19 @@ class GUITableActions
                                    'align' => 'right',
                                    'width' => '1px',
                                   );
+
+            // Update the settings array.
+            $settings['columns'] = $columns;
+        }
+
+        if (Util::getArrayIndex($settings, 'rowNumbering', self::$rowNumbering) === TRUE) {
+            $columns            = array_reverse($columns, TRUE);
+            $columns['_number'] = array(
+                                   'name'  => '',
+                                   'align' => 'left',
+                                   'width' => '10px',
+                                  );
+            $columns            = array_reverse($columns, TRUE);
 
             // Update the settings array.
             $settings['columns'] = $columns;
@@ -204,13 +224,15 @@ class GUITableActions
     /**
      * Paint the rows of the table.
      *
-     * @param array $rows     An array of arrays that contain row data.
-     * @param array $columns  An array of column names and information.
-     * @param array $settings Settings for the widget.
+     * @param array   $rows         An array of arrays that contain row data.
+     * @param array   $columns      An array of column names and information.
+     * @param array   $settings     Settings for the widget.
+     * @param boolean $actualRowids If TRUE, then the rowids passed are correct.
+     *                              (as opposed to just being an array starting at 0).
      *
      * @return void
      */
-    public static function paintRows(array $rows, array $columns, array $settings)
+    public static function paintRows(array $rows, array $columns, array $settings, $actualRowids=FALSE)
     {
         $id         = $settings['widget']['id'];
         $class      = 'GUITable';
@@ -242,6 +264,18 @@ class GUITableActions
             if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
                 if (isset($row['_remove']) === FALSE) {
                     $row['_remove'] = '&nbsp;<div class="GUI-delete"><span class="GUI-deleteIcon"/></div>';
+                }
+            }
+
+            if (Util::getArrayIndex($settings, 'rowNumbering', self::$rowNumbering) === TRUE) {
+                if (isset($row['_number']) === FALSE) {
+                    if ($actualRowids === TRUE) {
+                        $rowNumber = $rowid;
+                    } else {
+                        $rowNumber = $idx;
+                    }
+
+                    $row['_number'] = '<div class="GUI-rowNumber" style="vertical-align:middle">'.$rowNumber.'.</div>';
                 }
             }
 
@@ -337,7 +371,7 @@ class GUITableActions
             $rows[$rowid] = API::executeRequest($channel['system'], $channel['action'], array($rowsData[$rowid]), $api['options']);
         }
 
-        GUITable::paintRows($rows, $columnNames, $settings);
+        GUITable::paintRows($rows, $columnNames, $settings, TRUE);
 
     }//end generateRows()
 
