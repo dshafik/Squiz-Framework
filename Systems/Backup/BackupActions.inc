@@ -117,20 +117,60 @@ class BackupActions
      */
     public static function getBackupList()
     {
-        $backups = Backup::getBackups();
+        Channels::includeSystem('GUI');
+        $btnSettings = array(
+                        'value'  => 'Download',
+                        'click'  => array(
+                                     'function' => 'BackupBackupScreen.download',
+                                     'arguments' => array(),
+                                    ),
+                       );
 
-        $list = array();
+        $list    = array();
+        $backups = Backup::getBackups();
         foreach ($backups as $day => $backup) {
+            $btnSettings['click']['arguments'] = array($backup['name']);
+            $download = GUI::createWidget($day.'-download', 'GUIButton', $btnSettings);
+
             $list[$day] = array(
                            'date'    => $backup['date'],
                            'size'    => $backup['size'],
-                           'actions' => '[download] [restore]',
+                           'actions' => $download,
                           );
         }
 
         return $list;
 
     }//end getBackupList()
+
+
+    /**
+     * Downloads a backup.
+     *
+     * Note that the file is served directly and the script
+     * will exit when the file is sent.
+     *
+     * @param string $name The name of the backup file. Do not
+     *                     include the extension.
+     *
+     * @return void
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function downloadBackup($name)
+    {
+        $dataDir = BaseSystem::getDataDir('Backup');
+        $file    = $dataDir.'/'.$name.'.tar.gz';
+        if (file_exists($file) === FALSE) {
+            throw new ChannelException(_('The requested backup file does not exist'));
+        }
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        header('Content-Disposition: attachment; filename='.$name.'.tar.gz;');
+        FileSystem::serveFile($file, 'application/x-tar-gz');
+
+    }//end downloadBackup()
 
 
     /**

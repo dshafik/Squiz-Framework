@@ -16,23 +16,20 @@
                     <date>
                         <name><text>Date and Time</text></name>
                         <align>left</align>
-                        <width>250px</width>
                     </date>
                     <size>
                         <name><text>Size</text></name>
                         <align>center</align>
-                        <width>250px</width>
                     </size>
                     <actions>
                         <name></name>
                         <align>left</align>
-                        <width>250px</width>
                     </actions>
                 </setting>
                 <setting name="rows">
                     <dataProvider action="Backup::getBackupList" />
                 </setting>
-                <setting name="alternate">cols</setting>
+                <setting name="alternate">rows</setting>
             </widget>
         </setting>
     </widget>
