@@ -84,21 +84,10 @@ sfapi.get = function(system, action, params, callback, format)
     head.appendChild(scriptTag);
 
     // Form URL to send the request.
-    var src = sfapi.createURL(system, action, format);
+    var src = sfapi.createURL(system, action, format, params);
     src    += '?_callback=sfapi._getCallback';
 
-    var token = document.getElementById('__api_token');
-    if (token) {
-        src += '&_api_token=' + token.value;
-    }
-
-    if (params) {
-        for (var id in params) {
-            if (params.hasOwnProperty(id) === true) {
-                src += '&' + id + '=' + escape(params[id])
-            }
-        }
-    }
+    src = sfapi.attachTokenToURL(src);
 
     sfapi._getCallback = function(data) {
         if (data.error) {
@@ -142,12 +131,27 @@ sfapi.post = function(system, action, params, successCallback, errorCallback, fo
 
 };
 
-sfapi.createURL = function(system, action, format)
+sfapi.createURL = function(system, action, format, params)
 {
     format = format || 'json';
 
     var url = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix;
     url    += '/' + format + '/' + system + '/' + action;
+
+    return url;
+
+};
+
+sfapi.attachTokenToURL = function(url)
+{
+    var token = document.getElementById('__api_token');
+    if (token) {
+        var tokenParam = {
+            _api_token: token.value
+        };
+
+        url = dfx.addToQueryString(url, tokenParam);
+    }
 
     return url;
 
