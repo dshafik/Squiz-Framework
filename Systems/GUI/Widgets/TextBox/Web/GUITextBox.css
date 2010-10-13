@@ -19,3 +19,7 @@
 .GUITextBox.selected {
     border: 1px solid #6FA8D7;
 }
+
+input.GUITextBox.usingHint {
+    color: #AAA;
+}

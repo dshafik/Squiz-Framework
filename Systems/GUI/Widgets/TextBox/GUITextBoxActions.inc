@@ -91,6 +91,24 @@ class GUITextBoxActions
      */
     protected static $focus = FALSE;
 
+    /**
+     * If specified then this value will be shown if no value is set.
+     *
+     * If the textbox is left empty then this will be set as the value of the field.
+     *
+     * @var string
+     */
+    protected static $defaultValue = '';
+
+    /**
+     * Text shown as a message in the field.
+     *
+     * Not available for 'password' type.
+     *
+     * @var string
+     */
+    protected static $hint = '';
+
 
     /**
      * Prints this widgets content.
@@ -116,8 +134,25 @@ class GUITextBoxActions
         $value = Util::getArrayIndex(
             $settings,
             'value',
-            ''
+            self::$value
         );
+
+        $hint      = Util::getArrayIndex($settings, 'hint', self::$hint);
+        $usingHint = FALSE;
+        $value     = trim($value);
+
+        if (empty($value) === TRUE) {
+            $value = Util::getArrayIndex(
+                $settings,
+                'defaultValue',
+                self::$defaultValue
+            );
+
+            if (empty($value) === TRUE && empty($hint) === FALSE) {
+                $value     = $hint;
+                $usingHint = TRUE;
+            }
+        }
 
         $size          = Util::getArrayIndex($settings, 'size', self::$size);
         $maxLengthProp = Util::getArrayIndex($settings, 'maxlength', 0);
@@ -137,6 +172,10 @@ class GUITextBoxActions
 
         $type = Util::getArrayIndex($settings, 'type', self::$type);
 
+        if ($usingHint === TRUE) {
+            $class .= ' usingHint';
+        }
+
         // The input field.
         echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength;
 
@@ -146,7 +185,6 @@ class GUITextBoxActions
         }
 
         echo ' />';
-
         echo '</div>';
 
         // If focus set to true then add JS code.

@@ -32,7 +32,7 @@ function GUITextBox(id, settings)
 {
     this.id           = id;
     this.settings     = settings;
-    var widgetElement = dfx.getId(self.id);
+    var widgetElement = dfx.getId(this.id);
     this.textBox      = dfx.getClass('input', widgetElement)[0];
 
     this.init();
@@ -51,10 +51,15 @@ GUITextBox.prototype = {
         var textBox       = dfx.getClass('input', widgetElement)[0];
 
         dfx.addEvent(textBox, 'blur', function() {
+            if (self.useDefaultValue() !== true) {
+                self.useHint();
+            }
+
             dfx.removeClass(textBox, 'selected');
         });
 
         dfx.addEvent(textBox, 'focus', function() {
+            self.removeHint();
             dfx.addClass(textBox, 'selected');
             self.fireFocusCallbacks();
         });
@@ -86,7 +91,13 @@ GUITextBox.prototype = {
     {
         var widgetElement = dfx.getId(this.id);
         var textBox       = dfx.getClass('input', widgetElement)[0];
-        return textBox.value;
+
+        var value = textBox.value;
+        if (value === this.settings.hint) {
+            value = '';
+        }
+
+        return value;
 
     },
 
@@ -118,6 +129,35 @@ GUITextBox.prototype = {
     {
         this.setValue(this.settings.value);
         GUI.setModified(this, false);
+
+    },
+
+    removeHint: function()
+    {
+         if (dfx.hasClass(this.textBox, 'usingHint') === true && this.textBox.value === this.settings.hint) {
+            this.textBox.value = '';
+            dfx.removeClass(this.textBox, 'usingHint');
+         }
+
+    },
+
+    useHint: function()
+    {
+        if (this.textBox.value.length === 0 && !this.settings.defaultValue && this.settings.hint) {
+            dfx.addClass(this.textBox, 'usingHint');
+            this.textBox.value = this.settings.hint;
+        }
+
+    },
+
+    useDefaultValue: function()
+    {
+        if (this.textBox.value.length === 0 && this.settings.defaultValue) {
+            this.textBox.value = this.settings.defaultValue;
+            return true;
+        }
+
+        return false;
 
     }
 
