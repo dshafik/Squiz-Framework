@@ -5,5 +5,8 @@
     <cron_job script="BackupCron.inc" name="Backup" interval="daily">
       <description>This job creates backups of your system. It is recommended that you run this job daily.</description>
     </cron_job>
+    <cron_job script="RestoreCron.inc" name="Restore" interval="frequent">
+      <description>This job allows you to restore a backup of your system. It is recommended that you run this job frequently.</description>
+    </cron_job>
   </cron_jobs>
 </system>

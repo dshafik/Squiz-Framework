@@ -33,4 +33,12 @@ var BackupBackupScreen = new function()
         window.location.href = url;
     };
 
+    this.restore = function(name) {
+        var params = {
+            name: name
+        };
+
+        var url = GUI.sendRequest('Backup', 'queueRestoreBackup', params);
+    };
+
 };

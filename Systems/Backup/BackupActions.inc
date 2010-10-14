@@ -68,6 +68,111 @@ class BackupActions
 
 
     /**
+     * Restores a backup file.
+     *
+     * Note that the system will be blown away during this process
+     * and you're going to need access to delete the root dir of the
+     * system as well.
+     *
+     * @param string $name The name of the backup file to restore.
+     *
+     * @return void
+     *
+     */
+    public static function restoreBackup($name)
+    {
+        // Make sure we have a restore script.
+        $script = dirname(__FILE__).'/Scripts/restore.sh';
+        if (file_exists($script) === FALSE) {
+            return;
+        }
+
+        $dataDir = BaseSystem::getDataDir('Backup');
+        $file    = $dataDir.'/'.$name.'.tar.gz';
+        if (file_exists($file) === FALSE) {
+            exit();
+        }
+
+        exec($script.' '.$file.' '.Init::ROOT_DIR);
+
+    }//end restoreBackup()
+
+
+    /**
+     * Queues up the restoration of a backup.
+     *
+     * The restore process is handled via a cron to allow the process
+     * to run as root, so this method just creates a todo file in the
+     * backup dir so the cron knows what to do.
+     *
+     * @param string $name The name of the backup file to restore.
+     *
+     * @return boolean
+     *
+     * @api            write
+     * @api-permission superuser
+     */
+    public static function queueRestoreBackup($name)
+    {
+        $dataDir = BaseSystem::getDataDir('Backup');
+        $file    = $dataDir.'/'.$name.'.tar.gz';
+        if (file_exists($file) === FALSE) {
+            return FALSE;
+        }
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        FileSystem::filePutContents($dataDir.'/backup.todo', $name);
+
+        return TRUE;
+
+    }//end queueRestoreBackup()
+
+
+    /**
+     * Gets the name of the backup queued for restoration.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function getQueuedRestoreBackup()
+    {
+        $dataDir = BaseSystem::getDataDir('Backup');
+        $file    = $dataDir.'/backup.todo';
+        if (file_exists($file) === FALSE) {
+            return '';
+        }
+
+        $name = file_get_contents($file);
+        return $name;
+
+    }//end getQueuedRestoreBackup()
+
+
+    /**
+     * Removes a backup queued for restoration.
+     *
+     * @return boolean
+     *
+     * @api            write
+     * @api-permission superuser
+     */
+    public static function removeQueuedRestoreBackup()
+    {
+        $dataDir = BaseSystem::getDataDir('Backup');
+        $file    = $dataDir.'/backup.todo';
+        if (file_exists($file) === FALSE) {
+            return TRUE;
+        }
+
+        $removed = unlink($file);
+        return $removed;
+
+    }//end removeQueuedRestoreBackup()
+
+
+    /**
      * Returns information about backups that have been created.
      *
      * @return array
@@ -118,24 +223,33 @@ class BackupActions
     public static function getBackupList()
     {
         Channels::includeSystem('GUI');
-        $btnSettings = array(
-                        'value'  => 'Download',
-                        'click'  => array(
-                                     'function' => 'BackupBackupScreen.download',
-                                     'arguments' => array(),
-                                    ),
-                       );
+        $dbtnSettings = array(
+                         'value'  => 'Download',
+                         'click'  => array(
+                                      'function' => 'BackupBackupScreen.download',
+                                      'arguments' => array(),
+                                     ),
+                        );
+        $rbtnSettings = array(
+                         'value'  => 'Restore',
+                         'click'  => array(
+                                      'function' => 'BackupBackupScreen.restore',
+                                      'arguments' => array(),
+                                     ),
+                        );
 
         $list    = array();
         $backups = Backup::getBackups();
         foreach ($backups as $day => $backup) {
-            $btnSettings['click']['arguments'] = array($backup['name']);
-            $download = GUI::createWidget($day.'-download', 'GUIButton', $btnSettings);
+            $dbtnSettings['click']['arguments'] = array($backup['name']);
+            $rbtnSettings['click']['arguments'] = array($backup['name']);
+            $download = GUI::createWidget($day.'-download', 'GUIButton', $dbtnSettings);
+            $restore  = GUI::createWidget($day.'-restore', 'GUIButton', $rbtnSettings);
 
             $list[$day] = array(
                            'date'    => $backup['date'],
                            'size'    => $backup['size'],
-                           'actions' => $download,
+                           'actions' => $download.' '.$restore,
                           );
         }
 

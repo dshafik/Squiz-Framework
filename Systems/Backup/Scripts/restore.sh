@@ -226,7 +226,7 @@ if [ "${existing_folder}" -eq 1 ]; then
     if [ -d "${RESTORE_FOLDER}.old/data/Backup" ]; then
         print_verbose "Found old backups, copying to the new folder .. "
         mkdir -p "${RESTORE_FOLDER}/data/Backup"
-        cp -fr ${RESTORE_FOLDER}.old/data/Backup/* ${RESTORE_FOLDER}/data/Backup/
+        cp -fr ${RESTORE_FOLDER}.old/data/Backup/*.tar.gz ${RESTORE_FOLDER}/data/Backup/
         print_verbose "Done"
     fi
 
@@ -308,6 +308,7 @@ PGCONNECT_TIMEOUT=10
 export PGCONNECT_TIMEOUT
 
 print_verbose "Re-creating database .. "
+/etc/init.d/postgresql-8.3 restart
 dropdb -U postgres ${DB_DBNAME}
 createdb -U postgres -O ${DB_USERNAME} -E SQL_ASCII ${DB_DBNAME}
 
@@ -334,4 +335,8 @@ rm -f ${data_file}
 print_verbose "Finished cleaning up."
 
 print_verbose "System restored."
+
+print_verbose "Restarting web server .."
+/etc/init.d/lighttpd restart
+print_verbose "Done"
 

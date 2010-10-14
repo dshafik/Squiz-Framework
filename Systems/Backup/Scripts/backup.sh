@@ -468,8 +468,8 @@ for file in `find "${sysroot_base}" -name cache -o -name data -prune -o -type f 
 	echo "${sysroot_dir}/${file}" >> "${exclude_file}"
 done
 
-# the my4 cron job puts things in the sysroot_base/data/Backup folder, so exclude everything in there.
-echo "${sysroot_base}/data/Backup/*" >> ${exclude_file}
+# the backup cron job puts things in the sysroot_base/data/Backup folder, so exclude everything in there.
+echo "${sysroot_base}/data/Backup/*.tar.gz" >> ${exclude_file}
 
 echo "${sysroot_base}/cache/*" >> ${exclude_file}
 echo "${SYSTEM_ROOT}/cache/*" >> ${exclude_file}
