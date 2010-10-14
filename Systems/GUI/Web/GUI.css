@@ -11,12 +11,12 @@
 }
 
 .GUI-screen-left {
-    width: 250px;
+    width: 280px;
     float: left;
 }
 
 .GUI-screen-right {
-    margin-left: 270px;
+    margin-left: 290px;
     margin-top: 10px;
 }
 
