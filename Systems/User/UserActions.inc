@@ -1122,11 +1122,16 @@ class UserActions
 
         include_once 'Libs/String/String.inc';
         $lastLogin  = $user['last_login'];
-        $timestamp  = strtotime($lastLogin);
-        $lastLogin  = String::easyDatetime($timestamp);
-        $lastLogin .= sprintf(' (%s ago)', String::readableSeconds(time() - $timestamp));
-        if ((time() - $timestamp) > (3600 * 24 * 30)) {
-            $lastLogin = '<span style="color:red;">'.$lastLogin.'</span>';
+        if ($lastLogin === FALSE) {
+            $lastLogin = _('Never logged in');
+        } else {
+            $timestamp  = strtotime($lastLogin);
+            $lastLogin  = String::easyDatetime($timestamp);
+            $lastLogin .= sprintf(' (%s ago)', String::readableSeconds(time() - $timestamp));
+            if ((time() - $timestamp) > (3600 * 24 * 30)) {
+                // Last login is more than 30 days ago.
+                $lastLogin = '<span style="color:red;">'.$lastLogin.'</span>';
+            }
         }
 
         $columns['lastLogin'] = $lastLogin;
