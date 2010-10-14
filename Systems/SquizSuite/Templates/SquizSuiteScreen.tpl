@@ -13,21 +13,23 @@
                     <currTypeIcon>
                         <name><text>Type</text></name>
                         <align>left</align>
+                        <width>47px</width>
                     </currTypeIcon>
                     <currName>
                         <name><text>Name</text></name>
                         <align>left</align>
+                        <width>378px</width>
                     </currName>
                     <currStatusIcon>
                         <name><text>Status</text></name>
                         <align>left</align>
+                        <width>67px</width>
                     </currStatusIcon>
                     <currSummary>
                         <name>Summary</name>
                         <align>left</align>
                     </currSummary>
                 </setting>
-                <setting name="hideHeader">true</setting>
                 <setting name="rows">
                     <dataProvider action="SquizSuite::getCurrentProductRow" />
                 </setting>
@@ -52,14 +54,17 @@
                     <currTypeIcon>
                         <name><text>Type</text></name>
                         <align>left</align>
+                        <width>47px</width>
                     </currTypeIcon>
                     <currName>
                         <name><text>Name</text></name>
                         <align>left</align>
+                        <width>378px</width>
                     </currName>
                     <currStatusIcon>
                         <name><text>Status</text></name>
                         <align>left</align>
+                        <width>67px</width>
                     </currStatusIcon>
                     <currSummary>
                         <name>Summary</name>
