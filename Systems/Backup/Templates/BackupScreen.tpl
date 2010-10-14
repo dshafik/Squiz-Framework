@@ -16,14 +16,16 @@
                     <date>
                         <name><text>Date and Time</text></name>
                         <align>left</align>
+                        <width>225px</width>
                     </date>
                     <size>
                         <name><text>Size</text></name>
                         <align>center</align>
+                        <width>80px</width>
                     </size>
                     <actions>
                         <name></name>
-                        <align>left</align>
+                        <align>right</align>
                     </actions>
                 </setting>
                 <setting name="rows">
