@@ -38,7 +38,13 @@ var BackupBackupScreen = new function()
             name: name
         };
 
-        var url = GUI.sendRequest('Backup', 'queueRestoreBackup', params);
+        var url = GUI.sendRequest('Backup', 'queueRestoreBackup', params, function(response) {
+            if (response && response.result) {
+                GUI.queueOverlay({
+                    icon: 'loading'
+                });
+            }
+        });
     };
 
 };
