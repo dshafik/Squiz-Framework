@@ -1,6 +1,6 @@
 #SquizSuiteScreen {
-    margin-left: 70px;
-    width: 965px;
+    width: 1000px;
+    margin: 0 auto;
 }
 
 #squizSuite-currentProduct-box .GUITable-colWrapper {
