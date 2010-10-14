@@ -176,7 +176,9 @@ class GUIScreenSettingsActions
      * Print a single item.
      *
      * @param string  $itemid      Id of the list item.
-     * @param string  $itemContent Content of the item.
+     * @param mixed   $itemContent Content of the item.
+     *                             This could be an array with ('warning' => msg) to
+     *                             display a warning item with specified content.
      * @param array   $settings    List of widget settings.
      * @param integer $index       The index of the item.
      *
@@ -185,21 +187,49 @@ class GUIScreenSettingsActions
      */
     public static function printItem($itemid, $itemContent, array $settings, $index)
     {
-        $class = $settings['widget']['type'];
+        $class   = $settings['widget']['type'];
+        $warning = FALSE;
+
+        if (is_array($itemContent) === TRUE) {
+            if (isset($itemContent['warning']) === TRUE) {
+                $warning     = TRUE;
+                $itemContent = $itemContent['warning'];
+            }
+
+            if (empty($itemContent) === TRUE) {
+                return;
+            }
+        }
+
         echo '<div itemid="'.$itemid.'"  class="'.$class.'-item';
 
-        if ($index === 0
-            && Util::getArrayIndex($settings, 'selectable', FALSE) === TRUE
-        ) {
-            echo ' selected';
+        if ($warning === TRUE) {
+            echo ' warning';
+        } else {
+            if ($index === 0
+                && Util::getArrayIndex($settings, 'selectable', FALSE) === TRUE
+            ) {
+                echo ' selected';
+            }
         }
 
         echo '">';
 
-        echo $itemContent;
+        if ($warning === TRUE) {
+            echo '<span class="'.$class.'-warning-icon"></span>';
+            echo '<span class="'.$class.'-warning-msg">'.$itemContent.'</span>';
+        } else {
+            echo $itemContent;
 
-        if (Util::getArrayIndex($settings, 'removable', self::$removable) === TRUE) {
-            echo '<div class="GUI-delete"><span class="GUI-deleteIcon" /></div>';
+            $allowRemove = Util::getArrayIndex(
+                $settings,
+                'removable',
+                self::$removable
+            );
+
+            if ($allowRemove === TRUE) {
+                echo '<div class="GUI-delete"><span class="GUI-deleteIcon" /></div>';
+            }
         }
 
         echo '</div>';
