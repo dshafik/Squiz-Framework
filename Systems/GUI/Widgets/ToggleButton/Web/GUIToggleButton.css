@@ -9,7 +9,7 @@
 }
 
 .GUIToggleButton.left {
-    background: url('toggle-slider-left.png') no-repeat scroll 0 0 transparent;
+    background: url(toggle-slider-left.png) no-repeat scroll 0 0 transparent;
     float: left;
     height: 31px;
     margin-top: 4px;
@@ -17,7 +17,7 @@
 }
 
 .GUIToggleButton.middle {
-    background: url('toggle-slider-mid.png') repeat-x scroll 0 0 transparent;
+    background: url(toggle-slider-mid.png) repeat-x scroll 0 0 transparent;
     float: left;
     height: 31px;
     margin-top: 4px;
@@ -26,7 +26,7 @@
 }
 
 .GUIToggleButton.right {
-    background: url('toggle-slider-right.png') no-repeat scroll 0 0 transparent;
+    background: url(toggle-slider-right.png) no-repeat scroll 0 0 transparent;
     float: left;
     height: 31px;
     margin-top: 4px;
@@ -55,7 +55,7 @@
 }
 
 .GUIToggleButton.toggle {
-    background: url('toggle-slider-glow.png') no-repeat scroll 0 0 transparent;
+    background: url(toggle-slider-glow.png) no-repeat scroll 0 0 transparent;
     height: 31px;
     position: absolute;
     width: 40px;

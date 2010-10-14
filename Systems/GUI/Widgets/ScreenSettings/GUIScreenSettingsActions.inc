@@ -112,6 +112,8 @@ class GUIScreenSettingsActions
 
         // End mid section.
         echo '</div>';
+
+        echo '<div class="'.$class.'-contentFooter"><span/></div>';
         echo '</div>';
 
         // Add item template to settings array.

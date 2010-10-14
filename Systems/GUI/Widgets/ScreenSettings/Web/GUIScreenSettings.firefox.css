@@ -1,0 +1,5 @@
+.GUIScreenSettings-contentFooter span {
+    -moz-border-radius-bottomleft: 9px;
+    -moz-border-radius-bottomright: 9px;
+    background-image: -moz-linear-gradient(0% 0 -90deg, #FFFFFF, #EEEEEE);
+}

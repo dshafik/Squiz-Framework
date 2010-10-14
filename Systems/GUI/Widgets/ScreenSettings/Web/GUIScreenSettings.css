@@ -39,3 +39,14 @@
     background-image: -moz-linear-gradient(0% 0% -90deg, #8EB6F7, #5386CA);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#8EB6F7, endColorstr=#5386CA);
 }
+
+.GUIScreenSettings-contentFooter {
+    height: 5px;
+}
+
+.GUIScreenSettings-contentFooter span {
+    background-color: #EDEDED;
+    display: block;
+    height: 5px;
+    margin: 0 1px;
+}
