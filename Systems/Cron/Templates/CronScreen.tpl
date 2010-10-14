@@ -157,6 +157,7 @@
                     <setting name="columns">
                         <job>
                             <align>left</align>
+                            <width>600px</width>
                             <name><text>Jobs</text></name>
                         </job>
                         <lastRun>

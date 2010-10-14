@@ -2,10 +2,6 @@
     margin: 0 50px;
 }
 
-#CronScreen .th-job {
-    width: 44%;
-}
-
 #CronScreen .col-job em {
     font-size: 11px;
 }
