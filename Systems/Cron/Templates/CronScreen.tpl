@@ -24,6 +24,13 @@
                     <label><text>Frequent</text></label>
                     <items>
                         <value>
+                            <warning>
+                                <dataProvider action="Cron::getCronSkipWarning">
+                                    <arg>frequent</arg>
+                                </dataProvider>
+                            </warning>
+                        </value>
+                        <value>
                             <content>
                                 <text>
                                     <value>Runs every %s minute(s)</value>
@@ -44,24 +51,22 @@
                             </content>
                         </value>
                         <value>
-                            <content>
-                                 <text>
-                                    <value>Last run on %s</value>
-                                    <args>
-                                        <arg>
-                                            <dataProvider action="Cron::getLastRunTime">
-                                                <arg>frequent</arg>
-                                            </dataProvider>
-                                        </arg>
-                                    </args>
-                                </text>
-                            </content>
+                            <dataProvider action="Cron::getLastRunTime">
+                                <arg>frequent</arg>
+                            </dataProvider>
                         </value>
                     </items>
                 </frequent>
                 <hourly>
                     <label><text>Hourly</text></label>
                     <items>
+                        <value>
+                            <warning>
+                                <dataProvider action="Cron::getCronSkipWarning">
+                                    <arg>hourly</arg>
+                                </dataProvider>
+                            </warning>
+                        </value>
                         <value>
                             <content>
                                 <text>
@@ -83,24 +88,22 @@
                             </content>
                         </value>
                         <value>
-                            <content>
-                                 <text>
-                                    <value>Last run on %s</value>
-                                    <args>
-                                        <arg>
-                                            <dataProvider action="Cron::getLastRunTime">
-                                                <arg>hourly</arg>
-                                            </dataProvider>
-                                        </arg>
-                                    </args>
-                                </text>
-                            </content>
+                            <dataProvider action="Cron::getLastRunTime">
+                                <arg>hourly</arg>
+                            </dataProvider>
                         </value>
                     </items>
                 </hourly>
                 <daily>
                     <label><text>Daily</text></label>
                     <items>
+                        <value>
+                            <warning>
+                                <dataProvider action="Cron::getCronSkipWarning">
+                                    <arg>daily</arg>
+                                </dataProvider>
+                            </warning>
+                        </value>
                         <value>
                             <content>
                                 <text>
@@ -133,18 +136,9 @@
                             </content>
                         </value>
                         <value>
-                            <content>
-                                 <text>
-                                    <value>Last run on %s</value>
-                                    <args>
-                                        <arg>
-                                            <dataProvider action="Cron::getLastRunTime">
-                                                <arg>daily</arg>
-                                            </dataProvider>
-                                        </arg>
-                                    </args>
-                                </text>
-                            </content>
+                            <dataProvider action="Cron::getLastRunTime">
+                                <arg>daily</arg>
+                            </dataProvider>
                         </value>
                     </items>
                 </daily>

@@ -1,6 +1,5 @@
 #CronScreen {
-    width: 1160px;
-    margin: 0 auto;
+    margin: 0 50px;
 }
 
 #CronScreen .th-job {
@@ -11,3 +10,10 @@
     font-size: 11px;
 }
 
+#CronScreen #cronJobsList .GUITable-firstCol {
+    border-left: none;
+}
+
+#CronScreen #cronJobsList .GUITable-lastCol {
+    border-right: none;
+}

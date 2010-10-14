@@ -991,8 +991,16 @@ class CronActions
      */
     public static function getLastRunTime($cronType)
     {
+        // Check if its running.
+        $typeData = DAL::getAssoc(Cron::getCronType($cronType));
+
+        if ($typeData['running'] === TRUE) {
+            return _('Cron is running now');
+        }
+
         include_once 'Libs/String/String.inc';
-        $runTime = String::easyDatetime(time());
+        $runTime = String::easyDatetime(strtotime($typeData['started']));
+        $runTime = sprintf(_('Last run on %s'), $runTime);
 
         return $runTime;
 
@@ -1107,6 +1115,29 @@ class CronActions
         return TRUE;
 
     }//end _updateFrequencyInterval()
+
+
+    /**
+     * Returns a warning message if the cron type was skipped.
+     *
+     * Returns blank string if no errors.
+     *
+     * @param string $cronType Type of the cron.
+     *
+     * @return string
+     */
+    public static function getCronSkipWarning($cronType)
+    {
+        $typeData = DAL::getAssoc(Cron::getCronType($cronType));
+        $msg      = '';
+        if ((int) $typeData['run_check'] > 0) {
+            $msg = _('This script has been skipped %s time. There may be an error with one of the jobs or the scripts frequency setting.');
+            $msg = sprintf($msg, $typeData['run_check']);
+        }
+
+        return $msg;
+
+    }//end getCronSkipWarning()
 
 
 }//end class
