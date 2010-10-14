@@ -146,84 +146,68 @@
     </div>
     <!-- New/Installed Updates table -->
     <div class="PatchingScreenMainContent GUI-screen-right">
-        <widget type="GUI/Box" id="updatesBox">
-            <setting name="headerContent">
-                <content>
-                    <div style="float:left;">
-                        <widget type="GUI/ContentSwitcher" id="updatesBox-switcher">
-                            <setting name="items">
-                                <value>
-                                    <id>newUpdates</id>
-                                    <label><text>New Updates</text></label>
-                                    <itemContent>
-                                        <!--text>No updates are available</text-->
-                                        <widget type="GUI/Table" id="newUpdates-table">
-                                            <setting name="alternate">false</setting>
-                                            <setting name="allowDelete">false</setting>
-                                            <setting name="hideHeader">false</setting>
-                                            <setting name="columns">
-                                                <patchId>
-                                                    <name><text>Patch ID</text></name>
-                                                    <align>left</align>
-                                                </patchId>
-                                                <summary>
-                                                    <name><text>Summary</text></name>
-                                                    <align>left</align>
-                                                </summary>
-                                                <scheduledT>
-                                                    <name><text>Scheduled Date/Time</text></name>
-                                                    <align>left</align>
-                                                </scheduledT>
-                                            </setting>
-                                            <setting name="rows">
-                                                <dataProvider action="Patching::getNewUpdateRows" />
-                                            </setting>
-                                        </widget>
-                                    </itemContent>
-                                </value>
-                                <value>
-                                    <id>installedUpdates</id>
-                                    <label><text>Installed Updates</text></label>
-                                    <itemContent>
-                                        <!--text>No updates have been installed</text-->
-                                        <widget type="GUI/Table" id="installedUpdates-table">
-                                            <setting name="alternate">false</setting>
-                                            <setting name="allowDelete">false</setting>
-                                            <setting name="hideHeader">false</setting>
-                                            <setting name="columns">
-                                                <patchId>
-                                                    <name><text>Patch ID</text></name>
-                                                    <align>left</align>
-                                                </patchId>
-                                                <summary>
-                                                    <name><text>Summary</text></name>
-                                                    <align>left</align>
-                                                </summary>
-                                                <installedT>
-                                                    <name><text>Installation Date/User</text></name>
-                                                    <align>left</align>
-                                                </installedT>
-                                            </setting>
-                                            <setting name="rows">
-                                                <dataProvider action="Patching::getInstalledUpdateRows" />
-                                            </setting>
-                                        </widget>
-                                    </itemContent>
-                                </value>
+        <widget type="GUI/TabPane" id="updatesBox-switcher">
+            <setting name="tabs">
+                <value>
+                    <id>newUpdates</id>
+                    <label><text>New Updates</text></label>
+                    <itemContent>
+                        <!--text>No updates are available</text-->
+                        <widget type="GUI/Table" id="newUpdates-table">
+                            <setting name="alternate">false</setting>
+                            <setting name="allowDelete">false</setting>
+                            <setting name="hideHeader">false</setting>
+                            <setting name="columns">
+                                <patchId>
+                                    <name><text>Patch ID</text></name>
+                                    <align>left</align>
+                                </patchId>
+                                <summary>
+                                    <name><text>Summary</text></name>
+                                    <align>left</align>
+                                </summary>
+                                <scheduledT>
+                                    <name><text>Scheduled Date/Time</text></name>
+                                    <align>left</align>
+                                </scheduledT>
                             </setting>
-                            <setting name="loadType">static</setting>
+                            <setting name="rows">
+                                <dataProvider action="Patching::getNewUpdateRows" />
+                            </setting>
                         </widget>
-                    </div>
-               </content>
-           </setting>
-           <setting name="content">
-                <content>
-                    <dataProvider action="GUIContentSwitcher::getBodyContent">
-                        <arg><widget-settings id="updatesBox-switcher" /></arg>
-                    </dataProvider>
-                </content>
+                    </itemContent>
+                </value>
+                <value>
+                    <id>installedUpdates</id>
+                    <label><text>Installed Updates</text></label>
+                    <itemContent>
+                        <!--text>No updates have been installed</text-->
+                        <widget type="GUI/Table" id="installedUpdates-table">
+                            <setting name="alternate">false</setting>
+                            <setting name="allowDelete">false</setting>
+                            <setting name="hideHeader">false</setting>
+                            <setting name="columns">
+                                <patchId>
+                                    <name><text>Patch ID</text></name>
+                                    <align>left</align>
+                                </patchId>
+                                <summary>
+                                    <name><text>Summary</text></name>
+                                    <align>left</align>
+                                </summary>
+                                <installedT>
+                                    <name><text>Installation Date/User</text></name>
+                                    <align>left</align>
+                                </installedT>
+                            </setting>
+                            <setting name="rows">
+                                <dataProvider action="Patching::getInstalledUpdateRows" />
+                            </setting>
+                        </widget>
+                    </itemContent>
+                </value>
             </setting>
-       </widget>
+        </widget>
     </div>
     <dataProvider action="Patching::getUpToDateInitCode">
         <arg></arg>
