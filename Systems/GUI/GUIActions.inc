@@ -211,12 +211,10 @@ class GUIActions
     /**
      * Bakes all the templates in the Systems dir.
      *
-     * @param boolean $minified If TRUE then JS and CSS will be minified.
-     *
      * @since  4.0.0
      * @return void
      */
-    public static function bakeTemplates($minified=FALSE)
+    public static function bakeTemplates()
     {
         self::$_isBaking = TRUE;
 
@@ -232,50 +230,17 @@ class GUIActions
         }
 
         // Get All JS and CSS files in the system.
-        $jsFiles  = FileSystem::listDirectory($path, array('.js'));
-        $cssFiles = FileSystem::listDirectory($path, array('.css'));
-
-        $ignoreJSFiles = array('SquizAPI_demo.js');
+        $jsFiles  = self::_getJSFiles();
+        $cssFiles = self::_getCSSFiles();
 
         // Convert them to URLs.
         foreach ($jsFiles as $index => $file) {
-            if (strpos($file, 'DfxJSLib') !== FALSE
-                || in_array(basename($file), $ignoreJSFiles) === TRUE
-            ) {
-                unset($jsFiles[$index]);
-            } else {
-                $url = str_replace($root, '', $file);
-                $jsFiles[$index] = $url;
-            }
+            $url = str_replace($root, '/__web', $file);
+            $jsFiles[$index] = $url;
         }
 
-        $guiPath = GUI::getSystemWebPath('GUI');
-        array_unshift($jsFiles, $guiPath.'/DfxJSLib/mysource.js');
-        $url        = str_replace($root, '', $guiPath.'/DfxJSLib/mysource.js');
-        $jsFiles[0] = '/'.$url;
-
-        $allCSSFiles = array('all' => array());
-        foreach ($cssFiles as $index => $file) {
-            $url = str_replace($root, '', $file);
-
-            foreach (self::$_browserTypes as $bType => $parent) {
-                if (strpos(basename($file), '.'.$bType.'.') !== FALSE) {
-                    if (isset($browserSpecificCSS[$bType]) === FALSE) {
-                        $allCSSFiles[$bType] = array();
-                    }
-
-                    $allCSSFiles[$bType][] = $url;
-                    continue(2);
-                }
-            }
-
-            $allCSSFiles['all'][] = $url;
-        }
-
-        if ($minified === FALSE) {
-            GUI::setJSIncludes($jsFiles);
-            GUI::setCSSIncludes($allCSSFiles);
-        }
+        GUI::setJSIncludes($jsFiles);
+        GUI::setCSSIncludes($cssFiles);
 
         sort($templateDirs);
 
@@ -308,6 +273,76 @@ class GUIActions
         self::$_isBaking = FALSE;
 
     }//end bakeTemplates()
+
+
+    /**
+     * Returns array of JS files in the system.
+     *
+     * @return array
+     */
+    private static function _getJSFiles()
+    {
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        $root        = BaseSystem::getSystemRootPath();
+        $systemsPath = $root.'/Systems';
+        $guiWebPath  = $systemsPath.'/GUI/Web';
+
+        // First get the GUI and DfxJSLib, these need to come first.
+        $guiJSFiles = FileSystem::listDirectory($guiWebPath, array('.js'));
+
+        // Rest of the JS files.
+        $jsFiles = FileSystem::listDirectory($systemsPath, array('.js'));
+
+        $allFiles = array_merge($guiJSFiles, $jsFiles);
+        $allFiles = array_unique($allFiles);
+
+        // Remove the mysource.js not needed in Framework.
+        foreach ($allFiles as $i => $file) {
+            if (basename($file) === 'mysource.js') {
+                unset($allFiles[$i]);
+                break;
+            }
+        }
+
+        return $allFiles;
+
+    }//end _getJSFiles()
+
+
+    /**
+     * Returns array of CSS files in the system.
+     *
+     * @return array
+     */
+    private static function _getCSSFiles()
+    {
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        $root = BaseSystem::getSystemRootPath();
+        $path = $root.'/Systems';
+
+        $cssFiles = FileSystem::listDirectory($path, array('.css'));
+
+        $allCSSFiles = array('all' => array());
+        foreach ($cssFiles as $index => $file) {
+            $url = str_replace($root, '', $file);
+
+            foreach (self::$_browserTypes as $bType => $parent) {
+                if (strpos(basename($file), '.'.$bType.'.') !== FALSE) {
+                    if (isset($browserSpecificCSS[$bType]) === FALSE) {
+                        $allCSSFiles[$bType] = array();
+                    }
+
+                    $allCSSFiles[$bType][] = $url;
+                    continue(2);
+                }
+            }
+
+            $allCSSFiles['all'][] = $url;
+        }
+
+        return $allCSSFiles;
+
+    }//end _getCSSFiles()
 
 
     /**
@@ -362,6 +397,7 @@ class GUIActions
         $phpNode = $tplDoc->createProcessingInstruction('php', $resetCurrTemplateCode);
         $tplDoc->appendChild($phpNode);
 
+        $jsCode  = '';
         $cssCode = '';
 
         // Now add the dependent files to the HEAD tag, if it exists.
@@ -369,9 +405,8 @@ class GUIActions
         if ($head->length !== 0) {
             $head = $head->item(0);
 
-            foreach (self::$_jsIncludes as $jsInclude) {
-                GUI::addJS(NULL, $jsInclude, $head);
-            }
+            // Include JS files.
+            $jsCode .= self::_getJSIncludeCode();
 
             // Include main CSS.
             $cssCode .= self::_getCSSIncludeCode('all');
@@ -402,8 +437,8 @@ class GUIActions
         $htmlCont = XML::xmlToXHTML($xmlContent);
 
         if ($head->length !== 0) {
-            // Put the CSS inclusion including browser specific CSS code.
-            $htmlCont = str_replace('</head>', $cssCode.'</head>', $htmlCont);
+            // Put the JS and CSS inclusion including browser specific CSS code.
+            $htmlCont = str_replace('</head>', $cssCode.$jsCode.'</head>', $htmlCont);
 
             // The <head> element exists, insert API token hidden input field
             // for the interface to work.
@@ -1979,15 +2014,62 @@ class GUIActions
         // Get parent browser's CSS.
         $css .= self::_getCSSIncludeCode(self::$_browserTypes[$browserType]);
 
+        $minifiedFilePath = BaseSystem::getDataDir('GUI').'/Web/squiz.'.$browserType.'.css';
+
+        $css  = '<?php ';
+        $css .= 'if (file_exists(\''.$minifiedFilePath.'\') === TRUE) {'."\n";
+        $css .= '?>';
+        $css .= '<link rel="stylesheet" type="text/css" href="/__web/squiz.'.$browserType.'.css" />';
+        $css .= '<?php '."\n";
+        $css .= "} else {\n ?>";
+
         // Current browser's CSS.
         foreach (self::$_cssIncludes[$browserType] as $cssFile) {
-            $url  = '/__web/'.$cssFile;
-            $css .= '<link rel="stylesheet" type="text/css" href="'.$url.'" />';
+            $url  = '/__web'.$cssFile;
+            $css .= '<link rel="stylesheet" type="text/css" href="'.$url.'" />'."\n";
         }
+
+        $css .= '<?php } ?>'."\n";
 
         return $css;
 
     }//end _getCSSIncludeCode()
+
+
+    /**
+     * Returns the JS Include code.
+     *
+     * @return string
+     */
+    private static function _getJSIncludeCode()
+    {
+        $minifiedFilePath = BaseSystem::getDataDir('GUI').'/Web/squiz.js';
+        $gzipedFilePath   = BaseSystem::getDataDir('GUI').'/Web/squiz.jgz';
+
+        $js  = '<?php ';
+        $js .= '// JS Includes.'."\n";
+        $js .= 'if (file_exists(\''.$gzipedFilePath.'\') === TRUE) {'."\n";
+        $js .= '?>';
+        $js .= '    <script src="/__web/squiz.jgz" type="text/javascript"></script>';
+        $js .= '<?php '."\n";
+        $js .= '} else if (file_exists(\''.$minifiedFilePath.'\') === TRUE) {'."\n";
+        $js .= '?>'."\n";
+        $js .= '    <script src="/__web/squiz.js" type="text/javascript"></script>';
+        $js .= '<?php '."\n";
+        $js .= '} else {'."\n";
+        $js .= '?>';
+
+        foreach (self::$_jsIncludes as $jsFile) {
+            $js .= '<script src="'.$jsFile.'" type="text/javascript"></script>'."\n";
+        }
+
+        $js .= '<?php '."\n";
+        $js .= '}//end Include JS';
+        $js .= ' ?'.'>';
+
+        return $js;
+
+    }//end _getJSIncludeCode()
 
 
     /**
@@ -2257,57 +2339,6 @@ class GUIActions
 
 
     /**
-     * Copies the web files from Systems dir to web dir.
-     *
-     * @since  4.0.0
-     * @return void
-     */
-    public static function copyWebFiles()
-    {
-        include_once 'Libs/FileSystem/FileSystem.inc';
-
-        $paths = array(Init::ROOT_DIR.'/Systems' => 'Systems');
-        foreach ($paths as $systemsPath => $webName) {
-            $webDirds = FileSystem::findDirectories($systemsPath, 'web');
-            $webDir   = Init::WEB_DIR.'/'.$webName;
-
-            // Need to keep the directory structure.
-            $systemsPath = Channels::getSystemsPath();
-            foreach ($webDirds as $dir) {
-                $path = str_replace($systemsPath, '', $dir);
-                $path = dirname(str_replace('/Widgets', '', $path));
-
-                @FileSystem::mkdir($webDir.$path, 0755, TRUE);
-
-                // Copy the contents.
-                FileSystem::copyDirectory($dir, $webDir.$path);
-            }
-        }
-
-    }//end copyWebFiles()
-
-
-    /**
-     * Returns the specified systems lineage/path.
-     *
-     * @param string $systemName Name of the system.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    private static function _getSystemLineage($systemName)
-    {
-        $systemsPath = Channels::getSystemsPath();
-        $path        = Channels::getSystemsPath($systemName);
-        $path        = str_replace($systemsPath, '', $path);
-        $path        = str_replace('/Widgets', '', $path);
-
-        return $path;
-
-    }//end _getSystemLineage()
-
-
-    /**
      * Returns the specified system's web path.
      *
      * @param string $systemName Name of the system.
@@ -2335,6 +2366,141 @@ class GUIActions
         return self::$_docType;
 
     }//end getDocType()
+
+
+    /**
+     * Minifies all JS files.
+     *
+     * If both arguments are FALSE then the JS files will be placed in to one file
+     * without any minification.
+     *
+     * Returns the path to the generated file.
+     *
+     * @param boolean $minify If TRUE then JS content will be minified.
+     * @param boolean $gzip   If TRUE then file will be gzipped.
+     *
+     * @return string
+     */
+    public static function minifyGzipJSFiles($minify=TRUE, $gzip=TRUE)
+    {
+        $root      = BaseSystem::getSystemRootPath();
+        $jsminPath = $root.'/Systems/GUI/Scripts/jsmin-1.1.1.php';
+
+        if (file_exists($jsminPath) === FALSE) {
+            return FALSE;
+        }
+
+        // Get the list of JS files.
+        $jsFiles = self::_getJSFiles();
+
+        $jsContent = '';
+        foreach ($jsFiles as $file) {
+            $jsContent .= file_get_contents($file);
+        }
+
+        if ($minify === TRUE) {
+            include_once $jsminPath;
+
+            // @codingStandardsIgnoreStart
+            // JSMin is the 3rd party library file and the way we include is
+            // different from MySource standards.
+            $jsContent = JSMin::minify($jsContent);
+            // @codingStandardsIgnoreEnd
+        }
+
+        $dataWebDir = BaseSystem::getDataDir('GUI').'/Web';
+        if (file_exists($dataWebDir) === FALSE) {
+            mkdir($dataWebDir, 0755, TRUE);
+        }
+
+        $newFile = $dataWebDir.'/squiz.js';
+        file_put_contents($newFile, $jsContent);
+
+        if ($gzip === TRUE) {
+            $jgzFile     = $dataWebDir.'/squiz.jgz';
+            $gzipCommand = 'gzip -c -n '.$newFile.' > '.$jgzFile;
+            system($gzipCommand);
+
+            $newFile = $jgzFile;
+        }
+
+        return $newFile;
+
+    }//end minifyGzipJSFiles()
+
+
+    /**
+     * Minifies all CSS files in all Web folders.
+     *
+     * @return void
+     */
+    public static function minifyCSSFiles()
+    {
+        $root       = BaseSystem::getSystemRootPath();
+        $cssMinPath = $root.'/Systems/GUI/Scripts/cssmin.php';
+
+        if (file_exists($cssMinPath) === FALSE) {
+            return;
+        }
+
+        include_once $cssMinPath;
+
+        $cssFiles = self::_getCSSFiles();
+        $path     = BaseSystem::getDataDir('GUI').'/Web';
+        $root     = BaseSystem::getSystemRootPath();
+
+        foreach ($cssFiles as $browserType => $cssFiles) {
+            $css = '';
+            foreach ($cssFiles as $file) {
+                $fileContent = file_get_contents($root.$file);
+                $fileContent = self::_replaceURLforCSSminification($root.$file, $fileContent);
+
+                $css .= $fileContent;
+            }
+
+            $css = trim($css);
+            if (empty($css) === FALSE) {
+                // PHPCS exception for external library file.
+                // @codingStandardsIgnoreStart
+                $css = CSSMin::minify($css, 900);
+                // @codingStandardsIgnoreEnd
+
+                file_put_contents($path.'/squiz.'.$browserType.'.css', $css);
+            }
+        }
+
+    }//end minifyCSSFiles()
+
+
+    /**
+     * Replace url() values in CSS for the minification.
+     *
+     * @param string $file    CSS file path.
+     * @param string $content CSS content.
+     *
+     * @return string
+     */
+    private static function _replaceURLforCSSminification($file, $content)
+    {
+        $root    = BaseSystem::getSystemRootPath();
+        $matches = array();
+        preg_match_all('/url\(([^\)]+)\)/', $content, $matches);
+        $matches = array_unique($matches[1]);
+        $fileDir = dirname($file);
+
+        foreach ($matches as $match) {
+            $newPath = realpath($fileDir.'/'.$match);
+            if ($newPath === FALSE) {
+                continue;
+            }
+
+            $replacement = str_replace($root, '/__web', $newPath);
+            $content     = str_replace('('.$match.')', '('.$replacement.')', $content);
+        }
+
+        return $content;
+
+    }//end _replaceURLforCSSminification()
 
 
     /**
@@ -2386,10 +2552,29 @@ class GUIActions
             return FALSE;
         }
 
-        $systemsPath = Channels::getSystemsPath();
+        $guiFiles = array(
+                     'squiz.js',
+                     'squiz.jgz',
+                     'squiz.all.css',
+                     'squiz.firefox.css',
+                     'squiz.msie.css',
+                     'squiz.msie7.css',
+                     'squiz.msie8.css',
+                     'squiz.msie9.css',
+                     'squiz.safari.css',
+                    );
 
-        $path = dirname(Channels::getSystemsPath()).'/'.substr(str_replace('//', '/', $url), ($idx + 6));
-        $path = realpath($path);
+        $guiFile     = FALSE;
+        $systemsPath = Channels::getSystemsPath();
+        $filename    = basename($url);
+
+        if (in_array($filename, $guiFiles) === TRUE) {
+            $path    = BaseSystem::getDataDir('GUI').'/Web/'.$filename;
+            $guiFile = TRUE;
+        } else {
+            $path = dirname($systemsPath).'/'.substr(str_replace('//', '/', $url), ($idx + 6));
+            $path = realpath($path);
+        }
 
         // File does not exist.
         if ($path === FALSE) {
@@ -2397,12 +2582,14 @@ class GUIActions
             exit;
         }
 
-        // Must be in the Systems dir.
-        if (substr($path, 0, strlen($systemsPath)) !== $systemsPath
-            || strpos($url, '/Web/') === FALSE
-        ) {
-            header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
-            exit;
+        if ($guiFile === FALSE) {
+            // Must be in the Systems dir.
+            if (substr($path, 0, strlen($systemsPath)) !== $systemsPath
+                || strpos($url, '/Web/') === FALSE
+            ) {
+                header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
+                exit;
+            }
         }
 
         // All good start sending headers.
@@ -2416,31 +2603,30 @@ class GUIActions
             }
         }
 
-        include_once 'Libs/FileSystem/FileSystem.inc';
-        $filename = basename($path);
-        $mimeType = FileSystem::getMimeType($filename);
-
         if ($filename === 'styles_moz.css'
             || $filename === 'styles_ie7.css'
             || $filename === 'styles_ie8.css'
         ) {
             ob_start('ob_gzhandler');
 
-                header('Content-type: text/css; charset: UTF-8');
-                header('Cache-Control: must-revalidate');
+            header('Content-type: text/css; charset: UTF-8');
+            header('Cache-Control: must-revalidate');
 
-                $now     = time();
-                $expires = date('D, j M Y 00:00:00', ($now + 86400));
-                header('Expires: '.$expires);
-                header('Last-Modified: '.$modified);
+            $now     = time();
+            $expires = date('D, j M Y 00:00:00', ($now + 86400));
+            header('Expires: '.$expires);
+            header('Last-Modified: '.$modified);
 
-                echo file_get_contents(dirname(__FILE__).'/web/'.$filename);
+            echo file_get_contents(dirname(__FILE__).'/web/'.$filename);
         } else {
             header('X-Sendfile: '.$path);
-            if ($filename === 'mysource.jgz' || $filename === 'dfx.jgz') {
+            if ($filename === 'squiz.jgz') {
                 header('Content-Encoding: gzip');
                 header('Content-type: application/x-javascript');
             } else {
+                include_once 'Libs/FileSystem/FileSystem.inc';
+                $mimeType = FileSystem::getMimeType($filename);
+
                 header('Content-type: '.$mimeType);
             }
 
