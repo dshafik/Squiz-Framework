@@ -1,0 +1,13 @@
+#CronScreen {
+    width: 1160px;
+    margin: 0 auto;
+}
+
+#CronScreen .th-job {
+    width: 45%;
+}
+
+#CronScreen .col-job em {
+    font-size: 11px;
+}
+

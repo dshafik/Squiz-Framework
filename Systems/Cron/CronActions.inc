@@ -899,9 +899,9 @@ class CronActions
 
         $info['job'] = $jobDesc;
 
-        $runTime = '--';
+        $runTime = _('Never');
 
-        $script['last_run'] = time();
+        $script['last_run'] = Util::getArrayIndex($script, 'last_run');
 
         if ($script['last_run'] !== NULL) {
             include_once 'Libs/String/String.inc';
