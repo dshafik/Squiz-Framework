@@ -204,7 +204,14 @@ class GUITableActions
                     $colClass = 'middle';
                 }
 
-                echo '<th align="'.$column['align'].'" class="'.$settings['widget']['type'].'-'.$colClass.'Col th-'.$colid.'">'.$column['name'].'</th>';
+                echo '<th class="'.$settings['widget']['type'].'-'.$colClass.'Col th-'.$colid.'" ';
+
+                echo 'style="text-align: '.$column['align'].';';
+                if (isset($column['width']) === TRUE) {
+                    echo ' width: '.$column['width'].';';
+                }
+
+                echo '">'.$column['name'];'</th>';
             }
 
             echo '</tr></thead>';
@@ -314,7 +321,14 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td'.$colspan.' colid="'.$id.'-'.$rowid.'-'.$colid.'" align="'.$columns[$colid]['align'].'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'">';
+                echo '<td'.$colspan.' colid="'.$id.'-'.$rowid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'" ';
+
+                echo 'style="text-align: '.$columns[$colid]['align'].';';
+                if (isset($columns[$colid]['width']) === TRUE) {
+                    echo ' width: '.$columns[$colid]['width'].';';
+                }
+
+                echo '">';
                 echo '<div class="'.$class.'-colWrapper">';
                 echo $col;
                 if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
