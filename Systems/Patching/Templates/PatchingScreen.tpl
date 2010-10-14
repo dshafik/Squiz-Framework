@@ -48,14 +48,9 @@
                                     </content>
                                 </value>
                                 <value>
-                                    <content>
-                                        <div class="PatchingScreen-demoWarningWrap">
-                                            <span class="PatchingScreen-demoWarning-icon">&nbsp;</span>
-                                            <span class="PatchingScreen-demoWarning-text">
-                                                <text>Your system is currently running in demonstration mode. As a result all automatic updating features are disabled until you activate your system</text>
-                                            </span>
-                                        </div>
-                                    </content>
+                                    <warning>
+                                        <text>Your system is currently running in demonstration mode. As a result all automatic updating features are disabled until you activate your system</text>
+                                    </warning>
                                 </value>
                             </items>
                         </systemid>

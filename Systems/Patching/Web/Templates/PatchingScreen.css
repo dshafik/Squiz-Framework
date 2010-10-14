@@ -1,3 +1,7 @@
+#PatchingScreen {
+    margin: 0 50px;
+}
+
 .PatchingScreen-activateWrap {
     overflow: hidden;
 }
@@ -68,25 +72,6 @@ div.PatchingScreen-activateWrap span {
 #PatchingScreen-cancelActivationBtn {
     float: left;
     margin-left: 45px;
-}
-
-.PatchingScreen-demoWarningWrap {
-    background: url(warning_bg_stripes.png) repeat scroll 0 0 transparent;
-    border-bottom: 1px solid #F6E27E;
-    font-size: 11px;
-}
-
-.PatchingScreen-demoWarning-icon {
-    background: url(warning_large.png) no-repeat scroll 75% 50% transparent;
-    float: left;
-    min-height: 60px;
-    width: 20%;
-}
-
-.PatchingScreen-demoWarning-text {
-    display: block;
-    overflow: hidden;
-    padding: 8px 5px 8px 8px;
 }
 
 /* New Updates Table */
