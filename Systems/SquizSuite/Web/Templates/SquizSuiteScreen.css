@@ -3,12 +3,14 @@
     margin: 0 auto;
 }
 
-#squizSuite-currentProduct-box .GUITable-colWrapper {
+#squizSuite-currentProduct-box .GUITable-colWrapper,
+#squizSuite-connectedProduct-box .GUITable-colWrapper {
     padding: 0px;
 }
 
-#squizSuite-connectedProduct-box .GUITable-colWrapper {
-    padding: 0px;
+#squizSuite-currentProduct-box td.col-currName .GUITable-colWrapper,
+#squizSuite-connectedProduct-box td.col-currName .GUITable-colWrapper {
+    padding-left: 15px;
 }
 
 #squizSuite-connectedProduct-box div.SquizSuiteScreen-productDetailWrap {
@@ -19,6 +21,10 @@
 
 #squizSuite-currentProduct-box tr.rowOdd {
     height: 76px;
+}
+
+#squizSuite-currProductName .GUITextBox.input {
+    width: 50%;
 }
 
 #squizSuite-connectedProduct-box {
@@ -74,10 +80,6 @@ td.col-currTypeIcon {
     background-color: transparent;
 }
 
-td.col-currName {
-    padding-left: 15px;
-}
-
 td.col-currStatusIcon {
     background-color: #F5F5F5;
 }
@@ -117,7 +119,7 @@ span.SquizSuiteScreen-summaryValue {
 div.SquizSuiteScreen-productIconWrap {
     background: url(squizsuite-icons.png);
     height: 29px;
-    margin-left: 22px;
+    margin-left: 30px;
     width: 30px;
 }
 
@@ -139,6 +141,7 @@ div.SquizSuiteScreen-productIconWrap.SquizAnalytics {
 
 div.SquizSuiteScreen-productIconWrap.unknown {
     background-position: 0 30px;
+    margin-left: 15px;
 }
 
 /* Product Status Icon */
@@ -146,7 +149,7 @@ div.SquizSuiteScreen-productIconWrap.unknown {
 div.SquizSuiteScreen-statusWrap {
     width: 20px;
     height: 20px;
-    margin-left: 24px;
+    margin-left: 28px;
 }
 
 div.SquizSuiteScreen-statusWrap.live {
@@ -190,19 +193,21 @@ span.SquizSuiteScreen-productExpander.expanded {
     background-color: #F8F8F8;
 }
 
-#SquizSuiteScreen-newProductTable td.col-currName {
-    padding-left: 15px;
-    width: 871px;
-}
-
 #SquizSuiteScreen-newProductTable td.col-currStatusIcon {
     background-color: #F5F5F5;
-    width: 67px;
 }
 
 span.SquizSuiteScreen-newProductHeadDesc {
     font-style: italic;
     color: #9C9B9B;
+}
+
+#SquizSuiteScreen-newProductTable td.col-currTypeIcon {
+    padding: 4px 15px;
+}
+
+#SquizSuiteScreen-newProductTable td.lastRow {
+    padding: 0;
 }
 
 /* Pending Approval */

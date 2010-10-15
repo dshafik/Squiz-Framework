@@ -13,17 +13,17 @@
                     <currTypeIcon>
                         <name><text>Type</text></name>
                         <align>left</align>
-                        <width>47px</width>
+                        <width>60px</width>
                     </currTypeIcon>
                     <currName>
                         <name><text>Name</text></name>
                         <align>left</align>
-                        <width>378px</width>
+                        <width>420px</width>
                     </currName>
                     <currStatusIcon>
                         <name><text>Status</text></name>
-                        <align>left</align>
-                        <width>67px</width>
+                        <align>middle</align>
+                        <width>47px</width>
                     </currStatusIcon>
                     <currSummary>
                         <name>Summary</name>
@@ -54,17 +54,17 @@
                     <currTypeIcon>
                         <name><text>Type</text></name>
                         <align>left</align>
-                        <width>47px</width>
+                        <width>60px</width>
                     </currTypeIcon>
                     <currName>
                         <name><text>Name</text></name>
                         <align>left</align>
-                        <width>378px</width>
+                        <width>420px</width>
                     </currName>
                     <currStatusIcon>
                         <name><text>Status</text></name>
-                        <align>left</align>
-                        <width>67px</width>
+                        <align>middle</align>
+                        <width>47px</width>
                     </currStatusIcon>
                     <currSummary>
                         <name>Summary</name>
@@ -73,6 +73,7 @@
                     <delIcon>
                         <name />
                         <align>left</align>
+                        <width>25px</width>
                     </delIcon>
                 </setting>
                 <setting name="allowDelete">false</setting>

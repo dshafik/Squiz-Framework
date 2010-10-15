@@ -1989,12 +1989,13 @@ class SquizSuiteActions
         $newProductLabel .= '</span>';
 
         $setting = array(
-                    'allowDelete' => TRUE,
+                    'allowDelete' => FALSE,
                     'hideHeader'  => TRUE,
                     'columns'     => array(
                                       'currTypeIcon' => array(
                                                          'name'  => _('Type'),
                                                          'align' => 'left',
+                                                         'width' => '60px',
                                                         ),
                                       'currName'     => array(
                                                          'name'  => _('Name'),
