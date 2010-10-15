@@ -110,7 +110,7 @@ var RoleRoleScreen = new function()
             }
 
            var privid = toggleWidget.id.split('-')[0];
-           if (role.unrestricted.inArray(privid) === true) {
+           if (role.unrestricted && role.unrestricted.inArray(privid) === true) {
                toggleWidget.setValue(true, true);
            } else {
                toggleWidget.setValue(false, true);
