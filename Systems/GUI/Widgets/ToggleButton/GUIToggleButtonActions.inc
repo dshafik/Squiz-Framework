@@ -57,7 +57,7 @@ class GUIToggleButtonActions
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
 
-        echo '<div class="'.$class.'" id="'.$id.'">';
+        echo '<div class="'.$class.' main" id="'.$id.'">';
 
         $selected = Util::getArrayIndex($settings, 'value', self::$value);
         if ($selected === TRUE) {

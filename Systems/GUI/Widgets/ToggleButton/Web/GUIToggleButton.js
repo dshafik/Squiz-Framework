@@ -28,7 +28,7 @@ function GUIToggleButton(id, settings) {
     GUI.addWidgetEvent(this, 'toggleOn');
     GUI.addWidgetEvent(this, 'toggleOff');
 
-    this.currentValue = settings.value;
+    this.currentValue = settings.value || false;
 
     this.init();
 }
@@ -53,65 +53,85 @@ GUIToggleButton.prototype = {
         return this.currentValue;
     },
 
-    setValue: function(value) {
+    setValue: function(value, isInitValue) {
         var self = this;
         if (value !== self.currentValue) {
             // Only do something if the value is different from the current value
             self.currentValue = value;
             if (value === true) {
                 // move to true
-                self.switchOn();
+                self.switchOn(isInitValue);
             } else {
                 // move to false
-                self.switchOff();
+                self.switchOff(isInitValue);
             }
         }
     },
 
-    switchOff: function() {
+    switchOff: function(isInitValue) {
         var sec = 300;
         var self     = this;
         var widgetElement = dfx.getId(self.id);
         var glowMask = dfx.getClass('toggle', widgetElement)[0];
 
-        GUI.setModified(self, true);
+        if (isInitValue !== true) {
+            GUI.setModified(self, true);
+        }
 
-        dfx.animate(glowMask, {left: 50}, sec, function() {
+        if (isInitValue === true) {
             var optYes = dfx.getClass('yes', widgetElement)[0];
             dfx.removeClass(optYes, 'selected');
             var optNo = dfx.getClass('no', widgetElement)[0];
             dfx.addClass(optNo, 'selected');
+            dfx.setStyle(glowMask, 'left', '50px');
+        } else {
+            dfx.animate(glowMask, {left: 50}, sec, function() {
+                var optYes = dfx.getClass('yes', widgetElement)[0];
+                dfx.removeClass(optYes, 'selected');
+                var optNo = dfx.getClass('no', widgetElement)[0];
+                dfx.addClass(optNo, 'selected');
 
-            // finish, fire event
-            if (self.settings.toggleAction) {
-                eval(self.settings.toggleAction);
-            }
+                // finish, fire event
+                if (self.settings.toggleAction) {
+                    eval(self.settings.toggleAction);
+                }
 
-            self.fireToggleOffCallbacks();
-        });
+                self.fireToggleOffCallbacks();
+            });
+        }
     },
 
-    switchOn: function() {
+    switchOn: function(isInitValue) {
         var sec = 300;
         var self     = this;
         var widgetElement = dfx.getId(self.id);
         var glowMask = dfx.getClass('toggle', widgetElement)[0];
 
-        GUI.setModified(self, true);
+        if (isInitValue !== true) {
+            GUI.setModified(self, true);
+        }
 
-        dfx.animate(glowMask, {left: 6}, sec, function() {
+        if (isInitValue === true) {
             var optYes = dfx.getClass('yes', widgetElement)[0];
             dfx.addClass(optYes, 'selected');
             var optNo = dfx.getClass('no', widgetElement)[0];
             dfx.removeClass(optNo, 'selected');
+            dfx.setStyle(glowMask, 'left', '6px');
+        } else {
+            dfx.animate(glowMask, {left: 6}, sec, function() {
+                var optYes = dfx.getClass('yes', widgetElement)[0];
+                dfx.addClass(optYes, 'selected');
+                var optNo = dfx.getClass('no', widgetElement)[0];
+                dfx.removeClass(optNo, 'selected');
 
-            // finish, fire event
-            if (self.settings.toggleAction) {
-                eval(self.settings.toggleAction);
-            }
+                // finish, fire event
+                if (self.settings.toggleAction) {
+                    eval(self.settings.toggleAction);
+                }
 
-            self.fireToggleOnCallbacks();
-        });
+                self.fireToggleOnCallbacks();
+            });
+        }
     },
 
     revert: function()

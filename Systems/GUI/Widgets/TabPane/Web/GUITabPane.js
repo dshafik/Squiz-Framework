@@ -50,6 +50,13 @@ GUITabPane.prototype = {
         var tabContent = dfx.getClass('tabContent-' + tabid, this.elem)
         dfx.addClass(tabContent, 'active');
 
+    },
+
+    getVisibleContentElement: function()
+    {
+        var visibleElement = dfx.getClass('GUITabPane-tabContent active', this.elem)[0];
+        return visibleElement;
+
     }
 
 };
