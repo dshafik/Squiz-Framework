@@ -101,6 +101,17 @@
         </primary>
     </query>
 
+    <query id="removePrivilegesLike">
+        <primary>
+            <delete>
+                <where>
+                    <equal table="role_privilege" column="roleid">:roleid</equal>
+                    <like table="role_privilege" column="privilege">:privilege</like>
+                </where>
+            </delete>
+        </primary>
+    </query>
+
     <query id="removePrivilegeFromRole">
         <primary>
             <delete>
@@ -122,6 +133,9 @@
                 <from>
                     <table>role</table>
                 </from>
+                <order-by>
+                    <field table="role" column="roleid" />
+                </order-by>
             </select>
         </primary>
     </query>

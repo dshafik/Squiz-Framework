@@ -26,7 +26,7 @@
         <!-- End Roles Screen settings box -->
     </div>
     <div class="RolesScreenMainContent GUI-screen-right">
-        <widget type="GUI/TabPane" id="box-graphs">
+        <widget type="GUI/TabPane" id="role-switcher">
             <setting name="tabs">
                 <dataProvider action="Role::getPrivilegeListForRolesScreen" />
             </setting>
@@ -34,7 +34,7 @@
                 <content>
                     <div class="RoleScreen-roleNameSection">
                         <label for="role-name-input"><text>Role Name</text></label>
-                        <div style="float:right;">
+                        <div style="float:right; padding-top: 2px;">
                             <widget type="GUI/TextBox" id="role-name" />
                         </div>
                     </div>

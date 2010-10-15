@@ -168,11 +168,26 @@ class RoleActions
      * @param string  $privilege Privilege to grant.
      *
      * @return integer
+     * @throws ChannelException If there is a DB error.
      */
     public static function grantPrivilege($roleid, $privilege)
     {
-        $query  = DAL::getQuery('Role', 'grantPrivilegeToRole');
-        $result = DAL::executeQuery($query);
+        try {
+            DAL::beginTransaction();
+            if (strpos($privilege, '%') !== FALSE) {
+                // First remove all the sub privileges and this one.
+                $query  = DAL::getQuery('Role', 'removePrivilegesLike');
+                $result = DAL::executeQuery($query);
+            }
+
+            $query  = DAL::getQuery('Role', 'grantPrivilegeToRole');
+            $result = DAL::executeQuery($query);
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollback();
+            throw new ChannelException($e->getMessage());
+        }
+
         return $result;
 
     }//end grantPrivilege()
@@ -206,11 +221,27 @@ class RoleActions
      * @param string  $privilege Privilege to remove.
      *
      * @return integer
+     * @throws ChannelException If there is a DB error.
      */
     public static function revokePrivilege($roleid, $privilege)
     {
-        $query  = DAL::getQuery('Role', 'removePrivilegeFromRole');
-        $result = DAL::executeQuery($query);
+        try {
+            DAL::beginTransaction();
+            if (strpos($privilege, '%') !== FALSE) {
+                // First remove all the sub privileges and this one.
+                $query  = DAL::getQuery('Role', 'removePrivilegesLike');
+                $result = DAL::executeQuery($query);
+            } else {
+                $query  = DAL::getQuery('Role', 'removePrivilegeFromRole');
+                $result = DAL::executeQuery($query);
+            }
+
+            DAL::commit();
+        } catch (DALException $e) {
+            DAL::rollback();
+            throw new ChannelException($e->getMessage());
+        }
+
         return $result;
 
     }//end revokePrivilege()
@@ -305,7 +336,8 @@ class RoleActions
         $roles = Role::getRoles();
         ksort($roles);
 
-        $grantedPrivs = Role::getPrivilegesByRole(key($roles));
+        $initRoleid   = key($roles);
+        $grantedPrivs = Role::getPrivilegesByRole($initRoleid);
         sort($grantedPrivs);
 
         // Get the list of top level privileges.
@@ -313,6 +345,8 @@ class RoleActions
         $prevTop    = NULL;
         $previous   = NULL;
         $prevLevel  = 0;
+
+        $unrestricted = array();
         foreach ($privileges as $privilege => $info) {
             $privParts = explode('.', $privilege);
             if (strpos($privilege, $prevTop.'.') !== 0) {
@@ -329,7 +363,11 @@ class RoleActions
 
             $selected = FALSE;
             foreach ($grantedPrivs as $grantedPriv) {
-                if ($privilege === $grantedPriv || $privilege.'.%' === $grantedPriv) {
+                if ($grantedPriv === $prevTop.'.%') {
+                    $unrestricted[] = $prevTop;
+                    $selected       = 'sel-inherit';
+                    break;
+                } else if ($privilege === $grantedPriv || $privilege.'.%' === $grantedPriv) {
                     $selected = TRUE;
                     break;
                 } else if (strpos($privilege, str_replace('%', '', $grantedPriv)) === 0) {
@@ -349,7 +387,7 @@ class RoleActions
             $items[] = array(
                         'id'          => $topLevelName,
                         'label'       => _($topLevelName),
-                        'itemContent' => self::_getPrivilegeListItemContent($topLevelName, $privs),
+                        'itemContent' => self::_getPrivilegeListItemContent($topLevelName, $privs, $unrestricted),
                        );
         }
 
@@ -363,10 +401,11 @@ class RoleActions
      *
      * @param string $topLevelName Name of the top level privilege.
      * @param array  $privileges   List of privileges in the system.
+     * @param array  $unrestricted List of top leve privileges that have unrestricted access.
      *
      * @return string
      */
-    private static function _getPrivilegeListItemContent($topLevelName, array $privileges)
+    private static function _getPrivilegeListItemContent($topLevelName, array $privileges, array $unrestricted)
     {
         Channels::includeSystem('GUI');
 
@@ -381,7 +420,13 @@ class RoleActions
         $content .= sprintf(_('Grant unrestricted access to %s privileges'), $topLevelName);
         $content .= '</span>';
         $content .= '<div class="'.$class.'-unrestrictedToggle">';
-        $content .= GUI::createWidget($id.'-unrestricted', 'GUIToggleButton');
+
+        $settings = array();
+        if (in_array($topLevelName, $unrestricted) === TRUE) {
+            $settings['value'] = TRUE;
+        }
+
+        $content .= GUI::createWidget($id.'-unrestricted', 'GUIToggleButton', $settings);
         $content .= '</div>';
         $content .= '</div>';
 
@@ -437,15 +482,25 @@ class RoleActions
     {
         $data  = array();
         $roles = Role::getRoles();
+        ksort($roles);
 
         $grantedPrivs = array();
         foreach ($roles as $roleid => $roleName) {
             $grantedPrivs = Role::getPrivilegesByRole($roleid);
             sort($grantedPrivs);
 
+            $unrestricted = array();
+            foreach ($grantedPrivs as $priv) {
+                $parts = explode('.%', $priv);
+                if ($parts[0].'.%' === $priv) {
+                    $unrestricted[] = $parts[0];
+                }
+            }
+
             $data[$roleid] = array(
-                              'name'    => $roleName,
-                              'granted' => $grantedPrivs,
+                              'name'         => $roleName,
+                              'granted'      => $grantedPrivs,
+                              'unrestricted' => $unrestricted,
                              );
         }
 
@@ -468,6 +523,7 @@ class RoleActions
             DAL::beginTransaction();
             $errors       = array();
             $templateData = Util::getArrayIndex($data, 'templateData', NULL);
+
             if ($templateData === NULL) {
                 $errors[] = _('Empty template data');
             } else {
@@ -497,11 +553,31 @@ class RoleActions
 
                         $currentPrivs = Role::getPrivilegesByRole($roleid);
                         $removedPrivs = array_diff($currentPrivs, $info['granted']);
+                        $newPrivs     = array_diff(self::_filterPrivileges($info['granted']), $currentPrivs);
+
+                        // Check unrestricted setting..
+                        $unrestrictedAccess = array();
+                        foreach ($info['unrestricted'] as $privilege) {
+                            $unrestrictedAccess[] = $privilege;
+                            Role::grantPrivilege($roleid, $privilege.'.%');
+
+                            // Remove all privileges under this privilege.
+                            foreach ($removedPrivs as $i => $removedPriv) {
+                                if (strpos($removedPriv, $privilege.'.') === 0) {
+                                    unset($removedPrivs[$i]);
+                                }
+                            }
+
+                            foreach ($newPrivs as $i => $newPriv) {
+                                if (strpos($newPriv, $privilege.'.') === 0) {
+                                    unset($newPrivs[$i]);
+                                }
+                            }
+                        }
+
                         foreach ($removedPrivs as $privilege) {
                             Role::revokePrivilege($roleid, $privilege);
                         }
-
-                        $newPrivs = array_diff(self::_filterPrivileges($info['granted']), $currentPrivs);
 
                         foreach ($newPrivs as $privilege) {
                             Role::grantPrivilege($roleid, $privilege);

@@ -68,6 +68,7 @@ var RoleRoleScreen = new function()
         });
 
         // Unrestricted access toggle button change event.
+        // Also set the initial values.
         var toggleButtons = dfx.getClass('GUIToggleButton', dfx.getClass('RoleScreen-unrestrictedToggle'));
         dfx.foreach(toggleButtons, function(idx) {
             var buttonElement = toggleButtons[idx];
@@ -99,6 +100,24 @@ var RoleRoleScreen = new function()
         // Change the role name field.
         GUI.getWidget('role-name').setValue(role.name);
 
+        // Set the toggle button values.
+        var toggleButtons = dfx.getClass('GUIToggleButton', dfx.getClass('RoleScreen-unrestrictedToggle'));
+        dfx.foreach(toggleButtons, function(idx) {
+            var buttonElement = toggleButtons[idx];
+            var toggleWidget  = GUI.getWidget(buttonElement.id);
+            if (!toggleWidget) {
+                return;
+            }
+
+           var privid = toggleWidget.id.split('-')[0];
+           if (role.unrestricted.inArray(privid) === true) {
+               toggleWidget.setValue(true, true);
+           } else {
+               toggleWidget.setValue(false, true);
+           }
+
+        });
+
         // Update the privilege settings on the screen using roles granted list.
         _updatePrivilegeStates(role.granted);
 
@@ -107,15 +126,39 @@ var RoleRoleScreen = new function()
 
     var _saveRoleSettings = function(roleid) {
         // Get the role name.
-        _data[roleid].name = GUI.getWidget('role-name').getValue(name);
+        _data[roleid].name = GUI.getWidget('role-name').getValue();
+
+        // Unrestricted access setting.
+        var toggleButtons = dfx.getClass('GUIToggleButton main', dfx.getId('RolesScreen'));
+        _data[roleid].unrestricted = [];
+        dfx.foreach(toggleButtons, function(i) {
+            var id    = toggleButtons[i].id;
+            var value = GUI.getWidget(id).getValue();
+            if (value === true) {
+                _data[roleid].unrestricted.push(id.split('-')[0]);
+            }
+        });
+
+        var granted = [];
+        dfx.foreach(_data[roleid].unrestricted, function(i) {
+            // Each unrestricted privilege needs to be added to granted array, so that
+            // later on we do not add its child privileges to 'granted' array.
+            var priv = _data[roleid].unrestricted[i] + '.%';
+            granted.push(priv);
+        });
 
         // Get the granted settings.
         var items = dfx.getClass('RoleScreen-privListItem', dfx.getId('RolesScreen'));
         var iln   = items.length;
 
-        var granted = [];
         for (var i = 0; i < iln; i++) {
             var item = items[i];
+            if (granted.inArray(item.id.split('.')[0] + '.%') === true) {
+                // No need to add this privilege to granted array since its top level
+                // privilege has unrestricted access.
+                continue;
+            }
+
             if (dfx.hasClass(item, 'enabled') === true
                 || dfx.hasClass(item, 'enabledByParent') === true
             ) {
@@ -213,9 +256,15 @@ var RoleRoleScreen = new function()
         }
     };
 
-    var changeToggleState = function(toggle, forceState) {
+    var changeToggleState = function(toggle, forceState, unrestricted) {
         if (dfx.isset(forceState) === false && dfx.hasClass(toggle, 'enabledByParent') === true) {
             return;
+        }
+
+        var className = 'enabled';
+        if (unrestricted === true) {
+            className = 'enabledByParent';
+            dfx.removeClass(toggle, 'enabled');
         }
 
         GUI.setModified(this, true);
@@ -223,26 +272,26 @@ var RoleRoleScreen = new function()
                 || dfx.hasClass(toggle, 'collapse') === true
             ) {
             if (forceState === true) {
-                dfx.addClass(toggle, 'enabled');
+                dfx.addClass(toggle, className);
                 changeChildPrivilegeStates(toggle, true);
             } else if (forceState === false) {
-                dfx.removeClass(toggle, 'enabled');
+                dfx.removeClass(toggle, className);
                 changeChildPrivilegeStates(toggle, false);
             } else {
                 // A parent so update it self and its children.
-                if (dfx.hasClass(toggle, 'enabled') === true) {
-                    dfx.removeClass(toggle, 'enabled');
+                if (dfx.hasClass(toggle, className) === true) {
+                    dfx.removeClass(toggle, className);
                     changeChildPrivilegeStates(toggle, false);
                 } else {
-                    dfx.addClass(toggle, 'enabled');
+                    dfx.addClass(toggle, className);
                     changeChildPrivilegeStates(toggle, true);
                 }
             }
         } else {
-            if (forceState === false || dfx.hasClass(toggle, 'enabled') === true) {
-                dfx.removeClass(toggle, 'enabled');
+            if (forceState === false || (forceState !== true && dfx.hasClass(toggle, className) === true)) {
+                dfx.removeClass(toggle, className);
             } else {
-                dfx.addClass(toggle, 'enabled');
+                dfx.addClass(toggle, className);
             }
         }//end if
     };
@@ -274,7 +323,7 @@ var RoleRoleScreen = new function()
 
         var privListElements = dfx.getClass('RoleScreen-privListItem level-1', visibleElement);
         dfx.foreach(privListElements, function(i) {
-            changeToggleState(privListElements[i], state);
+            changeToggleState(privListElements[i], state, true);
         });
     };
 
