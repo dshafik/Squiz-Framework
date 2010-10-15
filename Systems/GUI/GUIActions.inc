@@ -2024,9 +2024,15 @@ class GUIActions
         $css .= "} else {\n ?>";
 
         // Current browser's CSS.
-        foreach (self::$_cssIncludes[$browserType] as $cssFile) {
-            $url  = '/__web'.$cssFile;
-            $css .= '<link rel="stylesheet" type="text/css" href="'.$url.'" />'."\n";
+        $chunks = array_chunk(self::$_cssIncludes[$browserType], 30);
+        foreach ($chunks as $chunk) {
+            $css .= '<style type="text/css">';
+            foreach ($chunk as $cssFile) {
+                $url  = '/__web'.$cssFile;
+                $css .= '@import url("'.$url.'");'."\n";
+            }
+
+            $css .= '</style>';
         }
 
         $css .= '<?php } ?>'."\n";
