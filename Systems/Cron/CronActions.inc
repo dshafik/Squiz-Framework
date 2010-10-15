@@ -998,6 +998,10 @@ class CronActions
             return _('Cron is running now');
         }
 
+        if (empty($typeData['started']) === TRUE) {
+            return _('Cron has not run yet');
+        }
+
         include_once 'Libs/String/String.inc';
         $runTime = String::easyDatetime(strtotime($typeData['started']));
         $runTime = sprintf(_('Last run on %s'), $runTime);
