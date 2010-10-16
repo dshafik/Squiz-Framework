@@ -573,13 +573,14 @@ class FileSystem
     /**
      * Format File Size.
      *
-     * @param integer $size If specified then $path argument will not be used.
-     * @param string  $unit The maximum unit that can be used to display size.
+     * @param integer $size  If specified then $path argument will not be used.
+     * @param string  $unit  The maximum unit that can be used to display size.
+     * @param boolean $round Round the result off to whole numbers.
      *
      * @return string
      * @access public
      */
-    public static function formatFileSize($size, $unit=NULL)
+    public static function formatFileSize($size, $unit=NULL, $round=FALSE)
     {
         $units   = array(
                     self::FILE_SIZE_BYTE,
@@ -601,7 +602,11 @@ class FileSystem
             $factor++;
         }
 
-        $readable = sprintf('%01.2f%s', $size, $units[$factor]);
+        if ($round === TRUE) {
+            $readable = sprintf('%01d%s', $size, $units[$factor]);
+        } else {
+            $readable = sprintf('%01.2f%s', $size, $units[$factor]);
+        }
 
         return $readable;
 
