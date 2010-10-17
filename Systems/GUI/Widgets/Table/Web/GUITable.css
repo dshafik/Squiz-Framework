@@ -79,8 +79,9 @@ table.GUITable {
 
 .GUITable tr.loadingRow td {
     background-color: #EEE;
-    vertical-align: top;
+    vertical-align: middle;
     text-align: center;
+    height: 2.5em;
 }
 
 .GUITable-colRemovedOverlay {
