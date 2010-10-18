@@ -205,7 +205,7 @@ class Email
         $header  = '';
         $header .= '<html><head><title></title></head><body style="margin:0px;padding:0px;">';
         $header .= '<table style="font-size:0px;" border="0" cellpadding="0" cellspacing="0" width="100%" background="'.$url.'/background.png">';
-        $header .= '<tr><td style="padding-left:10px;" width="150px"><img src="'.$url.'/logo.png" /></td><td style="color:#FFF;font: 17px arial;">- '.$title.'</td></tr></table>';
+        $header .= '<tr><td style="padding-left:10px; padding-bottom: 8px;"><img src="'.$url.'/logo.png" /></td><td style="color:#FFF;font: 17px arial; width: 100%; padding-left: 5px;">- '.$title.'</td></tr></table>';
         $header .= '<!-- main content !--><div style="padding:15px;background-color:#FFF;">';
         return $header;
 
