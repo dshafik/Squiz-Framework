@@ -44,13 +44,13 @@ dfx.startMousePositionTrack = function(callback)
             pageY = e.pageY;
         };
     */
-    $().bind('mousemove', callback);
+    jQuery(document.body).bind('mousemove', callback);
 
 };
 
 dfx.stopMousePositionTrack = function(callback)
 {
-    $().unbind('mousemove', callback);
+    jQuery(document.body).unbind('mousemove', callback);
 
 };
 
