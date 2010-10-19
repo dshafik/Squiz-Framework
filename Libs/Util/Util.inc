@@ -426,6 +426,14 @@ class Util
             }
         }//end if
 
+        // Convert viper href attribtues to normal hrefs.
+        $viperAttributes = $xpath->query('//@viper_href | //@viper_src');
+        foreach ($viperAttributes as $attribute) {
+            $value = $attribute->value;
+            $attribute->ownerElement->setAttribute(str_replace('viper_', '', $attribute->name), $value);
+            $attribute->ownerElement->removeAttribute($attribute->name);
+        }
+
         // Need to decode href and src attributes because browsers encode these
         // attributes and they might contain keywords (e.g. chars % ~).
         $linkReferences = array();
@@ -554,7 +562,7 @@ class Util
 
 
     /**
-     * Encode content to a JSON object. 
+     * Encode content to a JSON object.
      *
      * @param mixed   $content Content to encode.
      * @param boolean $force   Force an array as an assoc array.
