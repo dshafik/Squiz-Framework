@@ -1,7 +1,7 @@
 .GUIScreenSwitcher {
     background-image: url(menu_mid.png);
     background-repeat: repeat-x;
-    margin: 0 0 15px;
+    margin: 0 -5px 15px -7px;
 }
 
 .GUIScreenSwitcher-left {
