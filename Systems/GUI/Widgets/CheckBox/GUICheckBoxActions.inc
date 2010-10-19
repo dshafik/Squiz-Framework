@@ -59,6 +59,13 @@ class GUICheckBoxActions
      */
     protected static $checked = FALSE;
 
+    /**
+     * Label for the checkbox type.
+     *
+     * @var string
+     */
+    protected static $label = FALSE;
+
 
     /**
      * Prints this widgets content.
@@ -96,6 +103,11 @@ class GUICheckBoxActions
         }
 
         echo ' />';
+
+        if (isset($settings['label']) === TRUE && empty($settings['label']) === FALSE) {
+            echo '<label for="'.$id.'-checkbox" class="'.$class.' label">'.$settings['label'].'</label>';
+        }
+
         echo '</div>';
 
         return $settings;
