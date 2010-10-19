@@ -51,6 +51,7 @@ GUICheckBox.prototype = {
 
         dfx.addEvent(checkbox, 'click', function(e) {
             self.fireClickCallbacks(this.checked, e);
+            self.setValue(this.checked);
         });
 
     },
@@ -65,14 +66,12 @@ GUICheckBox.prototype = {
 
     setValue: function(value)
     {
+        // No need to check if anything has changed, it always will be
+        // when it gets in here.
         var widgetElement = dfx.getId(this.id);
         var checkbox      = dfx.getClass('checkbox', widgetElement)[0];
-        if (value !== textBox.checked) {
-            // Only do something if the value is different from the current value.
-            checkbox.checked = value;
-            GUI.setModified(this, true);
-        }
-
+        checkbox.checked  = value;
+        GUI.setModified(this, true);
     },
 
     focus: function()
