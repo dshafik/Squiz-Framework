@@ -54,8 +54,8 @@ class GUILineageActions
 
         echo '<div id="'.$id.'" class="'.$class.'">';
         echo '<ul>';
-        foreach ($lineage as $item) {
-            self::printItem($item, $settings);
+        foreach ($lineage as $itemid => $item) {
+            self::printItem($itemid, $item, $settings);
         }
 
         echo '</ul>';
@@ -74,17 +74,18 @@ class GUILineageActions
     /**
      * Prints a single lineage item.
      *
-     * @param array $item     The lineage item to print.
-     * @param array $settings Widget settings.
+     * @param string $itemid   The ID of the item to print.
+     * @param array  $item     The lineage item to print.
+     * @param array  $settings Widget settings.
      *
      * @return void
      */
-     public static function printItem(array $item, array $settings)
+     public static function printItem($itemid, array $item, array $settings)
      {
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
 
-        echo '<li>';
+        echo '<li itemid="'.$itemid.'">';
         echo '<a>'.$item['title'].'</a>';
         echo '</li>';
 
