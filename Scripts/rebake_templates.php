@@ -47,7 +47,11 @@ Channels::includeSystem('GUI');
 GUI::bakeTemplates();
 echoDone();
 
-echo '3. Fixing file system permissions';
+echo '3. Clearing template cache';
+system('rm '.$rootdir.'/data/GUI/tplCache/*');
+echoDone();
+
+echo '4. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
 echoDone();
 
