@@ -48,7 +48,7 @@ var RoleRoleScreen = new function()
 
         // Set the initial selected role's name.
         _prevSelectedRole = GUI.getWidget('rolesList').getSelectedItemId();
-        if (_prevSelectedRole !== null) {
+        if (_prevSelectedRole !== undefined) {
             GUI.getWidget('role-name').setValue(_data[_prevSelectedRole].name);
         }
 
