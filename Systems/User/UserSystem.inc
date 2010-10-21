@@ -51,6 +51,16 @@ class UserSystem extends BaseSystem
     {
         parent::install();
 
+        Channels::includeSystem('User');
+
+        // Create Local Users folder and register edit templates.
+        $usersFolder = User::createUsersFolder(_('Local Users & Groups'), 'User', 'editFolder.tpl');
+        User::addEditTemplate('user', 'User', 'editUser.tpl');
+        User::addEditTemplate('userGroup', 'User', 'editUserGroup.tpl');
+
+        $admin = User::createUser('admin', 'Admin', 'User', 'admin@squiz.com.au', 'password', array($usersFolder));
+        User::addSuperUser($admin);
+
     }//end install()
 
 
