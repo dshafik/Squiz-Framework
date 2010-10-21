@@ -241,10 +241,14 @@ class GUIContentSwitcherActions
             $content .= $item['itemContent'];
         } else {
             Channels::includeSystem('GUI');
-            ob_start();
-                GUI::printTemplate($item['system'], $item['id'].'.tpl');
-                $content .= ob_get_contents();
-            ob_end_clean();
+
+            // If we are recaching, don't print the template.
+            if (GUI::isReCachingTemplate() === FALSE) {
+                ob_start();
+                    GUI::printTemplate($item['system'], $item['id'].'.tpl');
+                    $content .= ob_get_contents();
+                ob_end_clean();
+            }
         }
 
         $content .= '</div>';

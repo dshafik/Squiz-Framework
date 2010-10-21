@@ -144,6 +144,16 @@ class GUIActions
      */
     private static $_isReCacheTemplate = FALSE;
 
+    /**
+     * If TRUE then we are in the process of recaching a template.
+     *
+     * This is set and unset during the reCacheTemplate() function. It is not to be
+     * confused with the above variable, which is used during bake time.
+     *
+     * @var boolean
+     */
+    private static $_isReCaching = FALSE;
+
 
     /**
      * Includes the template PHP file.
@@ -1775,6 +1785,9 @@ class GUIActions
                 if ($timeDiff < $ttl) {
                     return TRUE;
                 }
+            } else {
+                // Zero TTL = no expiry time. If it exists, return it.
+                return TRUE;
             }
         }
 
@@ -1808,11 +1821,27 @@ class GUIActions
 
         // Include the re-cache template file. These files contain calls to
         // GUI::saveTemplateCache().
+        self::$_isReCaching = TRUE;
+
         ob_start();
             include $path;
         ob_end_clean();
 
+        self::$_isReCaching = FALSE;
+
     }//end reCacheTemplate()
+
+
+    /**
+     * Returns TRUE if we are in the middle of a reCacheTemplate() call.
+     *
+     * @return boolean
+     */
+    public static function isReCachingTemplate()
+    {
+        return self::$_isReCaching;
+
+    }//end isRecaching()
 
 
     /**
