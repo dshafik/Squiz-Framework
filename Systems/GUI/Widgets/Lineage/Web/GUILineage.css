@@ -1,9 +1,11 @@
 .GUILineage ul {
     list-style: none;
-    background: url(lineage_bg.png) repeat-x;
-    line-height: 22px;
+    line-height: 25px;
     overflow: hidden;
-    min-height: 22px;
+    min-height: 25px;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f2f2f2), to(#c2c2c2));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #f2f2f2, #c2c2c2);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#f2f2f2, endColorstr=#c2c2c2);
 }
 
 .GUILineage li {
@@ -13,10 +15,10 @@
 .GUILineage li a {
     display: block;
     float: left;
-    line-height: 22px;
-    padding-right: 15px;
+    line-height: 25px;
+    padding-right: 18px;
     padding-left: 5px;
-    background: url(lineage_arrow.png) no-repeat 100% 0;
+    background: url(lineage_arrow.png) no-repeat 100% 50%;
     font-size: 11px;
     cursor: pointer;
 }
