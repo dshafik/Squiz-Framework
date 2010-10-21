@@ -908,7 +908,7 @@ class CronActions
             $runTime = String::easyDatetime(strtotime($script['last_run']));
             if ($script['last_duration'] !== NULL) {
                 include_once 'Libs/String/String.inc';
-                $runTime .= ' ('.String::readableSeconds($script['last_duration']).')';
+                $runTime .= '<br />('.String::readableSeconds($script['last_duration']).')';
             }
         }
 

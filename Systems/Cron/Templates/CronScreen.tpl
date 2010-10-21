@@ -157,12 +157,12 @@
                     <setting name="columns">
                         <job>
                             <align>left</align>
-                            <width>600px</width>
                             <name><text>Jobs</text></name>
                         </job>
                         <lastRun>
-                            <align>left</align>
+                            <align>center</align>
                             <name><text>Last Run</text></name>
+                            <width>16em</width>
                         </lastRun>
                         <frequency>
                             <align>center</align>
