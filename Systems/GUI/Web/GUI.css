@@ -65,6 +65,8 @@ label.GUI-requiredField {
 .GUI-textOverflow {
     position: relative;
     height: 1.4em;
+    width: 99%;
+    left: 1%;
 }
 
 .GUI-textOverflow-text {
@@ -73,6 +75,7 @@ label.GUI-requiredField {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    left: 0;
 }
 
 .GUI-overlay {
