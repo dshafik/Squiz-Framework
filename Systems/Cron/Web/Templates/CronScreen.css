@@ -1,5 +1,10 @@
 #CronScreen {
-    margin: 0 50px;
+    margin:0 auto;
+    width:1160px;
+}
+
+#CronScreen .th-enabled {
+    width: 100px;
 }
 
 #CronScreen .col-job em {
