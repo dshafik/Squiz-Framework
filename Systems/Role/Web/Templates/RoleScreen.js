@@ -48,7 +48,9 @@ var RoleRoleScreen = new function()
 
         // Set the initial selected role's name.
         _prevSelectedRole = GUI.getWidget('rolesList').getSelectedItemId();
-        GUI.getWidget('role-name').setValue(_data[_prevSelectedRole].name);
+        if (_prevSelectedRole !== null) {
+            GUI.getWidget('role-name').setValue(_data[_prevSelectedRole].name);
+        }
 
         // Add event call back for SettingsBox item selection.
         var self = this;
