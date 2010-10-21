@@ -269,7 +269,6 @@ var RoleRoleScreen = new function()
             dfx.removeClass(toggle, 'enabled');
         }
 
-        GUI.setModified(this, true);
         if (dfx.hasClass(toggle, 'expand') === true
                 || dfx.hasClass(toggle, 'collapse') === true
             ) {
@@ -354,6 +353,11 @@ var RoleRoleScreen = new function()
         };
 
         return data;
+    };
+
+    this.saved = function() {
+        GUI.reloadTemplate('Role:RoleScreen');
+        GUI.setModified(this, false);
     };
 
 };
