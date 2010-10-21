@@ -64,7 +64,7 @@ label.GUI-requiredField {
 
 .GUI-textOverflow {
     position: relative;
-    height: 1.4em;
+    height: 22px;
     width: 99%;
     left: 1%;
 }

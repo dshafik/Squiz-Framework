@@ -38,7 +38,7 @@ table.GUITable {
 .GUITable td {
     border-bottom: 1px solid #CECECE;
     border-right: 1px solid #CECECE;
-    line-height: 17px;
+    line-height: 22px;
 }
 
 .GUITable.noBorders td,
