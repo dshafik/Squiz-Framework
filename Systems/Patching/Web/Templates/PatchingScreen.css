@@ -1,5 +1,6 @@
 #PatchingScreen {
-    margin: 0 50px;
+    margin:0 auto;
+    width:1160px;
 }
 
 .PatchingScreen-activateWrap {
