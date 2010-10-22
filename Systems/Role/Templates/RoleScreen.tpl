@@ -1,3 +1,9 @@
+<condition>
+    <if-not condition="User::isSystemAdministrator()">
+        <exception><text>You must be a super user to access this screen</text></exception>
+    </if-not>
+</condition>
+
 <div id="RolesScreen">
     <div class="RolesSettingsBoxContainer GUI-screen-left">
         <!-- Start Rolest Screen settings box -->
