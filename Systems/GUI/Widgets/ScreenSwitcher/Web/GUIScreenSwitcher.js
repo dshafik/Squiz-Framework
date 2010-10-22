@@ -39,9 +39,11 @@ function GUIScreenSwitcher(id, settings)
     // Add the inital item template to GUI's template list.
     var itemsCount = settings._items.length;
     for (var i = 0; i < itemsCount; i++) {
-        if (settings._items[i].id === settings.initialItem) {
+        var itemid = settings._items[i].id;
+        if (itemid === settings.initialItem) {
+            var itemSystem = settings._items[i].system;
             // Add the initially loaded template.
-            GUI.addTemplate(settings._items[i].system + ':' + settings._items[i].id);
+            GUI.addTemplate(itemSystem + ':' + itemid);
             break;
         }
     }
@@ -118,6 +120,7 @@ GUIScreenSwitcher.prototype = {
             GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
         }
 
+        GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
         GUIContentSwitcher.prototype.loadMode.call(this, system, modeid);
 
     }

@@ -148,8 +148,6 @@ GUIContentSwitcher.prototype = {
 
         dfx.addClass(itemContentElem, 'visible');
 
-        GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
-
         this.current = {
             system: system,
             modeid: modeid
@@ -165,9 +163,6 @@ GUIContentSwitcher.prototype = {
         };
 
         GUI.loadContent(this.className, 'getDynamicItemContent', dfx.getId(this.settings.target), params);
-
-        // Add the loaded template.
-        GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
 
         this.current = {
             system: system,
