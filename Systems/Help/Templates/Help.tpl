@@ -27,7 +27,7 @@
                 <a href="javascript:Help.general();" class="Help-control-button general" title="{generalButtonTitle}"></a>
                 <widget id="Help-search" type="GUI/TextBox">
                     <setting name="size">20</setting>
-                    <setting name="value"><text>Search</text></setting>
+                    <setting name="hint"><text>Search...</text></setting>
                 </widget>
                 <dataProvider action="Help::getSystemsMenu" />
             </div>
