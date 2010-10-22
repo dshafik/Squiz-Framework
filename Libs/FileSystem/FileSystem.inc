@@ -268,61 +268,57 @@ class FileSystem
             return FALSE;
         }
 
-        $dir = new DirectoryIterator($path);
-        while ($dir->valid() === TRUE) {
-            if ($dir->isDot() === TRUE) {
-                // This is '.' or '..'. Not interested.
-                $dir->next();
-                continue;
-            }
-
-            if ($dir->isDir() === TRUE) {
-                // If $deleteRoot is FALSE, then we don't want to delete
-                // .svn entries, as with directories like the oven directory,
-                // this will break updates on parent directories.
-                if ($deleteRoot === FALSE) {
-                    if ($dir->getFileName() === '.svn') {
-                        $dir->next();
-                        continue;
-                    }
-                }
-
-                // Recursively call this method to clear nested directories.
-                if (self::clearDirectory($dir->getPathName(), FALSE) === FALSE) {
-                    return FALSE;
-                }
-
-                // Directory is now clear, so we can remove the directory.
-                if (rmdir($dir->getPathName()) === FALSE) {
-                    // Unable to delete the directory. Throw Exception, as the
-                    // operation will ultimately fail.
-                    $error = 'Unable to delete directory: '.$dir->getPathName;
-                    throw new RuntimeException($error);
-                }
-
-                $dir->next();
-                continue;
-            }//end if
-
-            // We have a file or symbolic link, we need to unlink it.
-            if (in_array($dir->getFileName(), $omitFiles) === FALSE) {
-                if (unlink($dir->getPathName()) === FALSE) {
-                    // Problem deleting the file, throw exception.
-                    $error = 'Unable to delete file: '.$dir->getPathName;
-                    throw new RuntimeException($error);
-                }
-            }
-
-            $dir->next();
-        }//end while
-
         if ($deleteRoot === TRUE) {
-            if (file_exists($path) === TRUE) {
-                if (rmdir($path) === FALSE) {
-                    $error = 'Unable to delete directory: '.$dir->getPathName;
-                    throw new RuntimeException($error);
-                }
+            $cmd = 'rm -rf '.escapeshellarg($path);
+        } else {
+            $cmd = escapeshellcmd('find');
+            $cmdArgs[] = escapeshellarg($path);
+            $cmdArgs[] = '-mindepth 1';
+            $cmdArgs[] = '-depth';
+
+            // Don't delete '.svn' directories anywhere in the path.
+            $cmdArgs[] = '!';
+            $cmdArgs[] = escapeshellarg('(');
+
+            // Match .svn directory itself.
+            $cmdArgs[] = '-wholename';
+            $cmdArgs[] = escapeshellarg('*/.svn');
+
+            // Match directory contents.
+            $cmdArgs[] = '-o';
+            $cmdArgs[] = '-wholename';
+            $cmdArgs[] = escapeshellarg('*/.svn/*');
+            $cmdArgs[] = escapeshellarg(')');
+
+            // Don't delete omitted files and directories, but only at the top level.
+            foreach ($omitFiles as $omitFile) {
+                $cmdArgs[] = '!';
+
+                // Match omitted file or directory itself.
+                $cmdArgs[] = escapeshellarg('(');
+                $cmdArgs[] = '-wholename';
+                $cmdArgs[] = escapeshellarg($path.'/'.$omitFile);
+
+                // Match directory contents (this will not match anything if a file,
+                // and symbolic links are not followed by default in "find", so will
+                // not delete contents of a directory pointed to by a symlink).
+                $cmdArgs[] = '-o';
+                $cmdArgs[] = '-wholename';
+                $cmdArgs[] = escapeshellarg($path.'/'.$omitFile.'/*');
+                $cmdArgs[] = escapeshellarg(')');
             }
+
+            $cmdArgs[] = '-delete';
+
+            $cmd .= ' '.implode(' ', $cmdArgs);
+        }
+
+        exec($cmd, $output, $returnCode);
+
+        if ($returnCode !== 0) {
+            // We had a problem.
+            $error = 'Unable to clear directory: '.$path;
+            throw new RuntimeException($error);
         }
 
         return TRUE;
