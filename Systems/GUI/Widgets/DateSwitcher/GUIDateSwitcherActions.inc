@@ -81,13 +81,15 @@ class GUIDateSwitcherActions
         $settings['startDate'] = Util::getArrayIndex($settings, 'startDate', self::$startDate);
         $settings['months']    = (int) Util::getArrayIndex($settings, 'months', self::$months);
 
+        $endDate = date('Y-m-d', strtotime($settings['startDate'].' +'.$settings['months'].' months -1 day'));
+
         $forClass = 'GUIDateSwitcher-for-'.$settings['widget']['id'];
 
         echo '<div class="'.$settings['widget']['type'].'" id="'.$settings['widget']['id'].'">';
         echo '<ul class="switcher-list">';
         echo '<li class="previous-period '.$forClass.'-previous"><a href=""><span></span></a></li>';
         echo '<li class="current-period '.$forClass.'-current"><a href="">';
-        echo sprintf(ngettext('Last month', 'Last %s months', $settings['months']), $settings['months']);
+        echo sprintf(ngettext('%s month: %s - %s', '%s months: %s - %s', $settings['months']), $settings['months'], date('j M', strtotime($settings['startDate'])), date('j M', strtotime($endDate)));
         echo '</a>';
         echo '<span class="static-text last-1-month">'._('Last month').'</span>';
         echo '<span class="static-text last-3-months">'._('Last 3 months').'</span>';
