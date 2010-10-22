@@ -48,8 +48,12 @@ GUI::bakeTemplates();
 echoDone();
 
 echo '3. Clearing template cache';
-system('rm '.$rootdir.'/data/GUI/tplCache/*');
-echoDone();
+if (is_dir($rootdir.'/data/GUI/tplCache') === TRUE) {
+    system('rm '.$rootdir.'/data/GUI/tplCache/*');
+    echoDone();
+} else {
+    echoSkip();
+}
 
 echo '4. Fixing file system permissions';
 system($rootdir.'/Scripts/fix_perms.sh');
@@ -66,6 +70,18 @@ function echoDone()
     echo exec('echo -en "\033[54G"; echo -n "[ " ; echo -en "\033[0;32mDone" ; tput sgr0 ; echo " ]"')."\n";
 
 }//end echoDone()
+
+
+/**
+ * Echo skip function.
+ *
+ * @return void
+ */
+function echoSkip()
+{
+    echo exec('echo -en "\033[54G"; echo -n "[ " ; echo -en "\033[0;33mSkip" ; tput sgr0 ; echo " ]"')."\n";
+
+}//end echoSkip()
 
 
 ?>
