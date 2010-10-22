@@ -82,13 +82,6 @@ class GUIActions
     private static $_templateVarCounter = 0;
 
     /**
-     * Templates initialisation PHP code.
-     *
-     * @var string
-     */
-    private static $_templateInitCode = '';
-
-    /**
      * Template variable initialisation codes.
      *
      * @var string
@@ -370,7 +363,6 @@ class GUIActions
      */
     public static function bakeTemplate($systemName, $templateName, DOMNode $tplDoc, $isReCacheTemplate=FALSE)
     {
-        self::$_templateInitCode      = '';
         self::$_templateVariablesCode = '';
         self::$_isReCacheTemplate     = $isReCacheTemplate;
         self::$_currentTemplateKey    = '';
@@ -391,14 +383,11 @@ class GUIActions
 
         $php .= self::_getVarCode().' = array();'."\n";
 
-        // Add the PHP code to member var so that during parsing it can be updated.
-        self::$_templateInitCode = $php;
-
         // Parse the special tags in the template file.
         GUI::parseTemplate($tplDoc);
 
         $initCodes  = self::$_templateVariablesCode;
-        $initCodes .= self::$_templateInitCode;
+        $initCodes .= $php;
 
         $phpNode = $tplDoc->createProcessingInstruction('php', $initCodes);
         $tplDoc->insertBefore($phpNode, $tplDoc->firstChild);
@@ -420,19 +409,19 @@ class GUIActions
 
             // Include main CSS.
             $cssCode .= self::_getCSSIncludeCode('all');
-            $cssCode .= "\n<?php \n";
+            $cssCode .= "\n<"."?php \n";
             $cssCode .= "Channels::includeSystem('GUI'); \n";
             $cssCode .= '$_gui_browserType = GUI::getBrowserType();'."\n";
             $cssCode .= 'switch ($_gui_browserType) {'."\n";
             foreach (self::$_browserTypes as $browserType => $parentType) {
                 $cssCode .= 'case \''.$browserType."':\n";
-                $cssCode .= ' ?>';
+                $cssCode .= ' ?'.'>';
                 $cssCode .= self::_getCSSIncludeCode($browserType)."\n";
-                $cssCode .= '<?php ';
+                $cssCode .= '<'.'?php ';
                 $cssCode .= "break;\n";
             }
 
-            $cssCode .= "}\n?>";
+            $cssCode .= "}\n?".'>';
         }//end if
 
         include_once 'Libs/XML/XML.inc';
@@ -651,16 +640,18 @@ class GUIActions
     /**
      * Parses the specified template, converting the special tags to HTML/PHP.
      *
-     * @param DOMNode $tplDoc The Template DOMDocument.
+     * @param DOMNode $tplDoc   The Template DOMDocument.
+     * @param string  $assignTo Variable to assign the results to.
      *
      * @since  4.0.0
-     * @return void
+     * @return string
      */
-    public static function parseTemplate(DOMNode $tplDoc)
+    public static function parseTemplate(DOMNode $tplDoc, $assignTo=NULL)
     {
         include_once 'Libs/XML/XML.inc';
         $tagNames = array(
                      'var',
+                     'content',
                      'widget',
                      'text',
                      'dataProvider',
@@ -668,6 +659,7 @@ class GUIActions
                      'cache',
                     );
 
+        $php = '';
         foreach ($tagNames as $tagName) {
             $tags     = $tplDoc->getElementsByTagName($tagName);
             $topLevel = array();
@@ -677,38 +669,16 @@ class GUIActions
                 }
             }
 
+            // Only the top level tags are parsed by this method, all the rest will
+            // be parsed by the rest of the parseXYZ methods.
             foreach ($topLevel as $tag) {
-                call_user_func(array('self', '_parse'.ucfirst($tagName).'Tag'), $tag);
+                $php .= call_user_func(array('self', '_parse'.ucfirst($tagName).'Tag'), $tag, $assignTo);
             }
-        }
-
-    }//end parseTemplate()
-
-
-    /**
-     * Converts widget tags to HTML/PHP.
-     *
-     * @param DOMNode $parent The parent tag.
-     *
-     * @since  4.0.0
-     * @return string
-     */
-    private static function _convertWidgetTags(DOMNode $parent)
-    {
-        $php .= self::_getVarCode('widget').' = array();'."\n";
-
-        while (TRUE) {
-            $widgets = $parent->getElementsByTagName('widget');
-            if ($widgets->length === 0) {
-                break;
-            }
-
-            $php .= self::_parseWidgetTag($widgets->item(0));
         }
 
         return $php;
 
-    }//end _convertWidgetTags()
+    }//end parseTemplate()
 
 
     /**
@@ -778,19 +748,7 @@ class GUIActions
         $settingsVar  = self::_getVarCode('widget', $widgetid).'["settings"]';
         $settingsCode = self::_getWidgetSettings($widget);
 
-        if ($assignTo === NULL) {
-            if (empty(self::$_cacheTagInfo) === TRUE || self::$_isReCacheTemplate === TRUE) {
-                self::$_templateInitCode .= $settingsCode;
-            } else {
-                $tplCacheCode  = 'if (GUI::templateCacheExists('.self::_printAttributeValue(self::$_cacheTagInfo['cacheKey']).', '.self::_printAttributeValue(self::$_cacheTagInfo['ttl']).') === FALSE) {';
-                $tplCacheCode .= $settingsCode;
-                $tplCacheCode .= '}';
-
-                self::$_templateInitCode .= $tplCacheCode;
-            }
-        } else {
-             $php .= $settingsCode;
-        }
+        $php .= $settingsCode;
 
         // Include widget system.
         $php .= 'Channels::includeSystem("'.$widgetSystemName.'");'."\n";
@@ -818,11 +776,21 @@ class GUIActions
             $php .= $assignTo." = ob_get_clean();\n";
         } else {
             // Top level widget. Need to replace the widget tag with the PHP code.
-            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
-            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
-            $node    = $widget->ownerDocument->importNode($tmpNode, TRUE);
-            $widget->parentNode->insertBefore($node, $widget);
+             // and declare &nbsp for templates containing a &nbsp.
+            $declare   = '[ <!ENTITY nbsp "&#160;"> ]>';
+            $contents  = str_replace(self::$_docType, '', $contents);
+            $contents .= self::$_docType;
+            $contents  = str_replace('>', $declare, $contents);
+            $contents .= '<phpCode><?php '.$php.' ?></phpCode>';
+
+            $tmpDoc = DOMDocument::loadXML($contents);
+            foreach ($tmpDoc->getElementsByTagName('phpCode')->item(0)->childNodes as $tmpNode) {
+                $node = $widget->ownerDocument->importNode($tmpNode, TRUE);
+                $widget->parentNode->insertBefore($node, $widget);
+            }
+
             $widget->parentNode->removeChild($widget);
+            $php = '';
         }//end if
 
         return $php;
@@ -1035,37 +1003,11 @@ class GUIActions
             return $php;
         }
 
-        $indexVarName = NULL;
         foreach ($setting->childNodes as $node) {
             if ($node->nodeType === XML_TEXT_NODE) {
                 continue;
             } else if ($node->nodeType === XML_ELEMENT_NODE) {
-                // There are a few special/reserved tags.
-                switch ($node->tagName) {
-                    case 'text':
-                        $php .= self::_parseTextTag($node, $varName);
-                    break;
-
-                    case 'widget':
-                        $php .= self::_parseWidgetTag($node, $varName);
-                    break;
-
-                    case 'dataProvider':
-                        $php .= self::_parseDataProviderTag($node, $varName);
-                    break;
-
-                    case 'widget-settings':
-                        $php .= self::_parseWidgetSettingsTag($node, $varName);
-                    break;
-
-                    case 'condition':
-                        $php .= self::_parseConditionTag($node, $varName);
-                    break;
-
-                    default:
-                        $php .= self::_parseTag($node, $varName, $indexVarName);
-                    break;
-                }//end switch
+                $php .= self::_parseTag($node, $varName);
             }//end if
         }//end foreach
 
@@ -1132,11 +1074,11 @@ class GUIActions
             break;
 
             case 'condition':
-                $php .= self::_parseConditionTag($node, $varName);
+                $php .= self::_parseConditionTag($node, $assignTo);
             break;
 
             case 'exception':
-                $php .= self::_parseExceptionTag($node, $varName);
+                $php .= self::_parseExceptionTag($node, $assignTo);
             break;
 
             case 'var':
@@ -1148,37 +1090,7 @@ class GUIActions
             break;
 
             case 'content':
-                // Need to wrap content.
-                $domContent  = self::$_docType;
-                $domContent .= '<__tempContent></__tempContent>';
-
-                $temptpl = new DOMDocument('1.0');
-                $temptpl->loadXML($domContent);
-
-                $tempContentEl = $temptpl->getElementsByTagName('__tempContent')->item(0);
-
-                foreach ($node->childNodes as $contentChild) {
-                    $importedNode = $temptpl->importNode($contentChild, TRUE);
-                    $tempContentEl->appendChild($importedNode);
-                }
-
-                GUI::parseTemplate($tempContentEl);
-                $subTemplateStr = $temptpl->saveXML();
-
-                // Just get the content we want.
-                $subTemplateStr = str_replace(self::$_docType, '', $subTemplateStr);
-                $subTemplateStr = trim(str_replace('<?xml version="1.0"?>', '', $subTemplateStr));
-                $subTemplateStr = str_replace('<__tempContent>', '', $subTemplateStr);
-                $subTemplateStr = str_replace('</__tempContent>', '', $subTemplateStr);
-                $subTemplateStr = ' ?>'.$subTemplateStr.'<?php ';
-
-                if ($assignTo !== NULL) {
-                    $php .= 'ob_start();'."\n";
-                    $php .= $subTemplateStr;
-                    $php .= $assignTo.' = ob_get_clean();'."\n";
-                } else {
-                    $php .= $subTemplateStr;
-                }
+                $php .= self::_parseContentTag($node, $assignTo);
             break;
 
             default:
@@ -1299,6 +1211,7 @@ class GUIActions
             $node    = $dp->ownerDocument->importNode($tmpNode, TRUE);
             $dp->parentNode->insertBefore($node, $dp);
             $dp->parentNode->removeChild($dp);
+            $php = '';
         }
 
         return $php;
@@ -1403,6 +1316,7 @@ class GUIActions
             $node    = $text->ownerDocument->importNode($tmpNode, TRUE);
             $text->parentNode->insertBefore($node, $text);
             $text->parentNode->removeChild($text);
+            $php = '';
         }
 
         return $php;
@@ -1468,7 +1382,9 @@ class GUIActions
                      'if-null' => 'if',
                     );
 
-        $php = '';
+        $php     = '';
+        $varName = '$'.self::_getNextVarName('_conditionVar');
+
         foreach ($node->childNodes as $child) {
             if ($child->nodeType === XML_ELEMENT_NODE
                 && isset($tagTypes[$child->tagName]) === TRUE
@@ -1508,7 +1424,13 @@ class GUIActions
                 }//end if
 
                 foreach ($child->childNodes as $condChild) {
-                    $php .= self::_parseTag($condChild, $assignTo);
+                    $parseTagRes = self::_parseTag($condChild, $varName);
+                    if (empty($parseTagRes) === TRUE) {
+                        continue;
+                    }
+
+                    $php .= $parseTagRes."\n";
+                    $php .= 'echo (isset('.$varName.') === TRUE ? '.$varName." : '');\n";
                 }
 
                 if (self::$_isReCacheTemplate === FALSE) {
@@ -1532,6 +1454,7 @@ class GUIActions
             }
 
             $node->parentNode->removeChild($node);
+            $php = '';
         }
 
         return $php;
@@ -1542,7 +1465,7 @@ class GUIActions
     /**
      * Returns the PHP script of the given exception tag.
      *
-     * @param DOMNode $node     The text node to convert.
+     * @param DOMNode $node     The exception node to convert.
      * @param string  $assignTo The variable to assign to. This must be a valid PHP
      *                          variable name (e.g. $example['value']).
      *
@@ -1574,6 +1497,7 @@ class GUIActions
             }
 
             $node->parentNode->removeChild($node);
+            $php = '';
         }
 
         return $php;
@@ -1622,6 +1546,62 @@ class GUIActions
         return '';
 
     }//end _parseVarTag()
+
+
+    /**
+     * Returns the PHP script of the given content tag.
+     *
+     * @param DOMNode $contentTag The content node to convert.
+     * @param string  $assignTo   The variable to assign to. This must be a valid PHP
+     *                            variable name (e.g. $example['value']).
+     *
+     * @since  4.0.0
+     * @return string
+     */
+    private static function _parseContentTag(DOMNode $contentTag, $assignTo=NULL)
+    {
+        // Need to wrap content.
+        $domContent  = self::$_docType;
+        $domContent .= '<__tempContent></__tempContent>';
+
+        $temptpl = new DOMDocument('1.0');
+        $temptpl->loadXML($domContent);
+
+        $tempContentEl = $temptpl->getElementsByTagName('__tempContent')->item(0);
+
+        foreach ($contentTag->childNodes as $contentChild) {
+            $importedNode = $temptpl->importNode($contentChild, TRUE);
+            $tempContentEl->appendChild($importedNode);
+        }
+
+        $varName = self::_getNextVarName();
+        GUI::parseTemplate($tempContentEl);
+        $subTemplateStr = $temptpl->saveXML();
+
+        // Just get the content we want.
+        $subTemplateStr = str_replace(self::$_docType, '', $subTemplateStr);
+        $subTemplateStr = trim(str_replace('<?xml version="1.0"?>', '', $subTemplateStr));
+        $subTemplateStr = str_replace('<__tempContent>', '', $subTemplateStr);
+        $subTemplateStr = str_replace('</__tempContent>', '', $subTemplateStr);
+        $subTemplateStr = ' ?>'.$subTemplateStr.'<?php ';
+
+        $php = '';
+        if ($assignTo !== NULL) {
+            $php .= 'ob_start();'."\n";
+            $php .= $subTemplateStr;
+            $php .= $assignTo.' = ob_get_clean();'."\n";
+        } else {
+            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$subTemplateStr.' ?></phpCode>');
+            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
+            $node    = $contentTag->ownerDocument->importNode($tmpNode, TRUE);
+            $contentTag->parentNode->insertBefore($node, $contentTag);
+            $contentTag->parentNode->removeChild($contentTag);
+            $php = '';
+        }
+
+        return $php;
+
+    }//end _parseContentTag()
 
 
     /**
@@ -1841,7 +1821,7 @@ class GUIActions
     {
         return self::$_isReCaching;
 
-    }//end isRecaching()
+    }//end isReCachingTemplate()
 
 
     /**
@@ -2099,7 +2079,7 @@ class GUIActions
         }
 
         $js .= '<?php '."\n";
-        $js .= '}//end Include JS';
+        $js .= '}//end Include JS'."\n";
         $js .= ' ?'.'>';
 
         return $js;
