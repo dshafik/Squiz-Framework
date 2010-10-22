@@ -750,7 +750,7 @@ dfx.stripTags = function(content, allowedTags)
     var re      = new RegExp(/<\/?(\w+)((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[^'">\s]+))?)+\s*|\s*)\/?>/gim);
     var resCont = content;
     while ((match = re.exec(content)) != null) {
-        if (dfx.inArray(match[1], allowedTags) !== true) {
+        if (dfx.isset(allowedTags) === false || dfx.inArray(match[1], allowedTags) !== true) {
             resCont = resCont.replace(match[0], '');
         }
     }
