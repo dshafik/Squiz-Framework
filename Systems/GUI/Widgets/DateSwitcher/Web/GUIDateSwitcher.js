@@ -41,7 +41,7 @@ GUIDateSwitcher.prototype = {
         if (this.settings.startDate === null) {
             this.startDate = null;
         } else {
-            this.startDate = new Date(self.settings.startDate);
+            this.startDate = new Date(this.settings.startDate);
         }
 
         this.months = this.settings.months;
