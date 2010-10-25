@@ -47,6 +47,7 @@
                 </setting>
                 <setting name="alternate">cols</setting>
                 <setting name="allowDelete">true</setting>
+                <setting name="noItemsMsg"><text>There are no super users in the system</text></setting>
             </widget>
         </setting>
     </widget>
