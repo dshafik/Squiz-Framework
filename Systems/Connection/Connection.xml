@@ -27,5 +27,18 @@
                 <parameter>userid</parameter>
             </modify-parameters>
         </modifier>
+
+        <modifier>
+            <required>yes</required>
+            <method>convertToAssetid</method>
+            <action>Permission::grantPermission</action>
+            <fatal>yes</fatal>
+            <parameters>
+                <parameter>userid</parameter>
+            </parameters>
+            <modify-parameters>
+                <parameter>userid</parameter>
+            </modify-parameters>
+        </modifier>
     </plugs>
 </system>
