@@ -1,0 +1,7 @@
+.GUIContainerSwitcher-itemContent {
+    display: none;
+}
+
+.GUIContainerSwitcher-itemContent.visible {
+    display: block;
+}
