@@ -211,7 +211,7 @@ class GUITableActions
                     echo ' width: '.$column['width'].';';
                 }
 
-                echo '">'.$column['name'];'</th>';
+                echo '">'.$column['name'].'</th>';
             }
 
             echo '</tr></thead>';
@@ -251,13 +251,19 @@ class GUITableActions
 
         $idx = 1;
         foreach ($rows as $rowid => $row) {
+            // Set the class id.
+            $classid = $rowid;
+            if (strpos($rowid, ':') !== FALSE) {
+                list($paintid, $classid) = explode(':', $rowid);
+            }
+
             if ($idx === $rowCount) {
                 $rowClass = ' lastRow';
             } else if ($idx !== 1) {
                 $rowClass = ' midRow';
             }
 
-            echo '<tr rowid="'.$rowid.'" class="';
+            echo '<tr rowid="'.$classid.'" class="';
 
             if (($idx % 2) === 0) {
                 echo 'rowEven';
@@ -265,7 +271,7 @@ class GUITableActions
                 echo 'rowOdd';
             }
 
-            echo ' row-'.$rowid;
+            echo ' row-'.$classid;
             echo '">';
 
             if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
@@ -277,7 +283,13 @@ class GUITableActions
             if (Util::getArrayIndex($settings, 'rowNumbering', self::$rowNumbering) === TRUE) {
                 if (isset($row['_number']) === FALSE) {
                     if ($actualRowids === TRUE) {
-                        $rowNumber = $rowid;
+                        if (strpos($rowid, ':') === FALSE) {
+                            $paintid = $rowid;
+                        } else {
+                            list($paintid, $rowid) = explode(':', $rowid);
+                        }
+
+                        $rowNumber = $paintid;
                     } else {
                         $rowNumber = $idx;
                     }
@@ -321,7 +333,7 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td'.$colspan.' colid="'.$id.'-'.$rowid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'" ';
+                echo '<td'.$colspan.' colid="'.$id.'-'.$classid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'" ';
 
                 echo 'style="text-align: '.$columns[$colid]['align'].';';
                 if (isset($columns[$colid]['width']) === TRUE) {
