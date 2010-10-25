@@ -44,7 +44,7 @@ GUIContainerSwitcher.prototype = {
         dfx.addEvent(buttons, 'click', function(e) {
             if (e.currentTarget.parentNode === parentElem) {
                 self.buttonClicked(e.currentTarget);
-                event.stopPropagation();
+                e.stopPropagation();
             }
         });
 
