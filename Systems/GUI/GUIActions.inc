@@ -1311,10 +1311,17 @@ class GUIActions
 
         if ($assignTo === NULL) {
             // Top level text. Need to replace the text tag with the PHP code.
-            $tmpDoc  = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
-            $tmpNode = $tmpDoc->getElementsByTagName('phpCode')->item(0)->firstChild;
-            $node    = $text->ownerDocument->importNode($tmpNode, TRUE);
-            $text->parentNode->insertBefore($node, $text);
+            // Top level text. Need to replace the text tag with the PHP code.
+            $tmpDoc      = DOMDocument::loadXML('<phpCode><?php '.$php.' ?></phpCode>');
+            $phpCodeElem = $tmpDoc->getElementsByTagName('phpCode')->item(0);
+            $childCount  = $phpCodeElem->childNodes->length;
+
+            for ($i = 0; $i < $childCount; $i++) {
+                $tmpNode = $phpCodeElem->childNodes->item($i);
+                $newNode = $text->ownerDocument->importNode($tmpNode, TRUE);
+                $text->parentNode->insertBefore($newNode, $text);
+            }
+
             $text->parentNode->removeChild($text);
             $php = '';
         }
