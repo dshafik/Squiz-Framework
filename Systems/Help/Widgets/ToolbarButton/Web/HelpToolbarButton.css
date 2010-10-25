@@ -10,6 +10,8 @@
 
 #Help-dialog .GUIDialog-top {
     background-image: -moz-linear-gradient(0% 0 -90deg, #F9F06F, #C5BF66);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F9F06F), to(#C5BF66));
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F9F06F, endColorstr=#C5BF66);
     border-color: #CCC664;
 }
 
