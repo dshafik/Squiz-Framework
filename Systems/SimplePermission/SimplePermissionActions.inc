@@ -199,6 +199,23 @@ class SimplePermissionActions implements PermissionActions
 
 
     /**
+     * Returns TRUE if there are projects in the system.
+     *
+     * @return boolean
+     */
+    public static function hasProjects()
+    {
+        $projects = Permission::getProjects();
+        if (empty($projects) === TRUE) {
+            return FALSE;
+        }
+
+        return TRUE;
+
+    }//end hasProjects()
+
+
+    /**
      * Returns the list of projects for the Permissions screen.
      *
      * @return array
@@ -282,6 +299,7 @@ class SimplePermissionActions implements PermissionActions
         $listSettings = array(
                          'items'          => $listItems,
                          'allowDelete'    => TRUE,
+                         'noItemsMsg'     => _('There are no users assigned to this role.'),
                          'itemsGenerator' => array(
                                               'system' => 'Permission',
                                               'action' => 'generatePermissionScreenListItems',
@@ -327,7 +345,7 @@ class SimplePermissionActions implements PermissionActions
         $iconPath = Asset::getTypeIconPath(Asset::getTypeOfAsset($assetid));
         $name     = Attribute::getAttributeValue($assetid, 'name');
         $data     = array(
-                     'itemContent' => '<div class="PermissionScreen-listItem"><img src="'.$iconPath.'" /> '.$name.'</div>',
+                     'itemContent' => '<div class="PermissionScreen-listItem" title="#'.$assetid.'"><img src="'.$iconPath.'" /> '.$name.'</div>',
                     );
 
         return $data;

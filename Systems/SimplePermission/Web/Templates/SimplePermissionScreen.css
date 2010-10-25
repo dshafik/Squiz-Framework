@@ -4,6 +4,7 @@
 
 .PermissionScreen-listItem {
     line-height: 30px;
+    padding-left: 5px;
 }
 
 .PermissionScreen-listItem img {
