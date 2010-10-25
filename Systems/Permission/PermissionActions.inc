@@ -68,7 +68,7 @@ interface PermissionActions
     /**
      * Returns TRUE if User has specified Permission for Asset.
      *
-     * @param integer $resource  Resource ID to check access to.
+     * @param integer $assetid   Resource ID to check access to.
      * @param string  $privilege The privilege to check for.
      * @param integer $userid    Check access for this User ID.
      *
@@ -93,6 +93,25 @@ interface PermissionActions
      * @return void
      */
     public static function checkAPIPermission($system, $action, array $args, array $settings);
+
+
+    /**
+     * Returns list of projects and their titles.
+     *
+     * @return array
+     */
+    public static function getProjects();
+
+
+    /**
+     * Returns array of users for the specified resource and role.
+     *
+     * @param string $assetid Resource ID to check access to.
+     * @param string $roleid  Id of the Role to use for permissions.
+     *
+     * @return array
+     */
+    public static function getUsers($assetid, $roleid);
 
 
 }//end interface
