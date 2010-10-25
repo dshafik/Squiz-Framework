@@ -146,6 +146,9 @@ GUIList.prototype = {
             // Remove loading row.
             dfx.remove(self._loadingItem);
 
+            // Hide no Items msg.
+            self.hideNoItemsMsg();
+
             while (tmp.firstChild) {
                 self.elem.appendChild(tmp.firstChild);
             }
@@ -157,6 +160,39 @@ GUIList.prototype = {
                 callback.call(self, rows);
             }
         }, 'raw');
+
+    },
+
+    showNoItemsMsg: function()
+    {
+        if (!this.settings.noItemsMsg) {
+            return;
+        }
+
+        dfx.addClass(this.elem, 'noItems');
+
+        var noItemsid  = this.id + '-noItemsMsg';
+        var noItemsDiv = dfx.getId(noItemsid);
+        if (!noItemsDiv) {
+            noItemsDiv    = document.createElement('div');
+            noItemsDiv.id = noItemsid;
+            dfx.addClass(noItemsDiv, 'GUIList-noItemsMsg');
+            dfx.setHtml(noItemsDiv, this.settings.noItemsMsg);
+            dfx.insertAfter(this.elem, noItemsDiv);
+        }
+
+        dfx.addClass(noItemsDiv, 'noItems');
+
+    },
+
+    hideNoItemsMsg: function()
+    {
+        var noItemsDiv = dfx.getId(this.id + '-noItemsMsg');
+        if (noItemsDiv) {
+            dfx.removeClass(noItemsDiv, 'noItems');
+        }
+
+        dfx.removeClass(this.elem, 'noItems');
 
     }
 

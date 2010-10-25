@@ -53,3 +53,21 @@
 .GUIList .GUI-delete.deleted .GUI-deleteIcon {
     margin-top: -8px;
 }
+
+
+/* No Items styles */
+ul.GUIList.noItems {
+    display: none;
+}
+
+div.GUIList-noItemsMsg {
+    display: none;
+    background-color: #F8F8F8;
+    color: #8B8B8B;
+    font-style: italic;
+    padding: 12px;
+}
+
+div.GUIList-noItemsMsg.noItems {
+    display: block;
+}

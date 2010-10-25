@@ -124,6 +124,13 @@ class GUITableActions
      */
     protected static $rowGenerator = NULL;
 
+    /**
+     * Message that is displayed when there are no items in the table.
+     *
+     * @var string
+     */
+    protected static $noItemsMsg = '';
+
 
     /**
      * Prints widgets content.
@@ -135,6 +142,9 @@ class GUITableActions
      */
     public static function paint(array $settings)
     {
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
+
         $settings['rows'] = Util::getArrayIndex($settings, 'rows', array());
         $tableClass       = $settings['widget']['type'];
 
@@ -185,6 +195,10 @@ class GUITableActions
             $tableClass .= ' selectable';
         }
 
+        if (empty($settings['rows']) === TRUE) {
+            $tableClass .= ' noItems';
+        }
+
         echo '<table class="'.$tableClass.'" id="'.$settings['widget']['id'].'" cellspacing="0" cellpadding="0">';
 
         if (isset($settings['hideHeader']) === FALSE
@@ -222,6 +236,13 @@ class GUITableActions
         GUITable::paintRows($settings['rows'], $columns, $settings);
 
         echo '</tbody></table>';
+
+        $noItemsMsg = Util::getArrayIndex($settings, 'noItemsMsg', self::$noItemsMsg);
+        if (empty($settings['rows']) === TRUE && empty($noItemsMsg) === FALSE) {
+            echo '<div id="'.$id.'-noItemsMsg" class="'.$class.'-noItemsMsg noItems">';
+            echo $noItemsMsg;
+            echo '</div>';
+        }
 
         return $settings;
 

@@ -59,6 +59,13 @@ class GUIListActions
      */
     protected static $itemsGenerator = NULL;
 
+    /**
+     * Message that is displayed when there are no items in the list.
+     *
+     * @var string
+     */
+    protected static $noItemsMsg = '';
+
 
     /**
      * Prints widgets content.
@@ -83,14 +90,27 @@ class GUIListActions
             $deletingClass = ' deletable';
         }
 
-        echo '<ul id="'.$id.'" class="'.$class.$sortingClass.$deletingClass.'">';
-
         $items = Util::getArrayIndex($settings, 'items', self::$items);
+
+        $noItemsClass = '';
+        if (empty($items) === TRUE) {
+            $noItemsClass = ' noItems';
+        }
+
+        echo '<ul id="'.$id.'" class="'.$class.$sortingClass.$deletingClass.$noItemsClass.'">';
+
         foreach ($items as $itemid => $item) {
             self::paintItem($itemid, $item, $settings);
         }
 
         echo '</ul>';
+
+        $noItemsMsg = Util::getArrayIndex($settings, 'noItemsMsg', self::$noItemsMsg);
+        if (empty($items) === TRUE && empty($noItemsMsg) === FALSE) {
+            echo '<div id="'.$id.'-noItemsMsg" class="'.$class.'-noItemsMsg '.$noItemsClass.'">';
+            echo $noItemsMsg;
+            echo '</div>';
+        }
 
         return $settings;
 

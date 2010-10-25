@@ -21,6 +21,14 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
+/**
+ * GUITable widget.
+ *
+ * @param {string} id       The id of the widget.
+ * @param {object} settings The settings of the widget.
+ *
+ * @constructor
+ */
 function GUITable(id, settings)
 {
     this.id       = id;
@@ -137,7 +145,7 @@ GUITable.prototype = {
 
         var self = this;
         GUI.sendRequest('GUITable', 'generateRows', params, function(rowHTML) {
-            var tmp     = document.createElement('div');
+            var tmp = document.createElement('div');
             dfx.setStyle(tmp, 'display', 'none');
 
             // Add the tmp div to DOM so that any JS script retrieved will work with
@@ -148,6 +156,9 @@ GUITable.prototype = {
 
             // Remove loading row.
             dfx.remove(self._loadingRow);
+
+            // Hide no Items msg.
+            self.hideNoItemsMsg();
 
             // Get the last row.
             var currentRowCount = tbody.childNodes.length;
@@ -304,6 +315,39 @@ GUITable.prototype = {
 
             callback.call(this, colid, colWidget, td);
         }
+
+    },
+
+    showNoItemsMsg: function()
+    {
+        if (!this.settings.noItemsMsg) {
+            return;
+        }
+
+        dfx.addClass(this.elem, 'noItems');
+
+        var noItemsid  = this.id + '-noItemsMsg';
+        var noItemsDiv = dfx.getId(noItemsid);
+        if (!noItemsDiv) {
+            noItemsDiv    = document.createElement('div');
+            noItemsDiv.id = noItemsid;
+            dfx.addClass(noItemsDiv, 'GUIList-noItemsMsg');
+            dfx.setHtml(noItemsDiv, this.settings.noItemsMsg);
+            dfx.insertAfter(this.elem, noItemsDiv);
+        }
+
+        dfx.addClass(noItemsDiv, 'noItems');
+
+    },
+
+    hideNoItemsMsg: function()
+    {
+        var noItemsDiv = dfx.getId(this.id + '-noItemsMsg');
+        if (noItemsDiv) {
+            dfx.removeClass(noItemsDiv, 'noItems');
+        }
+
+        dfx.removeClass(this.elem, 'noItems');
 
     }
 

@@ -93,7 +93,7 @@ GUITextBox.prototype = {
         var textBox       = dfx.getClass('input', widgetElement)[0];
 
         var value = textBox.value;
-        if (value === this.settings.hint) {
+        if (value === this.settings.hint && dfx.hasClass(textBox, 'usingHint') === true) {
             value = '';
         }
 
