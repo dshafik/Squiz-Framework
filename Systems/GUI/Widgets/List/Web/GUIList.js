@@ -146,7 +146,9 @@ GUIList.prototype = {
             // Remove loading row.
             dfx.remove(self._loadingItem);
 
-            self.elem.appendChild(tmp.firstChild);
+            while (tmp.firstChild) {
+                self.elem.appendChild(tmp.firstChild);
+            }
 
             dfx.remove(tmp);
             GUI.setModified(self, true);

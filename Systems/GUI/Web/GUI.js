@@ -248,7 +248,7 @@ var GUI = new function()
      * @param {DOMElement} targetElement The DOMElement that will wrap the content.
      * @param {object}     params        Parameters for the API method.
      */
-    this.loadContent = function(system, method, targetElement, params) {
+    this.loadContent = function(system, method, targetElement, params, callback) {
         if (dfx.isObj(targetElement) === false) {
             targetElement = dfx.getId(targetElement);
         }
@@ -256,6 +256,9 @@ var GUI = new function()
         GUI.sendRequest(system, method, params, function(contents) {
             // Set the contents.
             dfx.setHtml(targetElement, contents);
+            if (callback) {
+                callback.call(this);
+            }
         }, 'raw');
     };
 

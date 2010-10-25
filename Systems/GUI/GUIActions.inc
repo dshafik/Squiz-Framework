@@ -2259,6 +2259,13 @@ class GUIActions
         try {
             foreach ($templateData as $key => $data) {
                 list($system, $templateName) = explode(':', $key);
+
+                // Check if its an implementer.
+                $channelInfo = Channels::getSystemDependencies($system, 'inheritance');
+                if (empty($channelInfo) === FALSE) {
+                    $system = $channelInfo[0]['to'];
+                }
+
                 Channels::includeSystem($system);
                 $templateName = 'save'.$templateName;
 
