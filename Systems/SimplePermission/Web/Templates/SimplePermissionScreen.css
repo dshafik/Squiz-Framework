@@ -1,0 +1,19 @@
+.PermissionScreen-role .GUIBox-headerContent {
+    float: right;
+}
+
+.PermissionScreen-listItem {
+    line-height: 30px;
+}
+
+.PermissionScreen-listItem img {
+    vertical-align: middle;
+}
+
+.PermissionScreen-rolesLists {
+    display: none;
+}
+
+.PermissionScreen-rolesLists.active {
+    display: block;
+}

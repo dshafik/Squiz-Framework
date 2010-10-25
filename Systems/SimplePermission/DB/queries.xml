@@ -68,4 +68,24 @@
         </primary>
     </query>
 
+    <query id="getUsersByRoleAndResource">
+        <primary>
+            <select>
+                <fields>
+                    <field table="permission" column="userid" />
+                </fields>
+                <from>
+                    <table>permission</table>
+                </from>
+                <where>
+                    <equal table="permission" column="roleid">:roleid</equal>
+                    <equal table="permission" column="resource">:resource</equal>
+                </where>
+                <order-by>
+                    <field table="permission" column="userid" />
+                </order-by>
+            </select>
+        </primary>
+    </query>
+
 </queries>

@@ -169,10 +169,10 @@ class SimplePermissionActions implements PermissionActions
 
         if ($perm === FALSE) {
             $response = array(
-                        'system'    => $system,
-                        'action'    => $action,
-                        'exception' => _('You do not have permission to perform the requested action'),
-                       );
+                         'system'    => $system,
+                         'action'    => $action,
+                         'exception' => _('You do not have permission to perform the requested action'),
+                        );
 
             Channels::includeSystem('API');
             API::sendHeader(401);
@@ -181,6 +181,247 @@ class SimplePermissionActions implements PermissionActions
         }
 
     }//end checkAPIPermission()
+
+
+    /**
+     * Returns list of projects and their titles.
+     *
+     * @return array
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function getProjects()
+    {
+        return array();
+
+    }//end getProjects()
+
+
+    /**
+     * Returns the list of projects for the Permissions screen.
+     *
+     * @return array
+     */
+    public static function getProjectsListForScreen()
+    {
+        $projects = Permission::getProjects();
+
+        return $projects;
+
+    }//end getProjectsListForScreen()
+
+
+    /**
+     * Returns contents for the specified project's permissions.
+     *
+     * @param string $resourceid Id of the resource.
+     *
+     * @return void
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function getPermissionListForScreen($resourceid=NULL)
+    {
+        if ($resourceid === NULL) {
+            $projects = Permission::getProjects();
+            ksort($projects);
+            $resourceid = key($projects);
+        } else {
+            Channels::includeSystem('GUI');
+            GUI::setCurrentTemplateKey('SimplePermission::PermissionScreen');
+        }
+
+        // Get the list of roles that are available.
+        Channels::includeSystem('Role');
+        $roles = Role::getRoles();
+
+        echo '<div id="PermissionScreen-rolesLists-'.$resourceid.'" class="PermissionScreen-rolesLists active">';
+        if (empty($roles) === TRUE) {
+            echo _('There are no roles');
+        } else {
+            // Foreach role create a GUIBox and GUIList for each box with list of users.
+            foreach ($roles as $roleid => $roleName) {
+                echo '<div id="PermissionScreen-rolesList-'.$roleid.'" class="PermissionScreen-rolesList">';
+                self::_printRoleForScreen($resourceid, $roleid, $roleName);
+                echo '</div>';
+            }
+        }
+
+        echo '</div>';
+
+    }//end getPermissionListForScreen()
+
+
+    /**
+     * Prints a role with list of users assigned to it.
+     *
+     * @param string $resourceid Id of the resource.
+     * @param string $roleid     Id of the role.
+     * @param string $roleName   Name of the role.
+     *
+     * @return void
+     */
+    private static function _printRoleForScreen($resourceid, $roleid, $roleName)
+    {
+        Channels::includeSystem('GUI');
+
+        $id    = 'PermissionScreen-role-'.$resourceid.'-'.$roleid;
+        $class = 'PermissionScreen-role';
+        echo '<div class="'.$class.'" id="'.$id.'">';
+        echo '<h2>'.$roleName.'</h2>';
+
+        // Get list of users/groups who are assigned to this role.
+        $assets    = Permission::getUsers($resourceid, $roleid);
+        $listItems = array();
+        foreach ($assets as $assetid) {
+            $listItems[$assetid] = Permission::generatePermissionScreenListItems($assetid);
+        }
+
+        $listSettings = array(
+                         'items'          => $listItems,
+                         'allowDelete'    => TRUE,
+                         'itemsGenerator' => array(
+                                              'system' => 'Permission',
+                                              'action' => 'generatePermissionScreenListItems',
+                                             ),
+                        );
+
+        $usersList = GUI::createWidget($id.'-list', 'GUIList', $listSettings);
+
+        $buttonSettings = array(
+                           'value' => _('Add New'),
+                           'click' => 'SimplePermissionPermissionScreen.addNew(\''.$resourceid.'\', \''.$roleid.'\')',
+                          );
+        $buttonWidget   = GUI::createWidget($id.'-addUser', 'GUIButton', $buttonSettings);
+
+        $boxSettings = array(
+                        'title'         => _('Users & Groups'),
+                        'headerContent' => $buttonWidget,
+                        'content'       => $usersList,
+                       );
+        $box = GUI::createWidget($id.'-box', 'GUIBox', $boxSettings);
+
+        echo $box;
+        echo '</div>';
+
+    }//end _printRoleForScreen()
+
+
+    /**
+     * Generates list items for specified userids.
+     *
+     * @param string $assetid List of user/group ids.
+     *
+     * @return array
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function generatePermissionScreenListItems($assetid)
+    {
+        Channels::includeSystem('Asset');
+        Channels::includeSystem('Attribute');
+
+        $iconPath = Asset::getTypeIconPath(Asset::getTypeOfAsset($assetid));
+        $name     = Attribute::getAttributeValue($assetid, 'name');
+        $data     = array(
+                     'itemContent' => '<div class="PermissionScreen-listItem"><img src="'.$iconPath.'" /> '.$name.'</div>',
+                    );
+
+        return $data;
+
+    }//end generatePermissionScreenListItems()
+
+
+    /**
+     * Returns array of users for the specified resource and role.
+     *
+     * @param string $resource Resource ID to check access to.
+     * @param string $roleid   Id of the Role to use for permissions.
+     *
+     * @return array
+     */
+    public static function getUsers($resource, $roleid)
+    {
+        $query  = DAL::getQuery('SimplePermission', 'getUsersByRoleAndResource');
+        $result = DAL::getAssoc($query, 0);
+
+        return $result;
+
+    }//end getUsers()
+
+
+    /**
+     * Saved the changes in Permission screen.
+     *
+     * @param array $data Data from the permission screen.
+     *
+     * @return mixed
+     * @throws ChannelException If there is an error while saving.
+     */
+    public static function savePermissionScreen(array $data)
+    {
+        Channels::includeSystem('User');
+        if (User::isSystemAdministrator() === FALSE) {
+            throw new ChannelException(_('You must be a super user to access this screen'));
+        }
+
+        $errors = array();
+        try {
+            DAL::beginTransaction();
+
+            Channels::includeSystem('Role');
+            $projects = Permission::getProjects();
+            $roles    = Role::getRoles();
+
+            foreach ($projects as $projectid => $projectName) {
+                foreach ($roles as $roleid => $roleName) {
+                    $index = 'PermissionScreen-role-'.$projectid.'-'.$roleid.'-list';
+                    if (isset($data[$index]) === FALSE) {
+                        // Not found in the save array for some reason..
+                        continue;
+                    }
+
+                    $items        = array_keys($data[$index]['items']);
+                    $removedItems = array_keys($data[$index]['removed']);
+
+                    foreach ($removedItems as $removedid) {
+                        if (strpos($removedid, 'new-') === 0) {
+                            continue;
+                        }
+
+                        Permission::revokePermission($projectid, $roleid, $removedid);
+                    }
+
+                    foreach ($items as $itemid) {
+                        if (strpos($itemid, 'new-') === 0 && in_array($itemid, $removedid) === FALSE) {
+                            $newItemid = str_replace('new-', '', $itemid);
+                            if (empty($newItemid) === FALSE) {
+                                Permission::grantPermission($projectid, $roleid, $newItemid);
+                            }
+                        }
+                    }
+                }//end foreach
+            }//end foreach
+
+            DAL::commit();
+        } catch (ChannelException $e) {
+            DAL::rollback();
+            $errors[] = $e->getMessage();
+        }//end try
+
+        $retVal = TRUE;
+        if (empty($errors) === FALSE) {
+            $retVal = array('errors' => $errors);
+        } else {
+            $retVal = array('success' => TRUE);
+        }
+
+        return $retVal;
+
+    }//end savePermissionScreen()
 
 
 }//end class
