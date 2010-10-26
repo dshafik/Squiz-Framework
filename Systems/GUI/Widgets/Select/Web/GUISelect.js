@@ -45,11 +45,6 @@ function GUISelect(id, settings)
 GUISelect.prototype = {
     init: function()
     {
-        // If the selected array is not an array, then make it one.
-        if (!this.settings.selected.length) {
-            this.settings.selected = [this.settings.selected];
-        }
-
         var self      = this;
         var selectBox = dfx.getId(this.id);
 
@@ -85,6 +80,10 @@ GUISelect.prototype = {
 
     setValue: function(newValue, domEvent)
     {
+        if ((newValue instanceof Array) === false) {
+            newValue = [newValue];
+        }
+
         // If programmatic change, pass a null event.
         domEvent = domEvent || null;
 
