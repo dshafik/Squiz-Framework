@@ -7,3 +7,17 @@
     margin-top: 5px;
     width: 32px;
 }
+
+/* Intervention popup styles */
+#userLogoutButton-intervention .GUIIntervention-content {
+    text-align: center;
+}
+
+#userLogoutButton-intervention .GUIIntervention-content button {
+    margin-top: 10px;
+    min-width: 45%;
+}
+
+#userLogoutButton-intervention .GUIIntervention-content #userLogoutButton-ivbuttonYes {
+    margin-right: 10px;
+}

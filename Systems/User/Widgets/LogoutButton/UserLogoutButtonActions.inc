@@ -44,7 +44,30 @@ class UserLogoutButtonActions
         $class = $settings['widget']['type'];
 
         echo '<div id="'.$id.'" class="'.$class.'" title="'._('Logout').'"';
-        echo ' onclick="window.location=window.location.href.toString() + \'?sq_logout=true\'"></div>';
+        echo ' onclick="GUI.getWidget(\''.$id.'-intervention\').show();"></div>';
+
+        Channels::includeSystem('GUI');
+
+        $ivContents     = '<p>'._('Are you sure you want to logout?').'</p>';
+        $buttonSettings = array(
+                           'value'  => _('Yes'),
+                           'click'  => 'window.location=window.location.href.toString() + \'?sq_logout=true\'',
+                           'colour' => 'Dark',
+                          );
+        $ivContents    .= GUI::createWidget($id.'-ivbuttonYes', 'GUIButton', $buttonSettings);
+        $buttonSettings = array(
+                           'value'  => _('No'),
+                           'click'  => 'GUI.getWidget(\''.$id.'-intervention\').hide();',
+                           'colour' => 'Dark',
+                          );
+        $ivContents    .= GUI::createWidget($id.'-ivbuttonNo', 'GUIButton', $buttonSettings);
+
+        Channels::includeSystem('GUI');
+        $ivSettings = array(
+                       'targetElementid' => $id,
+                       'elementContents' => $ivContents,
+                      );
+        echo GUI::createWidget($id.'-intervention', 'GUIIntervention', $ivSettings);
 
         return $settings;
 
