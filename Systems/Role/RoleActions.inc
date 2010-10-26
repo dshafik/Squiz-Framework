@@ -386,7 +386,7 @@ class RoleActions
         foreach ($structured as $topLevelName => $privs) {
             $items[] = array(
                         'id'          => $topLevelName,
-                        'label'       => _($topLevelName),
+                        'label'       => ucfirst(_($topLevelName)),
                         'itemContent' => self::_getPrivilegeListItemContent($topLevelName, $privs, $unrestricted),
                        );
         }
