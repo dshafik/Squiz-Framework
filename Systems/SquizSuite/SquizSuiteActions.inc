@@ -855,6 +855,14 @@ class SquizSuiteActions
             // Verify the User Agent string. Can we get the system type out of it?
             self::_parseUserAgentString();
 
+            $currProduct = SquizSuite::getProduct();
+            if (empty($currProduct['connection']['url']) === TRUE) {
+                // The current system does not have any API URL set and
+                // is not ready to accept any connection request.
+                $errMsg = 'The system is not ready to accept any connection request.';
+                throw new ChannelException($errMsg);
+            }
+
             // Parse the posted XML file. Exception will be thrown in case error occurs.
             include_once 'Libs/Security/Security.inc';
             $required = array(
@@ -1250,13 +1258,23 @@ class SquizSuiteActions
             switch($updateType) {
                 case 'name':
                 case 'cert':
-                case 'url':
                     $product['connection'][$updateType] = $updateValue;
                     SquizSuite::updateProduct(
                         $systemid,
                         'connection',
                         $product['connection']
                     );
+                break;
+
+                case 'url':
+                    if ($product['connection']['url'] === $updateValue['old']) {
+                        $product['connection']['url'] = $updateValue['new'];
+                        SquizSuite::updateProduct(
+                            $systemid,
+                            'connection',
+                            $product['connection']
+                        );
+                    }
                 break;
 
                 default:
@@ -2143,7 +2161,6 @@ class SquizSuiteActions
         // Current product name.
         $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
         if ($currProductName !== NULL) {
-            $newURL      = '';
             $nameUpdated = FALSE;
             $currProduct = SquizSuite::getProduct();
             if ($currProduct['connection']['name'] !== $currProductName) {
@@ -2157,6 +2174,8 @@ class SquizSuiteActions
         // Current product URL.
         $currProductURL = Util::getArrayIndex($data, 'squizSuite-currProductURL', '');
         if ($currProductURL !== NULL) {
+            $newURL      = '';
+            $oldURL      = '';
             $urlUpdated  = FALSE;
             $currProduct = SquizSuite::getProduct();
 
@@ -2172,39 +2191,12 @@ class SquizSuiteActions
             if ($currProduct['connection']['url'] !== $currProductURL) {
                 $urlUpdated        = TRUE;
                 $connection        = $currProduct['connection'];
+                $oldURL            = $connection['url'];
                 $connection['url'] = $currProductURL;
+                $newURL            = $connection['url'];
                 SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
             }
         }
-
-        // Save Usernames and Passwords for Matrix products.
-        $products = SquizSuite::getAllProducts();
-        foreach ($products as $p) {
-            if ($p['type'] !== 'Squiz Matrix') {
-                // Not Matrix continue...
-                continue;
-            }
-
-            $systemid     = $p['systemid'];
-            $upConnection = $p['connection'];
-            $newUsername  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-username', NULL);
-            $newPassword  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-password', NULL);
-            if ($newUsername !== NULL
-                && (array_key_exists('username', $p['connection']['username']) === FALSE
-                || $newUsername !== $p['connection']['username'])
-            ) {
-                $upConnection['username'] = $newUsername;
-                SquizSuite::updateProduct($systemid, 'connection', $upConnection);
-            }
-
-            if ($newPassword !== NULL
-                && (array_key_exists('password', $p['connection']['password']) === FALSE
-                || $newPassword !== $p['connection']['password'])
-            ) {
-                $upConnection['password'] = $newPassword;
-                SquizSuite::updateProduct($systemid, 'connection', $upConnection);
-            }
-        }//end foreach
 
         // Deleted Product Connection.
         $templateData    = Util::getArrayIndex($data, 'templateData', array());
@@ -2214,6 +2206,54 @@ class SquizSuiteActions
                 SquizSuite::removeProduct($systemid);
             }
         }
+
+        $products = SquizSuite::getAllProducts();
+        foreach ($products as $product) {
+            if ($product['current'] === TRUE) {
+                continue;
+            }
+
+            $systemid = $product['systemid'];
+            if ($product['status'] === 'live') {
+                $updated    = FALSE;
+                $apiURL     = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-apiURL', NULL);
+                $connection = $product['connection'];
+                if ($apiURL !== NULL
+                    && $connection['url'] !== $apiURL
+                ) {
+                    $updated           = TRUE;
+                    $connection['url'] = $apiURL;
+                }
+
+                if ($updated === TRUE) {
+                    SquizSuite::updateProduct($systemid, 'connection', $connection);
+                }
+            }//end if
+
+            // Save Usernames and Passwords for Matrix products.
+            if ($product['type'] === 'Squiz Matrix') {
+                // Not Matrix continue...
+                $systemid     = $product['systemid'];
+                $upConnection = $product['connection'];
+                $newUsername  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-username', NULL);
+                $newPassword  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-password', NULL);
+                if ($newUsername !== NULL
+                    && (array_key_exists('username', $product['connection']['username']) === FALSE
+                    || $newUsername !== $product['connection']['username'])
+                ) {
+                    $upConnection['username'] = $newUsername;
+                    SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+                }
+
+                if ($newPassword !== NULL
+                    && (array_key_exists('password', $product['connection']['password']) === FALSE
+                    || $newPassword !== $product['connection']['password'])
+                ) {
+                    $upConnection['password'] = $newPassword;
+                    SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+                }
+            }//end if
+        }//end foreach
 
         // New Product.
         $newProductURL = Util::getArrayIndex($data, 'squizSuite-new-apiURL', '');
@@ -2267,7 +2307,10 @@ class SquizSuiteActions
             $updateValue = $currProductName;
         } else if ($urlUpdated === TRUE) {
             $updateType  = 'url';
-            $updateValue = $newURL;
+            $updateValue = array(
+                            'old' => $oldURL,
+                            'new' => $newURL,
+                           );
         }
 
         if ($updateType !== NULL && $updateValue !== NULL) {
