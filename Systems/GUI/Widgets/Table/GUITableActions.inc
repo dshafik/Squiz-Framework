@@ -195,7 +195,8 @@ class GUITableActions
             $tableClass .= ' selectable';
         }
 
-        if (empty($settings['rows']) === TRUE) {
+        $noItemsMsg = Util::getArrayIndex($settings, 'noItemsMsg', self::$noItemsMsg);
+        if (empty($settings['rows']) === TRUE && empty($noItemsMsg) === FALSE) {
             $tableClass .= ' noItems';
         }
 
@@ -237,7 +238,6 @@ class GUITableActions
 
         echo '</tbody></table>';
 
-        $noItemsMsg = Util::getArrayIndex($settings, 'noItemsMsg', self::$noItemsMsg);
         if (empty($settings['rows']) === TRUE && empty($noItemsMsg) === FALSE) {
             echo '<div id="'.$id.'-noItemsMsg" class="'.$class.'-noItemsMsg noItems">';
             echo $noItemsMsg;

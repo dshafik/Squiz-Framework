@@ -135,6 +135,9 @@ GUITable.prototype = {
             dfx.setHtml(this._loadingRow, '<td colspan="' + colCount + '"><img src="' + GUI.getWidgetURL('GUI/Table') + '/ajax-loader.gif" /></td>');
         }
 
+        // Hide no Items msg.
+        this.hideNoItemsMsg();
+
         tbody.appendChild(this._loadingRow);
 
         var params = {
@@ -156,9 +159,6 @@ GUITable.prototype = {
 
             // Remove loading row.
             dfx.remove(self._loadingRow);
-
-            // Hide no Items msg.
-            self.hideNoItemsMsg();
 
             // Get the last row.
             var currentRowCount = tbody.childNodes.length;
