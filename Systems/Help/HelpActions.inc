@@ -439,13 +439,23 @@ class HelpActions
 
         if (empty($results) === TRUE) {
             if ($startOffset === 0) {
-                $contents .= '<h2>'._('No search results').'</h2>';
+                $contents .= '<h3 class="Help-noSearchResults">'._('No search results').'</h3>';
             }
         } else {
             // Options for the 2nd argument of Help.loadPage function.
             $opts = urlencode(json_encode(array('searchedWords' => $words)));
 
-            $contents .= '<div class="Help-searchResults-list">';
+            if ($startOffset === 0) {
+                // Show number of results.
+                $contents .= sprintf(
+                              _('<h3>%s results found for <strong>%s</strong></h3>'),
+                             $totalResults,
+                             $searchString
+                             );
+            }
+
+            $contents .= '<ol id="Help-searchResults-list" class="Help-searchResults-list">';
+
             foreach ($results as $fileName => $score) {
                 $dom->loadHTMLFile($docsDir.$fileName);
 
@@ -459,17 +469,20 @@ class HelpActions
                     }
                 }
 
+                $articleType = 'article';
+                if (strpos($id, 'glossary-') === 0) {
+                    $articleType = 'glossary';
+                }
+
                 $href      = 'javascript:parent.window.Help.loadPage(\''.$id.'\', '.$opts.');';
-                $contents .= '<div class="Help-searchResult">';
+                $contents .= '<li class="Help-searchResult '.$articleType.'">';
                 $contents .= '<h4><a href="'.$href.'">'.$title.'</a></h4>';
-                $contents .= '<p>'.$summary.'</p>';
-                $contents .= '</div>';
+                $contents .= '<div class="Help-searchResult-summary">'.$summary.'</div>';
+                $contents .= '</li>';
             }
         }//end if
 
-        if ($startOffset === 0) {
-            $contents .= '</div>';
-        }
+        $contents .= '</ol>';
 
         if ($hasMoreResults === TRUE) {
             $href      = 'javascript:parent.window.Help.getSearchResults(\''.$searchString.'\', '.($startOffset + $maxResults).');';
@@ -1664,7 +1677,7 @@ class HelpActions
             }
 
             // Small icon for the system.
-            $iconURL = '/__web/Systems/'.$systemName.'/Web/sm_'.strtolower($systemName).'_icon.png';
+            $iconURL = '/__web/Systems/'.$systemName.'/Web/icon_'.strtolower($systemName).'_help.png';
 
             $href  = 'Help.closeMenu();Help.loadIndexPage(\''.$systemName.'\');';
             $html .= '<li onclick="'.$href.'" id="Help-dialog-sysMenuItem-'.$systemName.'" >';

@@ -132,6 +132,10 @@ var Help = new function()
                 var tln       = textNodes.length;
                 var regExp    = new RegExp(word, 'gi');
                 for (var j = 0; j < tln; j++) {
+                    if (dfx.isTag(textNodes[j].parentNode, 'script') === true) {
+                        continue;
+                    }
+
                     textNodes[j].nodeValue = textNodes[j].nodeValue.replace(regExp, '__REPLACE_' + i + '__$&__');
                 }
             }
@@ -171,10 +175,16 @@ var Help = new function()
             var wrapper = document.createElement('div');
             dfx.setHtml(wrapper, content);
 
-            var iframeDoc       = dfx.getIframeDocument(_iframe);
-            var currentMoreLink = dfx.getClass('Help-searchResults-moreLink', iframeDoc);
+            var iframeDoc         = dfx.getIframeDocument(_iframe);
+            var searchResultsList = dfx.getClass('Help-searchResults-list', iframeDoc)[0];
 
-            dfx.insertAfter(currentMoreLink, wrapper);
+            var currentMoreLink = dfx.getClass('Help-searchResults-moreLink', iframeDoc)[0];
+
+            dfx.insertAfter(searchResultsList.lastChild, wrapper.firstChild.childNodes);
+
+            if (wrapper.childNodes[1]) {
+                dfx.insertAfter(currentMoreLink, wrapper.childNodes[1]);
+            }
 
             // Remove the old 'More' link.
             dfx.remove(currentMoreLink);
