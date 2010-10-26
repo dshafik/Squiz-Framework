@@ -1280,7 +1280,7 @@ class SquizSuiteActions
                 default:
                     // Do nothing.
                 break;
-            }
+            }//end switch
 
             $response = 'ok';
             return $response;
@@ -1815,7 +1815,7 @@ class SquizSuiteActions
             'GUITextBox',
             array(
              'value' => $currProduct['connection']['name'],
-             'size'  => 50
+             'size'  => 50,
             )
         );
 
@@ -1825,7 +1825,10 @@ class SquizSuiteActions
         $url .= GUI::createWidget(
             'squizSuite-currProductURL',
             'GUITextBox',
-            array('value' => $currProduct['connection']['url'], 'size' => 50)
+            array(
+             'value' => $currProduct['connection']['url'],
+             'size'  => 50,
+            )
         );
 
         // Product summary information.
@@ -2196,7 +2199,7 @@ class SquizSuiteActions
                 $newURL            = $connection['url'];
                 SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
             }
-        }
+        }//end if
 
         // Deleted Product Connection.
         $templateData    = Util::getArrayIndex($data, 'templateData', array());
