@@ -52,6 +52,13 @@ class GUIButtonActions
     protected static $type = 'button';
 
     /**
+     * TRUE if the button is disabled.
+     *
+     * @var boolean
+     */
+    protected static $disabled = '';
+
+    /**
      * The colour of the button.
      *
      * @var string
@@ -68,8 +75,9 @@ class GUIButtonActions
      */
     public static function paint(array $settings)
     {
-        $value  = Util::getArrayIndex($settings, 'value', '');
-        $colour = Util::getArrayIndex($settings, 'colour', self::$colour);
+        $value    = Util::getArrayIndex($settings, 'value', '');
+        $colour   = Util::getArrayIndex($settings, 'colour', self::$colour);
+        $disabled = Util::getArrayIndex($settings, 'disabled', '');
 
         // Handle click setting.
         $onClick = '';
@@ -101,6 +109,10 @@ class GUIButtonActions
         echo '<button id="'.$settings['widget']['id'].'"';
 
         echo ' type="'.Util::getArrayIndex($settings, 'type', self::$type).'"';
+
+        if ($disabled === 'disabled') {
+            echo ' disabled="disabled"';
+        }
 
         echo ' class="'.$settings['widget']['type'].' button'.$colour.'"'.$onClick.'>';
 
