@@ -3,6 +3,10 @@
     margin: 0 auto;
 }
 
+#currProductTable td.col-currName {
+    padding: 10px 0;
+}
+
 #squizSuite-currentProduct-box .GUITable-colWrapper,
 #squizSuite-connectedProduct-box .GUITable-colWrapper {
     padding: 0px;
@@ -21,10 +25,6 @@
 
 #squizSuite-currentProduct-box tr.rowOdd {
     height: 76px;
-}
-
-#squizSuite-currProductName .GUITextBox.input {
-    width: 50%;
 }
 
 #squizSuite-connectedProduct-box {
@@ -93,7 +93,7 @@ td.col-currSummary {
 }
 
 #squizSuite-currProductName {
-    margin-top: 6px;
+    margin: 6px 0;
 }
 
 span.SquizSuiteScreen-currentPrductNameDesc {

@@ -1788,14 +1788,28 @@ class SquizSuiteActions
         $typeC    = str_replace(' ', '', $currProduct['type']);
         $typeIcon = '<div class="SquizSuiteScreen-productIconWrap '.$typeC.'">&nbsp;</div>';
 
+        // Name of the product.
         $name  = '<strong>'._('Name').'</strong>&nbsp;&nbsp;';
         $name .= '<span class="SquizSuiteScreen-currentPrductNameDesc">('._('this name will appear in all connected products').')</span><br />';
         $name .= GUI::createWidget(
             'squizSuite-currProductName',
             'GUITextBox',
-            array('value' => $currProduct['connection']['name'])
+            array(
+             'value' => $currProduct['connection']['name'],
+             'size'  => 50
+            )
         );
 
+        // URL of the product.
+        $url  = '<strong>'._('URL').'</strong>&nbsp;&nbsp;';
+        $url .= '<span class="SquizSuiteScreen-currentPrductNameDesc">('._('this URL is required to add a new product').')</span><br />';
+        $url .= GUI::createWidget(
+            'squizSuite-currProductURL',
+            'GUITextBox',
+            array('value' => $currProduct['connection']['url'], 'size' => 50)
+        );
+
+        // Product summary information.
         $summary        = '<strong>'._('Summary').'</strong><br /><div class="SquizSuiteScreen-summaryWrap">';
         $productSummary = SquizSuite::getProductSummary();
         foreach ($productSummary as $field) {
@@ -1808,7 +1822,7 @@ class SquizSuiteActions
         $rows   = array();
         $rows[] = array(
                    'currTypeIcon'   => $typeIcon,
-                   'currName'       => $name,
+                   'currName'       => $name.$url,
                    'currStatusIcon' => '&nbsp;',
                    'currSummary'    => $summary,
                   );
@@ -2138,6 +2152,29 @@ class SquizSuiteActions
             }
         }
 
+        // Current product URL.
+        $currProductURL = Util::getArrayIndex($data, 'squizSuite-currProductURL', '');
+        if ($currProductURL !== NULL) {
+            $urlUpdated  = FALSE;
+            $currProduct = SquizSuite::getProduct();
+
+            Channels::includeSystem('API');
+            $apiSuffix      = API::getAPISuffix();
+            $currProductURL = rtrim($currProductURL, '/');
+            if (empty($currProductURL) === FALSE
+                && strpos($currProductURL, $apiSuffix) !== (strlen($currProductURL) - 5)
+            ) {
+                $currProductURL .= '/'.$apiSuffix;
+            }
+
+            if ($currProduct['connection']['url'] !== $currProductURL) {
+                $urlUpdated        = TRUE;
+                $connection        = $currProduct['connection'];
+                $connection['url'] = $currProductURL;
+                SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
+            }
+        }
+
         // Save Usernames and Passwords for Matrix products.
         $products = SquizSuite::getAllProducts();
         foreach ($products as $p) {
@@ -2179,9 +2216,12 @@ class SquizSuiteActions
         // New Product.
         $newProductURL = Util::getArrayIndex($data, 'squizSuite-new-apiURL', '');
         if (empty($newProductURL) === FALSE) {
+            Channels::includeSystem('API');
+            $apiSuffix = API::getAPISuffix();
+
             $url = rtrim($newProductURL, '/');
-            if (strpos($url, '__api') !== (strlen($url) - 5)) {
-                $url .= '/__api';
+            if (strpos($url, $apiSuffix) !== (strlen($url) - 5)) {
+                $url .= '/'.$apiSuffix;
             }
 
             $response = SquizSuite::sendMessage($url, 'suiteConnect');

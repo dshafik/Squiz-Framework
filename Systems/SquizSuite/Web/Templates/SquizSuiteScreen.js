@@ -81,6 +81,13 @@ var SquizSuiteSquizSuiteScreen = new function()
             return true;
         });
 
+        // Disable Add New button if the current URL is not set.
+        if (data.currentProduct.connection.url === '') {
+            GUI.getWidget('addNewProduct').disable();
+        } else {
+            GUI.getWidget('addNewProduct').enable();
+        }
+
         // Hide new product row.
         _newRow       = _connectedProductRows[(_connectedProductRows.length - 3)];
         _newDetailRow = _connectedProductRows[(_connectedProductRows.length - 1)];
