@@ -31,6 +31,7 @@
                 <setting name="rows">
                     <dataProvider action="Backup::getBackupList" />
                 </setting>
+                <setting name="noItemsMsg"><text>No backups have been created</text></setting>
                 <setting name="alternate">rows</setting>
             </widget>
         </setting>
