@@ -1,3 +1,13 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: Arial, Sans-serif;
+    font-size: 12px;
+    color: #000;
+}
+
 #Help-dialog .GUIDialog-middle {
     border: none;
 }
@@ -84,7 +94,7 @@ a.Help-control-button.general:active {
     float: right;
 }
 
-/* IFrame styles */
+/* iFrame/Content styles */
 .Help-iframe {
     font-family: arial;
     font-size: 12px;
@@ -99,7 +109,7 @@ a.Help-control-button.general:active {
 }
 
 .Help-iframe a {
-    color: #153864;
+    color: #5395D8;
     text-decoration: none;
 }
 
@@ -198,29 +208,72 @@ a.Help-control-button.general:active {
 }
 
 /* Help Search results */
+.Help-iframe h3 {
+    color:#24517d;
+    font-size:15px;
+    font-weight: normal;
+    padding: 10px;
+    background-color: #c4e1fd;
+    border: 1px solid #9bc7f3;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+ }
+ .Help-iframe .Help-searchResults-moreLink {
+    display: inline;
+}
+.Help-iframe .Help-searchResults-moreLink a,
+.Help-iframe .Help-searchResults-moreLink a:visited {
+    display: block;
+    font-weight: normal;
+    padding: 5px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    text-align: center;
+    border: 1px solid #bbb;
+    color: #444;
+    text-shadow: 0px 1px 1px #FFF;
+    background-color: #dbdbdb;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f8f8f8), to(#c0c0c0));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #f8f8f8, #c0c0c0);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#f8f8f8, endColorstr=#c0c0c0);
+}
+
+.Help-iframe ol.Help-searchResults-list {
+    padding: 0 0 0 15px;
+    margin: 10px 0;
+    color: #777;
+    font-size: 10px;
+}
 .Help-iframe .Help-searchResult {
-    border-bottom: 1px solid #DDD;
-    margin-bottom: 5px;
+    border-bottom: 1px dotted #DEDEDE;
+    padding: 7px 0 7px 21px;
+    background: transparent url(icon-article.png) 0 11px no-repeat;
+}
+.Help-iframe .Help-searchResult.glossary {
+    background-image: url(icon-glossary.png);
 }
 
 .Help-iframe .Help-searchResult h4 {
+    font-size: 12px;
     margin: 0;
     padding: 2px 0;
 }
-
 .Help-iframe .Help-searchResult h4 a {
-    text-decoration: none;
     color: #000;
+}
+.Help-iframe .Help-searchResult.glossary h4 a {
+    color: #111;
+    font-weight: normal;
+    font-style: italic;
 }
 
 .Help-iframe .Help-searchResult h4 a:hover {
     text-decoration: underline;
 }
 
-.Help-iframe .Help-searchResult p {
-    margin: 0;
-    padding: 0;
-    padding-left: 10px;
+.Help-iframe .Help-searchResult-summary {
+    font-size: 12px;
+    color: #888;
 }
 
 .Help-iframe .Help-searchTerm-1 {
@@ -360,4 +413,18 @@ a.Help-control-button.general:active {
 #Help-dialog .GUIDialog-subTitle {
     font-size: 15px;
     color: #000;
+}
+
+/* Search Input overrides */
+
+#Help-search-input.GUITextBox.input {
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    padding-left: 22px;
+    width: 105px;
+    background: transparent url(icon-search.png) 6px 58% no-repeat;
+    -webkit-box-shadow: 1px 1px 3px #ccc inset;
+    -moz-box-shadow: 1px 1px 3px #ccc inset;
+    border-color: #aaa #ccc #ddd;
+    outline: none;
 }
