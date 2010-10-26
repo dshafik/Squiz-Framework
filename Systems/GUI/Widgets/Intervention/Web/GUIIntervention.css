@@ -1,0 +1,90 @@
+.GUIIntervention {
+    background-color: #FFF;
+    -moz-border-radius: 9px;
+    -moz-box-shadow: 0px 0px 20px 2px #222;
+    position: fixed;
+    z-index: 5001;
+    border: 3px solid #EFEFEF;
+    display: none;
+}
+
+.GUIIntervention.visible {
+    display: block;
+}
+
+.GUIIntervention.calc {
+    display: block;
+    visibility: hidden;
+}
+
+.GUIIntervention-arrow {
+    background: url(arrow.png) no-repeat;
+    width: 42px;
+    height: 31px;
+    position: absolute;
+}
+
+.GUIIntervention.top {
+    margin-top: 30px;
+}
+
+.GUIIntervention.top .GUIIntervention-arrow {
+    margin-top: -30px;
+}
+
+.GUIIntervention.top.left {
+    margin-left: -24px;
+}
+
+.GUIIntervention.top.left .GUIIntervention-arrow {
+    left: 2px;
+}
+
+.GUIIntervention.top.right {
+    margin-left: 27px;
+}
+
+.GUIIntervention.top.right .GUIIntervention-arrow {
+    right: 1px;
+}
+
+
+.GUIIntervention.top.center .GUIIntervention-arrow {
+    left: 50%;
+    margin-left: -20px;
+}
+
+.GUIIntervention.bottom {
+    margin-top: -30px;
+}
+
+.GUIIntervention.bottom.right {
+    margin-left: 27px;
+}
+
+.GUIIntervention.bottom.left {
+    margin-left: -24px;
+}
+
+.GUIIntervention.bottom .GUIIntervention-arrow {
+    margin-bottom: -30px;
+    bottom: 0;
+    background-position: 0 -31px;
+}
+
+.GUIIntervention.bottom.center .GUIIntervention-arrow {
+    left: 50%;
+    margin-left: -20px;
+}
+
+.GUIIntervention.bottom.left .GUIIntervention-arrow {
+    left: 2px;
+}
+
+.GUIIntervention.bottom.right .GUIIntervention-arrow {
+    right: 2px;
+}
+
+.GUIIntervention-content {
+    margin: 10px;
+}
