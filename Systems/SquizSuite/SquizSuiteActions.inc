@@ -1250,6 +1250,7 @@ class SquizSuiteActions
             switch($updateType) {
                 case 'name':
                 case 'cert':
+                case 'url':
                     $product['connection'][$updateType] = $updateValue;
                     SquizSuite::updateProduct(
                         $systemid,
@@ -2142,6 +2143,7 @@ class SquizSuiteActions
         // Current product name.
         $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
         if ($currProductName !== NULL) {
+            $newURL      = '';
             $nameUpdated = FALSE;
             $currProduct = SquizSuite::getProduct();
             if ($currProduct['connection']['name'] !== $currProductName) {
@@ -2257,12 +2259,22 @@ class SquizSuiteActions
             }//end if
         }//end if
 
-        // Product name has been changed. Send out the product update message.
+        // Product name or URL has been changed. Send out the product update messages.
+        $updateType  = NULL;
+        $updateValue = NULL;
         if ($nameUpdated === TRUE) {
+            $updateType  = 'name';
+            $updateValue = $currProductName;
+        } else if ($urlUpdated === TRUE) {
+            $updateType  = 'url';
+            $updateValue = $newURL;
+        }
+
+        if ($updateType !== NULL && $updateValue !== NULL) {
             $liveProducts = SquizSuite::getLiveProducts();
             $options      = array(
-                             'updateType'  => 'name',
-                             'updateValue' => $currProductName,
+                             'updateType'  => $updateType,
+                             'updateValue' => $updateValue,
                             );
 
             foreach ($liveProducts as $product) {
@@ -2272,7 +2284,7 @@ class SquizSuiteActions
                     $options
                 );
             }
-        }//end if
+        }
 
         return $retVal;
 
