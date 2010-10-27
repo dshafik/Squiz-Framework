@@ -148,6 +148,43 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the default systemid for the type passed.
+     *
+     * @param string $productType Type of the product.
+     *
+     * @return string
+     */
+    public static function getDefaultIDForType($productType)
+    {
+        $id = '';
+        switch ($productType) {
+            case 'Squiz CMS':
+                $id = 'cms_demo';
+            break;
+
+            case 'Squiz Analytics':
+                $id = 'analytics_demo';
+            break;
+
+            case 'Squiz Search':
+                $id = 'search_demo';
+            break;
+
+            case 'Squiz Update':
+                $id = 'update_demo';
+            break;
+
+            default:
+                // No default ID for unknown product.
+            break;
+        }//end switch
+
+        return $id;
+
+    }//end getDefaultIDForType()
+
+
+    /**
      * Returns the public key of the current product.
      *
      * @return string
@@ -236,6 +273,60 @@ class SquizSuiteActions
         return self::$_suiteSystemUser;
 
     }//end isSuiteSystemUser()
+
+
+    /**
+     * Add a new Update Product for activation.
+     *
+     * If the system hasn't been activated yet, its ID does not
+     * exist in the update server. In this instance, we can not
+     * proceed the normal connection handshake sequence to connect.
+     *
+     * This action will set the appropriate setting for the update server
+     * to connect and the rest will be handled by the real activation
+     * in Patching System.
+     *
+     * @return void
+     */
+    public static function addUpdateServerForActivation($apiURL)
+    {
+        Channels::includeSystem('API');
+        $apiURL   = rtrim($apiURL, '/');
+        $cert     = '';
+        $message  = array();
+        $systemid = NULL;
+        try {
+            $response = API::sendCURLAPIRequest(
+                $apiURL.'/json/SquizSuite/getPublicKey',
+                $message
+            );
+        } catch (Exception $e) {
+            $response['curlInfo'] = array('http_code' => NULL);
+        }
+
+        if ($response['curlInfo']['http_code'] === 200) {
+            $decoded = json_decode($response['result'], TRUE);
+            $cert    = $decoded['result'];
+
+            $systemid   = 'update_demo';
+            $systemName = 'Demo Squiz Update';
+            $systemType = 'Squiz Update';
+            $connection = array(
+                           'url'  => $apiURL,
+                           'name' => $systemName,
+                           'cert' => $cert,
+                          );
+
+            SquizSuite::registerProduct(
+                $systemid,
+                $systemType,
+                $connection
+            );
+
+            SquizSuite::updateProduct($systemid, 'current', FALSE);
+            SquizSuite::updateProduct($systemid, 'status', 'pending');
+        }
+    }//end addUpdateServerForActivation()
 
 
     /**
@@ -2274,72 +2365,8 @@ class SquizSuiteActions
             }//end if
         }//end foreach
 
-        // New Product.
-        $newProductURL = Util::getArrayIndex($data, 'squizSuite-new-apiURL', '');
-        if (empty($newProductURL) === FALSE) {
-            Channels::includeSystem('API');
-            $apiSuffix = API::getAPISuffix();
-
-            $url = rtrim($newProductURL, '/');
-            if (strpos($url, $apiSuffix) !== (strlen($url) - 5)) {
-                $url .= '/'.$apiSuffix;
-            }
-
-            // Check whether Update Product already exists.
-            $productType     = '';
-            $getProdTypeURL  = $url;
-            $getProdTypeURL .= '/json/SquizSuite/getProductType';
-            $response        = API::sendCURLAPIRequest($getProdTypeURL, array());
-            if ($response['curlInfo']['http_code'] === 200) {
-                $productType = json_decode($response['result'], TRUE);
-                $productType = $productType['result'];
-                if ($productType === 'Squiz Update') {
-                    // It is a Squiz Update system.
-                    $updateProducts = SquizSuite::getProductsByType('Squiz Update');
-                    if (empty($updateProducts) === FALSE) {
-                        return _('Update Product already exists');
-                    }
-                }
-            }
-
-            $response   = SquizSuite::sendMessage($url, 'suiteConnect');
-            $matrixTest = FALSE;
-            if ($response['curlInfo']['http_code'] === 404) {
-                // This may be a Matrix connection if a 404 is received, try again.
-                $url        = substr($url, 0, -6);
-                $response   = SquizSuite::sendMessage($url, 'suiteConnect');
-                $matrixTest = TRUE;
-            }
-
-            if ($response['curlInfo']['http_code'] !== 200) {
-                $retVal = _($response['curlInfo']['http_code'].' response returned.');
-            } else {
-                $response = $response['result'];
-                if (strpos($response, '<?xml') !== 0) {
-                    $retVal = _('Error occurred.');
-                } else {
-                    Channels::includeSystem('API');
-                    $dom = new DomDocument();
-                    $dom->loadXML($response);
-
-                    $responseDom = $dom->getElementsByTagName('result')->item(0);
-                    $response    = API::getResponseFromXMLDom($responseDom);
-                    if ($response === 'ok') {
-                        $tempid     = uniqid();
-                        if ($matrixTest === TRUE) {
-                            $systemType = 'Squiz Matrix';
-                        } else {
-                            $systemType = $productType;
-                        }
-
-                        $connection = array('url' => $url);
-                    }
-
-                    SquizSuite::registerProduct($tempid, $systemType, $connection);
-                    SquizSuite::updateProduct($tempid, 'status', 'pending');
-                }//end if
-            }//end if
-        }//end if
+        // Add a new product.
+        self::_saveAddNewProduct($data);
 
         // Product name or URL has been changed. Send out the product update messages.
         $updateType  = NULL;
@@ -2374,6 +2401,95 @@ class SquizSuiteActions
         return $retVal;
 
     }//end _saveSquizSuiteScreen()
+
+
+    /**
+     * Helper function to process saving a new product.
+     *
+     * @param array $data Submitted data to process.
+     *
+     * @return mixed
+     */
+    private static function _saveAddNewProduct(array $data)
+    {
+        // New Product.
+        $newProductURL = Util::getArrayIndex($data, 'squizSuite-new-apiURL', '');
+        if (empty($newProductURL) === FALSE) {
+            Channels::includeSystem('API');
+            $apiSuffix = API::getAPISuffix();
+
+            $url = rtrim($newProductURL, '/');
+            if (strpos($url, $apiSuffix) !== (strlen($url) - 5)) {
+                $url .= '/'.$apiSuffix;
+            }
+
+            // Check whether Update Product already exists.
+            $productType     = '';
+            $getProdTypeURL  = $url;
+            $getProdTypeURL .= '/json/SquizSuite/getProductType';
+            $response        = API::sendCURLAPIRequest($getProdTypeURL, array());
+            if ($response['curlInfo']['http_code'] === 200) {
+                $productType = json_decode($response['result'], TRUE);
+                $productType = $productType['result'];
+                if ($productType === 'Squiz Update') {
+                    // It is a Squiz Update system.
+                    $updateProducts = SquizSuite::getProductsByType('Squiz Update');
+                    if (empty($updateProducts) === FALSE) {
+                        return _('Update Product already exists');
+                    }
+                }
+            }
+
+            $currProduct   = SquizSuite::getProduct();
+            $currTypeDefID = SquizSuite::getDefaultIDForType(SquizSuite::getProductType());
+            if ($currProduct['systemid'] === $currTypeDefID
+                && $productType === 'Squiz Update'
+            ) {
+                // This is not an activated system and tries to connect to
+                // the update server.
+                SquizSuite::addUpdateServerForActivation($url);
+                return;
+            }
+
+            $response   = SquizSuite::sendMessage($url, 'suiteConnect');
+            $matrixTest = FALSE;
+            if ($response['curlInfo']['http_code'] === 404) {
+                // This may be a Matrix connection if a 404 is received, try again.
+                $url        = substr($url, 0, -6);
+                $response   = SquizSuite::sendMessage($url, 'suiteConnect');
+                $matrixTest = TRUE;
+            }
+
+            if ($response['curlInfo']['http_code'] !== 200) {
+                $retVal = _($response['curlInfo']['http_code'].' response returned.');
+            } else {
+                $response = $response['result'];
+                if (strpos($response, '<?xml') !== 0) {
+                    $retVal = _('Error occurred.');
+                } else {
+                    Channels::includeSystem('API');
+                    $dom = new DomDocument();
+                    $dom->loadXML($response);
+
+                    $responseDom = $dom->getElementsByTagName('result')->item(0);
+                    $response    = API::getResponseFromXMLDom($responseDom);
+                    if ($response === 'ok') {
+                        $tempid = uniqid();
+                        if ($matrixTest === TRUE) {
+                            $systemType = 'Squiz Matrix';
+                        } else {
+                            $systemType = $productType;
+                        }
+
+                        $connection = array('url' => $url);
+                        SquizSuite::registerProduct($tempid, $systemType, $connection);
+                        SquizSuite::updateProduct($tempid, 'status', 'pending');
+                    }
+                }//end if
+            }//end if
+        }//end if
+
+    }//end _saveAddNewProduct()
 
 
     /**
