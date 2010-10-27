@@ -45,6 +45,13 @@ class GUIAssetPickerActions
      */
     protected static $content = '';
 
+    /**
+     * Custom function that will be called to retrieve the children.
+     *
+     * @var array
+     */
+    protected static $getChildrenFunction = NULL;
+
 
     /**
      * Prints widgets content.
@@ -89,6 +96,12 @@ class GUIAssetPickerActions
         Channels::includeSystem('Permission');
         if (Permission::hasPermission($rootNode, 'asset.read.content') === FALSE) {
             return array();
+        }
+
+        $getChildrenFunction = Util::getArrayIndex($jsSettings, 'getChildrenFunction', NULL);
+        if ($getChildrenFunction !== NULL) {
+            $children = call_user_func($getChildrenFunction, $rootNode);
+            return $children;
         }
 
         Channels::includeSystem('Linking');

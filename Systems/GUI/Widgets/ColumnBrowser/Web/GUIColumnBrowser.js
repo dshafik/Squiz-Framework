@@ -42,9 +42,9 @@ function GUIColumnBrowser(id, settings)
         this._lineageWidget = GUI.getWidget(this.settings.lineageWidgetId);
     }
 
-    this.init();
-
     GUI.addWidgetEvent(this, 'itemClicked');
+
+    this.init();
 
 }
 
@@ -63,6 +63,10 @@ GUIColumnBrowser.prototype = {
             this._lineageWidget.addItemClickedCallback(function(itemid, index) {
                 self.lineageItemClicked(itemid, index);
             });
+        }
+
+        if (dfx.isset(this.settings.initialItemid) === true) {
+            this.selectItem(this.settings.initialItemid, 0);
         }
 
     },
@@ -118,7 +122,7 @@ GUIColumnBrowser.prototype = {
         var iln   = items.length;
 
         for (var i = 0; i < iln; i++) {
-            if (dfx.attr(items[i], 'itemid') === itemid) {
+            if (dfx.attr(items[i], 'itemid').toString() === itemid.toString()) {
                 this.itemClicked(items[i]);
                 return true;
             }

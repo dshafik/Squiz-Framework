@@ -98,6 +98,13 @@ class GUIColumnBrowserActions
     protected static $dynamicLoading = FALSE;
 
     /**
+     * Initial item id.
+     *
+     * @var string
+     */
+    protected static $initialItemid = NULL;
+
+    /**
      * List of columns.
      *
      * @var array
@@ -184,14 +191,14 @@ class GUIColumnBrowserActions
 
         foreach ($items as $itemInfo) {
             ob_start();
-                GUIColumnBrowser::paintItem($itemInfo, $settings);
+            GUIColumnBrowser::paintItem($itemInfo, $settings);
 
-                if (empty($itemInfo['children']) === FALSE) {
-                    // Paint children in a new column.
-                    GUIColumnBrowser::paintColumns($settings, $itemInfo['children'], ($level + 1), $itemInfo['id'], $itemInfo['title']);
-                }
+            if (empty($itemInfo['children']) === FALSE) {
+                // Paint children in a new column.
+                GUIColumnBrowser::paintColumns($settings, $itemInfo['children'], ($level + 1), $itemInfo['id'], $itemInfo['title']);
+            }
 
-                self::$_columns[$level][$parentid]['content'] .= ob_get_contents();
+            self::$_columns[$level][$parentid]['content'] .= ob_get_contents();
             ob_end_clean();
         }
 
@@ -291,11 +298,11 @@ class GUIColumnBrowserActions
         }
 
         ob_start();
-            foreach ($items as $item) {
-                GUIColumnBrowser::paintItem($item, $settings);
-            }
+        foreach ($items as $item) {
+            GUIColumnBrowser::paintItem($item, $settings);
+        }
 
-            $contents = ob_get_contents();
+        $contents = ob_get_contents();
         ob_end_clean();
 
         return $contents;
@@ -363,16 +370,16 @@ class GUIColumnBrowserActions
             $contents .= '<div class="GUIColumnBrowser-column-card visible" parentid="'.$parentid.'">';
 
             ob_start();
-                foreach ($items as $item) {
-                    $selected = FALSE;
-                    if ((string) $childSelection === (string) $item['id']) {
-                        $selected = TRUE;
-                    }
-
-                    GUIColumnBrowser::paintItem($item, $settings, $selected);
+            foreach ($items as $item) {
+                $selected = FALSE;
+                if ((string) $childSelection === (string) $item['id']) {
+                    $selected = TRUE;
                 }
 
-                $contents .= ob_get_contents();
+                GUIColumnBrowser::paintItem($item, $settings, $selected);
+            }
+
+            $contents .= ob_get_contents();
             ob_end_clean();
 
             $contents .= '</div></div>';
