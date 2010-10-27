@@ -34,6 +34,7 @@ class GUIButtonActions
      * Value of button.
      *
      * @var string
+     * @internal
      */
     protected static $value = '';
 
@@ -41,6 +42,7 @@ class GUIButtonActions
      * The onlcick action for the button.
      *
      * @var string
+     * @internal
      */
     protected static $click = '';
 
@@ -48,6 +50,7 @@ class GUIButtonActions
      * The type of the button (e.g. submit).
      *
      * @var string
+     * @internal
      */
     protected static $type = 'button';
 
@@ -62,8 +65,17 @@ class GUIButtonActions
      * The colour of the button.
      *
      * @var string
+     * @internal
      */
     protected static $colour = 'Default';
+
+    /**
+     * Access key for the button.
+     *
+     * @var string
+     * @internal
+     */
+    protected static $accessKey = NULL;
 
 
     /**
@@ -91,7 +103,13 @@ class GUIButtonActions
                     $funcArguments = array();
                 }
 
-                $args = '\''.implode('\', \'', $funcArguments).'\'';
+                $quoteArgs = Util::getArrayIndex($click, 'quoteArgs', TRUE);
+
+                if ($quoteArgs === TRUE) {
+                    $args = '\''.implode('\', \'', $funcArguments).'\'';
+                } else {
+                    $args = implode(', ', $funcArguments);
+                }
 
                 $targetWidget = Util::getArrayIndex($click, 'targetWidget', NULL);
                 if ($targetWidget !== NULL) {
@@ -112,6 +130,11 @@ class GUIButtonActions
 
         if ($disabled === 'disabled') {
             echo ' disabled="disabled"';
+        }
+
+        $accessKey = Util::getArrayIndex($settings, 'accesskey', self::$accessKey);
+        if ($accessKey !== NULL) {
+            echo ' accesskey="'.$accessKey.'"';
         }
 
         echo ' class="'.$settings['widget']['type'].' button'.$colour.'"'.$onClick.'>';
