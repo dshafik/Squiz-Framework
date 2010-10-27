@@ -9,7 +9,7 @@
         <!-- Start Rolest Screen settings box -->
         <widget type="GUI/ScreenSettings" id="rolesList">
             <setting name="title">
-                <text>Roles Setting</text>
+                <text>Roles Manager</text>
             </setting>
             <setting name="subTitle">
                 <content>
