@@ -37,6 +37,8 @@ var UserUserManagerScreen = new function()
                 // Get edit template contents for the item.
                 _loadEditContents(itemid);
             });
+
+            browser.selectItem(data.localUsersFolderid, 0);
         }
     };
 
@@ -209,7 +211,8 @@ var UserUserManagerScreen = new function()
         };
 
         var templateSettings = {
-            rootNode: _usersFolderid
+            rootNode: _usersFolderid,
+            getChildrenFunction: ['User', 'getChildren']
         };
 
         var self = this;

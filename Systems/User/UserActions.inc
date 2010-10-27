@@ -979,7 +979,9 @@ class UserActions
 
         $usersFolder = array();
         $children    = array();
-        if ($parentid === NULL && $jsSettings === NULL) {
+        if (($parentid === NULL && $jsSettings === NULL)
+            || (string) $parentid === (string) User::getGlobalUsersFolderid()
+        ) {
             // List the User folders.
             $usersFolder = User::getUsersFolders();
             foreach ($usersFolder as $folderid => $info) {
@@ -1520,10 +1522,13 @@ class UserActions
             include $cacheFile;
         }
 
+        $userFolders = User::getUsersFolders(TRUE);
+
         $path = BaseSystem::getDataDir('User').'/usersFolderid.inc';
 
-        $data['usersFolderid'] = (int) file_get_contents($path);
-        $data['editTemplates'] = $editTemplates;
+        $data['usersFolderid']      = (int) file_get_contents($path);
+        $data['editTemplates']      = $editTemplates;
+        $data['localUsersFolderid'] = $userFolders[0];
 
         return json_encode($data);
 

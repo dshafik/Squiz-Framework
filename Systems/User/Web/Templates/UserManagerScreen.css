@@ -55,6 +55,7 @@
     position: absolute;
     left: 70%;
     z-index: 1;
+    margin: 1em 0 1.5em;
 }
 
 /* Right Panel styles */
