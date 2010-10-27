@@ -576,9 +576,8 @@ var Help = new function()
             dfx.setStyle(this.pointer, 'left', left + 'px');
 
             // Check if the help window is under the pointer then re-position it.
-            if (dfx.isChildOf(elem, this.domElem) === true) {
-                // Unless it is an element within the Help pop-up.
-            } else {
+            // Unless it is an element within the Help pop-up.
+            if (dfx.isChildOf(elem, this.domElem) !== true) {
                 var coords    = dfx.getBoundingRectangle(this.container);
                 rect          = dfx.getBoundingRectangle(this.pointer);
                 var posOffset = 20;
@@ -592,6 +591,7 @@ var Help = new function()
                 ) {
                     // It is on top of the pointer, so move it left or right.
                     var winDim = dfx.getWindowDimensions();
+
                     // Try to move it to the right first.
                     if (rect.x2 + posOffset + (coords.x2 - coords.x1) < winDim.width) {
                         newPos = (rect.x2 + posOffset);
@@ -599,6 +599,7 @@ var Help = new function()
                         newPos = (rect.x1 - posOffset - (coords.x2 - coords.x1));
                     }
 
+                    dfx.setStyle(this.container, 'margin-left', '0');
                     dfx.setStyle(this.container, 'right', 'auto');
                     dfx.setStyle(this.container, 'left', newPos + 'px');
                 }
