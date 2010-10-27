@@ -160,6 +160,12 @@ GUIScreenSettings.prototype = {
                 continue;
             }
 
+            // Check the widget has getValue() funciton.
+            // Some widgets might not have any value to return.
+            if (typeof widget.getValue !== 'function') {
+                continue;
+            }
+
             values[id] = widget.getValue();
         }//end for
 
