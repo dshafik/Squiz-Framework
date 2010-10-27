@@ -2285,12 +2285,30 @@ class SquizSuiteActions
                 $url .= '/'.$apiSuffix;
             }
 
-            $response = SquizSuite::sendMessage($url, 'suiteConnect');
+            // Check whether Update Product already exists.
+            $productType     = '';
+            $getProdTypeURL  = $url;
+            $getProdTypeURL .= '/json/SquizSuite/getProductType';
+            $response        = API::sendCURLAPIRequest($getProdTypeURL, array());
+            if ($response['curlInfo']['http_code'] === 200) {
+                $productType = json_decode($response['result'], TRUE);
+                $productType = $productType['result'];
+                if ($productType === 'Squiz Update') {
+                    // It is a Squiz Update system.
+                    $updateProducts = SquizSuite::getProductsByType('Squiz Update');
+                    if (empty($updateProducts) === FALSE) {
+                        return _('Update Product already exists');
+                    }
+                }
+            }
 
+            $response   = SquizSuite::sendMessage($url, 'suiteConnect');
+            $matrixTest = FALSE;
             if ($response['curlInfo']['http_code'] === 404) {
                 // This may be a Matrix connection if a 404 is received, try again.
-                $url      = substr($url, 0, -6);
-                $response = SquizSuite::sendMessage($url, 'suiteConnect');
+                $url        = substr($url, 0, -6);
+                $response   = SquizSuite::sendMessage($url, 'suiteConnect');
+                $matrixTest = TRUE;
             }
 
             if ($response['curlInfo']['http_code'] !== 200) {
@@ -2308,7 +2326,12 @@ class SquizSuiteActions
                     $response    = API::getResponseFromXMLDom($responseDom);
                     if ($response === 'ok') {
                         $tempid     = uniqid();
-                        $systemType = 'unknown';
+                        if ($matrixTest === TRUE) {
+                            $systemType = 'Squiz Matrix';
+                        } else {
+                            $systemType = $productType;
+                        }
+
                         $connection = array('url' => $url);
                     }
 
