@@ -299,7 +299,7 @@ class SimplePermissionActions implements PermissionActions
         $listSettings = array(
                          'items'          => $listItems,
                          'allowDelete'    => TRUE,
-                         'noItemsMsg'     => _('There are no users assigned to this role.'),
+                         'noItemsMsg'     => _('There are no users assigned to this role'),
                          'itemsGenerator' => array(
                                               'system' => 'Permission',
                                               'action' => 'generatePermissionScreenListItems',

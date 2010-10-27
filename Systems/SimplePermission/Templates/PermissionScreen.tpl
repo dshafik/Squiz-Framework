@@ -13,7 +13,7 @@
     <else>
       <content>
         <div id="PermissionScreen">
-            <div class="PermissionSettingsBoxContainer GUI-screen-left">
+            <div id="PermissionSettingsBoxContainer" class="GUI-screen-left">
                 <!-- Start Permissiont Screen settings box -->
                 <widget type="GUI/ScreenSettings" id="projectList">
                     <setting name="title">
@@ -27,7 +27,7 @@
                 </widget>
                 <!-- End Permission Screen settings box -->
             </div>
-            <div class="PermissionScreenMainContent GUI-screen-right">
+            <div id="PermissionScreenMainContent" class="GUI-screen-right">
                 <dataProvider action="Permission::getPermissionListForScreen" />
             </div>
             <script>

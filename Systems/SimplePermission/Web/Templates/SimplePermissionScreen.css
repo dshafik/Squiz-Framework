@@ -1,3 +1,7 @@
+#PermissionScreenMainContent {
+    width: 600px;
+}
+
 .PermissionScreen-role .GUIBox-headerContent {
     float: right;
 }
