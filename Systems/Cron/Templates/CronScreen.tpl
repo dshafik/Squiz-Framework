@@ -144,10 +144,10 @@
                 </daily>
             </setting>
         </widget>
-        <!-- End Cront Screen settings box -->
+        <!-- End Cron Screen settings box -->
     </div>
     <div class="CronScreenMainContent GUI-screen-right">
-        <!-- Start Cront Screen Jobs List -->
+        <!-- Start Cron Screen Jobs List -->
         <widget type="GUI/Box" id="CronScreenMainBox">
             <setting name="title"><text>Cron Jobs</text></setting>
             <setting name="content">
@@ -171,6 +171,7 @@
                         <enabled>
                             <align>center</align>
                             <name><text>Enabled</text></name>
+                            <width>100px</width>
                         </enabled>
                     </setting>
                     <setting name="rows">
@@ -181,6 +182,6 @@
                 </widget>
             </setting>
         </widget>
-        <!-- End Cront Screen Jobs List -->
+        <!-- End Cron Screen Jobs List -->
     </div>
 </div>
