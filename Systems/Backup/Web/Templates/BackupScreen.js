@@ -33,7 +33,11 @@ var BackupBackupScreen = new function()
         window.location.href = url;
     };
 
-    this.restore = function(name) {
+    this.restore = function(confirmed, name) {
+        if (confirmed !== true) {
+            return;
+        }
+
         var params = {
             name: name
         };

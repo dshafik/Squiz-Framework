@@ -226,15 +226,16 @@ class BackupActions
         $dbtnSettings = array(
                          'value'  => 'Download',
                          'click'  => array(
-                                      'function' => 'BackupBackupScreen.download',
+                                      'function'  => 'BackupBackupScreen.download',
                                       'arguments' => array(),
                                      ),
                         );
         $rbtnSettings = array(
                          'value'  => 'Restore',
                          'click'  => array(
-                                      'function' => 'BackupBackupScreen.restore',
+                                      'function'  => 'GUI.getWidget(\'backupScreen-confirmRestore\').show',
                                       'arguments' => array(),
+                                      'quoteArgs' => FALSE,
                                      ),
                         );
 
@@ -242,7 +243,7 @@ class BackupActions
         $backups = Backup::getBackups();
         foreach ($backups as $day => $backup) {
             $dbtnSettings['click']['arguments'] = array($backup['name']);
-            $rbtnSettings['click']['arguments'] = array($backup['name']);
+            $rbtnSettings['click']['arguments'] = array('this', '\''.$backup['name'].'\'');
             $download = GUI::createWidget($day.'-download', 'GUIButton', $dbtnSettings);
             $restore  = GUI::createWidget($day.'-restore', 'GUIButton', $rbtnSettings);
 

@@ -36,4 +36,23 @@
             </widget>
         </setting>
     </widget>
+
+    <widget type="GUI/Intervention" id="backupScreen-confirmRestore">
+        <setting name="onclose">BackupBackupScreen.restore</setting>
+        <setting name="elementContents">
+            <content>
+                <p><text>Are you sure you want to restore?</text></p>
+                <widget type="GUI/Button" id="backupScreen-confirmRestore-buttonYes">
+                    <setting name="value"><text>Restore</text></setting>
+                    <setting name="colour">Dark</setting>
+                    <setting name="click">GUI.getWidget('backupScreen-confirmRestore').hide(true);</setting>
+                </widget>
+                <widget type="GUI/Button" id="backupScreen-confirmRestore-buttonNo">
+                    <setting name="value"><text>Cancel</text></setting>
+                    <setting name="click">GUI.getWidget('backupScreen-confirmRestore').hide(false);</setting>
+                    <setting name="colour">Dark</setting>
+                </widget>
+            </content>
+        </setting>
+    </widget>
 </div>

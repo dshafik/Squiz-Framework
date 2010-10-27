@@ -1,3 +1,12 @@
 #BackupScreen p {
     line-height: 22px;
 }
+
+#backupScreen-confirmRestore {
+    text-align: center;
+}
+
+#backupScreen-confirmRestore button {
+    min-width: 47%;
+    margin-top: 10px;
+}
