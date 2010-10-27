@@ -462,17 +462,23 @@ class HelpActions
                 $id       = str_replace('.html', '', basename($fileName));
                 $title    = $dom->getElementsByTagName('h1')->item(0)->nodeValue;
                 $summary  = '';
-                $metaTags = $dom->getElementsByTagName('meta');
-                foreach ($metaTags as $metaTag) {
-                    if ($metaTag->getAttribute('name') === 'summary') {
-                        $summary = $metaTag->getAttribute('content');
-                    }
-                }
 
                 $articleType = 'article';
                 if (strpos($id, 'glossary-') === 0) {
                     $articleType = 'glossary';
+                    $termDesc = $dom->getElementsByTagName('div')->item(0);
+                    $summary = strip_tags($termDesc->nodeValue);
+                    include_once 'Libs/String/String.inc';
+                } else {
+                    $metaTags = $dom->getElementsByTagName('meta');
+                    foreach ($metaTags as $metaTag) {
+                        if ($metaTag->getAttribute('name') === 'summary') {
+                            $summary = $metaTag->getAttribute('content');
+                        }
+                    }
                 }
+
+                $summary = String::ellipsisize($summary, 100);
 
                 $href      = 'javascript:parent.window.Help.loadPage(\''.$id.'\', '.$opts.');';
                 $contents .= '<li class="Help-searchResult '.$articleType.'">';
