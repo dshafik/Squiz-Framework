@@ -4,7 +4,7 @@
     </if-not>
 </condition>
 
-<div id="BackupScreen">
+<div id="BackupScreen" class="GUI-screen-middle">
     <h2><text>Available Backups</text></h2>
     <p><text>Restoring a backup is a two step process. When you click the restore button, a message will appear confirming your request.</text></p>
     <p><text>If you restore a backup, all of your content and settings will be restored to the way they were at this particular point in time.</text></p>
