@@ -1365,8 +1365,6 @@ class HelpActions
             $containerTitle = $doc->createElement('h2');
             $containerTitle->nodeValue = _('Articles');
             $container->appendChild($containerTitle);
-            $hr = $doc->createElement('hr');
-            $container->appendChild($hr);
 
             $ulTag = $doc->createElement('ul');
             $ulTag->setAttribute('id', 'Help-articleList');
@@ -1441,7 +1439,7 @@ class HelpActions
 
         for ($i = 0; $i < $length; $i++) {
             $hasArticle   = FALSE;
-            $listContent .= '<h2 name="term'.$letters[$i].'" id="term'.$letters[$i].'">'.$letters[$i].'</h2><hr />';
+            $listContent .= '<h2 name="term'.$letters[$i].'" id="term'.$letters[$i].'">'.$letters[$i].'</h2>';
             $listContent .= '<ul class="Help-list">';
 
             $id    = current($glossaryTerms);
@@ -1529,8 +1527,7 @@ class HelpActions
                 $desc = $tplInfo['summary'];
             }
 
-            $contents .= '<h1>'.$templateName.' <a href="javascript:parent.window.Help.loadPage(\''.$tplHref.'\');">==&gt;</a></h1>';
-            $contents .= '<hr />';
+            $contents .= '<h2>'.$templateName.' <a href="javascript:parent.window.Help.loadPage(\''.$tplHref.'\');">==&gt;</a></h2>';
             $contents .= '<p>'.$desc.'</p>';
         }
 
@@ -1605,8 +1602,7 @@ class HelpActions
 
         // Print index page sections (e.g. Tasks, Troubleshooting).
         foreach (self::$_sections as $section) {
-            $contents .= '<h1>'.$section.'</h1>';
-            $contents .= '<hr />';
+            $contents .= '<h2>'.$section.'</h2>';
             $contents .= '<ul>';
             foreach ($templateArticles[strtolower($section)] as $title => $info) {
                 $contents .= '<li><a href="javascript:parent.window.Help.loadPage(\''.$info['id'].'\');">'.$title.'</a></li>';
