@@ -4,7 +4,7 @@
     </if-not>
 </condition>
 
-<div id="SquizSuiteScreen">
+<div id="SquizSuiteScreen" class="GUI-screen-middle">
     <widget type="GUI/Box" id="squizSuite-currentProduct-box">
         <setting name="title"><text>Current Product</text></setting>
         <setting name="content">
