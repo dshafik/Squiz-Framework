@@ -132,6 +132,22 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the type of the current product.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function getProductType()
+    {
+        $currProduct = SquizSuite::getProduct();
+        return $currProduct['type'];
+
+    }//end getProductType()
+
+
+    /**
      * Returns the public key of the current product.
      *
      * @return string
