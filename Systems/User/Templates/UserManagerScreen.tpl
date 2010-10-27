@@ -6,7 +6,7 @@
 
 <var name="screenData"><dataProvider action="User::getUserManagerScreenData" /></var>
 
-<div id="UserManagerScreen">
+<div id="UserManagerScreen" class="GUI-screen-middle">
     <widget type="GUI/Box" id="userManager-box">
         <setting name="title"><text>User Manager</text></setting>
         <setting name="borderRight">false</setting>

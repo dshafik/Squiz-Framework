@@ -1,8 +1,3 @@
-#UserManagerScreen {
-    width: 1160px;
-    margin: 0 auto;
-}
-
 .UserManagerScreen-userManager-item {
     height: 100%;
     background: url(../userType-icons.png) no-repeat 100% 0;
