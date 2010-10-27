@@ -111,12 +111,18 @@ a.Help-control-button.general:active {
 .Help-iframe h5,
 .Help-iframe h6 {
 	margin: 0.7em 0 0.7em 0;
+	color: #000;
 }
-.Help-iframe h1 {font-size: 16px; font-weight: normal; margin-top: 0;}
+.Help-iframe h1 {
+    font-size: 16px;
+    margin-top: 0;
+}
 .Help-iframe h2 {
     font-size: 14px;
     margin: 1.5em 0 1em 0;
     border-bottom: 1px dotted #ccc;
+    color: #333;
+    padding-bottom: 3px;
 }
 .Help-iframe h3 {font-size: 12px; margin-top: 1.4em;}
 .Help-iframe h4 {font-size: 1em;}
