@@ -448,10 +448,10 @@ class HelpActions
             if ($startOffset === 0) {
                 // Show number of results.
                 $contents .= sprintf(
-                              _('<h3>%s results found for <strong>%s</strong></h3>'),
-                             $totalResults,
-                             $searchString
-                             );
+                    _('<h3>%s results found for <strong>%s</strong></h3>'),
+                    $totalResults,
+                    $searchString
+                );
             }
 
             $contents .= '<ol id="Help-searchResults-list" class="Help-searchResults-list">';
@@ -459,16 +459,15 @@ class HelpActions
             foreach ($results as $fileName => $score) {
                 $dom->loadHTMLFile($docsDir.$fileName);
 
-                $id       = str_replace('.html', '', basename($fileName));
-                $title    = $dom->getElementsByTagName('h1')->item(0)->nodeValue;
-                $summary  = '';
+                $id      = str_replace('.html', '', basename($fileName));
+                $title   = $dom->getElementsByTagName('h1')->item(0)->nodeValue;
+                $summary = '';
 
                 $articleType = 'article';
                 if (strpos($id, 'glossary-') === 0) {
                     $articleType = 'glossary';
-                    $termDesc = $dom->getElementsByTagName('div')->item(0);
-                    $summary = strip_tags($termDesc->nodeValue);
-                    include_once 'Libs/String/String.inc';
+                    $termDesc    = $dom->getElementsByTagName('div')->item(0);
+                    $summary     = strip_tags($termDesc->nodeValue);
                 } else {
                     $metaTags = $dom->getElementsByTagName('meta');
                     foreach ($metaTags as $metaTag) {
@@ -478,6 +477,7 @@ class HelpActions
                     }
                 }
 
+                include_once 'Libs/String/String.inc';
                 $summary = String::ellipsisize($summary, 100);
 
                 $href      = 'javascript:parent.window.Help.loadPage(\''.$id.'\', '.$opts.');';
@@ -485,7 +485,7 @@ class HelpActions
                 $contents .= '<h4><a href="'.$href.'">'.$title.'</a></h4>';
                 $contents .= '<div class="Help-searchResult-summary">'.$summary.'</div>';
                 $contents .= '</li>';
-            }
+            }//end foreach
         }//end if
 
         $contents .= '</ol>';
@@ -1316,6 +1316,10 @@ class HelpActions
             if ($isIndexPage === TRUE && empty($info['summary']) === FALSE) {
                 self::$_docsInfo[$system]['template'][$template]['summary'] = $info['summary'];
             }
+
+            if ($isIndexPage === TRUE && empty($info['screenTitle']) === FALSE) {
+                self::$_docsInfo[$system]['template'][$template]['screenTitle'] = $info['screenTitle'];
+            }
         } else {
             if ($isIndexPage === TRUE && empty($info['screenTitle']) === FALSE) {
                 self::$_docsInfo[$system]['screenTitle'] = $info['screenTitle'];
@@ -1527,7 +1531,12 @@ class HelpActions
                 $desc = $tplInfo['summary'];
             }
 
-            $contents .= '<h2>'.$templateName.' <a href="javascript:parent.window.Help.loadPage(\''.$tplHref.'\');">==&gt;</a></h2>';
+            $screenTitle = $templateName;
+            if (empty($tplInfo['screenTitle']) === FALSE) {
+                $screenTitle = $tplInfo['screenTitle'];
+            }
+
+            $contents .= '<h2>'.$screenTitle.' <a href="javascript:parent.window.Help.loadPage(\''.$tplHref.'\');">==&gt;</a></h2>';
             $contents .= '<p>'.$desc.'</p>';
         }
 
@@ -1600,16 +1609,37 @@ class HelpActions
         $contents .= '</div>';
         $contents .= '<div class="Help-iframe-templateArticles">';
 
-        // Print index page sections (e.g. Tasks, Troubleshooting).
-        foreach (self::$_sections as $section) {
-            $contents .= '<h2>'.$section.'</h2>';
-            $contents .= '<ul>';
-            foreach ($templateArticles[strtolower($section)] as $title => $info) {
-                $contents .= '<li><a href="javascript:parent.window.Help.loadPage(\''.$info['id'].'\');">'.$title.'</a></li>';
+        $sections = self::$_sections;
+        foreach ($sections as $i => $section) {
+            if (count($templateArticles[strtolower($section)]) === 0) {
+                unset($sections[$i]);
             }
-
-            $contents .= '</ul></div>';
         }
+
+        // Print index page sections (e.g. Tasks, Troubleshooting).
+        $totalSections = count($sections);
+        foreach ($sections as $section) {
+            if ($totalSections === 1
+                && count($templateArticles[strtolower($section)]) === 1
+            ) {
+                foreach ($templateArticles[strtolower($section)] as $title => $info) {
+                    ob_start();
+                    Help::getPage($info['id']);
+                    $contents .= ob_get_contents();
+                    ob_clean();
+                }
+            } else {
+                $contents .= '<h2>'.$section.'</h2>';
+                $contents .= '<ul>';
+                foreach ($templateArticles[strtolower($section)] as $title => $info) {
+                    $contents .= '<li><a href="javascript:parent.window.Help.loadPage(\''.$info['id'].'\');">'.$title.'</a></li>';
+                }
+
+                $contents .= '</ul>';
+            }
+        }
+
+        $contents .= '</div>';
 
         Channels::includeSystem('GUI');
         $cssHref = self::_getPageCSSPath();
