@@ -16,8 +16,13 @@
 }
 
 .GUI-screen-right {
-    margin-left: 290px;
+    margin-left: 300px;
     margin-top: 10px;
+}
+
+.GUI-screen-middle {
+    width: 1160px;
+    margin: 0 auto;
 }
 
 .GUI-alignLeft {
