@@ -45,6 +45,15 @@ class GUIInterventionActions
      */
     protected static $elementContents = '';
 
+    /**
+     * Specified method will be called when the popup is closed.
+     *
+     * Data that was passed to JS show() method will be passed to this function.
+     *
+     * @var string
+     */
+    protected static $onclose = '';
+
 
     /**
      * Prints widgets content.

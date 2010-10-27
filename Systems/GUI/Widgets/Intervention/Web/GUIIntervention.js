@@ -36,6 +36,8 @@ function GUIIntervention(id, settings)
 
     this.elem = dfx.getId(id);
 
+    this._data = null;
+
     this._orientationOrder = [
         'top.center',
         'top.left',
@@ -64,24 +66,28 @@ GUIIntervention.prototype = {
 
     },
 
-    hide: function()
+    hide: function(info)
     {
         dfx.removeClass(this.elem, 'visible');
 
+        if (this.settings.onclose) {
+            eval(this.settings.onclose + '.call(this, info, this._data);');
+        }
+
     },
 
-    show: function()
+    show: function(targetElement, data)
     {
         dfx.removeClass(this.elem, 'visible');
         dfx.addClass(this.elem, 'calc');
 
         var classNames = ['top', 'left', 'right', 'bottom', 'middle', 'center'];
+        var elem       = this.element;
         dfx.foreach(classNames, function(i) {
-            dfx.addClass(element, classNames[i]);
+            dfx.addClass(elem, classNames[i]);
         });
 
-        var targetElement = null;
-        if (this.settings.targetElementid) {
+        if (!targetElement && this.settings.targetElementid) {
             targetElement = dfx.getId(this.settings.targetElementid);
         }
 
@@ -91,6 +97,8 @@ GUIIntervention.prototype = {
 
         dfx.addClass(this.elem, 'visible');
         dfx.removeClass(this.elem, 'calc');
+
+        this._data = data;
 
     },
 
