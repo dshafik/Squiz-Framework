@@ -44,8 +44,8 @@ class GUISaveButtonActions
         $class = $settings['widget']['type'];
 
         echo '<div id="'.$id.'" class="'.$class.' GUI-alignRight">';
-        echo '<button id="'.$id.'-save" disabled="true" class="GUIButton buttonSave GUI-alignleft"><span class="GUIButtonLabel">'._('Save').'</span></button>';
-        echo '<button id="'.$id.'-revert" disabled="true" class="GUIButton buttonSaveRevert GUI-alignleft"><span class="GUIButtonLabel">'._('Revert').'</span><span class="GUIButtonIcon"></span></button>';
+        echo '<button accesskey="s" id="'.$id.'-save" disabled="true" class="GUIButton buttonSave GUI-alignleft" onclick="GUI.save();"><span class="GUIButtonLabel">'._('Save').'</span></button>';
+        echo '<button id="'.$id.'-revert" disabled="true" class="GUIButton buttonSaveRevert GUI-alignleft" onclick="GUI.revert();"><span class="GUIButtonLabel">'._('Revert').'</span><span class="GUIButtonIcon"></span></button>';
         echo '</div>';
 
         return $settings;

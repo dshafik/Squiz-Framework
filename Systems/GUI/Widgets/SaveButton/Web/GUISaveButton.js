@@ -57,14 +57,6 @@ GUISaveButton.prototype = {
         this._saveButton   = dfx.getId(this.id + '-save');
         this._revertButton = dfx.getId(this.id + '-revert');
 
-        dfx.addEvent(this._saveButton, 'click', function() {
-            GUI.save();
-        });
-
-        dfx.addEvent(this._revertButton, 'click', function() {
-            GUI.revert();
-        });
-
         GUI.addModifiedCallback(function(widgetid, modified) {
             if (modified === true) {
                 self.enable();
