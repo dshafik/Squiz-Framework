@@ -1437,7 +1437,12 @@ class GUIActions
                     }
 
                     $php .= $parseTagRes."\n";
-                    $php .= 'echo (isset('.$varName.') === TRUE ? '.$varName." : '');\n";
+
+                    if ($assignTo === NULL) {
+                        $php .= 'echo (isset('.$varName.') === TRUE ? '.$varName." : '');\n";
+                    } else {
+                        $php .= $assignTo.' = (isset('.$varName.') === TRUE ? '.$varName." : '');\n";
+                    }
                 }
 
                 if (self::$_isReCacheTemplate === FALSE) {
