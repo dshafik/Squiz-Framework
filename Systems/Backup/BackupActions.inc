@@ -232,6 +232,7 @@ class BackupActions
                         );
         $rbtnSettings = array(
                          'value'  => 'Restore',
+                         'colour' => 'Dark',
                          'click'  => array(
                                       'function'  => 'GUI.getWidget(\'backupScreen-confirmRestore\').show',
                                       'arguments' => array(),
@@ -248,9 +249,10 @@ class BackupActions
             $restore  = GUI::createWidget($day.'-restore', 'GUIButton', $rbtnSettings);
 
             $list[$day] = array(
-                           'date'    => $backup['date'],
-                           'size'    => $backup['size'],
-                           'actions' => $download.' '.$restore,
+                           'date'     => $backup['date'],
+                           'size'     => $backup['size'],
+                           'download' => $download,
+                           'restore'  => $restore,
                           );
         }
 

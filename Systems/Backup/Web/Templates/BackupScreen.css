@@ -1,3 +1,7 @@
+#BackupScreen {
+    width: 800px;
+}
+
 #BackupScreen p {
     line-height: 22px;
 }

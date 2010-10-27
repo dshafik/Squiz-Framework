@@ -23,10 +23,16 @@
                         <align>center</align>
                         <width>80px</width>
                     </size>
-                    <actions>
+                    <download>
+                        <name></name>
+                        <align>left</align>
+                        <width>70px</width>
+                    </download>
+                    <restore>
                         <name></name>
                         <align>right</align>
-                    </actions>
+                        <width>70px</width>
+                    </restore>
                 </setting>
                 <setting name="rows">
                     <dataProvider action="Backup::getBackupList" />
@@ -41,7 +47,7 @@
         <setting name="onclose">BackupBackupScreen.restore</setting>
         <setting name="elementContents">
             <content>
-                <p><text>Are you sure you want to restore?</text></p>
+                <p><text>Are you sure you want to restore your system?</text></p>
                 <widget type="GUI/Button" id="backupScreen-confirmRestore-buttonYes">
                     <setting name="value"><text>Restore</text></setting>
                     <setting name="colour">Dark</setting>
