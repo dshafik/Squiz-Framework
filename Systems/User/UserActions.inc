@@ -1499,6 +1499,7 @@ class UserActions
                 $newGroupid = $parts[1];
                 if ($newGroupid !== $assetid
                     && in_array($newGroupid, $currentGroups) === FALSE
+                    && Asset::isTypeOf($newGroupid, 'userGroup') === TRUE
                 ) {
                     Linking::createLink($newGroupid, $assetid);
                 }
