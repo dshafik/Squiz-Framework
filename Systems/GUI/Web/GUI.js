@@ -154,6 +154,7 @@ var GUI = new function()
                 this.templateLineage.pop();
 
                 if (p === parent) {
+                    this.fireTemplateRemovedCallbacks(parent);
                     break;
                 }
             }
@@ -163,6 +164,7 @@ var GUI = new function()
     this.addTemplate = function(template) {
         if (dfx.inArray(template, this.templateLineage) === false) {
             this.templateLineage.push(template);
+            this.fireTemplateAddedCallbacks(template);
         }
     };
 
@@ -617,5 +619,7 @@ var GUI = new function()
 
     this.addWidgetEvent(this, 'modified');
     this.addWidgetEvent(this, 'reloadTemplate');
+    this.addWidgetEvent(this, 'templateAdded');
+    this.addWidgetEvent(this, 'templateRemoved');
 
 };
