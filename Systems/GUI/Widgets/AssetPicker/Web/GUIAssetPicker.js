@@ -47,6 +47,11 @@ GUIAssetPicker.prototype = {
             dfx.setStyle(browserElem, 'height', (contentSize.height - linHeight) + 'px');
         });
 
+        GUI.getWidget(this.id + '-dialog').addDialogClosedCallback(function() {
+            GUI.unloadTemplate('GUIAssetPicker:GUIAssetPicker');
+            GUI.dequeueOverlay('normal');
+        });
+
     },
 
     setSelectAssetsCallback: function(callback)
