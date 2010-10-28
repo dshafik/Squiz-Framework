@@ -314,6 +314,36 @@ class HelpActions
 
 
     /**
+     * Prints Help message box.
+     *
+     * @param string $message         The message to display.
+     * @param string $closeButtonText The text displayed next to close icon.
+     * @param string $messageType     The message type.
+     *
+     * @return void
+     */
+    public static function printMessageBox($message, $closeButtonText, $messageType='info')
+    {
+        echo '<div class="Help-message">';
+
+        // Top message section, displays message type icon and the message.
+        echo '<div class="Help-message-top type-'.$messageType.'">';
+        echo '<div class="Help-message-top-msg">';
+        echo $message;
+        echo '</div>';
+        echo '</div>';
+
+        // Message footer (shows the close icon).
+        echo '<div class="Help-message-footer">';
+        echo '<a class="Help-message-close" href="javascript:Help.hideMessages();" title="'.$closeButtonText.'">'.$closeButtonText.'</a>';
+        echo '</div>';
+
+        echo '</div>';
+
+    }//end printMessageBox()
+
+
+    /**
      * Searches docs and returns the results as a sarch result page.
      *
      * @param string  $searchString String to search for (space separated).

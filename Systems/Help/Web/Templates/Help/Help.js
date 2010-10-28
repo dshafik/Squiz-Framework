@@ -95,6 +95,10 @@ var Help = new function()
     };
 
     this.loadPage = function(pageid, options) {
+        if (this.isPickerActive() === true) {
+            return false;
+        }
+
         var helpIframe = dfx.getId('Help-iframe');
         _loadPageOpts  = options;
 
@@ -113,6 +117,7 @@ var Help = new function()
         });
 
         _handlePageLoadOptions();
+        self.hideMessages();
     };
 
     _handlePageLoadOptions = function() {
@@ -192,10 +197,18 @@ var Help = new function()
     };
 
     this.back = function() {
+        if (this.isPickerActive() === true) {
+            return false;
+        }
+
         history.back(1);
     };
 
     this.forward = function() {
+        if (this.isPickerActive() === true) {
+            return false;
+        }
+
         history.forward(1);
     };
 
@@ -223,19 +236,25 @@ var Help = new function()
         }
     };
 
-    this.picker = function() {
+    this.picker = function(showMessage) {
+        if (showMessage !== false) {
+            this.showMessage('pointer');
+        }
+
         var self = this;
         dfx.addEvent(document, 'keypress.Help_finder', function(e) {
             if (e.keyCode === 27) {
                 // If ESC key then cancel find.
                 dfx.removeEvent(document, 'keypress.Help_finder');
                 dfx.removeEvent(document, 'mousedown.Help_finder');
+                self.hideMessages();
             }
         });
 
         dfx.addEvent(document, 'mousedown.Help_finder', function(e) {
             var target = dfx.getMouseEventTarget(e);
             dfx.removeEvent(document, 'keypress.Help_finder');
+
             /*
                 Note: We need to prevent all events on the target element
                 and its parents (due to event bubbling) firing so that when
@@ -260,8 +279,12 @@ var Help = new function()
                 dfx.removeEvent(document, 'mouseup.Help_finder');
             });
 
-            // Ignore if the clicked element is the "find" button.
             dfx.removeEvent(document, 'mousedown.Help_finder');
+
+            // Ignore if the clicked element is the "find" button.
+            if (dfx.hasClass(target, 'Help-message-close') === true) {
+                return true;
+            }
 
             var elemInfos = _getIds(parents);
             if (target.id) {
@@ -283,7 +306,8 @@ var Help = new function()
                 var resultParts = result.split('|');
                 if (resultParts.length !== 3) {
                     // No results.
-                    alert(result);
+                    self.showMessage('pointer-noInfo');
+                    self.picker(false);
                 } else {
                     var pageid = resultParts[0];
                     Help.pointer.pointTo(resultParts[1], resultParts[2]);
@@ -295,6 +319,20 @@ var Help = new function()
             dfx.stopPropagation(e);
             return false;
         });
+    };
+
+    this.isPickerActive = function() {
+        var msgElem = dfx.getId('Help-dialog-msg-pointer-noInfo');
+        if (msgElem && dfx.hasClass(msgElem, 'active') === true) {
+            return true;
+        }
+
+        msgElem = dfx.getId('Help-dialog-msg-pointer');
+        if (msgElem && dfx.hasClass(msgElem, 'active') === true) {
+            return true;
+        }
+
+        return false;
     };
 
     /**
@@ -423,6 +461,28 @@ var Help = new function()
                 dfx.addClass(selectedItem, 'selected');
             }
         }
+    };
+
+    this.showMessage = function(msgid) {
+        var elemid  = 'Help-dialog-msg-' + msgid;
+        var msgElem = dfx.getId(elemid);
+
+        if (msgElem) {
+            if (dfx.hasClass(msgElem, 'visible') === true) {
+                jQuery(msgElem).effect("bounce", {distance: 10, times: 3}, 300);
+            } else {
+                // Hide all other messages.
+                this.hideMessages();
+                dfx.addClass(msgElem, 'visible');
+            }
+
+            dfx.addClass(dfx.getId('Help-overlay'), 'visible');
+        }
+    };
+
+    this.hideMessages = function() {
+        dfx.removeClass(dfx.getClass('Help-dialog-msg', dfx.getId('Help-iframeWrapper')), 'visible');
+        dfx.removeClass(dfx.getId('Help-overlay'), 'visible');
     };
 
     this.pointer = {
@@ -577,7 +637,7 @@ var Help = new function()
 
             // Check if the help window is under the pointer then re-position it.
             // Unless it is an element within the Help pop-up.
-            if (dfx.isChildOf(elem, this.domElem) !== true) {
+            if (dfx.isChildOf(elem, dfx.getId('Help-dialog')) !== true) {
                 var coords    = dfx.getBoundingRectangle(this.container);
                 rect          = dfx.getBoundingRectangle(this.pointer);
                 var posOffset = 20;

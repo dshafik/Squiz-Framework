@@ -18,20 +18,39 @@
     <setting name="content">
         <content>
             <div class="Help-controls">
-                <a href="javascript:Help.back();" class="Help-control-button back" title="{backButtonTitle}"></a>
-                <a href="javascript:Help.forward();" class="Help-control-button forward" title="{forwardButtonTitle}"></a>
-                <a href="javascript:Help.home();" class="Help-control-button home" title="{homeButtonTitle}"></a>
-                <a href="javascript:Help.toggleMenu();" class="Help-control-button menu" title="{menuButtonTitle}"></a>
-                <a href="javascript:Help.picker();" class="Help-control-button picker" title="{pickerButtonTitle}"></a>
-                <a href="javascript:Help.glossary();" class="Help-control-button glossary" title="{glossaryButtonTitle}"></a>
-                <a href="javascript:Help.general();" class="Help-control-button general" title="{generalButtonTitle}"></a>
+                <a href="javascript:void(0);" onclick="Help.back();" class="Help-control-button back" title="{backButtonTitle}"></a>
+                <a href="javascript:void(0);" onclick="Help.forward();" class="Help-control-button forward" title="{forwardButtonTitle}"></a>
+                <a href="javascript:void(0);" onclick="Help.home();" class="Help-control-button home" title="{homeButtonTitle}"></a>
+                <a href="javascript:void(0);" onclick="Help.toggleMenu();" class="Help-control-button menu" title="{menuButtonTitle}"></a>
+                <a href="javascript:void(0);" onclick="Help.picker();" class="Help-control-button picker" title="{pickerButtonTitle}"></a>
+                <a href="javascript:void(0);" onclick="Help.glossary();" class="Help-control-button glossary" title="{glossaryButtonTitle}"></a>
+                <a href="javascript:void(0);" onclick="Help.general();" class="Help-control-button general" title="{generalButtonTitle}"></a>
                 <widget id="Help-search" type="GUI/TextBox">
                     <setting name="size">20</setting>
                     <setting name="hint"><text>Search...</text></setting>
                 </widget>
                 <dataProvider action="Help::getSystemsMenu" />
             </div>
-            <iframe frameborder="0" border="0" name="Help-iframe" id="Help-iframe" width="100%" height="100%" src=""></iframe>
+            <div id="Help-iframeWrapper" class="Help-iframeWrapper">
+                <div id="Help-dialog-msg-pointer" class="Help-dialog-msg">
+                    <dataProvider action="Help::printMessageBox">
+                        <arg><text>Click on a section of the screen to view more information about it.</text></arg>
+                        <arg><text>Cancel</text></arg>
+                        <arg>info</arg>
+                    </dataProvider>
+                </div>
+                <div id="Help-dialog-msg-pointer-noInfo" class="Help-dialog-msg">
+                    <dataProvider action="Help::printMessageBox">
+                        <arg><text>There is no help information for the part of the screen that you have
+                        clicked on. Please click on another part of the screen or click Cancel.</text></arg>
+                        <arg><text>Cancel</text></arg>
+                        <arg>info</arg>
+                    </dataProvider>
+                </div>
+
+                <div class="Help-overlay" id="Help-overlay"></div>
+                <iframe name="Help-iframe" id="Help-iframe" frameborder="0" border="0" width="100%" height="100%" src=""></iframe>
+            </div>
         </content>
     </setting>
 </widget>
