@@ -47,7 +47,14 @@
                         <arg>info</arg>
                     </dataProvider>
                 </div>
-
+                <div id="Help-dialog-msg-screenChanged" class="Help-dialog-msg">
+                    <dataProvider action="Help::printMessageBox">
+                        <arg><text>You have switched screens. Click on the Home button to view the Suggestions for the current screen.</text></arg>
+                        <arg><text>Hide this message</text></arg>
+                        <arg>info</arg>
+                        <arg>true</arg>
+                    </dataProvider>
+                </div>
                 <div class="Help-overlay" id="Help-overlay"></div>
                 <iframe name="Help-iframe" id="Help-iframe" frameborder="0" border="0" width="100%" height="100%" src=""></iframe>
             </div>

@@ -213,8 +213,20 @@ class HelpActions
         }
 
         if (file_exists($filePath) === FALSE) {
-            printf(_('Page does not exist: #%s'), $pageid);
-            return;
+            Channels::includeSystem('GUI');
+            $cssHref   = self::_getPageCSSPath();
+            $contents  = GUI::getDocType();
+            $contents .= '<html><head><link href="'.$cssHref.'" type="text/css" rel="stylesheet" />';
+            $contents .= '</head><body class="Help-iframe pageNotFound">';
+
+            ob_start();
+            $msg = _('There are no help articles for the screen that you are currently viewing.');
+            Help::printMessageBox($msg, '', 'info', TRUE);
+            $contents .= ob_get_contents();
+            ob_end_clean();
+
+            $contents .= '</html></body>';
+            return $contents;
         }
 
         echo file_get_contents($filePath);
@@ -316,15 +328,22 @@ class HelpActions
     /**
      * Prints Help message box.
      *
-     * @param string $message         The message to display.
-     * @param string $closeButtonText The text displayed next to close icon.
-     * @param string $messageType     The message type.
+     * @param string  $message         The message to display.
+     * @param string  $closeButtonText The text displayed next to close icon.
+     * @param string  $messageType     The message type.
+     * @param boolean $inIframe        If TRUE then the message will be added to iframe body.
      *
      * @return void
      */
-    public static function printMessageBox($message, $closeButtonText, $messageType='info')
+    public static function printMessageBox($message, $closeButtonText, $messageType='info', $inIframe=FALSE)
     {
-        echo '<div class="Help-message">';
+        echo '<div class="Help-message"';
+
+        if ($inIframe === TRUE) {
+            echo ' iniframe="true"';
+        }
+
+        echo '>';
 
         // Top message section, displays message type icon and the message.
         echo '<div class="Help-message-top type-'.$messageType.'">';
@@ -333,10 +352,12 @@ class HelpActions
         echo '</div>';
         echo '</div>';
 
-        // Message footer (shows the close icon).
-        echo '<div class="Help-message-footer">';
-        echo '<a class="Help-message-close" href="javascript:Help.hideMessages();" title="'.$closeButtonText.'">'.$closeButtonText.'</a>';
-        echo '</div>';
+        if (empty($closeButtonText) === FALSE) {
+            // Message footer (shows the close icon).
+            echo '<div class="Help-message-footer">';
+            echo '<a class="Help-message-close" href="javascript:window.parent.Help.hideMessages('.var_export($inIframe, TRUE).');" title="'.$closeButtonText.'">'.$closeButtonText.'</a>';
+            echo '</div>';
+        }
 
         echo '</div>';
 

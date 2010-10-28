@@ -70,7 +70,29 @@ var Help = new function()
                 self.search(value);
             }
         });
-    }
+
+        // Add event callbacks for screen and mode changes so a message can be displayed.
+        var timeout = null;
+        GUI.addTemplateAddedCallback(function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                var pageType = _getCurrentPageType();
+                if (pageType === 'templateIndexPage' || pageType === 'pageNotFound') {
+                    self.showMessage('screenChanged');
+                }
+            }, 100);
+        });
+
+        GUI.addTemplateRemovedCallback(function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                var pageType = _getCurrentPageType();
+                if (pageType === 'templateIndexPage' || pageType === 'pageNotFound') {
+                    self.showMessage('screenChanged');
+                }
+            }, 100);
+        });
+    };
 
     this.refresh = function() {
         this.loadIndexPage();
@@ -118,6 +140,27 @@ var Help = new function()
 
         _handlePageLoadOptions();
         self.hideMessages();
+    };
+
+    /**
+     * Returns the current page's type (e.g. index page).
+     *
+     * Uses the className that is applied to the body tag in iframe.
+     *
+     * @return {string} The page's type.
+     */
+    _getCurrentPageType = function() {
+        var iframeDoc = dfx.getIframeDocument(_iframe);
+        if (!iframeDoc || !iframeDoc.body) {
+            return null;
+        }
+
+        var classNames = iframeDoc.body.className.split(' ');
+        if (classNames.length < 2 || classNames[0] !== 'Help-iframe') {
+            return;
+        }
+
+        return classNames[1];
     };
 
     _handlePageLoadOptions = function() {
@@ -468,21 +511,78 @@ var Help = new function()
         var msgElem = dfx.getId(elemid);
 
         if (msgElem) {
-            if (dfx.hasClass(msgElem, 'visible') === true) {
-                jQuery(msgElem).effect("bounce", {distance: 10, times: 3}, 300);
-            } else {
-                // Hide all other messages.
-                this.hideMessages();
-                dfx.addClass(msgElem, 'visible');
-            }
+            if (dfx.attr(dfx.getClass('Help-message', msgElem)[0], 'iniframe') === 'true') {
+                var iframeDoc = dfx.getIframeDocument(_iframe);
+                if (!iframeDoc.body
+                    || dfx.getId(elemid, iframeDoc)
+                ) {
+                    return;
+                }
 
-            dfx.addClass(dfx.getId('Help-overlay'), 'visible');
+                var tmpDiv = iframeDoc.createElement('div');
+                tmpDiv.id  = msgElem.id;
+                dfx.addClass(tmpDiv, 'Help-iframe-msg');
+                dfx.setHtml(tmpDiv, dfx.trim(dfx.getHtml(msgElem)));
+                dfx.insertBefore(iframeDoc.body.firstChild, tmpDiv);
+                _fadeInMessage(tmpDiv);
+            } else {
+                if (dfx.hasClass(msgElem, 'visible') === true) {
+                    jQuery(msgElem).effect("bounce", {distance: 10, times: 3}, 300);
+                } else {
+                    // Hide all other messages.
+                    this.hideMessages();
+                    dfx.addClass(msgElem, 'visible');
+                }
+
+                dfx.addClass(dfx.getId('Help-overlay'), 'visible');
+            }//end if
+        }//end if
+    };
+
+    this.hideMessages = function(inIframe) {
+        if (inIframe === true) {
+            var iframeDoc = dfx.getIframeDocument(_iframe);
+            var msgElem   = dfx.getClass('Help-iframe-msg', iframeDoc.body)[0];
+            dfx.removeClass(msgElem, 'visible');
+            self._fadeOutMessage(msgElem, function() {
+                dfx.remove(msgElem);
+            });
+        } else {
+            dfx.removeClass(dfx.getClass('Help-dialog-msg', dfx.getId('Help-iframeWrapper')), 'visible');
+            dfx.removeClass(dfx.getId('Help-overlay'), 'visible');
         }
     };
 
-    this.hideMessages = function() {
-        dfx.removeClass(dfx.getClass('Help-dialog-msg', dfx.getId('Help-iframeWrapper')), 'visible');
-        dfx.removeClass(dfx.getId('Help-overlay'), 'visible');
+    _fadeInMessage = function(msgElem) {
+        // Fade in and move down.
+        dfx.setStyle(msgElem, 'opacity', '0');
+        dfx.setStyle(msgElem, 'display', 'block');
+        dfx.setStyle(msgElem, 'margin-top', -dfx.getElementHeight(msgElem));
+        dfx.animate(msgElem, {marginTop: 0, opacity: 1}, 1000, function() {
+            dfx.setStyle(msgElem, 'display', 'block');
+            dfx.setStyle(msgElem, 'margin-top', '10px');
+            dfx.setStyle(msgElem, 'opacity', 1);
+        });
+    };
+
+    _fadeOutMessage = function(msgElem, callback) {
+        // Fade out and move up.
+        dfx.animate(
+            msgElem,
+            {
+                marginTop: (-dfx.getElementHeight(msgElem)),
+                opacity: 0
+            },
+            500,
+            function() {
+                dfx.setStyle(msgElem, 'display', 'none');
+                dfx.setStyle(msgElem, 'margin-top', '0px');
+                dfx.setStyle(msgElem, 'opacity', 1);
+                if (callback) {
+                    callback.call(this, msgElem);
+                }
+            }
+        );
     };
 
     this.pointer = {

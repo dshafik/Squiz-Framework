@@ -44,12 +44,20 @@ body {
     width: 100%;
 }
 
+.Help-iframe-msg {
+    display: none;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
 .Help-message {
     background-color: #BCE3FC;
     margin-top: 10px;
+    border: 1px solid #B6DDF6;
 }
 
-.Help-dialog-msg.visible {
+.Help-dialog-msg.visible,
+.Help-iframe-msg.visible {
     display: block;
 }
 
