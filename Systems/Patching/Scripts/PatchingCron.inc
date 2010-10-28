@@ -88,12 +88,6 @@ class PatchingCron implements CronScript
         } else {
             // Ask the central server for new updates, if any.
             $updated = Patching::wsCheckForUpdates();
-            if ($updated !== -1) {
-                // Update last check, so we can control how often this happens.
-                // See Patching::wsCheckForUpdates() for more info.
-                $config['last_checked']   = time();
-                $config['check_interval'] = (3600 * 12);
-            }
         }//end if
 
         // No more pending patch, turn off the schedule toggle.

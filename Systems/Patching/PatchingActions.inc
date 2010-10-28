@@ -950,7 +950,7 @@ class PatchingActions
      */
     public static function postRequest($type, $xml, $toArray=TRUE)
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE) {
             return array();
         }
@@ -983,7 +983,7 @@ class PatchingActions
      *
      * @return array
      */
-    private static function _getUpdateServer()
+    public static function getUpdateServer()
     {
         if (self::$_updateServerCache !== NULL) {
             return self::$_updateServerCache;
@@ -998,7 +998,7 @@ class PatchingActions
         self::$_updateServerCache = array_pop($updateServer);
         return self::$_updateServerCache;
 
-    }//end _getUpdateServer()
+    }//end getUpdateServer()
 
 
     /**
@@ -1015,7 +1015,7 @@ class PatchingActions
     {
         Channels::includeSystem('SquizSuite');
         $currProduct  = SquizSuite::getProduct();
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         $msg          = array();
         if ($enc === TRUE) {
             $msg['_pubKeySystemid']     = $updateServer['systemid'];
@@ -1068,7 +1068,7 @@ class PatchingActions
      */
     public static function wsActivateInstall($systemid)
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE) {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1172,14 +1172,14 @@ class PatchingActions
     /**
      * Send ActivateInstall message.
      *
-     * @param string $systemid Systemid to activate.
+     * @param string $systemid The ID of the system to activate.
      *
      * @return mixed
      */
     private static function _wsActivateInstall($systemid)
     {
         Channels::includeSystem('SquizSuite');
-        $updateServer   = self::_getUpdateServer();
+        $updateServer   = Patching::getUpdateServer();
         $currProduct    = SquizSuite::getCurrentProduct();
         $patchingConfig = Patching::getPatchingConfig();
         SquizSuite::updateProduct(
@@ -1222,7 +1222,7 @@ class PatchingActions
      * Before we send any message to the update server, it requires
      * the connected live suite connection established before hand.
      *
-     * @param array $updateServer Update product information.
+     * @param array $updateServer Information about the update server.
      *
      * @return boolean
      */
@@ -1238,7 +1238,12 @@ class PatchingActions
             $dom = new DomDocument();
             $dom->loadXML($response);
 
-            $responseDom = $dom->getElementsByTagName('result')->item(0);
+            $resultEl = $dom->getElementsByTagName('result');
+            if ($resultEl->length === 0) {
+                return FALSE;
+            }
+
+            $responseDom = $resultEl->item(0);
             $response    = API::getResponseFromXMLDom($responseDom);
             if ($response !== 'ok') {
                 return FALSE;
@@ -1283,23 +1288,13 @@ class PatchingActions
      */
     public static function wsCheckForUpdates()
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
 
         // Check if need to check for update according to interval setting.
         $config = Patching::getPatchingConfig();
-        if (isset($config['last_checked']) === TRUE) {
-            if (isset($config['check_interval']) === TRUE) {
-                $nextCheck = ($config['last_checked'] + $config['check_interval']);
-                if ($nextCheck > time()) {
-                    // No need.
-                    return -1;
-                }
-            }
-        }
-
         $ops    = array('currentRevision' => $config['revision']);
         $enc    = TRUE;
         $result = self::_wsSendMessage(
@@ -1419,7 +1414,7 @@ class PatchingActions
      */
     public static function wsCheckSubscription()
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1476,7 +1471,7 @@ class PatchingActions
      */
     public static function wsNotifyApplied($new, $old, $msg='')
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1520,7 +1515,7 @@ class PatchingActions
      */
     public static function wsNotifyRestored()
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1562,7 +1557,7 @@ class PatchingActions
      */
     public static function wsDownloadUpdate(array $updates)
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1620,7 +1615,7 @@ class PatchingActions
      */
     public static function wsCheckPremiumSubscription()
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1648,7 +1643,7 @@ class PatchingActions
      */
     public static function wsGetAWSKeys()
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1694,7 +1689,7 @@ class PatchingActions
      */
     public static function wsReleaseStatus()
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE || $updateServer['status'] === 'pending') {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1761,7 +1756,7 @@ class PatchingActions
      */
     public static function wsValidateUpdate($name)
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE) {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
@@ -1825,7 +1820,7 @@ class PatchingActions
      */
     public static function wsGetBugzilla()
     {
-        $updateServer = self::_getUpdateServer();
+        $updateServer = Patching::getUpdateServer();
         if ($updateServer === FALSE) {
             return 'ERR_NO_UPDATE_SERVER_CONFIGURED';
         }
