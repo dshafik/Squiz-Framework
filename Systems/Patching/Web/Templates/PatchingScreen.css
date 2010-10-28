@@ -7,6 +7,14 @@
     overflow: hidden;
 }
 
+.PatchingScreen-activateWrap-left {
+    float: left;
+}
+
+.PatchingScreen-activateWrap {
+    overflow: hidden;
+}
+
 /* System ID section */
 .PatchingScreen-activateWrap.hidden {
     display: none;
@@ -29,11 +37,11 @@
 }
 
 #PatchingScreen-changeIdBtn {
-    margin: 0 0 0 62px;
+    margin: 0 0 0 24px;
 }
 
 #PatchingScreen-cancelChangeBtn {
-    margin: 0 0 0 65px;
+    margin: 0 0 0 33px;
 }
 
 #PatchingScreen-checkAsapBtn {

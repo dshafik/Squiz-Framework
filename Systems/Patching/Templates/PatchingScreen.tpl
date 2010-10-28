@@ -63,31 +63,33 @@
                             <items>
                                 <value>
                                     <content>
-                                        <div id="PatchingScreen-systemidWrap" class="PatchingScreen-activateWrap">
-                                            <dataProvider action="SquizSuite::getSystemId" />
-                                        </div>
-                                        <div id="PatchingScreen-newActivationTextWrap" class="PatchingScreen-activateWrap hidden">
-                                            <widget type="GUI/TextBox" id="PatchingScreen-newActivationIdText">
-                                                <setting name="size">30</setting>
-                                                <setting name="maxlength">50</setting>
-                                                <setting name="inline">true</setting>
-                                            </widget>
-                                        </div>
-                                    </content>
-                                </value>
-                                <value>
-                                    <content>
-                                        <div id="PatchingScreen-changeIdBtnWrap" class="PatchingScreen-activateWrap">
-                                            <widget type="GUI/Button" id="PatchingScreen-changeIdBtn">
-                                                <setting name="value"><text>Change ID</text></setting>
-                                                <setting name="click"><![CDATA[PatchingPatchingScreen.changeActivationID()]]></setting>
-                                            </widget>
-                                        </div>
-                                        <div id="PatchingScreen-cancel-changeIdBtnWrap" class="PatchingScreen-activateWrap hidden">
-                                            <widget type="GUI/Button" id="PatchingScreen-cancelChangeBtn">
-                                                <setting name="value"><text>Cancel</text></setting>
-                                                <setting name="click"><![CDATA[PatchingPatchingScreen.cancelNewActivationID()]]></setting>
-                                            </widget>
+                                        <div class="PatchingScreen-activateWrap">
+                                            <div class="PatchingScreen-activateWrap-left">
+                                                <div id="PatchingScreen-systemidWrap" class="PatchingScreen-activateWrap">
+                                                    <dataProvider action="SquizSuite::getSystemId" />
+                                                </div>
+                                                <div id="PatchingScreen-newActivationTextWrap" class="PatchingScreen-activateWrap hidden">
+                                                    <widget type="GUI/TextBox" id="PatchingScreen-newActivationIdText">
+                                                        <setting name="size">20</setting>
+                                                        <setting name="maxlength">50</setting>
+                                                        <setting name="inline">true</setting>
+                                                    </widget>
+                                                </div>
+                                            </div>
+                                            <div class="PatchingScreen-activateWrap-left">
+                                                <div id="PatchingScreen-changeIdBtnWrap" class="PatchingScreen-activateWrap">
+                                                    <widget type="GUI/Button" id="PatchingScreen-changeIdBtn">
+                                                        <setting name="value"><text>Change ID</text></setting>
+                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.changeActivationID()]]></setting>
+                                                    </widget>
+                                                </div>
+                                                <div id="PatchingScreen-cancel-changeIdBtnWrap" class="PatchingScreen-activateWrap hidden">
+                                                    <widget type="GUI/Button" id="PatchingScreen-cancelChangeBtn">
+                                                        <setting name="value"><text>Cancel</text></setting>
+                                                        <setting name="click"><![CDATA[PatchingPatchingScreen.cancelNewActivationID()]]></setting>
+                                                    </widget>
+                                                </div>
+                                            </div>
                                         </div>
                                     </content>
                                 </value>
