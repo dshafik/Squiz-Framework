@@ -127,7 +127,11 @@ GUIModeSwitcher.prototype = {
     _getDynamicButtons: function()
     {
         if (!this._dynamicButtons) {
-            this._dynamicButtons = dfx.getTag('a', this._dynamicBtnContainer)
+            if (this._dynamicBtnContainer) {
+                this._dynamicButtons = dfx.getTag('a', this._dynamicBtnContainer)
+            } else {
+                this._dynamicButtons = [];
+            }
         }
 
         return this._dynamicButtons;
