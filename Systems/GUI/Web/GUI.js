@@ -313,6 +313,10 @@ var GUI = new function()
             targetElement.appendChild(main);
             dfx.setHtml(main, content);
 
+            if (options && options.modal === true) {
+                GUI.addTemplate(system + ':' + templateName.replace(/.tpl$/, ''));
+            }
+
             if (callback) {
                 callback.call(this, main);
             }

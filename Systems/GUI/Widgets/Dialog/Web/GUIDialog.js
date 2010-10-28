@@ -32,6 +32,7 @@ function GUIDialog(id, settings)
 
     // Events.
     GUI.addWidgetEvent(this, 'dialogResized');
+    GUI.addWidgetEvent(this, 'dialogClosed');
 
     var self = this;
     this.update();
@@ -198,7 +199,6 @@ GUIDialog.prototype = {
 
     open: function()
     {
-        GUI.queueOverlay();
         document.body.appendChild(this.elem);
 
     },
@@ -206,7 +206,7 @@ GUIDialog.prototype = {
     close: function(clickedElement)
     {
         dfx.remove(this.elem);
-        GUI.dequeueOverlay('normal');
+        this.fireDialogClosedCallbacks(this.id);
 
     },
 
