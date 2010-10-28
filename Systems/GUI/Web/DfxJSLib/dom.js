@@ -991,6 +991,15 @@ dfx.isStubElement = function(element)
             case 'img':
             case 'br':
             case 'hr':
+            case 'iframe':
+            case 'param':
+            case 'link':
+            case 'meta':
+            case 'input':
+            case 'frame':
+            case 'col':
+            case 'base':
+            case 'area':
                 return true;
             break;
 
