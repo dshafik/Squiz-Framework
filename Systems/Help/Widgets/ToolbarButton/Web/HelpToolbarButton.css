@@ -1,11 +1,9 @@
 #helpToolbarButton {
     background: url(help_toolbarIcon.png) no-repeat;
     cursor: pointer;
-    float: right;
     height: 25px;
-    margin-right: 50px;
-    margin-top: 5px;
     width: 32px;
+    float: left;
 }
 
 #Help-dialog .GUIDialog-top {
