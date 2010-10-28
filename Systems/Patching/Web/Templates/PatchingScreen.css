@@ -1,6 +1,6 @@
 #PatchingScreen {
-    margin:0 auto;
-    width:1160px;
+    margin: 0 auto;
+    width: 1160px;
 }
 
 .PatchingScreen-activateWrap {
@@ -9,10 +9,6 @@
 
 .PatchingScreen-activateWrap-left {
     float: left;
-}
-
-.PatchingScreen-activateWrap {
-    overflow: hidden;
 }
 
 /* System ID section */
@@ -176,10 +172,14 @@ span.PatchingScreen-expander {
 
 .PatchingScreen-notifyUserIcon {
     float: left;
+    height: 24px;
+    width: 30px;
+    background: url("/__web/Systems/User/AssetTypes/User/Web/icon_user_s.png") repeat scroll 0 0 transparent;
 }
 
 .PatchingScreen-notifyName {
     float: left;
+    margin: 4px 0 0 5px;
 }
 
 #patchingSettings .GUIScreenSettings-item.deleted {
@@ -192,6 +192,7 @@ span.PatchingScreen-expander {
     width: 16px;
     cursor: pointer;
     background: url("/__web/Systems/GUI/Web/delete.png") repeat scroll 0 0 transparent;
+    margin-top: 4px;
 }
 
 .PatchingScreen-notifyDelete.deleted {

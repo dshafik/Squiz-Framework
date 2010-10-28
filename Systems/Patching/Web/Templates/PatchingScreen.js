@@ -36,31 +36,28 @@ var PatchingPatchingScreen = new function()
         var self     = this;
         this._config = data.config;
 
-        this._patchingSettingsDiv = GUI.getWidget('patchingSettings');
         this._patchingSettingsDiv = dfx.getId('patchingSettings');
-        this._notifyToggleBtn     = GUI.getWidget('PatchingScreen-notifyUpdates');
 
+        this._notify = data.config.notify;
+        this._notifyToggleBtn        = GUI.getWidget('PatchingScreen-notifyUpdates');
+        this._notificationRecipients = data.config.recipient;
         this._deleteNotificationUser = {};
         this._addNotificationUser    = [];
-
-        // Remove the user from the notification list.
-        var delNotifyBtns = dfx.getClass('PatchingScreen-notifyDelete', this._patchingSettingsDiv);
-        dfx.foreach(delNotifyBtns, function(idx) {
-            dfx.addEvent(delNotifyBtns[idx], 'click', function(e) {
-                var userid = delNotifyBtns[idx].getAttribute('userid');
-                if (dfx.hasClass(delNotifyBtns[idx], 'deleted') === true) {
-                    dfx.removeClass(delNotifyBtns[idx], 'deleted');
-                    dfx.removeClass(delNotifyBtns[idx].parentNode.parentNode, 'deleted');
-                    self._deleteNotificationUser[userid] = false;
-                } else {
-                    dfx.addClass(delNotifyBtns[idx], 'deleted');
-                    dfx.addClass(delNotifyBtns[idx].parentNode.parentNode, 'deleted');
-                    self._deleteNotificationUser[userid] = true;
-                }
-            });
-
-            return true;
+        this._notifyToggleBtn.addToggleOnCallback(function(e) {
+            self.showRecipients();
         });
+
+        this._notifyToggleBtn.addToggleOffCallback(function(e) {
+            self.hideRecipients();
+        });
+
+        if (this._notify === false && this._notificationRecipients.length > 0) {
+            this.hideRecipients();
+        }
+
+        // Attach events for removing the user from the notification list.
+        var delNotifyBtns = dfx.getClass('PatchingScreen-notifyDelete', this._patchingSettingsDiv);
+        this.attachRemoveRecipientEvents(delNotifyBtns);
 
         // Attach expander events.
         this._updateBoxDiv = dfx.getId('updatesBox');
@@ -93,6 +90,45 @@ var PatchingPatchingScreen = new function()
 
         GUI.setModified(this, true);
     };
+
+    this.showRecipients = function() {
+        var settingMid = dfx.getClass('GUIScreenSettings-mid', this._patchingSettingsDiv)[0]
+        var childLen = settingMid.childNodes.length;
+        var notifLen = this._notificationRecipients.length;
+        for (var i = (childLen - 1); i > (childLen - 2 - notifLen); i--) {
+            dfx.showElement(settingMid.childNodes[i]);
+        }
+    },
+
+    this.attachRemoveRecipientEvents = function(btns) {
+        // Attach events for removing the user from the notification list.
+        var self = this;
+        dfx.foreach(btns, function(idx) {
+            dfx.addEvent(btns[idx], 'click', function(e) {
+                var userid = btns[idx].getAttribute('userid');
+                if (dfx.hasClass(btns[idx], 'deleted') === true) {
+                    dfx.removeClass(btns[idx], 'deleted');
+                    dfx.removeClass(btns[idx].parentNode.parentNode, 'deleted');
+                    self._deleteNotificationUser[userid] = false;
+                } else {
+                    dfx.addClass(btns[idx], 'deleted');
+                    dfx.addClass(btns[idx].parentNode.parentNode, 'deleted');
+                    self._deleteNotificationUser[userid] = true;
+                }
+            });
+
+            return true;
+        });
+    },
+
+    this.hideRecipients = function() {
+        var settingMid = dfx.getClass('GUIScreenSettings-mid', this._patchingSettingsDiv)[0]
+        var childLen = settingMid.childNodes.length;
+        var notifLen = this._notificationRecipients.length;
+        for (var i = (childLen - 1); i > (childLen - notifLen - 2); i--) {
+            dfx.hideElement(settingMid.childNodes[i]);
+        }
+    },
 
     this.toggleActivation = function() {
         var activWrap  = dfx.getClass('PatchingScreen-activateWrap', this._patchingSettingsDiv)[0];
@@ -160,8 +196,23 @@ var PatchingPatchingScreen = new function()
             if (dfx.inArray(userid, self._config.recipient) === false
                 && dfx.inArray(userid, self._addNotificationUser) === false
             ) {
-                alert('New user added. Insert a new row to the notificationlist.');
-                self._addNotificationUser.push(userid);
+                GUI.sendRequest('User', 'getUserById', {userid: userid}, function(data) {
+                    var c = '<div class="PatchingScreen-notifyRow">';
+                    c    += '    <div class="PatchingScreen-notifyUserIcon">&nbsp;</div>';
+                    c    += '    <div class="PatchingScreen-notifyName">';
+                    c    += dfx.ucFirst(data.result.first_name) + ' ' + dfx.ucFirst(data.result.last_name);
+                    c    += '</div>';
+                    c    += '    <div userid="' + userid + '" class="PatchingScreen-notifyDelete">&nbsp;</div>';
+                    c    += '</div>';
+                    self._addNotificationUser.push(userid);
+                    var settingMid = dfx.getClass('GUIScreenSettings-mid', self._patchingSettingsDiv)[0]
+
+                    var targetIdx = (settingMid.childNodes.length - 1);
+                    GUI.getWidget('patchingSettings').addItem('new', c, false, targetIdx);
+
+                    var delNotifyBtn = dfx.getClass('PatchingScreen-notifyDelete', settingMid.childNodes[targetIdx]);
+                    self.attachRemoveRecipientEvents(delNotifyBtn);
+                });
             }
 
             return true;

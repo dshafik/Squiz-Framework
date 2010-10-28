@@ -1897,12 +1897,15 @@ class PatchingActions
         );
 
         $rows[] = sprintf($toggleBtnRow, $toggleBtn);
+
+        // Notification User List row. It will be only shown
+        // if the notification is activated.
         Channels::includeSystem('User');
         foreach ($recipients as $userid) {
             $user = User::getUserById($userid);
-            $name = $user['first_name'].' '.$user['last_name'];
+            $name = ucwords($user['first_name'].' '.$user['last_name']);
             $row  = '<div class="PatchingScreen-notifyRow">';
-            $row .= '<div class="PatchingScreen-notifyUserIcon">[Icon]</div>';
+            $row .= '<div class="PatchingScreen-notifyUserIcon">&nbsp;</div>';
             $row .= '<div class="PatchingScreen-notifyName">'.$name.'</div>';
             $row .= '<div class="PatchingScreen-notifyDelete" userid="'.$userid.'">&nbsp;</div>';
             $row .= '</div>';
@@ -2159,6 +2162,7 @@ class PatchingActions
         Channels::includeSystem('SystemConfig');
         $config = Patching::getPatchingConfig();
         $config['notify']    = $notify;
+        $addedNotification   = array_diff($addedNotification, $deletedNotification);
         $config['recipient'] = array_diff($config['recipient'], $deletedNotification);
         $config['recipient'] = array_merge($config['recipient'], $addedNotification);
         SystemConfig::setConfig('Patching', $config);
