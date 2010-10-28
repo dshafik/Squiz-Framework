@@ -86,7 +86,7 @@ GUIScreenSettings.prototype = {
 
     },
 
-    addItem: function(itemid, title, selected)
+    addItem: function(itemid, title, selected, beforeIndex)
     {
         var template = this.settings._templates.item;
 
@@ -98,7 +98,11 @@ GUIScreenSettings.prototype = {
         var newElem = tmpEl.firstChild;
 
         var listCont = dfx.getClass('GUIScreenSettings-mid', dfx.getId(this.id))[0];
-        listCont.appendChild(newElem);
+        if (beforeIndex) {
+            dfx.insertBefore(listCont.childNodes[beforeIndex], newElem);
+        } else {
+            listCont.appendChild(newElem);
+        }
 
         if (selected === true) {
             this.selectItem(newElem);
