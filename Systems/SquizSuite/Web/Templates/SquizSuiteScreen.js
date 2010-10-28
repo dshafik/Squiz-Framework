@@ -82,10 +82,11 @@ var SquizSuiteSquizSuiteScreen = new function()
         });
 
         // Disable Add New button if the current URL is not set.
+        var btnCon = dfx.getClass('addNewButtonContainer', dfx.getId('squizSuite-connectedProduct-box'))[0];
         if (data.currentProduct.connection.url === '') {
-            GUI.getWidget('addNewProduct').disable();
+            dfx.hideElement(btnCon);
         } else {
-            GUI.getWidget('addNewProduct').enable();
+            dfx.showElement(btnCon);
         }
 
         // Hide new product row.
