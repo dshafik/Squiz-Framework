@@ -51,7 +51,7 @@ HelpToolbarButton.prototype = {
 
     },
 
-    _loadHelp: function(showAfterLoad)
+    _loadHelp: function(showAfterLoad, pageid)
     {
         var self = this;
         var options = {
@@ -60,7 +60,7 @@ HelpToolbarButton.prototype = {
 
         GUI.loadTemplate('Help', 'Help.tpl', null, function() {
             self._loaded = true;
-            self.showHelp();
+            self.showHelp(pageid);
         }, options);
 
     },
@@ -70,17 +70,17 @@ HelpToolbarButton.prototype = {
         this.showHelp();
     },
 
-    showHelp: function()
+    showHelp: function(pageid)
     {
         if (this._loaded === false) {
-            this._loadHelp(true);
+            this._loadHelp(true, pageid);
             return;
         }
 
         // Initialise the main Help widget.
         Help.init();
 
-        Help.refresh();
+        Help.refresh(pageid);
         this._loaded = false;
 
     }

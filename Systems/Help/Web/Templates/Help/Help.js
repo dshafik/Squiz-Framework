@@ -94,8 +94,12 @@ var Help = new function()
         });
     };
 
-    this.refresh = function() {
-        this.loadIndexPage();
+    this.refresh = function(pageid) {
+        if (!pageid) {
+            this.loadIndexPage();
+        } else {
+            this.loadPage(pageid);
+        }
     };
 
     this.loadGlossaryPage = function(template) {
