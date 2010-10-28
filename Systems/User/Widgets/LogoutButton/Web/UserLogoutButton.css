@@ -1,11 +1,9 @@
 #userLogoutButton {
     background: url(logout_act.png) no-repeat;
     cursor: pointer;
-    float: right;
     height: 25px;
-    margin-right: 0;
-    margin-top: 5px;
     width: 32px;
+    float: left;
 }
 
 /* Intervention popup styles */
