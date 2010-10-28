@@ -272,6 +272,18 @@ class GUITableActions
 
         $idx = 1;
         foreach ($rows as $rowid => $row) {
+            // If we have a "rowContent" field, then this will be the contents, and
+            // the rest will be options.
+            $customRowClass = '';
+            if (array_key_exists('rowContent', $row) === TRUE) {
+                $rowOptions = $row;
+                $row        = $row['rowContent'];
+
+                if (array_key_exists('rowClass', $rowOptions) === TRUE) {
+                    $customRowClass = ' '.$rowOptions['rowClass'];
+                }
+            }
+
             // Set the class id.
             $classid = $rowid;
             if (strpos($rowid, ':') !== FALSE) {
@@ -293,6 +305,7 @@ class GUITableActions
             }
 
             echo ' row-'.$classid;
+            echo $customRowClass;
             echo '">';
 
             if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
@@ -330,14 +343,21 @@ class GUITableActions
 
                 $col = Util::getArrayIndex($row, $colid, '');
 
-                $colspan = '';
+                $colspan         = '';
+                $customCellClass = '';
                 if (is_array($col) === TRUE) {
-                    if (array_key_exists('colspan', $col) === TRUE
-                        && array_key_exists('colContent', $col) === TRUE
-                    ) {
-                        $colspan     = ' colspan="'.$col['colspan'].'"';
-                        $colspanSkip = (((int) $col['colspan']) - 1);
-                        $col         = $col['colContent'];
+                    if (array_key_exists('colContent', $col) === TRUE) {
+                        $colOptions = $col;
+                        $col        = $col['colContent'];
+
+                        if (array_key_exists('colspan', $colOptions) === TRUE) {
+                            $colspan     = ' colspan="'.$colOptions['colspan'].'"';
+                            $colspanSkip = (((int) $colOptions['colspan']) - 1);
+                        }
+
+                        if (array_key_exists('cellClass', $colOptions) === TRUE) {
+                            $customCellClass = ' '.$colOptions['cellClass'];
+                        }
                     }
                 }
 
@@ -354,7 +374,7 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td'.$colspan.' colid="'.$id.'-'.$classid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.'" ';
+                echo '<td'.$colspan.' colid="'.$id.'-'.$classid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.$customCellClass.'" ';
 
                 echo 'style="text-align: '.$columns[$colid]['align'].';';
                 if (isset($columns[$colid]['width']) === TRUE) {
