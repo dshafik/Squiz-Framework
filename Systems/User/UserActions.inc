@@ -158,6 +158,9 @@ class UserActions
      * @param integer $userid ID of the user.
      *
      * @return integer
+     *
+     * @api            read
+     * @api-permission superuser
      */
     public static function getUserById($userid)
     {
