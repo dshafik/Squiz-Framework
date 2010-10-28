@@ -443,6 +443,80 @@ class GUITableActions
     }//end generateRows()
 
 
+    /**
+     * Generated new table rows in bulk using the specified data provider.
+     *
+     * This differs from generateRows() in the following way:
+     * - generateRows() expects an array of rowids, and the data provider channel
+     *   must return ONE row for EACH rowid passed, which are then painted and sent.
+     * - generateBulkRows() is for when the rowids are not known in advance, but you
+     *   have the arguments to send to the data provider in question (whether passed,
+     *   or gathered through refiners). The data provider then returns ZERO OR MORE
+     *   rows, which are then painted and sent. The expected result is the same as
+     *   is what is expected from a data provider in the "rows" setting in a
+     *   template.
+     *
+     * The data provider specified in $channel must be API-enabled.
+     *
+     * The only required parameters for this API call are the channel and widget
+     * settings. However, the data provider's required parameters must also be
+     * passed, or they need to be able to be gathered from other sources (such as
+     * refining API::getActionParameters). This is automatically set up through the
+     * JavaScript call that calls this. If the required parameters for the data
+     * provider channel are not found, a 400 (Bad Request) error will be sent.
+     *
+     * @param array $channel       The channel to call which generates the column
+     *                             contents using the given params.
+     * @param array $settings      The widget settings.
+     *
+     * @return void
+     * @throws ChannelException If invalid API channel is specified.
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function generateBulkRows(array $channel, array $settings)
+    {
+        // Check if channel is callable.
+        Channels::includeSystem('API');
+        $api = API::getAPI($channel['system'], $channel['action']);
+        if ($api === FALSE) {
+            throw new ChannelException(_('Specified channel is invalid'));
+        }
+
+        // This is an API request therefore we need to set the current template, it
+        // should be the same as the table's template.
+        Channels::includeSystem('GUI');
+        $template = Util::getArrayIndex($settings, 'template', array());
+        GUI::setCurrentTemplateKey(implode('::', $template));
+
+        Channels::includeSystem($channel['system']);
+        $columnNames = Util::getArrayIndex($settings, 'columns', array());
+
+        // Gather any parameters from the request, including those that may need to
+        // be populated from elsewhere.
+        $channelParams = API::getActionParameters(
+            'post',
+            $api['system'],
+            $api['action'],
+            $api['arguments']
+        );
+
+        if ($channelParams === FALSE) {
+            // Insufficient parameters were provided.
+            API::sendHeader(400);
+            $responseContent['exception'] = 'Provided parameters are not sufficient';
+            API::sendResponse($responseContent);
+            exit;
+        }
+
+        $rows = API::executeRequest($channel['system'], $channel['action'], $channelParams, $api['options']);
+
+        GUITable::paintRows($rows, $columnNames, $settings, TRUE);
+
+    }//end generateBulkRows()
+
+
 }//end class
 
 ?>

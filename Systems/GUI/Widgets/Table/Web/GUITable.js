@@ -191,6 +191,102 @@ GUITable.prototype = {
 
     },
 
+
+    /**
+     * Generates new rows in bulk using a channel and specified params.
+     *
+     * This method should be used for multiple complex table rows (e.g. rows with
+     * widgets), the channel specified must return array of rows with their column
+     * contents.
+     *
+     * @param {object}   params   Params for the data provider.
+     * @param {function} callback The function to call once the row is added.
+     * @param {string}   system   The name of the system that action belongs to. Optional.
+     * @param {string}   action   The name of the action to call. Optional.
+     *
+     * @return {void}
+     */
+    generateBulkRows: function(params, callback, system, action)
+    {
+        var channel = this.settings.rowGenerator;
+        if (system && action) {
+            channel = {
+                system: system,
+                action: action
+            };
+        }
+
+        var tbody = dfx.getTag('tbody', this.elem)[0];
+
+        if (!this._loadingRow) {
+            this._loadingRow = document.createElement('tr');
+            dfx.addClass(this._loadingRow, 'loadingRow');
+
+            var colCount = 0;
+            dfx.foreach(this.settings.columns, function() {
+                colCount++;
+            });
+
+            dfx.setHtml(this._loadingRow, '<td colspan="' + colCount + '"><img src="' + GUI.getWidgetURL('GUI/Table') + '/ajax-loader.gif" /></td>');
+        }
+
+        // Hide no Items msg.
+        this.hideNoItemsMsg();
+
+        tbody.appendChild(this._loadingRow);
+
+        params.channel  = channel;
+        params.settings = this.settings;
+
+        for (var i in params) {
+            params[i] = dfx.jsonEncode(params[i]);
+        };
+
+        var self = this;
+        GUI.sendRequest('GUITable', 'generateBulkRows', params, function(rowHTML) {
+            var tmp = document.createElement('div');
+            dfx.setStyle(tmp, 'display', 'none');
+
+            // Add the tmp div to DOM so that any JS script retrieved will work with
+            // dfx.getId() etc.
+            document.body.appendChild(tmp);
+
+            dfx.setHtml(tmp, rowHTML);
+
+            // Remove loading row.
+            dfx.remove(self._loadingRow);
+
+            // Get the last row.
+            var currentRowCount = tbody.childNodes.length;
+
+            var rows = [];
+            while (tmp.firstChild) {
+                currentRowCount++;
+
+                rows.push(tmp.firstChild);
+                if ((currentRowCount % 2) === 0) {
+                    // Even.
+                    dfx.removeClass(tmp.firstChild, 'rowOdd');
+                    dfx.addClass(tmp.firstChild, 'rowEven');
+                } else {
+                    // Odd.
+                    dfx.removeClass(tmp.firstChild, 'rowEven');
+                    dfx.addClass(tmp.firstChild, 'rowOdd');
+                }
+
+                tbody.appendChild(tmp.firstChild);
+            }
+
+            dfx.remove(tmp);
+            GUI.setModified(self, true);
+
+            if (callback) {
+                callback.call(self, rows);
+            }
+        }, 'raw');
+
+    },
+
     /**
      * Toggles removed row state.
      *
