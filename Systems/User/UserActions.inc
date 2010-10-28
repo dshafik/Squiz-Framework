@@ -333,11 +333,13 @@ class UserActions
      */
     public static function addUsersToGroups(array $userids, array $userGroups)
     {
+        Channels::includeSystem('Asset');
         Channels::includeSystem('Linking');
         foreach ($userids as $userid) {
             foreach ($userGroups as $userGroupid) {
-                // TODO: Add a check to make sure that its a valid usergroup.
-                Linking::createLink($userGroupid, $userid);
+                if (Asset::isTypeOf($userGroupid, 'userGroup') === TRUE) {
+                    Linking::createLink($userGroupid, $userid);
+                }
             }
         }
 
