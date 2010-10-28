@@ -65,11 +65,11 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
             'numberOfStaticButton',
             self::$numberOfStaticButton
         );
-        
-        if ($staticButtons > $count) {
-            $staticButtons = $count;
+
+        if ($staticButtons > $total) {
+            $staticButtons = $total;
         }
-        
+
         // If only one expandable button would exist, then make that button static
         // instead.
         $expandableButtons = count($settings['items']) - $staticButtons;
@@ -79,14 +79,14 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
         }
 
         $settings['numberOfStaticButton'] = $staticButtons;
-        
+
         $classes = array('SwitcherList');
         if ($total === 1) {
             $classes[] = 'oneButton';
         } else if ($expandableButtons === 0) {
             $classes[] = 'noOverflow';
         }
-        
+
         echo '      <div class="'.implode(' ', $classes).'">';
         self::_paintStaticButtons($settings);
 
@@ -94,23 +94,23 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
             // Start 2nd list.
             echo '<div class="SwitcherList-overflow">
                     <ul class="SwitcherList-mode modeList-2" style="left: -14px; width: 1000px;">';
-    
+
             for ($i = $staticButtons; $i < $total; $i++) {
                 $mode       = $items[$i];
                 $modeSystem = Util::getArrayIndex($mode, 'system', '');
-    
+
                 if ($initItem === $mode['id']) {
                     $selected = ' selected';
                 } else {
                     $selected = '';
                 }
-    
+
                 echo '<li id="'.$id.'-'.$mode['id'].'" class="'.$class.'-modeButton'.$selected.'">';
                 echo '<a href="javascript:" modeid="'.$mode['id'].'" system="'.$modeSystem.'">'.$mode['label'].'</a></li>';
-    
+
                 $posClass = '';
             }
-    
+
             // End 2nd list.
             echo '</ul></div>';
         }
@@ -119,7 +119,7 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
         if ($expandableButtons > 0) {
             echo '<div class="'.$class.'-expander GUI-alignLeft"><span></span></div>';
         }
-        
+
         echo '</div>';
 
     }//end printButtonsContent()
@@ -139,24 +139,24 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
             $settings,
             'numberOfStaticButton',
             self::$numberOfStaticButton
-        );               
+        );
 
         $items    = Util::getArrayIndex($settings, 'items', array());
         $posClass = 'positionFirst';
         $selected = '';
         $initItem = Util::getArrayIndex($settings, 'initialItem', NULL);
-        
+
         $i = 0;
         foreach ($items as $item) {
             $i++;
             $posClass = '';
-            
+
             if ($i === 1) {
                 $posClass = 'positionFirst';
             } else if ($i === count($items)) {
                 $posClass = 'positionLast';
             }
-            
+
             if ($initItem === NULL || $initItem === $item['id']) {
                 $selected = ' selected';
             } else {
