@@ -1257,8 +1257,9 @@ class GUIActions
         }
 
         $code = array(
-                 'init' => $php,
-                 'list' => implode(', ', $argList),
+                 'init'   => $php,
+                 'values' => $argList,
+                 'list'   => implode(', ', $argList),
                 );
 
         return $code;
@@ -1268,6 +1269,26 @@ class GUIActions
 
     /**
      * Returns the PHP script of the given text tag.
+     *
+     * Text tags on their own are converted into plain localisable texts:
+     *   <text>Localisable text</text>
+     *
+     * Text tags with arguments are converted into localisable texts which are then
+     * run through sprintf():
+     *   <text>
+     *     <value>Localisable %s</value>
+     *     <args>
+     *       <arg>text</arg>
+     *     </args>
+     *   </text>
+     *
+     * Text tags with arguments can also accept a "plural" tag, which specifies that
+     * this should be converted into a numerically dependent localisable text
+     * (using ngettext() call). In this case, the first argument (cast to integer)
+     * will determine the number to be placed into ngettext(). If you do not want
+     * the first replacement in the string to determine this, use sprintf()
+     * positional parameters (eg. "%1$s") to move the replacements around. If no
+     * "args" tag, plural text is ignored.
      *
      * @param DOMNode $text     The text node to convert.
      * @param string  $assignTo The variable to assign to. This must be a valid PHP
@@ -1295,12 +1316,18 @@ class GUIActions
                 $php .= 'echo ';
             }
 
-            $php .= '_("'.$value.'");'."\n";
+            $php  .= '_(\''.$value.'\');'."\n";
         } else {
+            $plural = $tagInfo['plural'];
+
             // Init code for the arguments.
             $php .= $tagInfo['argsCode']['init'];
 
-            $printArgCode = '_("'.$value.'"), '.$tagInfo['argsCode']['list'];
+            if ($plural !== '') {
+                $printArgCode = 'ngettext(\''.$value.'\', \''.$plural.'\', (int) ('.$tagInfo['argsCode']['values'][0].')), '.$tagInfo['argsCode']['list'];
+            } else {
+                $printArgCode = '_(\''.$value.'\'), '.$tagInfo['argsCode']['list'];
+            }
 
             if ($assignTo !== NULL) {
                 $php .= $assignTo.' = sprintf('.$printArgCode.');'."\n";
@@ -1343,6 +1370,7 @@ class GUIActions
     {
         $tagInfo = array(
                     'value'    => '',
+                    'plural'   => '',
                     'argsCode' => array(),
                    );
 
@@ -1350,10 +1378,12 @@ class GUIActions
             if ($node->nodeType === XML_TEXT_NODE
                 || $node->nodeType === XML_CDATA_SECTION_NODE
             ) {
-                $tagInfo['value'] .= addcslashes($node->nodeValue, "\"\\\0");
+                $tagInfo['value'] .= addcslashes($node->nodeValue, "\'\\\0");
             } else if ($node->nodeType === XML_ELEMENT_NODE) {
                 if ($node->tagName === 'value') {
-                    $tagInfo['value'] .= addcslashes($node->nodeValue, "\"\\\0");
+                    $tagInfo['value'] .= addcslashes($node->nodeValue, "\'\\\0");
+                } else if ($node->tagName === 'plural') {
+                    $tagInfo['plural'] .= addcslashes($node->nodeValue, "\'\\\0");
                 } else if ($node->tagName === 'args') {
                     $tagInfo['argsCode'] = self::_getArgumentListCodes($node);
 
@@ -1364,6 +1394,7 @@ class GUIActions
         }
 
         $tagInfo['value'] = trim($tagInfo['value']);
+        $tagInfo['plural'] = trim($tagInfo['plural']);
 
         return $tagInfo;
 
@@ -1413,15 +1444,15 @@ class GUIActions
 
                     switch ($child->tagName) {
                         case 'if':
-                            $php .= ' ('.$condition.' === TRUE) {'."\n";
+                            $php .= ' (('.$condition.') === TRUE) {'."\n";
                         break;
 
                         case 'if-not':
-                            $php .= ' ('.$condition.' === FALSE) {'."\n";
+                            $php .= ' (('.$condition.') === FALSE) {'."\n";
                         break;
 
                         case 'if-null':
-                            $php .= ' ('.$condition.' === NULL) {'."\n";
+                            $php .= ' (('.$condition.') === NULL) {'."\n";
                         break;
 
                         default:
