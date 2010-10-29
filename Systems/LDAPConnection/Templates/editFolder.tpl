@@ -11,7 +11,7 @@
         <div id="{className}-infoSection">
             <div class="{className}-childUserDetails">
                 <div class="{className}-assetIcon"></div> : {groupInfo:childUserCount}
-                <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
+                <widget type="GUI/Button" id="UserManagerScreen-addNewLDAPConnection">
                     <setting name="value"><text>+ New Connection</text></setting>
                     <setting name="click">UserUserManagerScreen.showCreatePanel('createLDAPConnection');</setting>
                 </widget>
