@@ -50,13 +50,13 @@ class UserLogoutButtonActions
 
         $ivContents     = '<p>'._('Are you sure you want to logout?').'</p>';
         $buttonSettings = array(
-                           'value'  => _('Yes'),
+                           'value'  => _('Logout'),
                            'click'  => 'window.location=window.location.href.toString() + \'?sq_logout=true\'',
                            'colour' => 'Dark',
                           );
         $ivContents    .= GUI::createWidget($id.'-ivbuttonYes', 'GUIButton', $buttonSettings);
         $buttonSettings = array(
-                           'value'  => _('No'),
+                           'value'  => _('Cancel'),
                            'click'  => 'GUI.getWidget(\''.$id.'-intervention\').hide();',
                            'colour' => 'Dark',
                           );
