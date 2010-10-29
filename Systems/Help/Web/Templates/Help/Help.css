@@ -85,6 +85,64 @@ body {
     padding-right: 20px;
 }
 
+.Help-message.stepsBox.Help-iframe-msg {
+    display: block;
+}
+
+.Help-iframe .Help-message-stepsList .Help-searchTerm-1,
+.Help-iframe .Help-message-stepsList .Help-searchTerm-2,
+.Help-iframe .Help-message-stepsList .Help-searchTerm-3,
+.Help-iframe .Help-message-stepsList .Help-searchTerm-4,
+.Help-iframe .Help-message-stepsList .Help-searchTerm-5,
+.Help-iframe .Help-message-stepsList .Help-searchTerm-6,
+.Help-iframe .Help-message-stepsList .Help-searchTerm-7 {
+    background-color: transparent;
+}
+
+.Help-message-stepsList {
+    border-top: 1px solid #B6DDF6;
+    padding: 10px 0 0;
+    margin-top: 10px;
+}
+
+.Help-message-step {
+    padding-left: 48px;
+    background: url(step_1.png) no-repeat 5px 50%;
+    line-height: 30px;
+}
+
+.Help-message-step.step-2 {
+    background-image: url(step_2.png);
+}
+
+.Help-message-step.step-3 {
+    background-image: url(step_3.png);
+}
+
+.Help-message-step a {
+    float: right;
+    background: url(link_locator.png) no-repeat 100% 50%;
+    padding-right: 20px;
+    text-decoration: underline;
+}
+
+.Help-message-step.complete a {
+    display: none;
+}
+
+.Help-message-step.complete {
+    background-image: url(step_tick.png);
+    color: #999;
+}
+
+.Help-message-step.noAccess {
+    background-image: url(step_cross.png);
+}
+
+.Help-message.stepsBox {
+    margin-bottom: 10px;
+}
+
 /* Navigation styles */
 a.Help-control-button {
     float: left;

@@ -73,7 +73,8 @@ var Help = new function()
 
         // Add event callbacks for screen and mode changes so a message can be displayed.
         var timeout = null;
-        GUI.addTemplateAddedCallback(function() {
+        GUI.addTemplateAddedCallback(function(template) {
+            _updateShowMeLinks(template);
             clearTimeout(timeout);
             timeout = setTimeout(function() {
                 var pageType = _getCurrentPageType();
@@ -128,7 +129,7 @@ var Help = new function()
         var helpIframe = dfx.getId('Help-iframe');
         _loadPageOpts  = options;
 
-        dfx.attr(helpIframe, 'src', _apiURL + 'pageid=' + escape(pageid));
+        dfx.attr(helpIframe, 'src', _apiURL + 'pageid=' + escape(pageid) + '&templateLineage=' + dfx.jsonEncode(GUI.getTemplateLineage()));
     };
 
     this.iframeLoaded = function() {
@@ -589,32 +590,72 @@ var Help = new function()
         );
     };
 
+    this.showMe = function(widgetid, template) {
+        var widget = GUI.getWidget(widgetid);
+        if (!widget) {
+            return;
+        }
+
+        var element = widget.showButton(template, 5);
+        if (element) {
+            this.pointer.pointTo(null, null, element);
+        }
+    };
+
+    _updateShowMeLinks = function(newTemplate) {
+        var iframeDoc = dfx.getIframeDocument(_iframe);
+        var steps     = dfx.getClass('Help-message-step', iframeDoc.body);
+        var sln       = steps.length;
+        if (sln === 0) {
+            return;
+        }
+
+        var complete = true;
+        for (var i = 0; i < sln; i++) {
+            var step = steps[i];
+            if (complete === true && dfx.attr(step, 'template') === newTemplate) {
+                dfx.addClass(step, 'complete');
+            } else {
+                // Make sure this step is completed already, if not that means the
+                // steps are out of order so something is fail..
+                complete = dfx.hasClass(step, 'complete');
+            }
+        }
+
+        if (complete === true) {
+            setTimeout(function() {
+                Help.hideMessages(true);
+            }, 1500);
+        }
+    },
+
     this.pointer = {
         pointer: null,
         pointerDim: {},
         container: null,
 
-        pointTo: function(elemid, elemClass) {
+        pointTo: function(elemid, elemClass, elem) {
             this.container = dfx.getId('Help-dialog');
 
-            var elem = null;
-            if (!elemid || elemid === '') {
-                if (!elemClass || elemClass === '') {
-                    return;
-                }
-
-                // Get the first element that has the elemClass.
-                var celems = dfx.getClass(elemClass);
-                var cln    = celems.length;
-                for (var i = 0; i < cln; i++) {
-                    if (dfx.getElementWidth(celems[i]) > 0) {
-                        elem = celems[i];
-                        break;
+            if (!elem) {
+                if (!elemid || elemid === '') {
+                    if (!elemClass || elemClass === '') {
+                        return;
                     }
+
+                    // Get the first element that has the elemClass.
+                    var celems = dfx.getClass(elemClass);
+                    var cln    = celems.length;
+                    for (var i = 0; i < cln; i++) {
+                        if (dfx.getElementWidth(celems[i]) > 0) {
+                            elem = celems[i];
+                            break;
+                        }
+                    }
+                } else {
+                    // Get the elem element using the DOM element id.
+                    elem = dfx.getId(elemid);
                 }
-            } else {
-                // Get the elem element using the DOM element id.
-                elem = dfx.getId(elemid);
             }
 
             // If the specified elem is not in the DOM then we cannot pint to it.

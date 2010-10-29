@@ -198,14 +198,16 @@ class HelpActions
     /**
      * Prints the Help doc page for the specified page.
      *
-     * @param string $pageid Id of the page to load.
+     * @param string $pageid          Id of the page to load.
+     * @param array  $templateLineage Lineage of the active screen. Used to determine
+     *                                if user needs to change screens to view article.
      *
-     * @return void
+     * @return string
      *
      * @api            read
      * @api-permission public
      */
-    public static function getPage($pageid)
+    public static function getPage($pageid, array $templateLineage=array())
     {
         $filePath = Help::getDocsDirectory().'/'.$pageid;
         if (strpos($pageid, '.html') === FALSE) {
@@ -227,9 +229,56 @@ class HelpActions
 
             $contents .= '</html></body>';
             return $contents;
-        }
+        } else {
+            $contents = file_get_contents($filePath);
 
-        echo file_get_contents($filePath);
+            if (strpos($pageid, 'article-') === 0) {
+                // Article might belong to a different template and use may need to
+                // switch to that screen, show the steps to get to the correct template.
+                // Get the articles template.
+                $parts           = explode('-', $pageid);
+                $articleTemplate = $parts[1].':'.$parts[2];
+
+                // Reverse the lineage so we start from bottom.
+                $templateLineage = array_reverse($templateLineage);
+
+                $path = FALSE;
+                foreach ($templateLineage as $tpl) {
+                    // Get the lineage for the current active screen/mode up to the parent.
+                    $path = Help::getTemplateLineages($articleTemplate, $tpl);
+                    if ($path !== FALSE) {
+                        break;
+                    }
+                }
+
+                if ($path !== NULL && empty($path) === FALSE) {
+                    $parentTemplate = array_pop($path);
+                    $path           = array_reverse($path);
+                    $steps          = array();
+                    foreach ($path as $template) {
+                        $info    = self::_getTemplateInfo($template);
+                        $steps[] = array(
+                                    'title'         => $info['label'],
+                                    'template'      => $template,
+                                    'ownerWidgetid' => $info['parents'][$parentTemplate],
+                                   );
+
+                        $parentTemplate = $template;
+                    }
+
+                    // Found valid path to the template, add template switching code.
+                    $msg = _('In order to understand this article, please perform the following steps');
+                    ob_start();
+                        self::_printStepsBox($msg, _('Hide this message'), $steps);
+                    $boxContent = ob_get_contents();
+                    ob_end_clean();
+
+                    $contents = str_replace('<h1', $boxContent.'<h1', $contents);
+                }//end if
+            }//end if
+        }//end if
+
+        return $contents;
 
     }//end getPage()
 
@@ -362,6 +411,50 @@ class HelpActions
         echo '</div>';
 
     }//end printMessageBox()
+
+
+    /**
+     * Prints Help message box.
+     *
+     * @param string $message         The message to display.
+     * @param string $closeButtonText The text displayed next to close icon.
+     * @param array  $steps           List of steps to perform.
+     *
+     * @return void
+     */
+    private static function _printStepsBox($message, $closeButtonText, array $steps)
+    {
+        echo '<div class="Help-message stepsBox Help-iframe-msg"';
+        echo ' iniframe="true"';
+        echo '>';
+
+        // Top message section, displays message type icon and the message.
+        echo '<div class="Help-message-top type-info">';
+        echo '<div class="Help-message-top-msg">';
+        echo $message;
+        echo '</div>';
+
+        echo '<div class="Help-message-stepsList">';
+        foreach ($steps as $i => $step) {
+            echo '<div class="Help-message-step step-'.($i + 1).'" template="'.$step['template'].'">';
+            printf(_('Select %s'), $step['title']);
+            echo '<a href="javascript:window.parent.Help.showMe(\''.$step['ownerWidgetid'].'\', \''.$step['template'].'\');">'._('Show me').'</a>';
+            echo '</div>';
+        }
+
+        echo '</div>';
+        echo '</div>';
+
+        if (empty($closeButtonText) === FALSE) {
+            // Message footer (shows the close icon).
+            echo '<div class="Help-message-footer">';
+            echo '<a class="Help-message-close" href="javascript:window.parent.Help.hideMessages(true);" title="'.$closeButtonText.'">'.$closeButtonText.'</a>';
+            echo '</div>';
+        }
+
+        echo '</div>';
+
+    }//end _printStepsBox()
 
 
     /**
@@ -553,6 +646,131 @@ class HelpActions
         return $contents;
 
     }//end _getSearchResultsPage()
+
+
+    /**
+     * Returns template information.
+     *
+     * @param string $template Name of the template (e.g. System:template).
+     *
+     * @return array
+     */
+    private static function _getTemplateInfo($template)
+    {
+        $templates = array();
+        $tplPath   = BaseSystem::getDataDir('Help').'/tplPaths.inc';
+        if (file_exists($tplPath) === TRUE) {
+            include $tplPath;
+        }
+
+        if (isset($templates[$template]) === TRUE) {
+            return $templates[$template];
+        }
+
+        return array();
+
+    }//end _getTemplateInfo()
+
+
+    /**
+     * Returns the parent templates for a specified template.
+     *
+     * @param string $template Name of the template (e.g. System:template).
+     *
+     * @return array
+     */
+    private static function _getTemplateParents($template)
+    {
+        $templates = array();
+        $tplPath   = BaseSystem::getDataDir('Help').'/tplPaths.inc';
+        if (file_exists($tplPath) === TRUE) {
+            include $tplPath;
+        }
+
+        if (isset($templates[$template]) === TRUE) {
+            return array_keys($templates[$template]['parents']);
+        }
+
+        return array();
+
+    }//end _getTemplateParents()
+
+
+    /**
+     * Returns template lineage between two specified templates.
+     *
+     * @param string $template         Name of the template (e.g. System:template).
+     * @param string $topLevelTemplate Name of the template (e.g. System:template).
+     *
+     * @return array
+     */
+    public static function getTemplateLineages($template, $topLevelTemplate)
+    {
+        $lineage = array($template);
+        if ($template === $topLevelTemplate) {
+            return $lineage;
+        }
+
+        $parents = self::_getTemplateParents($template);
+
+        if (empty($parents) === TRUE) {
+            return FALSE;
+        }
+
+        $before = count($lineage);
+        foreach ($parents as $parent) {
+            $parentLin = Help::getTemplateLineages($parent, $topLevelTemplate);
+            if ($parentLin !== FALSE) {
+                $lineage = array_merge($lineage, $parentLin);
+                return $lineage;
+            }
+        }
+
+        if (empty($lineage) === TRUE || $before === count($lineage)) {
+            return FALSE;
+        }
+
+        return $lineage;
+
+    }//end getTemplateLineages()
+
+
+    /**
+     * Adds specified template to template lineage list.
+     *
+     * Note: template lineage related methods are used to display screen switching
+     * steps that appear in article pages.
+     *
+     * @param string $childTemplate  Name of the template (e.g. System:template).
+     * @param string $parentTemplate The name of the template parent template.
+     * @param string $widgetid       Id of the parent template widget.
+     * @param string $label          Label for the template.
+     *
+     * @return void
+     */
+    public static function addTemplateToLineage($childTemplate, $parentTemplate=NULL, $widgetid='', $label='')
+    {
+        $templates = array();
+        $tplPath   = BaseSystem::getDataDir('Help').'/tplPaths.inc';
+        if (file_exists($tplPath) === TRUE) {
+            include $tplPath;
+        }
+
+        if (isset($templates[$childTemplate]) === FALSE) {
+            $templates[$childTemplate] = array(
+                                          'label'   => $label,
+                                          'parents' => array(),
+                                         );
+        }
+
+        if ($parentTemplate !== NULL) {
+            $templates[$childTemplate]['parents'][$parentTemplate] = $widgetid;
+        }
+
+        include_once 'Libs/FileSystem/FileSystem.inc';
+        FileSystem::arrayToFile($templates, 'templates', $tplPath);
+
+    }//end addTemplateToLineage()
 
 
     /**
