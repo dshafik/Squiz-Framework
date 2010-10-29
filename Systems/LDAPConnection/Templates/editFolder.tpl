@@ -47,6 +47,7 @@
                     <label for="{ldapClassName}-new-port-input" class="GUI-requiredField"><text>Port</text></label>
                     <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-port">
                         <setting name="size">14</setting>
+                        <setting name="hintAsDefault">true</setting>
                         <setting name="hint">389</setting>
                     </widget>
                 </div>
@@ -94,6 +95,7 @@
                 <label for="{ldapClassName}-new-username-input" class="GUI-requiredField"><text>Username</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-uid">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">uid</setting>
                 </widget>
 
@@ -101,6 +103,7 @@
                 <label for="{ldapClassName}-new-cn-input" class="GUI-requiredField"><text>Name</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-cn">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">cn</setting>
                 </widget>
 
@@ -108,6 +111,7 @@
                 <label for="{ldapClassName}-new-givenname-input" class="GUI-requiredField"><text>First Name</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-givenname">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">givenname</setting>
                 </widget>
 
@@ -115,6 +119,7 @@
                 <label for="{ldapClassName}-new-sn-input" class="GUI-requiredField"><text>Last Name</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-sn">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">sn</setting>
                 </widget>
 
@@ -122,6 +127,7 @@
                 <label for="{ldapClassName}-new-mail-input" class="GUI-requiredField"><text>Email</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-mail">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">mail</setting>
                 </widget>
 
@@ -132,6 +138,7 @@
                 <label for="{ldapClassName}-new-ou-input" class="GUI-requiredField"><text>Group Name</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-ou">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">ou</setting>
                 </widget>
 
@@ -156,6 +163,7 @@
                 <label for="{ldapClassName}-new-uniqueIdUsers-input"><text>Unique ID attribute for users</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-uniqueIdUsers">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">dn</setting>
                 </widget>
 
@@ -163,6 +171,7 @@
                 <label for="{ldapClassName}-new-uniqueIdGroups-input"><text>Unique ID attribute for groups</text></label>
                 <widget type="GUI/TextBox" id="LDAPUserManagerScreen-new-uniqueIdGroups">
                     <setting name="size">20</setting>
+                    <setting name="hintAsDefault">true</setting>
                     <setting name="hint">dn</setting>
                 </widget>
 
