@@ -2020,8 +2020,9 @@ class SquizSuiteActions
 
                 case 'pending approval':
                     $setting  = array(
-                                 'value' => 'Approve Connection',
-                                 'click' => 'SquizSuiteSquizSuiteScreen.approveConnection(this)',
+                                 'value'       => 'Approve Connection',
+                                 'click'       => 'SquizSuiteSquizSuiteScreen.approveConnection(this)',
+                                 'customClass' => 'approveConnection',
                                 );
                     $summary .= '<span class="SquizSuiteScreen-pendingApprovalMsg">'._('Connection Pending ...').'</span>';
                     $summary .= GUI::createWidget('squizSuite-'.$product['systemid'].'-approve-btn', 'GUIButton', $setting);
@@ -2050,8 +2051,9 @@ class SquizSuiteActions
 
             // Product Details Row.
             $setting = array(
-                        'value' => $productUrl,
-                        'size'  => 40,
+                        'value'       => $productUrl,
+                        'size'        => 40,
+                        'customClass' => 'apiURL',
                        );
 
             if (strpos($product['status'], 'pending') === 0) {
