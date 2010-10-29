@@ -67,7 +67,13 @@ HelpToolbarButton.prototype = {
 
     toggleHelp: function()
     {
-        this.showHelp();
+        var dialog = dfx.getId('Help-dialog');
+        if (!dialog || dfx.getElementHeight(dialog) === 0) {
+            this._loadHelp(true);
+        } else {
+            GUI.getWidget('Help-dialog').close();
+        }
+
     },
 
     showHelp: function(pageid)
@@ -81,8 +87,6 @@ HelpToolbarButton.prototype = {
         Help.init();
 
         Help.refresh(pageid);
-        this._loaded = false;
-
     }
 
 };
