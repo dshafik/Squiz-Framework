@@ -116,6 +116,13 @@ class GUITextBoxActions
      */
     protected static $customClass = '';
 
+    /**
+     * Use hint as default value.
+     *
+     * @var boolean
+     */
+    protected static $hintAsDefault = FALSE;
+
 
     /**
      * Prints this widgets content.
