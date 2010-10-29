@@ -73,7 +73,14 @@ var Help = new function()
 
         // Add event callbacks for screen and mode changes so a message can be displayed.
         var timeout = null;
+        var prevTemplate = GUI.getCurrentTemplate();
         GUI.addTemplateAddedCallback(function(template) {
+            if (prevTemplate === template) {
+                return;
+            }
+
+            prevTemplate = template;
+
             _updateShowMeLinks(template);
             clearTimeout(timeout);
             timeout = setTimeout(function() {
@@ -84,7 +91,11 @@ var Help = new function()
             }, 100);
         });
 
-        GUI.addTemplateRemovedCallback(function() {
+        GUI.addTemplateRemovedCallback(function(template) {
+            if (prevTemplate === template) {
+                return;
+            }
+
             clearTimeout(timeout);
             timeout = setTimeout(function() {
                 var pageType = _getCurrentPageType();
