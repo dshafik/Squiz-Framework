@@ -338,9 +338,12 @@ class UserActions
     {
         Channels::includeSystem('Asset');
         Channels::includeSystem('Linking');
+        $usersFolders = User::getUsersFolders(TRUE);
         foreach ($userids as $userid) {
             foreach ($userGroups as $userGroupid) {
-                if (Asset::isTypeOf($userGroupid, 'userGroup') === TRUE) {
+                if (in_array($userGroupid, $usersFolders) === TRUE
+                    || Asset::isTypeOf($userGroupid, 'userGroup') === TRUE
+                ) {
                     Linking::createLink($userGroupid, $userid);
                 }
             }
@@ -1128,7 +1131,7 @@ class UserActions
         $columns['email'] = $user['email'];
 
         include_once 'Libs/String/String.inc';
-        $lastLogin  = $user['last_login'];
+        $lastLogin = $user['last_login'];
         if ($lastLogin === FALSE) {
             $lastLogin = _('Never logged in');
         } else {
@@ -1486,6 +1489,7 @@ class UserActions
         }
 
         Channels::includeSystem('Linking');
+        Channels::includeSystem('Asset');
 
         // Update parent groups.
         $currentGroups = User::getUserGroups($assetid, TRUE);
@@ -1497,14 +1501,15 @@ class UserActions
         }
 
         // Add the new groups.
-        $items = Util::getArrayIndex($parents, 'items', array());
+        $usersFolders = User::getUsersFolders(TRUE);
+        $items        = Util::getArrayIndex($parents, 'items', array());
         foreach ($items as $itemid => $tmp) {
             if (strpos($itemid, 'new_') === 0) {
                 $parts      = explode('_', $itemid);
                 $newGroupid = $parts[1];
                 if ($newGroupid !== $assetid
                     && in_array($newGroupid, $currentGroups) === FALSE
-                    && Asset::isTypeOf($newGroupid, 'userGroup') === TRUE
+                    && (Asset::isTypeOf($newGroupid, 'userGroup') === TRUE || in_array($newGroupid, $usersFolders) === TRUE)
                 ) {
                     Linking::createLink($newGroupid, $assetid);
                 }
