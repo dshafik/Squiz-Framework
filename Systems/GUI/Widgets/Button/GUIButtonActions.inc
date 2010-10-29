@@ -77,6 +77,13 @@ class GUIButtonActions
      */
     protected static $accessKey = NULL;
 
+    /**
+     * Custom class name to be added to button.
+     *
+     * @var string
+     */
+    protected static $customClass = '';
+
 
     /**
      * Prints widgets content.
@@ -137,7 +144,13 @@ class GUIButtonActions
             echo ' accesskey="'.$accessKey.'"';
         }
 
-        echo ' class="'.$settings['widget']['type'].' button'.$colour.'"'.$onClick.'>';
+        echo ' class="'.$settings['widget']['type'].' button'.$colour;
+        $customClass = Util::getArrayIndex($settings, 'customClass', self::$customClass);
+        if (empty($customClass) === FALSE) {
+            echo ' '.$customClass;
+        }
+
+        echo '"'.$onClick.'>';
 
         echo '<span class="'.$settings['widget']['type'].'Label">'.$value.'</span>';
         echo '</button>';

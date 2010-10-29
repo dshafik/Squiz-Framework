@@ -109,6 +109,13 @@ class GUITextBoxActions
      */
     protected static $hint = '';
 
+    /**
+     * Custom class name to be added to input field.
+     *
+     * @var string
+     */
+    protected static $customClass = '';
+
 
     /**
      * Prints this widgets content.
@@ -177,7 +184,13 @@ class GUITextBoxActions
         }
 
         // The input field.
-        echo '<input id="'.$id.'-input" class="'.$class.' input"'.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength;
+        echo '<input id="'.$id.'-input" class="'.$class.' input';
+        $customClass = Util::getArrayIndex($settings, 'customClass', self::$customClass);
+        if (empty($customClass) === FALSE) {
+            echo ' '.$customClass;
+        }
+
+        echo '" '.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength;
 
         $disabled = Util::getArrayIndex($settings, 'disabled', self::$disabled);
         if ($disabled === TRUE) {
