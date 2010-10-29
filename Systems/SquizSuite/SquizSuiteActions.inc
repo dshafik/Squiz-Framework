@@ -286,6 +286,8 @@ class SquizSuiteActions
      * to connect and the rest will be handled by the real activation
      * in Patching System.
      *
+     * @param string $apiURL The API Url of the Update Server.
+     *
      * @return void
      */
     public static function addUpdateServerForActivation($apiURL)
@@ -325,7 +327,8 @@ class SquizSuiteActions
 
             SquizSuite::updateProduct($systemid, 'current', FALSE);
             SquizSuite::updateProduct($systemid, 'status', 'pending');
-        }
+        }//end if
+
     }//end addUpdateServerForActivation()
 
 
@@ -850,11 +853,33 @@ class SquizSuiteActions
                     if ($product['current'] === FALSE
                         && $product['status'] === 'live'
                     ) {
-                        $productEl = $dom->createElement('product');
-                        API::buildResponseXMLDom($productEl, $product);
-                        $productsEl->appendChild($productEl);
-                    }
-                }
+                        $addSystem = TRUE;
+                        if ($product['type'] === 'Squiz Matrix') {
+                            $username = Util::getArrayIndex(
+                                $product['connection'],
+                                'username',
+                                ''
+                            );
+                            $password = Util::getArrayIndex(
+                                $product['connection'],
+                                'password',
+                                ''
+                            );
+
+                            if (empty($username) === TRUE
+                                && empty($password) === TRUE
+                            ) {
+                                $addSystem = FALSE;
+                            }
+                        }
+
+                        if ($addSystem === TRUE) {
+                            $productEl = $dom->createElement('product');
+                            API::buildResponseXMLDom($productEl, $product);
+                            $productsEl->appendChild($productEl);
+                        }
+                    }//end if
+                }//end foreach
 
                 if (array_key_exists('sync_direction', $options) === TRUE) {
                     $syncDir = $dom->createElement('sync_direction');
@@ -1283,10 +1308,7 @@ class SquizSuiteActions
                     continue;
                 }
 
-                $connection         = array();
-                $connection['url']  = $product['connection']['url'];
-                $connection['cert'] = $product['connection']['cert'];
-                $connection['name'] = $product['connection']['name'];
+                $connection = $product['connection'];
                 SquizSuite::registerProduct(
                     $product['systemid'],
                     $product['type'],
@@ -2268,7 +2290,8 @@ class SquizSuiteActions
     private static function _saveSquizSuiteScreen(array $data)
     {
         include_once 'Libs/Util/Util.inc';
-        $retVal = TRUE;
+        $retVal    = TRUE;
+        $broadcast = FALSE;
 
         // Current product name.
         $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
@@ -2344,7 +2367,7 @@ class SquizSuiteActions
 
             // Save Usernames and Passwords for Matrix products.
             if ($product['type'] === 'Squiz Matrix') {
-                // Not Matrix continue...
+                // Is Matrix continue...
                 $systemid     = $product['systemid'];
                 $upConnection = $product['connection'];
                 $newUsername  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-username', NULL);
@@ -2355,6 +2378,7 @@ class SquizSuiteActions
                 ) {
                     $upConnection['username'] = $newUsername;
                     SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+                    $broadcast = TRUE;
                 }
 
                 if ($newPassword !== NULL
@@ -2363,6 +2387,23 @@ class SquizSuiteActions
                 ) {
                     $upConnection['password'] = $newPassword;
                     SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+                    $broadcast = TRUE;
+                }
+
+                if ($broadcast === TRUE) {
+                    $currProduct   = SquizSuite::getCurrentProduct();
+                    $targetProduct = SquizSuite::getProduct($systemid);
+                    if ($currProduct['type'] !== 'Squiz Update'
+                        && $targetProduct['type'] !== 'Squiz Update'
+                    ) {
+                        // Update product shouldn't get involved with this.
+                        $options  = array('sync_direction' => 'broadcast');
+                        $response = SquizSuite::sendMessage(
+                            $systemid,
+                            'suiteProductSync',
+                            $options
+                        );
+                    }
                 }
             }//end if
         }//end foreach
@@ -2420,7 +2461,8 @@ class SquizSuiteActions
             Channels::includeSystem('API');
             $apiSuffix = API::getAPISuffix();
 
-            $url = rtrim($newProductURL, '/');
+            $url = trim($newProductURL);
+            $url = rtrim($url, '/');
             if (strpos($url, $apiSuffix) !== (strlen($url) - 5)) {
                 $url .= '/'.$apiSuffix;
             }
