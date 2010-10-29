@@ -93,34 +93,54 @@ class String
      * If you pass in a negative value, the format will
      * always be in seconds, so best not to do it.
      *
-     * @param integer $time Number of seconds.
+     * @param integer $time    Number of seconds.
+     * @param boolean $combine If TRUE, will combine the various formats together
+     *                         to get something like 4 minutes and 50 seconds
+     *                         instead of just 5 minutes.
      *
      * @return string
      */
-    public static function readableSeconds($time)
+    public static function readableSeconds($time, $combine=FALSE)
     {
         $result = '';
         if ($time > 31536000) {
             $unit   = floor(($time / 31536000));
             $result = sprintf(ngettext('%d year', '%d years', $unit), $unit);
+            $time  -= ($unit * 31536000);
         } else if ($time > 2419200) {
             $unit   = floor(($time / 2419200));
             $result = sprintf(ngettext('%d month', '%d months', $unit), $unit);
+            $time  -= ($unit * 2419200);
         } else if ($time > 604800) {
             $unit   = floor(($time / 604800));
             $result = sprintf(ngettext('%d week', '%d weeks', $unit), $unit);
+            $time  -= ($unit * 604800);
         } else if ($time > 86400) {
             $unit   = floor(($time / 86400));
             $result = sprintf(ngettext('%d day', '%d days', $unit), $unit);
+            $time  -= ($unit * 86400);
         } else if ($time > 3600) {
             $unit   = floor(($time / 3600));
             $result = sprintf(ngettext('%d hour', '%d hours', $unit), $unit);
+            $time  -= ($unit * 3600);
         } else if ($time > 60) {
             $unit   = floor(($time / 60));
             $result = sprintf(ngettext('%d minute', '%d minutes', $unit), $unit);
+            $time  -= ($unit * 60);
         } else {
             $result = sprintf(ngettext('%d second', '%d seconds', $time), $time);
+            $time   = 0;
         }//end if
+
+        if ($combine === TRUE && $time > 0) {
+            if ($time >= 60) {
+                $result .= ', ';
+            } else {
+                $result .= ' and ';
+            }
+
+            $result .= self::readableSeconds($time, TRUE);
+        }
 
         return $result;
 
