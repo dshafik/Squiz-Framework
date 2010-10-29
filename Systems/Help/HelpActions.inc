@@ -266,14 +266,15 @@ class HelpActions
                         $parentTemplate = $template;
                     }
 
-                    // Found valid path to the template, add template switching code.
-                    $msg = _('In order to understand this article, please perform the following steps');
-                    ob_start();
-                        self::_printStepsBox($msg, _('Hide this message'), $steps);
-                    $boxContent = ob_get_contents();
-                    ob_end_clean();
-
-                    $contents = str_replace('<h1', $boxContent.'<h1', $contents);
+                    if (empty($steps) === FALSE) {
+                        // Found valid path to the template, add template switching code.
+                        $msg = _('In order to understand this article, please perform the following steps');
+                        ob_start();
+                            self::_printStepsBox($msg, _('Hide this message'), $steps);
+                        $boxContent = ob_get_contents();
+                        ob_end_clean();
+                        $contents = str_replace('<h1', $boxContent.'<h1', $contents);
+                    }
                 }//end if
             }//end if
         }//end if
