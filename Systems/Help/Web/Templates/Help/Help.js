@@ -604,6 +604,10 @@ var Help = new function()
 
     _updateShowMeLinks = function(newTemplate) {
         var iframeDoc = dfx.getIframeDocument(_iframe);
+        if (!iframeDoc) {
+            return;
+        }
+
         var steps     = dfx.getClass('Help-message-step', iframeDoc.body);
         var sln       = steps.length;
         if (sln === 0) {
