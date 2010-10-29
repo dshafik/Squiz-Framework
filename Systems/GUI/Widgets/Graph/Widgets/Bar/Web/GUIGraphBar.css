@@ -53,6 +53,8 @@ ul.GUIGraphBar-data-row ul {
     padding: 0;
     margin: 0 1px;
     border: 1px solid #A0A0A0;
+    -moz-box-shadow: 1px 3px 6px #BBBBBB;
+    -webkit-box-shadow: 1px 3px 6px #BBBBBB;
     border-top: none;
     border-bottom: none;
     z-index: 2;
@@ -60,8 +62,20 @@ ul.GUIGraphBar-data-row ul {
     top: 0;
 }
 
+.SquizAnalytics-graphs-3-month .GUIGraphBar-data-point {
+    margin: 0 1px 0 0;
+}
+
+.SquizAnalytics-graphs-6-month .GUIGraphBar-data-point {
+    margin: 0;
+}
+
 .GUIGraphBar-data-point.first-point {
     border-top: 1px solid #A0A0A0;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-topright: 3px;
 }
 
 .GUIGraphBar-data-flag {
@@ -115,16 +129,19 @@ ul.GUIGraphBar-data-row ul {
 
 .GUIGraphBar .colour-black {
     background-color: #000;
+    border-color: #000;
     color: white;
 }
 
 .GUIGraphBar .colour-blue {
     background-color: #4480CF;
+    border-color: #4b75aa;
     color: white;
 }
 
 .GUIGraphBar .colour-gold {
     background-color: #EBE811;
+    border-color: #b4b33d;
     color: black;
 }
 
