@@ -9,7 +9,7 @@
         <!-- Group Info section -->
         <div id="{className}-infoSection">
             <div class="{className}-childUserDetails">
-                <div class="{className}-assetIcon"></div> : {groupInfo:childUserCount}
+                <div class="{className}-assetIcon childUserCount"></div> : {groupInfo:childUserCount}
                 <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
                     <setting name="value"><text>+ New</text></setting>
                     <setting name="click">UserUserManagerScreen.showCreatePanel('createUser')</setting>
@@ -20,7 +20,7 @@
                 </widget>
             </div>
             <div class="{className}-childGroupDetails">
-                <div class="{className}-assetIcon"></div> : {groupInfo:childGroupCount}
+                <div class="{className}-assetIcon childGroupCount"></div> : {groupInfo:childGroupCount}
                 <widget type="GUI/Button" id="UserManagerScreen-addNewGroup">
                     <setting name="value"><text>+ New</text></setting>
                     <setting name="click">UserUserManagerScreen.showCreatePanel('createGroup')</setting>

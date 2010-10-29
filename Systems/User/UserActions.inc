@@ -1026,7 +1026,7 @@ class UserActions
                 $mainTitle = array_shift($title);
                 $subTitle  = implode(' ', $title);
 
-                $itemContent  = '<div class="'.$class.'-userManager-item">';
+                $itemContent  = '<div class="'.$class.'-userManager-item '.str_replace(' ', '', $mainTitle).'">';
                 $itemContent .= '<div class="'.$class.'-userManager-item-title">'.$mainTitle.'</div>';
                 $itemContent .= '<div class="'.$class.'-userManager-item-subTitle">'.$subTitle.'</div>';
                 $itemContent .= '</div>';
