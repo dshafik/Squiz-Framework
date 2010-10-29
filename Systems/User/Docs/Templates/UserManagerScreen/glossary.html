@@ -1,5 +1,8 @@
-<h1>User Manager Section</h1>
-This section allows you to manage your <glossary id="User-user">users</glossary>, <glossary id="User-user_group">user groups</glossary> and <glossary id="User-UserManagerScreen-ldap_connection">LDAP connections</glossary>.
+<h1 elemid="userManager-box">User Manager Section</h1>
+This section allows you to view your <glossary id="User-user">users</glossary>, <glossary id="User-user_group">user groups</glossary> and <glossary id="User-UserManagerScreen-ldap_connection">LDAP connections</glossary>.
+
+<h1 elemid="userManager-editPane">Editing Section</h1>
+This section allows you to add new <glossary id="User-user">users</glossary>, <glossary id="User-user_group">user groups</glossary> and <glossary id="User-UserManagerScreen-ldap_connection">LDAP connections</glossary>, as well as edit and view existing users, user groups and LDAP connections.
 
 <!-- Local Users and Groups -->
 <h1>Local Users and Groups</h1>
@@ -11,62 +14,89 @@ This icon indicates the number of <glossary id="User-user">users</glossary> that
 <h1>User Group Icon</h1>
 This icon indicates the number of <glossary id="User-user_group">user groups</glossary> that have been created in the select <glossary id="User-user_group">user group</glossary>.
 
-<h1>Add Existing User Button</h1>
+<h1 elemid="UserManagerScreen-addExistingUser">Add Existing User Button</h1>
 This button allows you to add an existing <glossary id="User-user">user</glossary> to the <glossary id="User-user_group">user group</glossary> that you have selected.
 
-<h1>Add New User Button</h1>
+<h1 elemid="UserManagerScreen-addNewUser">Add New User Button</h1>
 This button allows you to create a new <glossary id="User-user">user</glossary> within the <glossary id="User-user_group">user group</glossary> that you have selected.
 
-<h1>Add Existing User Group Button</h1>
+<h1 elemid="UserManagerScreen-addExistingGroup">Add Existing User Group Button</h1>
 This button allows you to add an existing <glossary id="User-user_group">user group</glossary> to the <glossary id="User-user_group">user group</glossary> that you have selected.
 
-<h1>Add New User Group Button</h1>
+<h1 elemid="UserManagerScreen-addNewGroup">Add New User Group Button</h1>
 This button allows you to create a new <glossary id="User-user_group">user group</glossary> within the <glossary id="User-user_group">user group</glossary> that you have selected.
 
-<h1>Group Name Field</h1>
-The value that is entered into this field is used as the name of the <glossary id="User-user_group">user group</glossary>.
+<!-- Belongs to Section -->
+<h1 elemclass="UserManagerScreen-parentGroups">Belongs to Groups Section</h1>
+This section lists the <glossary id="User-user_group">user groups</glossary> that the selected <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> belong to. To add the user or group to another user group, click Add to another Group. To remove the user or group from a user group, click the <glossary id="User-UserManagerScreen-delete_icon">Delete icon</glossary>.
 
-<h1>Belongs to Groups Section</h1>
-This section lists the <glossary id="User-user_group">user groups</glossary> that the selected <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> belong to. To add the <glossary id="User-user">user</glossary> or group to another <glossary id="User-user_group">user group</glossary>, click <glossary id="User-UserManagerScreen-add_to_another_group_button">Add to another Group</glossary>. To remove the <glossary id="User-user">user</glossary> or group from a <glossary id="User-user_group">user group</glossary>, click the <glossary id="User-UserManagerScreen-delete_icon">Delete icon</glossary>.
-
-<h1>Delete Icon</h1>
+<h1 elemclass="GUI-deleteIcon">Delete Icon</h1>
 This icon allows you to remove a <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> from a <glossary id="User-user_group">user group</glossary>. When you click this icon, the <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> will remain on the screen but it will be disabled. It will be removed when you click <glossary id="GUI-save_button">Save</glossary>. If you marked the wrong <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> for deletion, click this icon once again. The <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> will not be deleted.
 
-<h1>Add to another Group Button</h1>
-This button allows you to add the selected <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> to another <glossary id="User-user_group">user group</glossary>. When you do this, the user(s) will receive any permissions that have been granted or denied to the selected <glossary id="User-user_group">user group</glossary>.
+<h1 elemid="UserManagerScreen-addToAnotherGroup">Add User to Another Group Button</h1>
+This button allows you to add the select <glossary id="User-user">user</glossary> to another <glossary id="User-user_group">user group</glossary>. When you do this, the user will receive any permissions that have been granted or denied to the selected <glossary id="User-user_group">user group</glossary>.
 
-<h1>First Name Field</h1>
+<h1 elemid="UserManagerScreen-editUserGroup-addToGroup">Add Group to Another Group Button</h1>
+This button allows you to add the selected <glossary id="User-user_group">user group</glossary> to another <glossary id="User-user_group">user group</glossary>. When you do this, the users in the group will receive any permissions that have been granted or denied to the selected <glossary id="User-user_group">user group</glossary>.
+
+<!-- Create New User -->
+<h1 elemid="UserManagerScreen-newUser-firstName-input">New User First Name Field</h1>
 The value that is entered into this field is used as the first name for the <glossary id="User-user">user</glossary>.
 
-<h1>Last Name Field</h1>
+<h1 elemid="UserManagerScreen-newUser-lastName-input">New User Last Name Field</h1>
 The vlaue that is entered into this field is used as the last name for the <glossary id="User-user">user</glossary>.
 
-<h1>Email Field</h1>
+<h1 elemid="UserManagerScreen-newUser-email-input">New User Email Field</h1>
 The value that is entered into this field is used as the email address for the <glossary id="User-user">user</glossary>. Any emails that are sent to the <glossary id="User-user">user</glossary> by the system will be sent to this email address.
 
-<h1>Active Field</h1>
-This field indicates whether the user account is active. If it is set to yes, the account is active and the <glossary id="User-user">user</glossary> will be able to log into the system. If it is set to no, the account is inactive.
-
-<h1>Username Field</h1>
+<h1 elemid="UserManagerScreen-newUser-username-input">New Username Field</h1>
 The value that is entered into this field is used as the username for the <glossary id="User-user">user</glossary>.
 
-<h1>Reset Password Button</h1>
-This button allows you to reset the password for the <glossary id="User-user">user</glossary>. When you click this button, the <glossary id="User-UserManagerScreen-password_field">Password field</glossary> will appear on the screen.
-
-<h1>Password Field</h1>
+<h1 elemid="UserManagerScreen-newUser-password">New User Password Field</h1>
 The value that is entered into this field is used as the password for the user. Enter a password into the first field and confirm the password by re-typing it into the second field. The strength of the password is indicated in the bar at the top of the field.
 
-<h1>Create User Button</h1>
+<h1 elemid="UserManagerScreen-newUser-createButton">Create User Button</h1>
 Once you have filled in the required fields, this button will create the new <glossary id="User-user">user</glossary>.
 
-<h1>Cancel User Button</h1>
+<h1 elemid="UserManagerScreen-cancelCreateUser">Cancel User Button</h1>
 This button allows you to cancel the creating of a new <glossary id="User-user">user</glossary>.
 
-<h1>Create User Group Button</h1>
+<!-- Edit User -->
+<h1 elemid="UserManagerScreen-editUser-existingUser-firstName-input">First Name Field</h1>
+The value that is entered into this field is used as the first name for the <glossary id="User-user">user</glossary>.
+
+<h1 elemid="UserManagerScreen-editUser-existingUser-lastName-input">Last Name Field</h1>
+The vlaue that is entered into this field is used as the last name for the <glossary id="User-user">user</glossary>.
+
+<h1 elemid="UserManagerScreen-editUser-existingUser-email-input">Email Field</h1>
+The value that is entered into this field is used as the email address for the <glossary id="User-user">user</glossary>. Any emails that are sent to the <glossary id="User-user">user</glossary> by the system will be sent to this email address.
+
+<h1 elemclass="UserManagerScreen-status">Active Field</h1>
+This field indicates whether the user account is active. If it is set to yes, the account is active and the <glossary id="User-user">user</glossary> will be able to log into the system. If it is set to no, the account is inactive.
+
+<h1 elemid="UserManagerScreen-editUser-existingUser-username-input">Username Field</h1>
+The value that is entered into this field is used as the username for the <glossary id="User-user">user</glossary>.
+
+<h1 elemid="UserManagerScreen-editUser-resetPassword">Reset Password Button</h1>
+This button allows you to reset the password for the <glossary id="User-user">user</glossary>. When you click this button, the <glossary id="User-UserManagerScreen-password_field">Password field</glossary> will appear on the screen.
+
+<h1 elemid="UserManagerScreen-editUser-existingUser-password">Password Field</h1>
+The value that is entered into this field is used as the password for the user. Enter a password into the first field and confirm the password by re-typing it into the second field. The strength of the password is indicated in the bar at the top of the field.
+
+<!-- Create User Group -->
+<h1 elemid="UserManagerScreen-newGroup-groupName-input">New User Group Name Field</h1>
+The value that is entered into this field is used as the name of the <glossary id="User-user_group">user group</glossary>.
+
+<h1 elemid="UserManagerScreen-createGroup">Create User Group Button</h1>
 Once you have filled in the required fields, this button will create the new <glossary id="User-user_group">user group</glossary>.
 
-<h1>Cancel User Group Button</h1>
+<h1 elemid="UserManagerScreen-cancelCreateUserGroup">Cancel User Group Button</h1>
 This button allows you to cancel the creating of a new <glossary id="User-user_group">user group</glossary>.
+
+<!-- Edit User Group -->
+<h1 elemid="UserManagerScreen-editUserGroup-groupName-input">Group Name Field</h1>
+The value that is entered into this field is used as the name of the <glossary id="User-user_group">user group</glossary>.
+
 
 <!-- LDAP Connections -->
 <h1>LDAP Connection</h1>
