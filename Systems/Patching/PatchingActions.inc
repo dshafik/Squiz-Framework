@@ -1008,10 +1008,11 @@ class PatchingActions
      * @param string  $serviceType Type of the service to make API call.
      * @param array   $ops         List of options to pass.
      * @param boolean $enc         TRUE if the encryption is needed.
+     * @param string  $format      Optional format to send API request.
      *
      * @return array
      */
-    private static function _wsSendMessage($url, $serviceType, array $ops, $enc=TRUE)
+    private static function _wsSendMessage($url, $serviceType, array $ops, $enc=TRUE, $format='json')
     {
         Channels::includeSystem('SquizSuite');
         $currProduct  = SquizSuite::getProduct();
@@ -1029,7 +1030,6 @@ class PatchingActions
             $msg['options']     = json_encode($ops);
         }
 
-        $format = 'json';
         $system = 'SquizUpdate';
         $action = 'updateService';
         $result = SquizSuite::sendRequest(
@@ -1368,7 +1368,7 @@ class PatchingActions
 
                 foreach ($toDownload as $revision => $info) {
                     $update[$revision] = $info;
-                    $status            = Patching::wsDownloadUpdate($update);
+                    $status            = Patching::wsDownloadUpdate($info);
                     if ($status === TRUE) {
                         // Extract the patch and register.
                         $patchName = str_replace('.tar.gz', '', $update[$revision]['filename']);
@@ -1389,6 +1389,8 @@ class PatchingActions
                             $body    = $patchInfo['name'].' is no longer valid, so it has been removed.';
                             Email::sendHtmlEmail($config['recipient'], $subject, $body);
                         }
+
+                        break;
                     }//end if
                 }//end foreach
 
@@ -1567,41 +1569,77 @@ class PatchingActions
         $currProduct = SquizSuite::getProduct();
         $config      = Patching::getPatchingConfig();
         $enc         = TRUE;
+        $updateInfo  = $updates;
+        $version     = $updateInfo['version'];
 
-        $patchingDataPath = BaseSystem::getDataDir('Patching');
-        foreach ($updates as $version => $updateInfo) {
-            $ops    = array(
-                       'version' => $version,
-                       'type'    => $currProduct['type'],
-                      );
-            $result = self::_wsSendMessage(
-                $updateServer['connection']['url'],
-                'DownloadUpdate',
-                $ops,
-                $enc
-            );
+        $msg = array(
+                'systemid' => $currProduct['systemid'],
+                'version'  => $version,
+               );
 
-            // Request failed.
-            if ($result['curlInfo']['http_code'] !== 200) {
+        $encPatchFilePath    = BaseSystem::getDataDir('Patching').'/patch_'.$version.'_enc.tar.gz';
+        $patchFileHeaderPath = BaseSystem::getDataDir('Patching').'/patch_'.$version.'_headers.txt';
+
+        $fp = fopen($encPatchFilePath, 'w+');
+        $hp = fopen($patchFileHeaderPath, 'w+');
+        $ch = curl_init($updateServer['connection']['url'].'/json/SquizUpdate/downloadPatchFile');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 3600);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
+        curl_setopt($ch, CURLOPT_WRITEHEADER, $hp);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+        $response = curl_exec($ch);
+        $curlinfo = curl_getinfo($ch);
+        curl_close($ch);
+        fclose($fp);
+        fclose($hp);
+
+        $headers   = file_get_contents($patchFileHeaderPath);
+        $lines     = explode("\r\n", $headers);
+        $password  = '';
+        $patchName = '';
+        foreach ($lines as $line) {
+            if (strpos($line, 'Password: ') === 0) {
+                $password = substr($line, 10, (strlen($line) - 10));
+            } else if (strpos($line, 'Patch-Name: ') === 0) {
+                $patchName = substr($line, 12, (strlen($line) - 12));
+            }
+        }
+
+        // Get the current product information.
+        $priKeyPath = BaseSystem::getDataDir('SquizSuite').'/privatekey.pem';
+        $priKey     = openssl_pkey_get_private('file://'.$priKeyPath);
+        $password   = base64_decode($password);
+
+        $decrypted = '';
+        $result    = openssl_private_decrypt(
+            $password,
+            $passdec,
+            $priKey
+        );
+
+        if ($result === FALSE) {
+            return FALSE;
+        }
+
+        $algorithm = 'blowfish';
+        $command   = '/usr/bin/openssl enc -d -'.$algorithm.' -a -salt -in '.$encPatchFilePath;
+        $command  .= ' -out '.$encPatchFilePath.'.dec  -pass pass:'.$passdec;
+        exec($command, $output, $returnVal);
+        if ($returnVal === 0 && file_exists($encPatchFilePath.'.dec') === TRUE) {
+            $targetPath = BaseSystem::getDataDir('Patching').'/'.$patchName;
+            exec('mv '.$encPatchFilePath.'.dec '.$targetPath);
+            exec('rm '.$encPatchFilePath);
+            $targetSize = filesize($targetPath);
+            $targetHash = sha1_file($targetPath);
+            if ($updateInfo['patch_size'] !== $targetSize
+                || $updateInfo['patch_sha1'] !== $targetHash
+            ) {
                 return FALSE;
             }
-
-            $result = json_decode($result['result'], TRUE);
-            if ($result['result']['status'] === 'OK') {
-                $filename      = $result['result']['filename'];
-                $base64Decoded = base64_decode($result['result']['base64Encoded_patch']);
-                $size          = mb_strlen($base64Decoded);
-                $hash          = sha1($base64Decoded);
-                if ($updateInfo['patch_size'] === $size
-                    && $updateInfo['patch_sha1'] === $hash
-                ) {
-                    // The downloaded patch has been verified.
-                    file_put_contents($patchingDataPath.'/'.$filename, $base64Decoded);
-                }
-            } else {
-                return $result['result']['status'];
-            }
-        }//end foreach
+        }
 
         return TRUE;
 
