@@ -11,6 +11,10 @@
     float: left;
 }
 
+.PatchingScreen-activateWrap-right {
+    float: right;
+}
+
 /* System ID section */
 .PatchingScreen-activateWrap.hidden {
     display: none;
@@ -30,10 +34,6 @@
 
 #PatchingScreen-systemidWrap {
     line-height: 22px;
-}
-
-#PatchingScreen-changeIdBtn {
-    margin: 0 0 0 24px;
 }
 
 #PatchingScreen-cancelChangeBtn {

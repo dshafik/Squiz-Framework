@@ -76,7 +76,7 @@
                                                     </widget>
                                                 </div>
                                             </div>
-                                            <div class="PatchingScreen-activateWrap-left">
+                                            <div class="PatchingScreen-activateWrap-right">
                                                 <div id="PatchingScreen-changeIdBtnWrap" class="PatchingScreen-activateWrap">
                                                     <widget type="GUI/Button" id="PatchingScreen-changeIdBtn">
                                                         <setting name="value"><text>Change ID</text></setting>
