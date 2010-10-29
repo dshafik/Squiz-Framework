@@ -323,7 +323,7 @@ class HelpActions
         foreach ($ids as $index => $id) {
             if (empty($id) === FALSE) {
                 $id             = preg_replace('/[^a-z0-9_-\s]/i', '', $id);
-                $cmd            = 'grep -liE ".*<h1 elemid=\"'.$id.'\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+                $cmd            = 'grep -liE ".*<h1[^>]* elemid=\"'.$id.'\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
                 $contentResults = array();
                 exec($cmd, $contentResults);
                 if (empty($contentResults) === FALSE) {
@@ -341,7 +341,7 @@ class HelpActions
             }
 
             // Search for the class names.
-            $cmd            = 'grep -liE ".*<h1 elemclass=\".*'.$className.'.*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+            $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\".*'.$className.'.*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
             $contentResults = array();
             exec($cmd, $contentResults);
             if (empty($contentResults) === FALSE) {
@@ -352,7 +352,7 @@ class HelpActions
             } else {
                 // Search for each class name individually.
                 $pipedClasses   = str_replace(' ', '|', $className);
-                $cmd            = 'grep -liE ".*<h1 elemclass=\".*('.$pipedClasses.').*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+                $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\".*('.$pipedClasses.').*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
                 $contentResults = array();
                 exec($cmd, $contentResults);
                 if (empty($contentResults) === FALSE) {
