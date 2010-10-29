@@ -113,6 +113,23 @@ GUIScreenSwitcher.prototype = {
 
     },
 
+    showButton: function(template)
+    {
+        var parts = template.split(':');
+        if (parts.length < 2) {
+            return;
+        }
+
+        var button = dfx.getId(this.id + '-' + parts[1]);
+        if (!button) {
+            return;
+        }
+
+        return dfx.getClass('GUIScreenSwitcher-icon', button)[0];
+
+
+    },
+
     loadMode: function(system, modeid)
     {
         // Unload the current template and call parent function.

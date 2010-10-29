@@ -172,6 +172,10 @@ var GUI = new function()
         return this.templateLineage[(this.templateLineage.length - 1)];
     };
 
+    this.getTemplateLineage = function() {
+        return this.templateLineage;
+    };
+
     /**
      * Add event handler functions to the passed object.
      *

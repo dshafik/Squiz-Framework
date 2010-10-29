@@ -457,6 +457,9 @@ class GUIActions
             $replacement .= '?'.">\n";
 
             $htmlCont = str_replace('<body>', $replacement, $htmlCont);
+
+            // Since this is a main template add it to the template list.
+            $htmlCont = str_replace('</head>', '<script>GUI.addTemplate(\''.$systemName.':'.$templateName.'\');</script></head>', $htmlCont);
         } else {
             // Replce the doc type for sub level templates.
             $htmlCont = str_replace(self::$_docType, '', $htmlCont);
@@ -759,8 +762,22 @@ class GUIActions
             $php .= "ob_start();\n";
         }
 
+        $installCode = $php;
+
         // Add the widget paint() call.
         $php .= $settingsVar.' = '.$widgetSystemName.'::paint('.$settingsVar.');'."\n";
+
+        try {
+            // If a widget has an install method then call it with the settings array.
+            if (self::$_isReCacheTemplate === FALSE && is_callable(array($widgetSystemName, 'install')) === TRUE) {
+                $installCode .= $settingsVar.' = '.$widgetSystemName.'::install('.$settingsVar.');'."\n";
+                ob_start();
+                eval($installCode);
+                ob_end_clean();
+            }
+        } catch (Exception $e) {
+            // Ignore all exceptions for now..
+        }
 
         // If this widget has a JS file then add it its JS init code.
         // Note that there is no need to include the JS file here since it should

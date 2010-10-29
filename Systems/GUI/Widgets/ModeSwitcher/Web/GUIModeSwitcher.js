@@ -222,8 +222,10 @@ GUIModeSwitcher.prototype = {
 
     },
 
-    expand: function()
+    expand: function(collapseTime)
     {
+        var seconds = this._slideTime;
+
         clearTimeout(this._autoCollapseT);
 
         dfx.attr(this._staticBtnContainer, 'state', 1);
@@ -232,13 +234,13 @@ GUIModeSwitcher.prototype = {
         dfx.attr(this._sliderElement, 'state', 1);
         dfx.animate(this._sliderElement, {
             width: (this._staticButtonsWidth + this._dynamicButtonsWidth)
-        }, this._slideTime, function() {
-            self.autoCollapse();
+        }, seconds, function() {
+            self.autoCollapse(collapseTime);
         });
 
         dfx.animate(this._dynamicBtnContainer, {
             left: (this._staticButtonsWidth - this._leftMargin)
-        }, this._slideTime);
+        }, seconds);
 
     },
 
@@ -271,8 +273,9 @@ GUIModeSwitcher.prototype = {
 
     },
 
-    autoCollapse: function()
+    autoCollapse: function(collapseTime)
     {
+        collapseTime = collapseTime || this._collapseTimeout;
         if (this._mouseOver === true) {
             return;
         }
@@ -285,7 +288,7 @@ GUIModeSwitcher.prototype = {
             }
 
             self.collapse();
-        }, this._collapseTimeout);
+        }, collapseTime);
 
     },
 
@@ -325,6 +328,35 @@ GUIModeSwitcher.prototype = {
 
         GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
         GUIContentSwitcher.prototype.loadMode.call(this, system, modeid);
+
+    },
+
+    showButton: function(template, secondsToShow)
+    {
+        secondsToShow = (secondsToShow * 1000) || null;
+        var parts     = template.split(':');
+        if (parts.length < 2) {
+            return;
+        }
+
+        var elem    = dfx.getId(this.id);
+        var buttons = dfx.getTag('a', elem);
+        var bln     = buttons.length;
+
+        var foundButton = null;
+        for (var i = 0; i < bln; i++) {
+            var button = buttons[i];
+            if (dfx.attr(button, 'system') === parts[0]
+                && dfx.attr(button, 'modeid') === parts[1]
+            ) {
+                foundButton = button;
+                break;
+            }
+        }
+
+        this.expand(secondsToShow);
+
+        return foundButton;
 
     }
 

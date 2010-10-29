@@ -79,7 +79,7 @@ class GUIContentSwitcherActions
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return void
+     * @return array
      */
     public static function paint(array $settings)
     {
@@ -290,6 +290,40 @@ class GUIContentSwitcherActions
         return $contents;
 
     }//end getDynamicItemContent()
+
+
+    /**
+     * Install this widget.
+     *
+     * Adds templates used in switchers to Help systems template lineage list.
+     *
+     * @param array $settings List of settings for this widget.
+     *
+     * @return void
+     */
+    public static function install(array $settings)
+    {
+        if (Channels::systemExists('Help') === FALSE) {
+            return;
+        }
+
+        if (isset($settings['items']) === TRUE) {
+            Channels::includeSystem('Help');
+            foreach ($settings['items'] as $item) {
+                if (empty($item['system']) === TRUE) {
+                    continue;
+                }
+
+                Help::addTemplateToLineage(
+                    $item['system'].':'.$item['id'],
+                    $settings['template']['system'].':'.$settings['template']['name'],
+                    $settings['widget']['id'],
+                    $item['label']
+                );
+            }
+        }
+
+    }//end install()
 
 
 }//end class
