@@ -1952,7 +1952,7 @@ class PatchingActions
         }//end foreach
 
         // Notification Add New User button.
-        $addNewBtnRow = '<div class="PatchingScreen-activateWrap"><span>'._('Notify of New Updates').'</span>%s</div>';
+        $addNewBtnRow = '<div class="PatchingScreen-activateWrap">%s</div>';
         $addNewBtn    = GUI::createWidget(
             'PatchingScreen-addNewUser',
             'GUIButton',
