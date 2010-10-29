@@ -2041,11 +2041,11 @@ class SquizSuiteActions
 
             // Product Row.
             $rows[] = array(
-                       'currTypeIcon'   => $typeIcon,
-                       'currName'       => $name,
-                       'currStatusIcon' => $statusIcon,
-                       'currSummary'    => $summary,
-                       'delIcon'        => $deleteIcon,
+                       'productTypeIcon'   => $typeIcon,
+                       'productName'       => $name,
+                       'productStatusIcon' => $statusIcon,
+                       'productSummary'    => $summary,
+                       'delIcon'           => $deleteIcon,
                       );
 
             // Product Details Row.
@@ -2095,20 +2095,20 @@ class SquizSuiteActions
             }//end if
 
             $rows[] = array(
-                       'currTypeIcon' => array(
-                                          'colspan'    => 5,
-                                          'colContent' => $colContent,
-                                         ),
+                       'productTypeIcon' => array(
+                                             'colspan'    => 5,
+                                             'colContent' => $colContent,
+                                            ),
                       );
 
             $count += 2;
         }//end foreach
 
         $rows[] = array(
-                   'currTypeIcon' => array(
-                                      'colspan'    => 5,
-                                      'colContent' => self::_getNewProductRowContent(),
-                                     ),
+                   'productTypeIcon' => array(
+                                         'colspan'    => 5,
+                                         'colContent' => self::_getNewProductRowContent(),
+                                        ),
                   );
         return $rows;
 

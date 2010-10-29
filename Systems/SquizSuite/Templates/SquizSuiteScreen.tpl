@@ -51,25 +51,25 @@
         <setting name="content">
             <widget type="GUI/Table" id="connProductsTable">
                 <setting name="columns">
-                    <currTypeIcon>
+                    <productTypeIcon>
                         <name><text>Type</text></name>
                         <align>left</align>
                         <width>60px</width>
-                    </currTypeIcon>
-                    <currName>
+                    </productTypeIcon>
+                    <productName>
                         <name><text>Name</text></name>
                         <align>left</align>
                         <width>420px</width>
-                    </currName>
-                    <currStatusIcon>
+                    </productName>
+                    <productStatusIcon>
                         <name><text>Status</text></name>
                         <align>middle</align>
                         <width>47px</width>
-                    </currStatusIcon>
-                    <currSummary>
+                    </productStatusIcon>
+                    <productSummary>
                         <name>Summary</name>
                         <align>left</align>
-                    </currSummary>
+                    </productSummary>
                     <delIcon>
                         <name />
                         <align>left</align>

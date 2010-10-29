@@ -1,4 +1,5 @@
-#currProductTable td.col-currName {
+#currProductTable td.col-currName,
+#currProductTable td.col-productName {
     padding: 10px 0;
 }
 
@@ -8,7 +9,8 @@
 }
 
 #squizSuite-currentProduct-box td.col-currName .GUITable-colWrapper,
-#squizSuite-connectedProduct-box td.col-currName .GUITable-colWrapper {
+#squizSuite-connectedProduct-box td.col-currName .GUITable-colWrapper,
+#squizSuite-connectedProduct-box td.col-productName .GUITable-colWrapper {
     padding-left: 15px;
 }
 
@@ -54,7 +56,7 @@ div.SquizSuiteScreen-deleteColBtn.recover {
     background-position: 0 16px;
 }
 
-td.col-currTypeIcon {
+td.col-currTypeIcon, td.col-productTypeIcon {
     background-color: #E7F1FF;
 }
 
@@ -67,23 +69,23 @@ td.col-currTypeIcon {
     display: none;
 }
 
-#squizSuite-connectedProduct-box tr.rowEven td.col-currTypeIcon {
+#squizSuite-connectedProduct-box tr.rowEven td.col-productTypeIcon {
     background-color: #F8F8F8;
 }
 
-#squizSuite-connectedProduct-box tr.deleted td.col-currTypeIcon {
+#squizSuite-connectedProduct-box tr.deleted td.col-productTypeIcon {
     background-color: transparent;
 }
 
-td.col-currStatusIcon {
+td.col-currStatusIcon, td.col-productStatusIcon {
     background-color: #F5F5F5;
 }
 
-#squizSuite-connectedProduct-box tr.deleted td.col-currStatusIcon {
+#squizSuite-connectedProduct-box tr.deleted td.col-productStatusIcon {
     background-color: transparent;
 }
 
-td.col-currSummary {
+td.col-currSummary, td.col-productSummary {
     padding-left: 15px;
 }
 
