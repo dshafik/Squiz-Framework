@@ -130,54 +130,61 @@ ul.GUIGraphBar-data-row ul {
 .GUIGraphBar .colour-black {
     background-color: #000;
     border-color: #000;
-    color: white;
+    color: #FFF;
 }
 
 .GUIGraphBar .colour-blue {
     background-color: #4480CF;
     border-color: #4b75aa;
-    color: white;
+    color: #FFF;
 }
 
 .GUIGraphBar .colour-gold {
     background-color: #EBE811;
     border-color: #b4b33d;
-    color: black;
+    color: #000;
 }
 
 .GUIGraphBar .colour-red {
     background-color: #C22;
-    color: white;
+    border-color: #a31f1f;
+    color: #FFF;
 }
 
 .GUIGraphBar .colour-green {
-    background-color: #292;
-    color: white;
+    background-color: #3a943a;
+    border-color: #2e762e;
+    color: #FFF;
 }
 
 .GUIGraphBar .colour-navy {
     background-color: #103264;
-    color: white;
+    border-color: #103264;
+    color: #FFF;
 }
 
 .GUIGraphBar .colour-orange {
     background-color: #E09A2D;
-    color: black;
+    border-color: #b7883f;
+    color: #000;
 }
 
 .GUIGraphBar .colour-purple {
-    background-color: #1F1F37;
-    color: white;
+    background-color: #44447a;
+    border-color: #313159;
+    color: #FFF;
 }
 
 .GUIGraphBar .colour-grass {
     background-color: #789312;
-    color: black;
+    border-color: #5d720e;
+    color: #000;
 }
 
 .GUIGraphBar .colour-grey {
     background-color: #ADADAD;
-    color: black;
+    border-color: #888;
+    color: #000;
 }
 
 .GUIGraphBar .style-plain {
