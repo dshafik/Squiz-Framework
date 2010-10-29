@@ -32,6 +32,7 @@
                         </value>
                         <value>
                             <content>
+                               <div id="CronScreen-frequent">
                                 <text>
                                     <value>Runs every %s minute(s)</value>
                                     <args>
@@ -48,6 +49,7 @@
                                         </arg>
                                     </args>
                                 </text>
+                               </div>
                             </content>
                         </value>
                         <value>
@@ -69,6 +71,7 @@
                         </value>
                         <value>
                             <content>
+                              <div id="CronScreen-hourly">
                                 <text>
                                     <value>Runs at %s minute(s) past the hour</value>
                                     <args>
@@ -85,6 +88,7 @@
                                         </arg>
                                     </args>
                                 </text>
+                              </div>
                             </content>
                         </value>
                         <value>
@@ -106,6 +110,7 @@
                         </value>
                         <value>
                             <content>
+                              <div id="CronScreen-daily">
                                 <text>
                                     <value>Runs every day at %s : %s</value>
                                     <args>
@@ -133,6 +138,7 @@
                                         </arg>
                                     </args>
                                 </text>
+                              </div>
                             </content>
                         </value>
                         <value>
