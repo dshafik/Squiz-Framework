@@ -224,20 +224,22 @@ class BackupActions
     {
         Channels::includeSystem('GUI');
         $dbtnSettings = array(
-                         'value'  => 'Download',
-                         'click'  => array(
-                                      'function'  => 'BackupBackupScreen.download',
-                                      'arguments' => array(),
-                                     ),
+                         'value'       => 'Download',
+                         'customClass' => 'Backup-Download-Button',
+                         'click'       => array(
+                                           'function'  => 'BackupBackupScreen.download',
+                                           'arguments' => array(),
+                                          ),
                         );
         $rbtnSettings = array(
-                         'value'  => 'Restore',
-                         'colour' => 'Dark',
-                         'click'  => array(
-                                      'function'  => 'GUI.getWidget(\'backupScreen-confirmRestore\').show',
-                                      'arguments' => array(),
-                                      'quoteArgs' => FALSE,
-                                     ),
+                         'value'       => 'Restore',
+                         'colour'      => 'Dark',
+                         'customClass' => 'Backup-Restore-Button',
+                         'click'       => array(
+                                           'function'  => 'GUI.getWidget(\'backupScreen-confirmRestore\').show',
+                                           'arguments' => array(),
+                                           'quoteArgs' => FALSE,
+                                          ),
                         );
 
         $list    = array();
