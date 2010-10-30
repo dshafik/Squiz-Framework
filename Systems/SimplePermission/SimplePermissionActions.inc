@@ -256,7 +256,7 @@ class SimplePermissionActions implements PermissionActions
 
         echo '<div id="PermissionScreen-rolesLists-'.$resourceid.'" class="PermissionScreen-rolesLists active">';
         if (empty($roles) === TRUE) {
-            echo _('There are no roles');
+            echo _('No roles have been created within the system.');
         } else {
             // Foreach role create a GUIBox and GUIList for each box with list of users.
             foreach ($roles as $roleid => $roleName) {
