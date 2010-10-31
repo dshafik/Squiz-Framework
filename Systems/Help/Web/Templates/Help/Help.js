@@ -72,7 +72,7 @@ var Help = new function()
         });
 
         // Add event callbacks for screen and mode changes so a message can be displayed.
-        var timeout = null;
+        var timeout      = null;
         var prevTemplate = GUI.getCurrentTemplate();
         GUI.addTemplateAddedCallback(function(template) {
             if (prevTemplate === template) {
@@ -88,6 +88,8 @@ var Help = new function()
                 if (pageType === 'templateIndexPage' || pageType === 'pageNotFound') {
                     self.showMessage('screenChanged');
                 }
+
+                Help.pointer.updateLinkIconStates(dfx.getIframeDocument(_iframe));
             }, 100);
         });
 
@@ -619,8 +621,8 @@ var Help = new function()
             return;
         }
 
-        var steps     = dfx.getClass('Help-message-step', iframeDoc.body);
-        var sln       = steps.length;
+        var steps = dfx.getClass('Help-message-step', iframeDoc.body);
+        var sln   = steps.length;
         if (sln === 0) {
             return;
         }
@@ -870,6 +872,14 @@ var Help = new function()
             }
         },
 
+        updateLinkIconStates: function(parentElem) {
+            var self     = this;
+            var locators = dfx.getClass('Help-locator-img', parentElem);
+            dfx.foreach(locators, function(i) {
+                self.updateLinkIconState(locators[i]);
+            });
+        },
+
         updateLinkIconState: function(pointerIconElem) {
             // Find out if the element the icon is pointing to exists on the screen.
             var elemid   = dfx.attr(pointerIconElem, 'elemid');
@@ -888,9 +898,21 @@ var Help = new function()
                 refElems = dfx.getClass(elemClass);
             }
 
+            var refElemsCount = refElems.length;
+            for (var i = (refElemsCount - 1); i >= 0; i--) {
+                // If element has 0 height and 0 width then it cannot be pointed.
+                if (dfx.getElementHeight(refElems[i]) === 0
+                    && dfx.getElementWidth(refElems[i]) === 0
+                ) {
+                    refElems.splice(i, 1);
+                }
+            }
+
             if (refElems.length > 0) {
                 // Element is not on the screen hide the link pointer icon.
                 dfx.setStyle(pointerIconElem, 'display', 'inline');
+            } else {
+                dfx.setStyle(pointerIconElem, 'display', 'none');
             }
         }
 
