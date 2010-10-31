@@ -39,10 +39,16 @@ var PatchingPatchingScreen = new function()
         this._patchingSettingsDiv = dfx.getId('patchingSettings');
 
         this._notify = data.config.notify;
+
         this._notifyToggleBtn        = GUI.getWidget('PatchingScreen-notifyUpdates');
         this._notificationRecipients = data.config.recipient;
         this._deleteNotificationUser = {};
         this._addNotificationUser    = [];
+
+        if (this._notify === false) {
+            self.hideRecipients();
+        }
+
         this._notifyToggleBtn.addToggleOnCallback(function(e) {
             self.showRecipients();
         });
@@ -122,9 +128,9 @@ var PatchingPatchingScreen = new function()
     },
 
     this.hideRecipients = function() {
-        var settingMid = dfx.getClass('GUIScreenSettings-mid', this._patchingSettingsDiv)[0]
-        var childLen = settingMid.childNodes.length;
-        var notifLen = this._notificationRecipients.length;
+        var settingMid = dfx.getClass('GUIScreenSettings-mid', this._patchingSettingsDiv)[0];
+        var childLen   = settingMid.childNodes.length;
+        var notifLen   = this._notificationRecipients.length;
         for (var i = (childLen - 1); i > (childLen - notifLen - 2); i--) {
             dfx.hideElement(settingMid.childNodes[i]);
         }
