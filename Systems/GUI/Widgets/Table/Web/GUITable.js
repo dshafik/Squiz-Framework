@@ -187,7 +187,10 @@ GUITable.prototype = {
             if (callback) {
                 callback.call(self, rows);
             }
-        }, 'raw');
+        }, 'raw', function(exception) {
+             // There was an error.. Remove the loading row.
+            dfx.remove(self._loadingRow);
+        });
 
     },
 
