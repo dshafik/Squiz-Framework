@@ -1109,12 +1109,22 @@ class UserActions
      * @param string $userid Column data for the new row.
      *
      * @return array
+     * @throws ChannelException If the specified userid is not a valid user asset.
      *
      * @api            read
      * @api-permission superuser
      */
     public static function getSuperUserTableColumns($userid)
     {
+        Channels::includeSystem('Asset');
+        if (Asset::isTypeOf($userid, 'user') === FALSE) {
+            Channels::includeSystem('Attribute');
+            $name  = '<strong><em>'.Attribute::getAttributeValue($userid, 'name').'</em></strong>';
+            $name .= ' (#'.$userid.')';
+            $msg   = sprintf(_('%s is not a valid user asset.'), $name);
+            throw new ChannelException($msg);
+        }
+
         $currentUser = User::getCurrentUserid();
         $user        = User::getUserById($userid);
 
@@ -1369,8 +1379,7 @@ class UserActions
         $errors  = array();
         $tplData = Util::getArrayIndex($data, 'templateData', NULL);
         if ($tplData === NULL) {
-            $errors[] = _('Failed to save');
-            return $errors;
+            return array('success' => TRUE);
         }
 
         try {
