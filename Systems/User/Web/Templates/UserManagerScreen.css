@@ -193,6 +193,10 @@
     background-image: url(../../AssetTypes/UserGroup/Web/icon_userGroup_s.png);
 }
 
+#UserManagerScreen-createGroup-button {
+    margin-top: 10px;
+}
+
 #UserManagerScreen-cancelCreateUserGroup,
 #UserManagerScreen-cancelCreate {
     float: right;

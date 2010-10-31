@@ -1339,7 +1339,7 @@ class UserActions
         Channels::includeSystem('Asset');
         Channels::includeSystem('Attribute');
 
-        $iconPath = Asset::getTypeIconPath($groupid);
+        $iconPath = Asset::getTypeIconPath(Asset::getTypeOfAsset($groupid));
         $name     = Attribute::getAttributeValue($groupid, 'name');
         $data     = array(
                      'itemContent' => '<div class="UserManagerScreen-listItem"><img src="'.$iconPath.'" /> '.$name.'</div>',

@@ -95,7 +95,7 @@
                     </widget>
                 </div>
                 <div class="{className}-editFolder-addToOtherGroup">
-                    <widget type="GUI/Button" id="UserManagerScreen-createGroup">
+                    <widget type="GUI/Button" id="UserManagerScreen-createGroup-button">
                         <setting name="value"><text>Create User Group</text></setting>
                         <setting name="click">UserUserManagerScreen.createUserGroup();</setting>
                     </widget>
