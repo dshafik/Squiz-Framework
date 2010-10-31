@@ -124,16 +124,24 @@ div.SquizSuiteScreen-productIconWrap.SquizCMS {
     background-position: 0 0px;
 }
 
-div.SquizSuiteScreen-productIconWrap.SquizMatrix {
+div.SquizSuiteScreen-productIconWrap.GoogleAccount {
     background-position: 0 60px;
 }
 
-div.SquizSuiteScreen-productIconWrap.SquizSearch {
+div.SquizSuiteScreen-productIconWrap.SquizSuite {
     background-position: 0 90px;
 }
 
-div.SquizSuiteScreen-productIconWrap.SquizAnalytics {
+div.SquizSuiteScreen-productIconWrap.SquizMatrix {
     background-position: 0 120px;
+}
+
+div.SquizSuiteScreen-productIconWrap.SquizSearch {
+    background-position: 0 150px;
+}
+
+div.SquizSuiteScreen-productIconWrap.SquizAnalytics {
+    background-position: 0 180px;
 }
 
 div.SquizSuiteScreen-productIconWrap.unknown {
