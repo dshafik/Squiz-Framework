@@ -26,7 +26,6 @@ function GUIContainerSwitcher(id, settings)
     GUIContentSwitcher.call(this, id, settings);
     this.className = 'GUIContainerSwitcher';
 
-
 }
 
 GUIContainerSwitcher.prototype = {
@@ -48,7 +47,7 @@ GUIContainerSwitcher.prototype = {
             }
         });
 
-    },
+    }
 
 };
 

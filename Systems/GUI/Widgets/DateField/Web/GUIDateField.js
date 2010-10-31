@@ -193,5 +193,5 @@ GUIDateField.prototype = {
 	getDateObject: function()
 	{
 	    return new Date(this.getValue());
-	},
+	}
 };
