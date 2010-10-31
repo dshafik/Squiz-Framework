@@ -489,7 +489,7 @@ class APIActions
 
             case 'raw':
                 if (isset($responseContent['exception']) === TRUE) {
-                    echo $responseContent['exception'];
+                    echo 'exception:'.$responseContent['exception'];
                 } else {
                     if (isset($responseContent['contentType']) === TRUE
                         && empty($responseContent['contentType']) === FALSE
