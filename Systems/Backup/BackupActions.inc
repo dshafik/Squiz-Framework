@@ -316,6 +316,30 @@ class BackupActions
     }//end afterBackup()
 
 
+    /**
+     * Add the backup size to the product summary.
+     *
+     * @param array $summary The summary of the current product.
+     *
+     * @return array
+     */
+    public static function addProductSummary(array $summary)
+    {
+        $backups = Backup::getBackups();
+        if (empty($backups) === TRUE) {
+            return $summary;
+        }
+
+        $backup = array_shift($backups);
+
+        $summary[] = array(
+                      'label' => _('Size'),
+                      'value' => $size = $backup['size'],
+                     );
+        return $summary;
+
+    }//end addProductSummary()
+
 }//end class
 
 ?>

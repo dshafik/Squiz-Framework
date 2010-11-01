@@ -1,6 +1,15 @@
 <?xml version="1.0"?>
 <system>
-  <plugs />
+  <plugs>
+      <refiner>
+          <required>yes</required>
+          <method>addProductSummary</method>
+          <action>SquizSuite::getProductSummary</action>
+          <parameters>
+              <parameter>retval</parameter>
+          </parameters>
+      </refiner>
+  </plugs>
   <cron_jobs>
     <cron_job script="BackupCron.inc" name="Backup" interval="daily">
       <description>This job creates backups of your system. It is recommended that you run this job daily.</description>
