@@ -25,4 +25,8 @@
 # @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
 ##
 
+if [ -f "/root/.mozilla/firefox/squiz/sessionstore.js" ]; then
+    rm /root/.mozilla/firefox/squiz/sessionstore.js
+fi
+
 DISPLAY=:1 iceweasel -printmode png -printfile $2 -print $3
