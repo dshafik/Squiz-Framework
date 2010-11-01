@@ -374,7 +374,12 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td'.$colspan.' colid="'.$id.'-'.$classid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.$customCellClass.'" ';
+                echo '<td'.$colspan.' colid="'.$id.'-'.$classid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.$customCellClass;
+                if ($colid === '_remove') {
+                    echo ' '.$id.'-_remove" ';
+                } else {
+                    echo '" ';
+                }
 
                 echo 'style="text-align: '.$columns[$colid]['align'].';';
                 if (isset($columns[$colid]['width']) === TRUE) {
