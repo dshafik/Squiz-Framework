@@ -18,6 +18,8 @@
 
 .GUITextBox.selected {
     border: 1px solid #6FA8D7;
+    -webkit-box-shadow: 0 0 5px #6FA8D7;
+    -moz-box-shadow: 0 0 5px #6FA8D7;
 }
 
 input.GUITextBox.usingHint {
