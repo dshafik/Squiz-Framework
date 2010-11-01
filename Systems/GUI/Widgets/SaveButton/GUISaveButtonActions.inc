@@ -45,8 +45,31 @@ class GUISaveButtonActions
 
         echo '<div id="'.$id.'" class="'.$class.' GUI-alignRight">';
         echo '<button accesskey="s" id="'.$id.'-save" disabled="true" class="GUIButton buttonSave GUI-alignleft" onclick="GUI.save();"><span class="GUIButtonLabel">'._('Save').'</span></button>';
-        echo '<button id="'.$id.'-revert" disabled="true" class="GUIButton buttonSaveRevert GUI-alignleft" onclick="GUI.revert();"><span class="GUIButtonLabel">'._('Revert').'</span><span class="GUIButtonIcon"></span></button>';
+        echo '<button id="'.$id.'-revert" disabled="true" class="GUIButton buttonSaveRevert GUI-alignleft" onclick="GUI.getWidget(\''.$id.'\').revert();"><span class="GUIButtonLabel">'._('Revert').'</span><span class="GUIButtonIcon"></span></button>';
         echo '</div>';
+
+        Channels::includeSystem('GUI');
+
+        $ivContents     = '<p>'._('You will lose any changes that you have made. Do you still want to revert?').'</p>';
+        $buttonSettings = array(
+                           'value'  => _('Cancel'),
+                           'click'  => 'GUI.getWidget(\''.$id.'-intervention\').hide();',
+                           'colour' => 'Dark',
+                          );
+        $ivContents    .= GUI::createWidget($id.'-ivbuttonYes', 'GUIButton', $buttonSettings);
+        $buttonSettings = array(
+                           'value'  => _('Revert'),
+                           'click'  => 'GUI.getWidget(\''.$id.'-intervention\').hide();GUI.revert();',
+                           'colour' => 'Dark',
+                          );
+        $ivContents    .= GUI::createWidget($id.'-ivbuttonNo', 'GUIButton', $buttonSettings);
+
+        Channels::includeSystem('GUI');
+        $ivSettings = array(
+                       'targetElementid' => $id,
+                       'elementContents' => $ivContents,
+                      );
+        echo GUI::createWidget($id.'-intervention', 'GUIIntervention', $ivSettings);
 
         return $settings;
 

@@ -60,10 +60,18 @@ GUISaveButton.prototype = {
         GUI.addModifiedCallback(function(widgetid, modified) {
             if (modified === true) {
                 self.enable();
-            } else {
-                self.disable();
             }
         });
+
+        GUI.addRevertedCallback(function() {
+            self.disable();
+        });
+
+    },
+
+    revert: function()
+    {
+        GUI.getWidget(this.id + '-intervention').show(this._revertButton);
 
     },
 

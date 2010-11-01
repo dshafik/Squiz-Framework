@@ -129,3 +129,21 @@ button.buttonSaveRevert .GUIButtonLabel {
     background-image: -moz-linear-gradient(top, #ce7d2f 15%, #764d19 50%, #402507 80%);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ce7d2f, endColorstr=#402507);
 }
+
+/* Revert Intervention popup styles */
+#save-intervention {
+    width: 235px;
+}
+
+#save-intervention .GUIIntervention-content {
+    text-align: center;
+}
+
+#save-intervention .GUIIntervention-content #save-ivbuttonYes {
+    margin-right:10px;
+}
+
+#save-intervention .GUIIntervention-content button {
+    margin-top:10px;
+    min-width:45%;
+}
