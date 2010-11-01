@@ -2,10 +2,11 @@
     background-image: url(menu_mid.png);
     background-repeat: repeat-x;
     margin: 0;
+    height: 134px;
 }
 
 .GUIScreenSwitcher-left {
-    display: inline-block;
+    display: block;
     vertical-align: top;
     width: 21px;
     height: 134px;
@@ -15,7 +16,7 @@
 }
 
 .GUIScreenSwitcher-right {
-    display: inline-block;
+    display: block;
     vertical-align: top;
     float: right;
     width: 21px;
@@ -26,7 +27,8 @@
 
 .GUIScreenSwitcher-button {
     margin-top: 10px;
-    display: inline-block;
+    display: block;
+    float: left;
     vertical-align: top;
     position: relative;
     top: 0;
