@@ -412,6 +412,51 @@ class UserActions
 
 
     /**
+     * Removes orphaned user/userGroup assets from the system.
+     *
+     * This is a runner plug to Maintenance::perform.
+     *
+     * @return void
+     */
+    public static function removeOrphanedUsers()
+    {
+        Channels::includeSystem('Asset');
+        Channels::includeSystem('Linking');
+
+        // Get the child assets of global users folder.
+        $globalUsersFolder = User::getGlobalUsersFolderid();
+        $children = DAL::getAssoc(Linking::getChildren($globalUsersFolder), 0);
+
+        $topUserTypes = array(
+                         'user',
+                         'userGroup',
+                        );
+        $types        = $topUserTypes;
+
+        foreach ($topUserTypes as $type) {
+            $childTypes = Asset::getChildTypes($type);
+            foreach ($childTypes as $typeInfo) {
+                $types[] = $typeInfo['typeid'];
+            }
+        }
+
+        // Get all the user/userGroup assets in the system.
+        $assetids = Asset::getAssetsByType($types);
+
+        // If any of the assets not in the children list then remove them.
+        $orphanedUsers = array_diff($assetids, $children);
+
+        // TODO: Should there be a getParents() check here incase a user asset is
+        // linked to somehere else?
+        // May also need to do recursion until orphanedUsers is empty.
+        foreach ($orphanedUsers as $assetid) {
+            Asset::delete($assetid);
+        }
+
+    }//end removeOrphanedUsers()
+
+
+    /**
      * Log in the user with the given password.
      *
      * If the username is not found or the password is not matched,
@@ -436,6 +481,12 @@ class UserActions
 
         $userid       = $user['id'];
         $currPassword = $user['password'];
+
+        Channels::includeSystem('Configuration');
+        if (Configuration::getAttributeValue($userid, 'status') !== TRUE) {
+            // User account is not active.
+            return FALSE;
+        }
 
         // Password Matched.
         include_once 'Libs/Security/Security.inc';

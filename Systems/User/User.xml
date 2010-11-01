@@ -18,5 +18,13 @@
         <parameter>retval</parameter>
       </parameters>
     </runner>
+
+    <runner>
+      <required>yes</required>
+      <method>removeOrphanedUsers</method>
+      <action listen="after">Maintenance::perform</action>
+      <fatal>no</fatal>
+      <parameters />
+    </runner>
   </plugs>
 </system>
