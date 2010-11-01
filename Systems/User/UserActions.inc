@@ -77,14 +77,42 @@ class UserActions
             Channels::includeSystem('Attribute');
             include_once 'Libs/Security/Security.inc';
 
+            $requiredFields = array(
+                               'firstName' => _('First Name'),
+                               'lastName'  => _('Last Name'),
+                               'password'  => _('Password'),
+                              );
+
+            foreach ($requiredFields as $var => $fieldTitle) {
+                if (empty($$var) === TRUE) {
+                    $msg = sprintf(
+                        _('%s field cannot be empty.'),
+                        '<strong><em>'.$fieldTitle.'</em></strong>'
+                    );
+                    throw new ChannelException($msg);
+                }
+            }
+
             $userid = Asset::create('user');
             $name   = ucfirst($firstName).' '.ucfirst($lastName);
+
+            // Check if username is taken.
+            if (User::usernameExists($username) === TRUE) {
+                $username = '<strong><em>'.$username.'</em></strong>';
+                $msg      = sprintf(
+                    _('The username %s is already being used by another user.'),
+                    $username
+                );
+                throw new ChannelException($msg);
+            }
+
+            User::setUserPassword($userid, $password);
+
             Attribute::setAttributeValue($userid, 'username', $username);
             Attribute::setAttributeValue($userid, 'name', $name);
             Attribute::setAttributeValue($userid, 'email', $email);
             Attribute::setAttributeValue($userid, 'first_name', $firstName);
             Attribute::setAttributeValue($userid, 'last_name', $lastName);
-            Attribute::setAttributeValue($userid, 'password', Security::hashUserPassword($password));
 
             User::addUsersToGroups(array($userid), $userGroups);
 
@@ -94,15 +122,44 @@ class UserActions
 
             DAL::commit();
         } catch (Exception $e) {
-            $msg  = 'Failed to create a new user.'."\n";
-            $msg .= $e->getMessage();
             DAL::rollback();
-            throw new ChannelException($msg);
+            throw new ChannelException($e->getMessage());
         }//end try
 
         return $userid;
 
     }//end createUser()
+
+
+    /**
+     * Sets the specified user's password.
+     *
+     * @param string $userid   ID of a user asset.
+     * @param string $password Password of the user.
+     *
+     * @return void
+     * @throws ChannelException If the user password is invalid.
+     */
+    public static function setUserPassword($userid, $password)
+    {
+        $minPasswordLength = 6;
+        if (strlen($password) < $minPasswordLength) {
+            $msg = sprintf(
+                _('Password must be at least %s characters long.'),
+                $minPasswordLength
+            );
+            throw new ChannelException($msg);
+        }
+
+        Channels::includeSystem('Attribute');
+        include_once 'Libs/Security/Security.inc';
+        Attribute::setAttributeValue(
+            $userid,
+            'password',
+            Security::hashUserPassword($password)
+        );
+
+    }//end setUserPassword()
 
 
     /**
@@ -1392,16 +1449,26 @@ class UserActions
                 case 'user':
                     // Save user details.
                     $attributes = array(
-                                   'first_name',
-                                   'last_name',
-                                   'email',
-                                   'username',
+                                   'first_name' => _('First Name'),
+                                   'last_name'  => _('Last Name'),
+                                   'email'      => NULL,
+                                   'username'   => _('Username'),
                                   );
 
-                    foreach ($attributes as $attrName) {
+                    foreach ($attributes as $attrName => $fieldTitle) {
                         $newValue = Util::getArrayIndex($tplData, $attrName, NULL);
                         $current  = Attribute::getAttributeValue($assetid, $attrName);
                         if ($newValue !== NULL && $current !== $newValue) {
+                            if (empty($newValue) === TRUE
+                                && $fieldTitle !== NULL
+                            ) {
+                                $msg = sprintf(
+                                    _('%s field cannot be empty.'),
+                                    '<strong><em>'.$fieldTitle.'</em></strong>'
+                                );
+                                throw new ChannelException($msg);
+                            }
+
                             Attribute::setAttributeValue($assetid, $attrName, $newValue);
                         }
                     }
@@ -1409,12 +1476,7 @@ class UserActions
                     // Update user password.
                     $password = Util::getArrayIndex($tplData, 'password');
                     if (empty($password) === FALSE) {
-                        include_once 'Libs/Security/Security.inc';
-                        Attribute::setAttributeValue(
-                            $assetid,
-                            'password',
-                            Security::hashUserPassword($password)
-                        );
+                        User::setUserPassword($assetid, $password);
                     }
 
                     // Update parent groups.
