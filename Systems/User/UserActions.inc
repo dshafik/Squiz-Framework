@@ -1372,11 +1372,14 @@ class UserActions
         $info['childGroupCount'] = 0;
         $info['childUserCount']  = 0;
 
+        $userTypes   = Asset::getChildTypes('user', NULL, TRUE);
+        $userTypes[] = 'user';
+
         foreach ($types as $type) {
-            if ($type === 'userGroup') {
-                $info['childGroupCount']++;
-            } else if ($type === 'user') {
+            if (in_array($type, $userTypes) === TRUE) {
                 $info['childUserCount']++;
+            } else {
+                $info['childGroupCount']++;
             }
         }
 
