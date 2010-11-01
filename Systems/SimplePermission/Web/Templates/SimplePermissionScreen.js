@@ -44,7 +44,7 @@ var SimplePermissionPermissionScreen = new function()
             return;
         }
 
-        var wrapperDiv = dfx.getClass('PermissionScreenMainContent')[0];
+        var wrapperDiv = dfx.getId('PermissionScreenMainContent');
 
         elem = document.createElement('div');
         wrapperDiv.appendChild(elem);
