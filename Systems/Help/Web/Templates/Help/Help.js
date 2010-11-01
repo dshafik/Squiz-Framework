@@ -58,6 +58,16 @@ var Help = new function()
             dfx.setStyle(iframe, 'height', (contentSize.height - navHeight - 27) + 'px');
         });
 
+        /*setInterval(function() {
+            Help.pointer.updateLinkIconStates(dfx.getIframeDocument(_iframe));
+        }, 1500);*/
+
+        GUI.addRequestCompleteCallback(function() {
+            // Each time a GUI request is completed update link icon states incase
+            // new content is available.
+            Help.pointer.updateLinkIconStates(dfx.getIframeDocument(_iframe));
+        });
+
         // Add search field event.
         var searchBox = GUI.getWidget('Help-search');
         searchBox.addKeyPressCallback(function(value, e) {
