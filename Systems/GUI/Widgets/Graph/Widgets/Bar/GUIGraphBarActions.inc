@@ -447,7 +447,7 @@ class GUIGraphBarActions
             $listWidth = '100%';
         }
 
-        echo '<ul class="'.$class.'-inner-list" style="width: '.$listWidth.'; right: '.$listRight.'; height: '.$height.'px;">';
+        echo '<div class="'.$class.'-inner-list" style="width: '.$listWidth.'; right: '.$listRight.'; height: '.$height.'px;">';
 
         $rowNumber = 0;
         foreach ($data as $dataRow) {
@@ -470,7 +470,7 @@ class GUIGraphBarActions
                 }
             }
 
-            echo '<ul class="'.$class.'-data-row';
+            echo '<div class="data-row';
 
             // We have a bar style?
             if (array_key_exists('bar_style', $dataRow) === TRUE) {
@@ -483,23 +483,17 @@ class GUIGraphBarActions
             echo number_format((100 / count($data)), 3);
             echo '%; left: ';
             echo number_format((100 / count($data) * ($rowNumber - 1)), 3);
-            echo '%; top: ';
-            echo ($height - $totalHeight);
-            echo 'px; height: ';
-            echo $totalHeight;
-            echo 'px">';
+            echo '%;">';
 
-            echo '<li class="row-bg" style="top: ';
-            echo ($barHeight - $maxBarHeight);
-            echo 'px; height: ';
+            echo '<div class="row-bg" style="height: ';
             echo $maxBarHeight;
-            echo 'px"></li>';
+            echo 'px"></div>';
 
             // Do we have a label for this data row?
             if (array_key_exists('label', $dataRow) === TRUE) {
-                echo '<li class="'.$class.'-data-label">';                
+                echo '<div class="data-label">';
                 echo $dataRow['label'];
-                echo '</li>';
+                echo '</div>';
             }
 
             $liTexts = array();
@@ -511,7 +505,7 @@ class GUIGraphBarActions
 
             // Separate the data block in a list.
 
-            echo '<ul style="display: block;">';
+            echo '<div class="point-list" style="top: '.($height - $totalHeight).'px;">';
 
             $rowLabels   = Util::getArrayIndex($dataRow, 'pointLabel', array());
             $tooltipRows = Util::getArrayIndex($dataRow, 'tooltipRows', array());
@@ -536,18 +530,18 @@ class GUIGraphBarActions
                 $firstPointStyle = '';
                 if (round($cumHeight) === $barHeight) {
                     if ($dataPointHeight > 0) {
-                        $firstPointStyle = ' first-point';
+                        $firstPointStyle = ' first';
                         $dataPointHeight--;
                     }
                 }
 
                 ob_start();
-                    echo '<li class="'.$class.'-data-point'.$firstPointStyle;
+                    echo '<div class="data-point '.$firstPointStyle;
                     echo ' colour-'.$groups[$groupIndex]['colour'];
                     echo ' style-'.$groups[$groupIndex]['style'];
                     echo '" style="height: ';
                     echo max($dataPointHeight, 0).'px">';
-                    echo '</li>';
+                    echo '</div>';
                     $liTexts[] = ob_get_contents();
                 ob_end_clean();
             }//end foreach
@@ -560,7 +554,7 @@ class GUIGraphBarActions
             // Do we have to print the x-axis? If so, print only those for which we
             // have x-axis values, and the empty label otherwise.
             if ($hasXAxis === TRUE) {
-                echo '<li class="'.$class.'-data-x-axis">';
+                echo '<div class="data-x-axis">';
 
                 if (array_key_exists('x-axis', $dataRow) === TRUE) {
                     if ($dataRow['x-axis'] !== '') {
@@ -568,20 +562,20 @@ class GUIGraphBarActions
                     }
                 }
 
-                echo '</li>';
+                echo '</div>';
             } else {
-                echo '<li class="'.$class.'-data-x-axis-empty">';
-                echo '</li>';
+                echo '<div class="data-x-axis empty">';
+                echo '</div>';
             }//end if
 
-            echo '</ul>';
+            echo '</div>';
 
             // Now print the flags, if we have any set.
             // If boolean, it'll display if TRUE.
             // If numeric or string, it'll display if not an empty string.
             // If null or unset, it's hidden.
             if (count($flags) > 0) {
-                echo '<ul style="display: block">';
+                echo '<div class="flag-list">';
 
                 $liTexts = array();
 
@@ -609,7 +603,7 @@ class GUIGraphBarActions
                     }//end if
 
                     ob_start();
-                        echo '<li class="'.$class.'-data-flag';
+                        echo '<div class="data-flag';
                         if ($showFlag === TRUE) {
                             echo ' colour-'.$flag['colour'];
                         }
@@ -619,13 +613,13 @@ class GUIGraphBarActions
                         echo ' style="height: '.$flag['height'].'px;';
                         echo ' line-height: '.($flag['height']).'px;"';
                         echo '>';
-                        echo '</li>';
+                        echo '</div>';
                         $liTexts[] = ob_get_contents();
                     ob_end_clean();
                 }//end foreach
 
                 echo implode('', $liTexts);
-                echo '</ul>';
+                echo '</div>';
             }//end if
 
             if (array_key_exists('tooltipTitle', $dataRow)
@@ -635,7 +629,7 @@ class GUIGraphBarActions
                 // The class arrowPosition-topMid is set by default on the tooltip LI
                 // Override class with arrowPosition-topRight at run-time where needed
                 // This will automatically position both the tooltip and the arrow
-                echo '<li class="tooltip  arrowPosition-topMid">';
+                echo '<div class="tooltip  arrowPosition-topMid">';
                 echo '<div class="tooltipArrow"></div>';
                 if (array_key_exists('tooltipTitle', $dataRow)) {
                     echo '<div class="title">';
@@ -677,13 +671,13 @@ class GUIGraphBarActions
                     echo '</div>';
                 }
 
-                echo '</li>';
+                echo '</div>';
             }
 
-            echo '</ul>';
+            echo '</div>';
         }//end foreach
 
-        echo '</ul>';
+        echo '</div>';
 
         // Draw the ticks.
         if ($tick !== NULL) {
@@ -693,14 +687,14 @@ class GUIGraphBarActions
                 for ($i = $maxValue; $i > 0; $i -= $tick['minor']) {
                     // Positions of major tick line and value.
                     $tickLineTop  = round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
-                    
-                    echo '<div class="tick-line minor" style="top: '.$tickLineTop.'px"></div>';                    
+
+                    echo '<div class="tick-line minor" style="top: '.$tickLineTop.'px"></div>';
                 }
             }
 
             for ($i = $maxValue; $i > 0; $i -= $tick['major']) {
                 $valueStr = sprintf($tick['format'], $i);
-                
+
                 // Positions of major tick line and value.
                 $tickLineTop  = round($maxBarHeight * (($maxValue - $i) / ($maxValue)));
                 $tickValueTop = ($tickLineTop + 2);

@@ -6,13 +6,12 @@
 }
 
 .GUIGraphBar-outer-list {
-    display: inline-block;
+    display: block;
     position: relative;
     top: 0;
     left: 0;
     padding: 0;
     margin: 0;
-    width: 100%;
     height: 500px;
 }
 
@@ -28,25 +27,33 @@
     z-index: 2;
 }
 
-ul.GUIGraphBar-data-row {
-    display: inline-block;
+.GUIGraphBar .data-row {
+    display: block;
     vertical-align: bottom;
     list-style: none;
     padding: 0;
     margin: 0;
-    bottom: 0;
+    top: 0;
     position: absolute;
+    height: 100%;
 }
 
-ul.GUIGraphBar-data-row ul {
-    display: inline;
-    vertical-align: bottom;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.GUIGraphBar .point-list {
+    position: absolute;
+    width: 100%;
+    margin: 0 0px;
+    left: 0px;
 }
 
-.GUIGraphBar-data-point {
+.GUIGraphBar .flag-list {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    margin: 0 0px;
+    left: 0px;
+}
+
+.GUIGraphBar .data-point {
     display: block;
     vertical-align: bottom;
     list-style: none;
@@ -62,15 +69,7 @@ ul.GUIGraphBar-data-row ul {
     top: 0;
 }
 
-.SquizAnalytics-graphs-3-month .GUIGraphBar-data-point {
-    margin: 0 1px 0 0;
-}
-
-.SquizAnalytics-graphs-6-month .GUIGraphBar-data-point {
-    margin: 0;
-}
-
-.GUIGraphBar-data-point.first-point {
+.GUIGraphBar .data-point.first {
     border-top: 1px solid #A0A0A0;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
@@ -78,7 +77,7 @@ ul.GUIGraphBar-data-row ul {
     -moz-border-radius-topright: 3px;
 }
 
-.GUIGraphBar-data-flag {
+.GUIGraphBar .data-flag {
     display: block;
     list-style: none;
     padding: 0;
@@ -89,7 +88,7 @@ ul.GUIGraphBar-data-row ul {
     overflow: hidden;
 }
 
-.GUIGraphBar-data-label {
+.GUIGraphBar .data-label {
     display: block;
     list-style: none;
     padding: 0;
@@ -101,7 +100,7 @@ ul.GUIGraphBar-data-row ul {
     overflow: hidden;
 }
 
-.GUIGraphBar-data-x-axis {
+.GUIGraphBar .data-x-axis {
     display: block;
     list-style: none;
     padding: 0;
@@ -117,12 +116,8 @@ ul.GUIGraphBar-data-row ul {
     border-top: 1px solid #A0A0A0;
 }
 
-.GUIGraphBar-data-x-axis-empty {
-    display: block;
-    list-style: none;
-    padding: 0;
+.GUIGraphBar .data-x-axis.empty {
     height: 0px;
-    margin: 0 0px 2px 0px;
     line-height: 1px;
     border-top: 1px solid #A0A0A0;
 }
@@ -223,7 +218,8 @@ ul.GUIGraphBar-data-row ul {
     background-color: #FFF;
     padding: 8px;
     position: relative;
-    top: 4px;
+    top: 100%;
+    margin-top: 4px;
     width: 200px;
     visibility: hidden;
     z-index: 1000;
@@ -269,24 +265,25 @@ ul.GUIGraphBar-data-row ul {
     position: absolute;
     left: 0;
     width: 100%;
+    top: 0;
 }
 
-.GUIGraphBar .GUIGraphBar-data-row.hover .tooltip {
+.GUIGraphBar .data-row.hover .tooltip {
     visibility: visible;
 }
 
-.GUIGraphBar .GUIGraphBar-data-row.hover .row-bg {
+.GUIGraphBar .data-row.hover .row-bg {
     opacity: 0.04;
     filter: alpha(opacity = 4);
 }
 /*
     Prevent the tooltip from appearing on hover when the GUIBox is faded, also remove the row colour hover
 */
-.GUIBox.GUIBox-faded .GUIGraphBar .GUIGraphBar-data-row.hover .tooltip {
+.GUIBox.GUIBox-faded .GUIGraphBar .data-row.hover .tooltip {
     visibility: hidden;
 }
 
-.GUIBox.GUIBox-faded .GUIGraphBar .GUIGraphBar-data-row.hover .row-bg {
+.GUIBox.GUIBox-faded .GUIGraphBar .data-row.hover .row-bg {
     opacity: 0;
     filter: alpha(opacity = 0);
 }
@@ -342,7 +339,7 @@ ul.GUIGraphBar-data-row ul {
     position: absolute;
     left: 0;
     width: 100%;
-    z-index: 1;    
+    z-index: 1;
 }
 
 .GUIGraphBar .tick-line.x-axis {
@@ -351,11 +348,11 @@ ul.GUIGraphBar-data-row ul {
 }
 
 .GUIGraphBar .tick-line.major {
-    border-top: 1px solid #E1E1E1;    
+    border-top: 1px solid #E1E1E1;
 }
 
 .GUIGraphBar .tick-line.major {
-    border-top: 1px solid #E1E1E1;    
+    border-top: 1px solid #E1E1E1;
 }
 
 .GUIGraphBar .tick-line.minor {

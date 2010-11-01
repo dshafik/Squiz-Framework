@@ -36,18 +36,18 @@ GUIGraphBar.prototype = {
         var self = this;
 
         var graph = dfx.getId(this.id);
-        var rows  = dfx.getClass('GUIGraphBar-data-row', graph);
+        var rows  = dfx.getClass('data-row', graph);
 
         dfx.foreach(rows, function(idx) {
             dfx.addEvent(rows[idx], 'mouseover', function(evt) {
                 if (dfx.hasClass(this, 'hover') === false) {
                     dfx.addClass(this, 'hover');
-                    
+
                     // Position the row's tooltip correctly.
-                    var tooltip = dfx.getClass('tooltip', rows[idx])[0];                    
+                    var tooltip = dfx.getClass('tooltip', rows[idx])[0];
                     var left = dfx.getElementCoords(tooltip).x;
                     var right = dfx.getWindowDimensions().width - left;
-                    
+
                     if (left < 10) {
                         // Allow 10px breathing space on the left.
                         dfx.removeClass(tooltip, 'arrowPosition-topMid');
