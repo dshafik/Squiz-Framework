@@ -1459,6 +1459,10 @@ class UserActions
                     // Check if channel is callable then call it.
                     if (is_callable($method) === TRUE) {
                         call_user_func($method, $tplData);
+
+                        // Update parent groups.
+                        $parents = Util::getArrayIndex($tplData, 'parents', array());
+                        self::_saveAssetParentGroups($assetid, $parents);
                     } else {
                         throw new ChannelException(_('Invalid asset type'));
                     }
