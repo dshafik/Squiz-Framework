@@ -230,6 +230,13 @@ GUIColumnBrowser.prototype = {
             dfx.setHtml(this._loaderElem, '<img src="' + GUI.getWidgetURL('GUI/AssetPicker') + '/white.gif" />');
         }
 
+        // Set the wrapper width so that 'overflow: auto' works when the loader is added.
+        var columnWrapperElem = dfx.getClass('GUIColumnBrowser-columnWrapper', this.elem)[0];
+        var currentWidth      = dfx.getElementWidth(columnWrapperElem);
+        var parentColWidth    = dfx.getElementWidth(parentColumnElement);
+        dfx.setStyle(columnWrapperElem, 'width', currentWidth + parentColWidth + 'px');
+
+        // Add the loader after the last visible column.
         dfx.insertAfter(parentColumnElement, this._loaderElem);
 
         var self = this;
