@@ -222,18 +222,36 @@ var GUI = new function()
         };
     };
 
-    this.sendRequest = function(system, action, params, callback, format) {
+    this.sendRequest = function(system, action, params, callback, format, errorCallback) {
         sfapi.post(system, action, params, function(data) {
-            if (!data || data.exception) {
+            if (dfx.isset(data) === false
+                || data.exception
+                || data.toString().indexOf('exception:') === 0
+            ) {
+                var exception = '';
+                if (data.exception) {
+                    exception = data.exception;
+                } else if (data.indexOf('exception:') === 0) {
+                    exception = data.replace('exception:', '');
+                }
+
+                if (!exception) {
+                    exception = 'Invalid response';
+                }
+
                 // Show error message.
                 GUI.queueOverlay({
                     icon: 'error',
-                    content: '<p>' + data.exception + '</p><br /><a href="javascript:GUI.dequeueOverlay(\'error\');">Close</a>'
+                    content: '<p>' + exception + '</p><br /><button class="GUIButton buttonDark" type="button" onclick="javascript:GUI.dequeueOverlay(\'error\');">Close</button>'
                 });
+
+                if (errorCallback) {
+                    errorCallback.call(this, exception, data);
+                }
             } else if (callback) {
                 callback.call(this, data);
             }
-        }, null, format);
+        }, errorCallback, format);
     };
 
     this.getRequestURL = function(system, action, params, format) {
@@ -437,16 +455,45 @@ var GUI = new function()
 
     this.revert = function() {
         _reverting = true;
-        dfx.foreach(_modifiedWidgets, function(widgetid) {
-            var widget = GUI.getWidget(widgetid);
-            if (widget && widget.revert) {
-                widget.revert();
+
+        var ln = this.templateLineage.length;
+
+        for (var i = (ln - 1); i >= 0; i--) {
+            var template = this.templateLineage[i];
+
+            // Template it self may have a getValue function.
+            // The templateData variable is a reserved var.
+            var tplSystemName   = template.split(':')[0];
+            var tplTemplateName = template.split(':')[1];
+            var tplClassName    = tplSystemName + tplTemplateName;
+
+            var revertTemplate = true;
+            if (window[tplClassName] && window[tplClassName].revert) {
+                revertTemplate = window[tplClassName].revert();
             }
-        });
+
+            if (revertTemplate === false) {
+                dfx.foreach(_modifiedWidgets, function(widgetid) {
+                    var widget = GUI.getWidget(widgetid);
+                    if (widget
+                        && widget.revert
+                        && widget.settings.template.system === tplSystemName
+                        && widget.settings.template.name === tplTemplateName
+                    ) {
+                        widget.revert();
+                    }
+                });
+            } else if (i === (ln - 1)) {
+                // Reload the top template.
+                GUI.reloadTemplate(template);
+            }
+        }
 
         _modifiedWidgets   = {};
         _modifiedTemplates = {};
         _reverting         = false;
+
+        this.fireRevertedCallbacks();
     };
 
     this.setModified = function(widget, state) {
@@ -622,6 +669,7 @@ var GUI = new function()
     };
 
     this.addWidgetEvent(this, 'modified');
+    this.addWidgetEvent(this, 'reverted');
     this.addWidgetEvent(this, 'reloadTemplate');
     this.addWidgetEvent(this, 'templateAdded');
     this.addWidgetEvent(this, 'templateRemoved');

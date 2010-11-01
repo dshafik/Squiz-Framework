@@ -126,6 +126,10 @@ img.GUI-overlay-icon {
     font-size: 16px;
 }
 
+#GUI-overlay-content button {
+    min-width: 100px;
+}
+
 .GUI-overlay-icon #GUI-overlay-content {
     margin-top: 50px;
 }
