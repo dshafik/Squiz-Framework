@@ -100,7 +100,7 @@ class PatchingActions
     public static function addProductSummary(array $summary)
     {
         $summary[] = array(
-                      'label' => 'Revision',
+                      'label' => _('Revision'),
                       'value' => Patching::getCurrentRevision(),
                      );
         return $summary;
