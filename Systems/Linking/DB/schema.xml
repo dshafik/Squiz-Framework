@@ -23,7 +23,10 @@
                     <column>childid</column>
                   </index>
                 </indexes>
-                <foreign-key name="asset_link_fk2" foreign-table="asset" on-delete="NO ACTION">
+                <foreign-key name="asset_link_fk1" foreign-table="asset" on-delete="CASCADE">
+                  <column references="assetid">parentid</column>
+                </foreign-key>
+                <foreign-key name="asset_link_fk2" foreign-table="asset" on-delete="CASCADE">
                   <column references="assetid">childid</column>
                 </foreign-key>
             </constraints>
