@@ -10,7 +10,7 @@
     <div id="{className}-createUser-wrapper">
         <div id="{className}-infoSection">
             <div class="{className}-childUserDetails">
-                <div class="{className}-assetIcon ldapConnectionCount"></div> : {groupInfo:childUserCount}
+                <div class="{className}-assetIcon ldapConnectionCount"></div> : {groupInfo:childGroupCount}
                 <widget type="GUI/Button" id="UserManagerScreen-addNewLDAPConnection">
                     <setting name="value"><text>+ New Connection</text></setting>
                     <setting name="click">UserUserManagerScreen.showCreatePanel('createLDAPConnection');</setting>
