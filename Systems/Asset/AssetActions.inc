@@ -625,14 +625,20 @@ class AssetActions
     /**
      * Returns a list of typeids of child asset types.
      *
-     * @param string  $typeid The type of assets to get.
-     * @param integer $lvl    Level restriction to filter.
+     * @param string  $typeid  The type of assets to get.
+     * @param integer $lvl     Level restriction to filter.
+     * @param boolean $idsOnly If TRUE then only the ids will be returned.
      *
      * @return array
      */
-    public static function getChildTypes($typeid, $lvl=NULL)
+    public static function getChildTypes($typeid, $lvl=NULL, $idsOnly=FALSE)
     {
-        $children = DAL::executeAssoc('Asset', 'getChildTypes');
+        if ($idsOnly === TRUE) {
+            $children = DAL::executeAssoc('Asset', 'getChildTypes', 0);
+        } else {
+            $children = DAL::executeAssoc('Asset', 'getChildTypes');
+        }
+
         return $children;
 
     }//end getChildTypes()
