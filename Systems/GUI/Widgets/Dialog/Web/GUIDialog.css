@@ -78,6 +78,11 @@ ui-draggable .GUIDialog-top {
     background: url(resizer.png) no-repeat;
     cursor: se-resize;
 }
-.GUIDialog.ui-resizable-resizing {
+
+/*.GUIDialog.ui-resizable-resizing {
     opacity: 0.8;
+}*/
+
+.GUIDialog-resize {
+    border: 2px dotted #666;
 }

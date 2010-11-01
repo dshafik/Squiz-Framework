@@ -40,7 +40,7 @@ function GUIDialog(id, settings)
     if (this.settings.resizable === true) {
         jQuery(this.elem).resizable({
             handles: 'se',
-            ghost: true,
+            helper: 'GUIDialog-resize',
             stop: function(e, ui) {
                 // Need to adjust the content element size.
                 var widthDiff  = (ui.size.width - ui.originalSize.width);
