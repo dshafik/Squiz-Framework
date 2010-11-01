@@ -72,6 +72,13 @@ class GUIBoxActions
      */
     protected static $borderLeft = TRUE;
 
+    /**
+     * Custom class name for the box container.
+     *
+     * @var string
+     */
+    protected static $customClass = '';
+
 
     /**
      * Prints widgets content.
@@ -100,7 +107,12 @@ class GUIBoxActions
             $borderClass .= ' noRightBorder';
         }
 
-        echo '<div id="'.$id.'" class="'.$class.$borderClass.'">';
+        $customClass = Util::getArrayIndex($settings, 'customClass', '');
+        if ($customClass !== '') {
+            $customClass = ' '.$customClass;
+        }
+
+        echo '<div id="'.$id.'" class="'.$class.$borderClass.$customClass.'">';
         echo '<div class="'.$class.'-header">';
 
         if (isset($settings['title']) === TRUE) {
