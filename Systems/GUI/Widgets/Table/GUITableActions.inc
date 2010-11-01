@@ -435,7 +435,12 @@ class GUITableActions
 
         $rows = array();
         foreach ($rowsData as $rowid => $columns) {
-            $rows[$rowid] = API::executeRequest($channel['system'], $channel['action'], array($rowsData[$rowid]), $api['options']);
+            $rowContent = API::executeRequest($channel['system'], $channel['action'], array($rowsData[$rowid]), $api['options']);
+            if ($rowContent === FALSE) {
+                continue;
+            }
+
+            $rows[$rowid] = $rowContent;
         }
 
         GUITable::paintRows($rows, $columnNames, $settings, TRUE);
