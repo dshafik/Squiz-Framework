@@ -446,11 +446,14 @@ class UserActions
         // If any of the assets not in the children list then remove them.
         $orphanedUsers = array_diff($assetids, $children);
 
-        // TODO: Should there be a getParents() check here incase a user asset is
-        // linked to somehere else?
-        // May also need to do recursion until orphanedUsers is empty.
-        foreach ($orphanedUsers as $assetid) {
-            Asset::delete($assetid);
+        if (empty($orphanedUsers) === FALSE) {
+            foreach ($orphanedUsers as $assetid) {
+                if (Asset::isAssetid($assetid) === TRUE && $assetid > 0) {
+                    Asset::delete($assetid);
+                }
+            }
+
+            User::removeOrphanedUsers();
         }
 
     }//end removeOrphanedUsers()
@@ -1533,10 +1536,6 @@ class UserActions
                         User::setUserPassword($assetid, $password);
                     }
 
-                    // Update parent groups.
-                    $parents = Util::getArrayIndex($tplData, 'parents', array());
-                    self::_saveAssetParentGroups($assetid, $parents);
-
                     // User Status.
                     $status = Util::getArrayIndex($tplData, 'status', NULL);
                     if ($status !== NULL) {
@@ -1547,6 +1546,10 @@ class UserActions
                             Configuration::setAttributeValue($assetid, 'status', $status);
                         }
                     }
+
+                    // Update parent groups.
+                    $parents = Util::getArrayIndex($tplData, 'parents', array());
+                    self::_saveAssetParentGroups($assetid, $parents);
                 break;
 
                 case 'userGroup':
@@ -1625,6 +1628,14 @@ class UserActions
         $removedGroups = Util::getArrayIndex($parents, 'removed');
         foreach ($removedGroups as $groupid => $tmp) {
             if (in_array($groupid, $currentGroups) === TRUE) {
+                if (Linking::isLastLink($assetid) === TRUE
+                    && Asset::isTypeOf($assetid, 'user') === TRUE
+                ) {
+                    // Set user account status to inactive so that they cannot login.
+                    Channels::includeSystem('Configuration');
+                    Configuration::setAttributeValue($assetid, 'status', FALSE);
+                }
+
                 Linking::deleteLink($groupid, $assetid);
             }
         }
