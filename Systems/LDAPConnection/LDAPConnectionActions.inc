@@ -129,23 +129,22 @@ class LDAPConnectionActions
         }
 
         $requiredFields = array(
-                           'host',
-                           'port',
-                           'baseDN',
-                           'bindDN',
+                           'host'   => _('Host Name'),
+                           'port'   => _('Port'),
+                           'baseDN' => _('Base DN'),
                           );
         self::_checkFields($details, $requiredFields);
 
         $requiredFields = array(
-                           'uid',
-                           'cn',
-                           'givenname',
-                           'sn',
-                           'mail',
+                           'uid'       => _('Username'),
+                           'cn'        => _('Name'),
+                           'givenname' => _('First Name'),
+                           'sn'        => _('Last Name'),
+                           'mail'      => _('Email'),
                           );
         self::_checkFields($userAttributes, $requiredFields);
 
-        $requiredFields = array('ou');
+        $requiredFields = array('ou' => _('Group Name'));
         self::_checkFields($groupAttributes, $requiredFields);
 
         // Create the asset.
@@ -210,23 +209,22 @@ class LDAPConnectionActions
         }
 
         $requiredFields = array(
-                           'host',
-                           'port',
-                           'baseDN',
-                           'bindDN',
+                           'host'   => _('Host Name'),
+                           'port'   => _('Port'),
+                           'baseDN' => _('Base DN'),
                           );
         self::_checkFields($details, $requiredFields);
 
         $requiredFields = array(
-                           'uid',
-                           'cn',
-                           'givenname',
-                           'sn',
-                           'mail',
+                           'uid'       => _('Username'),
+                           'cn'        => _('Name'),
+                           'givenname' => _('First Name'),
+                           'sn'        => _('Last Name'),
+                           'mail'      => _('Email'),
                           );
         self::_checkFields($userAttributes, $requiredFields);
 
-        $requiredFields = array('ou');
+        $requiredFields = array('ou' => _('Group Name'));
         self::_checkFields($groupAttributes, $requiredFields);
 
         try {
@@ -273,7 +271,7 @@ class LDAPConnectionActions
      */
     private static function _checkFields(array $fields, array $requiredFields)
     {
-        foreach ($requiredFields as $fieldName) {
+        foreach ($requiredFields as $fieldName => $title) {
             if (isset($fields[$fieldName]) === TRUE) {
                 $value = trim($fields[$fieldName]);
                 if (empty($value) === FALSE) {
@@ -281,7 +279,8 @@ class LDAPConnectionActions
                 }
             }
 
-            throw new ChannelException(sprintf(_('%s field cannot be empty'), $fieldName));
+            $title = '<strong><em>'.$title.'</em></strong>';
+            throw new ChannelException(sprintf(_('%s field cannot be empty'), $title));
         }
 
     }//end _checkFields()

@@ -55,56 +55,7 @@ class LDAPUserAssetType extends AssetAssetType
             }
         }
 
-        try {
-            self::_saveAssetParentGroups($data['assetid'], $data['parents']);
-        } catch (Exception $e) {
-            error_log($e);
-            throw new ChannelException($e->getMessage());
-        }
-
     }//end saveUserManagerScreen()
-
-
-    /**
-     * Updates the user groups that the specified asset belongs to.
-     *
-     * @param string $assetid Asset ID of a user or a user group.
-     * @param array  $parents The parents information from List widget.
-     *
-     * @return void
-     */
-    private static function _saveAssetParentGroups($assetid, array $parents)
-    {
-        if (empty($parents) === TRUE) {
-            return;
-        }
-
-        Channels::includeSystem('Linking');
-
-        // Update parent groups.
-        $currentGroups = User::getUserGroups($assetid, TRUE);
-        $removedGroups = Util::getArrayIndex($parents, 'removed');
-        foreach ($removedGroups as $groupid => $tmp) {
-            if (in_array($groupid, $currentGroups) === TRUE) {
-                Linking::deleteLink($groupid, $assetid);
-            }
-        }
-
-        // Add the new groups.
-        $items = Util::getArrayIndex($parents, 'items', array());
-        foreach ($items as $itemid => $tmp) {
-            if (strpos($itemid, 'new_') === 0) {
-                $parts      = explode('_', $itemid);
-                $newGroupid = $parts[1];
-                if ($newGroupid !== $assetid
-                    && in_array($newGroupid, $currentGroups) === FALSE
-                ) {
-                    Linking::createLink($newGroupid, $assetid);
-                }
-            }
-        }
-
-    }//end _saveAssetParentGroups()
 
 
 }//end class
