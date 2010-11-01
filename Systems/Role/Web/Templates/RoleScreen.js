@@ -117,7 +117,6 @@ var RoleRoleScreen = new function()
            } else {
                toggleWidget.setValue(false, true);
            }
-
         });
 
         // Update the privilege settings on the screen using roles granted list.
@@ -127,6 +126,10 @@ var RoleRoleScreen = new function()
     };
 
     var _saveRoleSettings = function(roleid) {
+        if (!_data[roleid]) {
+            return;
+        }
+
         // Get the role name.
         _data[roleid].name = GUI.getWidget('role-name').getValue();
 
@@ -331,6 +334,11 @@ var RoleRoleScreen = new function()
     this.createNewRole = function() {
         var itemid = 'new_' + dfx.getUniqueId();
         var title  = 'New Role';
+
+        if (_data instanceof Array) {
+            // This could happen if this is the first role.
+            _data = {};
+        }
 
         // Init the item info.
         _data[itemid] = {
