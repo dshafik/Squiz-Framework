@@ -8,7 +8,11 @@
 
 <condition>
     <if-not condition="Permission::hasProjects()">
-        <exception><text>There are no projects in the system</text></exception>
+        <content>
+            <div id="PermissionScreen">
+                <text>There are no projects in the system</text>
+            </div>
+        </content>
     </if-not>
     <else>
       <content>
