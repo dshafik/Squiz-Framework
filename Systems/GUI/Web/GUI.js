@@ -223,6 +223,7 @@ var GUI = new function()
     };
 
     this.sendRequest = function(system, action, params, callback, format, errorCallback) {
+        var self = this;
         sfapi.post(system, action, params, function(data) {
             if (dfx.isset(data) === false
                 || data.exception
@@ -251,6 +252,8 @@ var GUI = new function()
             } else if (callback) {
                 callback.call(this, data);
             }
+
+            self.fireRequestCompleteCallbacks();
         }, errorCallback, format);
     };
 
@@ -670,6 +673,7 @@ var GUI = new function()
 
     this.addWidgetEvent(this, 'modified');
     this.addWidgetEvent(this, 'reverted');
+    this.addWidgetEvent(this, 'requestComplete');
     this.addWidgetEvent(this, 'reloadTemplate');
     this.addWidgetEvent(this, 'templateAdded');
     this.addWidgetEvent(this, 'templateRemoved');
