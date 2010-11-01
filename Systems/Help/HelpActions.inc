@@ -215,6 +215,32 @@ class HelpActions
         }
 
         if (file_exists($filePath) === FALSE) {
+            $parts      = explode('-', $pageid);
+            $systemName = $parts[0];
+            $index      = 0;
+            if ($parts[0] === 'index'
+                || $parts[0] === 'glossary'
+                || $parts[0] === 'article'
+            ) {
+                $systemName = $parts[1];
+                $index      = 1;
+            }
+
+            // Could be a system that is implementing another system.
+            $channelInfo = Channels::getSystemDependencies($systemName, 'inheritance');
+            if (empty($channelInfo) === FALSE) {
+                $parts[$index] = $channelInfo[0]['to'];
+            }
+
+            $pageid = implode('-', $parts);
+
+            $filePath = Help::getDocsDirectory().'/'.$pageid;
+            if (strpos($pageid, '.html') === FALSE) {
+                $filePath .= '.html';
+            }
+        }//end if
+
+        if (file_exists($filePath) === FALSE) {
             Channels::includeSystem('GUI');
             $cssHref   = self::_getPageCSSPath();
             $contents  = GUI::getDocType();
