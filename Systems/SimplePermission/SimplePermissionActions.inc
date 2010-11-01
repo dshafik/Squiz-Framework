@@ -309,8 +309,9 @@ class SimplePermissionActions implements PermissionActions
         $usersList = GUI::createWidget($id.'-list', 'GUIList', $listSettings);
 
         $buttonSettings = array(
-                           'value' => _('Add New'),
-                           'click' => 'SimplePermissionPermissionScreen.addNew(\''.$resourceid.'\', \''.$roleid.'\')',
+                           'value'       => _('Add New'),
+                           'click'       => 'SimplePermissionPermissionScreen.addNew(\''.$resourceid.'\', \''.$roleid.'\')',
+                           'customClass' => 'addNewRole',
                           );
         $buttonWidget   = GUI::createWidget($id.'-addUser', 'GUIButton', $buttonSettings);
 
@@ -318,6 +319,7 @@ class SimplePermissionActions implements PermissionActions
                         'title'         => _('Users & Groups'),
                         'headerContent' => $buttonWidget,
                         'content'       => $usersList,
+                        'customClass'   => 'roleBox',
                        );
         $box = GUI::createWidget($id.'-box', 'GUIBox', $boxSettings);
 
