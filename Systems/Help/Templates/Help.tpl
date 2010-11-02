@@ -15,6 +15,8 @@
     <setting name="width">400</setting>
     <setting name="height">500</setting>
     <setting name="position">fixed</setting>
+    <setting name="posRight">25px</setting>
+    <setting name="posTop">70px</setting>
     <setting name="content">
         <content>
             <div class="Help-controls">
