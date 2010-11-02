@@ -2373,7 +2373,7 @@ class SquizSuiteActions
                 $newUsername  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-username', NULL);
                 $newPassword  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-password', NULL);
                 if ($newUsername !== NULL
-                    && (array_key_exists('username', $product['connection']['username']) === FALSE
+                    && (array_key_exists('username', $product['connection']) === FALSE
                     || $newUsername !== $product['connection']['username'])
                 ) {
                     $upConnection['username'] = $newUsername;
@@ -2382,7 +2382,7 @@ class SquizSuiteActions
                 }
 
                 if ($newPassword !== NULL
-                    && (array_key_exists('password', $product['connection']['password']) === FALSE
+                    && (array_key_exists('password', $product['connection']) === FALSE
                     || $newPassword !== $product['connection']['password'])
                 ) {
                     $upConnection['password'] = $newPassword;
