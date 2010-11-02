@@ -1,9 +1,9 @@
 #userLogoutButton {
+    -moz-border-radius: 14px 0 0 14px;
+}
+
+#userLogoutButton.GUIToolbar-button .UserLogoutButton-icon {
     background: url(logout_act.png) no-repeat;
-    cursor: pointer;
-    height: 25px;
-    width: 32px;
-    float: left;
 }
 
 /* Intervention popup styles */

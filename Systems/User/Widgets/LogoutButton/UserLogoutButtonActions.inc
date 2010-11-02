@@ -43,8 +43,8 @@ class UserLogoutButtonActions
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
 
-        echo '<div id="'.$id.'" class="'.$class.'" title="'._('Logout').'"';
-        echo ' onclick="GUI.getWidget(\''.$id.'-intervention\').show();"></div>';
+        echo '<a id="'.$id.'" class="'.$class.' GUIToolbar-button" title="'._('Click to logout').'"';
+        echo ' onclick="dfx.addClass(dfx.getId(\''.$id.'\'), \'active\');GUI.getWidget(\''.$id.'-intervention\').show();"><div class="'.$class.'-icon"></div></a>';
 
         Channels::includeSystem('GUI');
 
@@ -57,7 +57,7 @@ class UserLogoutButtonActions
         $ivContents    .= GUI::createWidget($id.'-ivbuttonYes', 'GUIButton', $buttonSettings);
         $buttonSettings = array(
                            'value'  => _('Cancel'),
-                           'click'  => 'GUI.getWidget(\''.$id.'-intervention\').hide();',
+                           'click'  => 'dfx.removeClass(dfx.getId(\''.$id.'\'), \'active\');GUI.getWidget(\''.$id.'-intervention\').hide();',
                            'colour' => 'Dark',
                           );
         $ivContents    .= GUI::createWidget($id.'-ivbuttonNo', 'GUIButton', $buttonSettings);
