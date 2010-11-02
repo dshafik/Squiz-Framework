@@ -96,6 +96,13 @@ class GUITableActions
     protected static $allowDelete = FALSE;
 
     /**
+     * Custom class for the delete column.
+     *
+     * @var string
+     */
+    protected static $customDeleteClass = '';
+
+    /**
      * If TRUE then the rows will be numbered at the start of each row.
      *
      * @var boolean
@@ -374,13 +381,15 @@ class GUITableActions
                     $colClass .= ' colOdd';
                 }
 
-                echo '<td'.$colspan.' colid="'.$id.'-'.$classid.'-'.$colid.'" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.$customCellClass;
+                echo '<td'.$colspan.' colid="'.$id.'-'.$classid.'-'.$colid;
+                echo '" class="'.$class.'-'.$colClass.$rowClass.' col-'.$colid.$customCellClass.' ';
+
                 if ($colid === '_remove') {
-                    echo ' '.$id.'-_remove" ';
-                } else {
-                    echo '" ';
+                    echo $id.'-_remove ';
+                    echo Util::getArrayIndex($settings, 'customDeleteClass', self::$customDeleteClass);
                 }
 
+                echo '" ';
                 echo 'style="text-align: '.$columns[$colid]['align'].';';
                 if (isset($columns[$colid]['width']) === TRUE) {
                     echo ' width: '.$columns[$colid]['width'].';';
@@ -475,9 +484,9 @@ class GUITableActions
      * JavaScript call that calls this. If the required parameters for the data
      * provider channel are not found, a 400 (Bad Request) error will be sent.
      *
-     * @param array $channel       The channel to call which generates the column
-     *                             contents using the given params.
-     * @param array $settings      The widget settings.
+     * @param array $channel  The channel to call which generates the column
+     *                        contents using the given params.
+     * @param array $settings The widget settings.
      *
      * @return void
      * @throws ChannelException If invalid API channel is specified.
