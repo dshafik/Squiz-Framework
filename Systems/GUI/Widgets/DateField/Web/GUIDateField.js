@@ -193,5 +193,10 @@ GUIDateField.prototype = {
 	getDateObject: function()
 	{
 	    return new Date(this.getValue());
+	},
+
+	revert: function()
+	{
+	    this.setValue(this.settings.initialDate);
 	}
 };
