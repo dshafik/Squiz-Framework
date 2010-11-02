@@ -278,3 +278,21 @@
 .UserManagerScreen-listItem img {
     vertical-align: top;
 }
+
+#UserManagerScreen-lastLinkIntervention-user,
+#UserManagerScreen-lastLinkIntervention-userGroup {
+    width: 320px;
+    text-align: center;
+}
+
+#UserManagerScreen-lastLinkIntervention-user button,
+#UserManagerScreen-lastLinkIntervention-userGroup button {
+    margin-top: 10px;
+    min-width: 45%;
+}
+
+#UserManagerScreen-lastLinkIntervention-user p,
+#UserManagerScreen-lastLinkIntervention-userGroup p {
+    margin-top: 10px;
+    text-align: left;
+}

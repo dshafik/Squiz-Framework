@@ -64,8 +64,9 @@ class UserLogoutButtonActions
 
         Channels::includeSystem('GUI');
         $ivSettings = array(
-                       'targetElementid' => $id,
-                       'elementContents' => $ivContents,
+                       'targetElementid'  => $id,
+                       'elementContents'  => $ivContents,
+                       'fixedPositioning' => TRUE,
                       );
         echo GUI::createWidget($id.'-intervention', 'GUIIntervention', $ivSettings);
 

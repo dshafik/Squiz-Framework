@@ -1675,11 +1675,21 @@ class UserActions
 
         $userFolders = User::getUsersFolders(TRUE);
 
+        Channels::includeSystem('Asset');
+        $assetTypes = array(
+                       'user'      => Asset::getChildTypes('user', NULL, TRUE),
+                       'userGroup' => Asset::getChildTypes('userGroup', NULL, TRUE),
+                      );
+
+        $assetTypes['user'][]      = 'user';
+        $assetTypes['userGroup'][] = 'userGroup';
+
         $path = BaseSystem::getDataDir('User').'/usersFolderid.inc';
 
         $data['usersFolderid']      = (int) file_get_contents($path);
         $data['editTemplates']      = $editTemplates;
         $data['localUsersFolderid'] = $userFolders[0];
+        $data['assetTypes']         = $assetTypes;
 
         return json_encode($data);
 

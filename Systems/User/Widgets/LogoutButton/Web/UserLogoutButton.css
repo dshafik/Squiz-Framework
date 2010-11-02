@@ -7,6 +7,10 @@
 }
 
 /* Intervention popup styles */
+#userLogoutButton-intervention {
+    width: 200px;
+}
+
 #userLogoutButton-intervention .GUIIntervention-content {
     text-align: center;
 }

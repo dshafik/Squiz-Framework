@@ -25,10 +25,12 @@ var UserUserManagerScreen = new function()
 {
     var _usersFolderid = 0;
     var _screenData    = {};
+    var _assetTypes    = {};
 
     this.init = function(data) {
         _usersFolderid = data.usersFolderid;
         _screenData    = data.editTemplates;
+        _assetTypes    = data.assetTypes;
 
         // Add the itemClicked event call back for the column browser.
         var browser = GUI.getWidget('userManager-assetBrowser');
@@ -47,7 +49,44 @@ var UserUserManagerScreen = new function()
             assetid: assetid
         };
 
-        GUI.loadContent('User', 'loadUserManagerEditContents', dfx.getId('userManager-editPane'), params);
+        GUI.loadContent('User', 'loadUserManagerEditContents', dfx.getId('userManager-editPane'), params, function() {
+            var parentsList = GUI.getWidget('UserManagerScreen-parentsList');
+            if (!parentsList) {
+                return;
+            }
+
+            // When an item is removed from parent's list we need to check if its the last item.
+            parentsList.addItemRemovedCallback(function(elemid, removedElem, deleteIcon) {
+                var value = parentsList.getValue();
+                if (dfx.isEmpty(value.items) === true) {
+                    // Items is empty therefore this asset will not have any parents
+                    // and it will be deleted, make sure user confirms this action.
+                    var interventionId = 'UserManagerScreen-lastLinkIntervention';
+                    if (UserUserManagerScreen.isUserType() === true) {
+                        interventionId += '-user';
+                    } else {
+                        interventionId += '-userGroup';
+                    }
+
+                    GUI.getWidget(interventionId).show(deleteIcon, deleteIcon);
+                }
+            });
+        });
+    };
+
+    this.cancelGroupDelete = function(id) {
+        var interventionWidget = GUI.getWidget(id);
+        if (!interventionWidget) {
+            return;
+        }
+
+        var data = interventionWidget.getData();
+        if (data) {
+            // Data should be the delte icon of the list item.
+            dfx.trigger(data, 'click');
+        }
+
+        interventionWidget.hide();
     };
 
     this.cancelCreate = function() {
@@ -151,6 +190,19 @@ var UserUserManagerScreen = new function()
         } else {
             dfx.addClass(header, 'Inactive');
         }
+    };
+
+    this.isUserType = function(assetType) {
+        if (!assetType) {
+            var editorPanel = dfx.getId('UserManagerScreen-editor');
+            assetType       = dfx.attr(editorPanel, 'assetType');
+        }
+
+        if (_assetTypes.user.inArray(assetType) === true) {
+            return true;
+        }
+
+        return false;
     };
 
     this.getValue = function() {
