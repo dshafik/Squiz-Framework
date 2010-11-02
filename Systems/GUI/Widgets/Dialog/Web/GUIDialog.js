@@ -67,7 +67,16 @@ function GUIDialog(id, settings)
 
     if (this.settings.draggable === true) {
         jQuery(this.elem).draggable({
-            handle: dfx.getClass('GUIDialog-top', this.elem)[0]
+            handle: dfx.getClass('GUIDialog-top', this.elem)[0],
+            start: function() {
+                // Change right/bottom styles top left/top.
+                var elemCoords = dfx.getElementCoords(self.elem);
+                dfx.setStyle(self.elem, 'left', elemCoords.x + 'px');
+                dfx.setStyle(self.elem, 'top', elemCoords.y + 'px');
+
+                dfx.setStyle(self.elem, 'right', '');
+                dfx.setStyle(self.elem, 'bottom', '');
+            }
         });
     }
 
@@ -106,8 +115,28 @@ GUIDialog.prototype = {
         // Set the width/height of main element to auto.
         dfx.setStyle(this.elem, 'height', 'auto');
         dfx.setStyle(this.elem, 'width', 'auto');
-        dfx.setStyle(this.elem, 'left', '50%');
-        dfx.setStyle(this.elem, 'top', '50%');
+
+        // Set the position.
+        var posLeft   = this.settings.posLeft || null;
+        var posTop    = this.settings.posTop || null;
+        var posRight  = this.settings.posRight || null;
+        var posBottom = this.settings.posBottom || null;
+
+        if (posLeft !== null) {
+            dfx.setStyle(this.elem, 'left', posLeft);
+        } else if (posRight !== null) {
+            dfx.setStyle(this.elem, 'right', posRight);
+        } else {
+            dfx.setStyle(this.elem, 'left', '50%');
+        }
+
+        if (posTop !== null) {
+            dfx.setStyle(this.elem, 'top', posTop);
+        } else if (posBottom !== null) {
+            dfx.setStyle(this.elem, 'bottom', posBottom);
+        } else {
+            dfx.setStyle(this.elem, 'top', '50%');
+        }
 
         var contentDiv    = dfx.getClass('GUIDialog-middle', this.elem)[0];
         var topElement    = dfx.getClass('GUIDialog-top', this.elem)[0];
@@ -130,10 +159,16 @@ GUIDialog.prototype = {
         // Calculate the position of the main element.
         var mainWidth  = dfx.getElementWidth(this.elem);
         var mainHeight = dfx.getElementHeight(this.elem);
-        var marginLeft = (parseInt(mainWidth / 2) * -1);
-        var marginTop  = (parseInt(mainHeight / 2) * -1);
-        dfx.setStyle(this.elem, 'margin-left', marginLeft + 'px');
-        dfx.setStyle(this.elem, 'margin-top', marginTop + 'px');
+
+        if (dfx.isset(this.settings.posLeft) === false) {
+            var marginLeft = (parseInt(mainWidth / 2) * -1);
+            dfx.setStyle(this.elem, 'margin-left', marginLeft + 'px');
+        }
+
+        if (dfx.isset(this.settings.posTop) === false) {
+            var marginTop = (parseInt(mainHeight / 2) * -1);
+            dfx.setStyle(this.elem, 'margin-top', marginTop + 'px');
+        }
 
         if (resetVis === true) {
             // Reset visibility.

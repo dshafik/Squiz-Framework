@@ -135,6 +135,42 @@ class GUIDialogActions
      */
     protected static $position = 'absolute';
 
+    /**
+     * The left position of the dialog.
+     *
+     * E.g. 50%, 10%, 10px.
+     *
+     * @var string
+     */
+    protected static $posLeft = '50%';
+
+    /**
+     * The top position of the dialog.
+     *
+     * E.g. 50%, 10%, 10px.
+     *
+     * @var string
+     */
+    protected static $posTop = '50%';
+
+    /**
+     * The left position of the dialog.
+     *
+     * Note that if posLeft is set then this value will be ignored.
+     *
+     * @var string
+     */
+    protected static $posRight = NULL;
+
+    /**
+     * The bottom position of the dialog.
+     *
+     * Note that if posTop is set then this value will be ignored.
+     *
+     * @var string
+     */
+    protected static $posBottom = NULL;
+
 
     /**
      * Prints widgets content.
@@ -169,6 +205,18 @@ class GUIDialogActions
         echo '<div class="'.$class.'-bottom">';
         echo Util::getArrayIndex($settings, 'bottomContent', '');
         echo '</div>';
+
+        // Make sure pos settings are correct.
+        $posLeft = Util::getArrayIndex($settings, 'posLeft', NULL);
+        $posTop  = Util::getArrayIndex($settings, 'posLeft', NULL);
+
+        if ($posLeft !== NULL) {
+            $settings['posRight'] = NULL;
+        }
+
+        if ($posTop !== NULL) {
+            $settings['posBottom'] = NULL;
+        }
 
         return $settings;
 

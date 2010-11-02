@@ -4,8 +4,6 @@
     -moz-border-radius: 9px;
     position: absolute;
     z-index: 1001;
-    top: 50%;
-    left: 50%;
     display: none;
     visibility: hidden;
     -moz-box-shadow: 0 0 25px #222;
@@ -31,6 +29,7 @@
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#4C72B7, endColorstr=#2B4165);
     cursor: move;
 }
+
 ui-draggable .GUIDialog-top {
     cursor: move;
 }
@@ -78,10 +77,6 @@ ui-draggable .GUIDialog-top {
     background: url(resizer.png) no-repeat;
     cursor: se-resize;
 }
-
-/*.GUIDialog.ui-resizable-resizing {
-    opacity: 0.8;
-}*/
 
 .GUIDialog-resize {
     border: 2px dotted #666;
