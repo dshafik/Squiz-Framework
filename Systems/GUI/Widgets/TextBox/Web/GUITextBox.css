@@ -14,12 +14,14 @@
     border: 1px solid #C2C3C5;
     opacity: 1;
     padding: 3px 2px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
 }
 
 .GUITextBox.selected {
-    border: 1px solid #6FA8D7;
-    -webkit-box-shadow: 0 0 5px #6FA8D7;
-    -moz-box-shadow: 0 0 5px #6FA8D7;
+    border: 1px solid #3A88F4;
+    -webkit-box-shadow: 0 0 4px #2B65B6;
+    -moz-box-shadow: 0 0 4px #2B65B6;
 }
 
 input.GUITextBox.usingHint {
