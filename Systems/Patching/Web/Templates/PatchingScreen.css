@@ -1,8 +1,3 @@
-#PatchingScreen {
-    margin: 0 auto;
-    width: 1160px;
-}
-
 .PatchingScreen-activateWrap {
     overflow: hidden;
 }
@@ -90,7 +85,7 @@ div.PatchingScreen-activateWrap span {
 }
 
 #newUpdates-table td.col-summary {
-    width: 600px;
+    width: 590px;
 }
 
 /* Installed Updates Table */
@@ -141,7 +136,15 @@ span.PatchingScreen-expander {
 .PatchingScreen-scheduled {
     background: url(tick.png) no-repeat scroll 0 0 transparent;
     height: 19px;
-    padding: 3px 0 0 27px;
+    padding: 3px 0 0 32px;
+    margin-top: 5px;
+}
+
+.PatchingScreen-scheduledBy {
+    background: url("/__web/Systems/User/AssetTypes/User/Web/icon_user_s.png") no-repeat scroll 0 0 transparent;
+    height: 19px;
+    padding: 3px 0 0 32px;
+    margin-top: 5px;
 }
 
 .PatchingScreen-scheduled.not {
