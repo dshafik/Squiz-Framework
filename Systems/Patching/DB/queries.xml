@@ -50,6 +50,7 @@
       <select>
         <fields>
           <field table="patching" column="name" />
+          <field table="patching" column="userid" />
           <field table="patching" column="scheduled" />
           <field table="patching" column="patch_sha1" />
         </fields>
