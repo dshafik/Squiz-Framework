@@ -26,8 +26,23 @@ function GUIGraphPie(id, settings)
     this.id       = id;
     this.settings = settings;
 
+    this.init();
 }
 
 GUIGraphPie.prototype = {
+    init: function() {
+        // Attach the API user token to the URL, and replace the tag with
+        // one with the new URL. (Simply updating the 'data' tag does not work in
+        // Webkit.)
+        var objectTag      = dfx.getId(this.id);
+        var container      = objectTag.parentNode;
+        var objectTagClone = dfx.cloneNode(objectTag);
 
+        var url = sfapi.attachTokenToURL(dfx.attr(objectTag, 'data'));
+        dfx.attr(objectTagClone, 'data', url);
+
+        dfx.remove(objectTag);
+        dfx.prepend(container, objectTagClone);
+
+    }
 };
