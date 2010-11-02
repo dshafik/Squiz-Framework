@@ -61,7 +61,10 @@ GUIIntervention.prototype = {
     init: function()
     {
         if (this.elem) {
-            document.body.appendChild(this.elem);
+            var elem = this.elem;
+            dfx.addLoadEvent(function() {
+                document.body.appendChild(elem);
+            });
         }
 
     },
