@@ -44,13 +44,20 @@ class GUISelectActions
      */
     protected static $options;
 
+    /**
+     * Custom class for the select widget. 
+     *
+     * @var string
+     */
+    protected static $customClass;
+
 
     /**
      * Prints this widgets content.
      *
      * @param array $settings The list of settings for this widget.
      *
-     * @return void
+     * @return array
      */
     public static function paint(array $settings=array())
     {
@@ -58,13 +65,14 @@ class GUISelectActions
         $class = $settings['widget']['type'];
 
         $minWidth     = Util::getArrayIndex($settings, 'minWidth');
+        $customClass  = Util::getArrayIndex($settings, 'customClass', self::$customClass);
         $inlineStyles = array();
 
         if ($minWidth !== NULL) {
             $inlineStyles[] = 'min-width: '.$minWidth.';';
         }
 
-        echo '<select id="'.$id.'" class="'.$class.'"';
+        echo '<select id="'.$id.'" class="'.$class.' '.$customClass.'"';
 
         if (count($inlineStyles) > 0) {
             echo ' style="'.implode(' ', $inlineStyles).'"';
@@ -108,7 +116,7 @@ class GUISelectActions
      *
      * @return void
      */
-    private static function _paintItems($options, $selected, $depth=0)
+    private static function _paintItems(array $options, $selected, $depth=0)
     {
         foreach ($options as $key => $option) {
             if (is_array($option) === TRUE) {

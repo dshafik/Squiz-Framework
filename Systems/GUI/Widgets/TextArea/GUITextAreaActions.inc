@@ -59,6 +59,13 @@ class GUITextAreaActions
     protected static $value = '';
 
     /**
+     * Custom class of the Text Area.
+     *
+     * @var string
+     */
+    protected static $customClass = '';
+
+    /**
      * If TRUE then the container will have the style display:inline.
      *
      * @var boolean
@@ -105,9 +112,10 @@ class GUITextAreaActions
             ''
         );
 
-        $colsProp = Util::getArrayIndex($settings, 'cols', self::$cols);
-        $rowsProp = Util::getArrayIndex($settings, 'rows', self::$rows);
-        $nameProp = Util::getArrayIndex($settings, 'name', self::$name);
+        $colsProp    = Util::getArrayIndex($settings, 'cols', self::$cols);
+        $rowsProp    = Util::getArrayIndex($settings, 'rows', self::$rows);
+        $nameProp    = Util::getArrayIndex($settings, 'name', self::$name);
+        $customClass = Util::getArrayIndex($settings, 'customClass', self::$customClass);
 
         // Add in the name property if needed.
         $name = '';
@@ -116,7 +124,7 @@ class GUITextAreaActions
         }
 
         // The input field.
-        echo '<textarea id="'.$id.'-textarea" class="'.$class.' textarea"';
+        echo '<textarea id="'.$id.'-textarea" class="'.$class.' textarea '.$customClass.'"';
         echo ' rows="'.$rowsProp.'" cols="'.$colsProp.'">';
         echo $value;
         echo '</textarea>';
