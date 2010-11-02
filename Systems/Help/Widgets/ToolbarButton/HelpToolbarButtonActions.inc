@@ -43,7 +43,7 @@ class HelpToolbarButtonActions
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
 
-        echo '<div id="'.$id.'" class="'.$class.'"></div>';
+        echo '<a title="'._('Click to view the help articles').'" id="'.$id.'" class="'.$class.' GUIToolbar-button"><div class="'.$class.'-icon"></div></a>';
 
         return $settings;
 

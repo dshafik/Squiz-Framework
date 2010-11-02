@@ -71,6 +71,7 @@ HelpToolbarButton.prototype = {
         if (!dialog || dfx.getElementHeight(dialog) === 0) {
             this._loadHelp(true);
         } else {
+            dfx.removeClass(dfx.getId(this.id), 'active');
             GUI.getWidget('Help-dialog').close();
         }
 
@@ -82,6 +83,13 @@ HelpToolbarButton.prototype = {
             this._loadHelp(true, pageid);
             return;
         }
+
+        var elem = dfx.getId(this.id);
+        GUI.getWidget('Help-dialog').addDialogClosedCallback(function() {
+            dfx.removeClass(elem, 'active');
+        });
+
+        dfx.addClass(dfx.getId(this.id), 'active');
 
         // Initialise the main Help widget.
         Help.init();
