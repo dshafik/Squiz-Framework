@@ -396,8 +396,8 @@ class PatchingActions
             $scheduled = NULL;
         }
 
-        Channels::includeSystem('Authentication');
-        $userid = Authentication::getCurrentUserid();
+        Channels::includeSystem('User');
+        $userid = User::getCurrentUserid();
 
         Channels::addToBasket('scheduled', $scheduled);
         Channels::addToBasket('userid', $userid);
@@ -1583,7 +1583,7 @@ class PatchingActions
         $fp = fopen($encPatchFilePath, 'w+');
         $hp = fopen($patchFileHeaderPath, 'w+');
         $ch = curl_init($updateServer['connection']['url'].'/json/SquizUpdate/downloadPatchFile');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_FILE, $fp);
         curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3600);
@@ -1981,14 +1981,16 @@ class PatchingActions
         $patches = Patching::getPatches();
 
         if (empty($patches) === FALSE) {
+            $config       = Patching::getPatchingConfig();
+            $scheduled    = $config['schedule'];
             $scheduleMsg  = '<div class="PatchingScreen-scheduleMsg">'._('Schedule installation of updates').'</div>';
             $scheduleMsg .= GUI::createWidget(
                 'PatchingScreen-schedulePatch',
                 'GUIToggleButton',
-                array()
+                array('value' => $scheduled)
             );
 
-            $scheduleMsg .= self::_getScheduleTimePicker(time());
+            $scheduleMsg .= self::_getScheduleTimePicker(time(), $scheduled);
 
             $rows[] = array(
                        'patchId' => array(
@@ -2012,11 +2014,18 @@ class PatchingActions
             $summary .= nl2br(Patching::getPatchNote($patch['name'], TRUE)).$expander.'</div>';
             $summary .= '<div class="PatchingScreen-summary full hidden">';
             $summary .= nl2br(Patching::getPatchNote($patch['name'])).$expander.'</div>';
-
-            if ($patch['scheduled'] === NULL) {
+            if ($patch['scheduled'] === NULL || $config['schedule'] === FALSE) {
                 $scheduled = '<div class="PatchingScreen-scheduled not">'._('Not Sceduled').'</div>';
             } else {
-                $scheduled = '<div class="PatchingScreen-scheduled">'._('Sceduled').'</div>';
+                include_once 'Libs/String/String.inc';
+                $scheduledStr = String::readableDatetime(strtotime($patch['scheduled']));
+                $scheduled    = '<div class="PatchingScreen-scheduled">'.$scheduledStr.'</div>';
+
+                Channels::includeSystem('User');
+                $userInfo   = User::getUserById($patch['userid']);
+                $scheduled .= '<div class="PatchingScreen-scheduledBy">';
+                $scheduled .= $userInfo['first_name'].' '.$userInfo['last_name'];
+                $scheduled .= '</div>';
             }
 
             $rows[] = array(
@@ -2024,7 +2033,7 @@ class PatchingActions
                        'summary'    => $summary,
                        'scheduledT' => $scheduled,
                       );
-        }
+        }//end foreach
 
         return $rows;
 
@@ -2037,15 +2046,21 @@ class PatchingActions
      * Prefills with the closest time, or based on the cron frequency settings.
      * If daily, hour and minute cannot be set.
      *
-     * @param integer $time The previously scheduled patch time.
+     * @param integer $time      The previously scheduled patch time.
+     * @param boolean $scheduled TRUE if the patch is scheduled.
      *
      * @return object
      */
-    private static function _getScheduleTimePicker($time)
+    private static function _getScheduleTimePicker($time, $scheduled=FALSE)
     {
         Channels::includeSystem('GUI');
         Channels::includeSystem('Cron');
-        $content      = '<div class="PatchingScreen-scheduleDatePicker hidden">';
+        $class = ' hidden';
+        if ($scheduled === TRUE) {
+            $class = '';
+        }
+
+        $content      = '<div class="PatchingScreen-scheduleDatePicker'.$class.'">';
         $cronTypes    = Cron::getCronTypes();
         $cronJob      = Cron::getCronJob('Patching', 'PatchingCron.inc');
         $cronSettings = array();
@@ -2207,7 +2222,6 @@ class PatchingActions
 
         // Activation.
         $activationID = trim(Util::getArrayIndex($data, 'PatchingScreen-activateIdText', ''));
-
         if (empty($activationID) === TRUE) {
             $activationID = trim(Util::getArrayIndex($data, 'PatchingScreen-newActivationIdText', ''));
         }
@@ -2219,6 +2233,17 @@ class PatchingActions
             }
         }
 
+        // Schedule the patch.
+        $schedule = Util::getArrayIndex($data, 'PatchingScreen-schedulePatch', FALSE);
+        $config   = Patching::getPatchingConfig();
+
+        $config['schedule'] = $schedule;
+        if ($schedule === TRUE) {
+            self::_saveSchedulePatch($data);
+        }
+
+        SystemConfig::setConfig('Patching', $config);
+
         if (isset($result['errors']) === FALSE) {
             $result = array('success' => $result);
         }
@@ -2226,6 +2251,73 @@ class PatchingActions
         return $result;
 
     }//end savePatchingScreen()
+
+
+    /**
+     * Process the patching schedule.
+     *
+     * @param array $data Submitted data to process.
+     *
+     * @return boolean
+     */
+    private static function _saveSchedulePatch(array $data)
+    {
+        $monthsStr = array(
+                      'January',
+                      'February',
+                      'March',
+                      'April',
+                      'May',
+                      'June',
+                      'July',
+                      'August',
+                      'September',
+                      'October',
+                      'November',
+                      'December',
+                     );
+
+        $time  = strtotime($day.' '.$monthsStr[(int) $month].' '.$year);
+        $day   = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleDay'));
+        $month = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleMonth'));
+        $year  = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleYear'));
+        $hour  = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleHour'));
+        $min   = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleMin'));
+
+        Channels::includeSystem('Cron');
+        $cronTypes    = Cron::getCronTypes();
+        $cronJob      = Cron::getCronJob('Patching', 'PatchingCron.inc');
+        $cronSettings = array();
+        foreach ($cronTypes as $type) {
+            if ($type['typeid'] === $cronJob['interval']) {
+                if ($type['typeid'] === 'daily') {
+                    $parts = explode(' ', $type['condition']);
+                    $min   = $parts[0];
+                    $hour  = $parts[1];
+                    break;
+                }
+            }
+        }
+
+        if ($hour !== '') {
+            $time += (((int) $hour) * 60 * 60);
+            if ($min !== '') {
+                $time += (((int) $min) * 60);
+            }
+        }
+
+        $patches = Patching::getPatchingInfo();
+        $names   = array();
+        foreach ($patches as $patch) {
+            if ($patch['patched'] === NULL) {
+                Patching::schedulePatch($patch['name'], $time);
+                $names[] = $patch['name'];
+            }
+        }
+
+        return TRUE;
+
+    }//end _saveSchedulePatch()
 
 
 }//end class
