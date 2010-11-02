@@ -45,6 +45,8 @@ function GUIList(id, settings)
         });
     }
 
+    GUI.addWidgetEvent(this, 'itemRemoved');
+
 }
 
 GUIList.prototype = {
@@ -57,6 +59,7 @@ GUIList.prototype = {
 
         if (dfx.hasClass(deleteIcon, 'deleted') === false) {
             dfx.addClass(deleteIcon, 'deleted');
+            this.fireItemRemovedCallbacks(dfx.attr(itemElement, 'itemid'), itemElement, dfx.getClass('GUI-deleteIcon', itemElement)[0]);
         } else {
             dfx.removeClass(deleteIcon, 'deleted');
         }

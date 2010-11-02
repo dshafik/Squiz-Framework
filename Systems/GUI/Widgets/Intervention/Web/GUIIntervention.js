@@ -82,9 +82,9 @@ GUIIntervention.prototype = {
         dfx.addClass(this.elem, 'calc');
 
         var classNames = ['top', 'left', 'right', 'bottom', 'middle', 'center'];
-        var elem       = this.element;
+        var elem       = this.elem;
         dfx.foreach(classNames, function(i) {
-            dfx.addClass(elem, classNames[i]);
+            dfx.removeClass(elem, classNames[i]);
         });
 
         if (!targetElement && this.settings.targetElementid) {
@@ -99,6 +99,12 @@ GUIIntervention.prototype = {
         dfx.removeClass(this.elem, 'calc');
 
         this._data = data;
+
+    },
+
+    getData: function()
+    {
+        return this._data;
 
     },
 

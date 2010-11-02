@@ -54,6 +54,13 @@ class GUIInterventionActions
      */
     protected static $onclose = '';
 
+    /**
+     * If TRUE then the popup will use 'fixed' positioning instead of 'absolute'.
+     *
+     * @var boolean
+     */
+    protected static $fixedPositioning = FALSE;
+
 
     /**
      * Prints widgets content.
@@ -67,7 +74,12 @@ class GUIInterventionActions
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
 
-        echo '<div id="'.$id.'" class="'.$class.'">';
+        $extraClass = '';
+        if (Util::getArrayIndex($settings, 'fixedPositioning', self::$fixedPositioning) === TRUE) {
+            $extraClass .= ' fixedPositioning';
+        }
+
+        echo '<div id="'.$id.'" class="'.$class.$extraClass.'">';
         echo '<div class="'.$class.'-arrow"></div>';
 
         echo '<div class="'.$class.'-content">';
