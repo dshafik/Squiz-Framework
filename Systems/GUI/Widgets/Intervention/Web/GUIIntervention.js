@@ -168,6 +168,10 @@ GUIIntervention.prototype = {
                 break;
             }
 
+            var scrollCoords = dfx.getScrollCoords();
+            posX -= scrollCoords['x'];
+            posY -= scrollCoords['y'];
+
             dfx.addClass(element, parts[0]);
             dfx.addClass(element, parts[1]);
             dfx.setStyle(element, 'left', posX + 'px');
