@@ -26,6 +26,7 @@ var UserUserManagerScreen = new function()
     var _usersFolderid = 0;
     var _screenData    = {};
     var _assetTypes    = {};
+    var _reloading     = false;
 
     this.init = function(data) {
         _usersFolderid = data.usersFolderid;
@@ -51,13 +52,14 @@ var UserUserManagerScreen = new function()
 
 
         // Check if template was modified.
-        if (GUI.isTemplateModified() === true) {
+        if (_reloading === false && GUI.isTemplateModified() === true) {
             if (GUI.unloadTemplate(GUI.getCurrentTemplate()) === false) {
                 return false;
             }
         }
 
         GUI.loadContent('User', 'loadUserManagerEditContents', dfx.getId('userManager-editPane'), params, function() {
+            _reloading = false;
             var parentsList = GUI.getWidget('UserManagerScreen-parentsList');
             if (!parentsList) {
                 return;
@@ -117,7 +119,7 @@ var UserUserManagerScreen = new function()
 
         GUI.sendRequest('User', 'createUser', userDetails, function(response) {
             if (response && response.result) {
-                browserWidget.reload();
+                _reloadBrowser();
             }
         });
     };
@@ -138,7 +140,7 @@ var UserUserManagerScreen = new function()
 
         GUI.sendRequest('User', 'createUserGroup', details, function(response) {
             if (response && response.result) {
-                browserWidget.reload();
+                _reloadBrowser();
             }
         });
     };
@@ -157,7 +159,7 @@ var UserUserManagerScreen = new function()
 
             GUI.sendRequest('User', 'addUsersToGroups', params, function(response) {
                 if (response && response.result) {
-                    browserWidget.reload();
+                    _reloadBrowser();
                 }
             });
         });
@@ -262,7 +264,7 @@ var UserUserManagerScreen = new function()
     };
 
     this.saved = function() {
-        GUI.getWidget('userManager-assetBrowser').reload();
+        _reloadBrowser();
     };
 
     var _showAssetPicker = function(callback) {
@@ -279,6 +281,11 @@ var UserUserManagerScreen = new function()
         GUI.loadTemplate('GUIAssetPicker', 'GUIAssetPicker.tpl', templateSettings, function() {
             GUI.getWidget('AssetPicker').setSelectAssetsCallback(callback);
         }, options);
+    };
+
+    var _reloadBrowser = function() {
+        _reloading = true;
+        GUI.getWidget('userManager-assetBrowser').reload();
     };
 
 };

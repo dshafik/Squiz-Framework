@@ -13,28 +13,52 @@
             </widget>
         </div>
         <div id="{className}-infoSection">
-            <div class="{className}-childUserDetails">
-                <div class="{className}-assetIcon"></div> : {groupInfo:childUserCount}
-                <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
-                    <setting name="value"><text>+ New</text></setting>
-                    <setting name="click">UserUserManagerScreen.showCreatePanel('createUser')</setting>
-                </widget>
-                <widget type="GUI/Button" id="UserManagerScreen-addExistingUser">
-                    <setting name="value"><text>+ Existing</text></setting>
-                    <setting name="click">UserUserManagerScreen.addExistingAsset();</setting>
-                </widget>
-            </div>
-            <div class="{className}-childGroupDetails">
-                <div class="{className}-assetIcon"></div> : {groupInfo:childGroupCount}
-                <widget type="GUI/Button" id="UserManagerScreen-addNewGroup">
-                    <setting name="value"><text>+ New</text></setting>
-                    <setting name="click">UserUserManagerScreen.showCreatePanel('createGroup')</setting>
-                </widget>
-                <widget type="GUI/Button" id="UserManagerScreen-addExistingGroup">
-                    <setting name="value"><text>+ Existing</text></setting>
-                    <setting name="click">UserUserManagerScreen.addExistingAsset();</setting>
-                </widget>
-            </div>
+            <widget type="GUI/Box" id="{className}-infoSection-box">
+                <setting name="title"><text>Group Members</text></setting>
+                <setting name="content">
+                    <content>
+                        <div id="{className}-childUserDetailsWrapper">
+                            <div class="{className}-childUserDetails">
+                                <div class="{className}-assetIcon childUserCount"></div><span><text>Users</text>:</span> <span class="{className}-count {className}-count-user">{groupInfo:childUserCount}</span>
+                                <div class="{className}-addMoreText {className}-addMoreText-user" onclick="dfx.toggleClass(dfx.getId('{className}-childUserDetailsWrapper'), 'active')"><span><text>Add More</text></span><div class="{className}-addMoreText-toggle"></div></div>
+                            </div>
+                            <div class="{className}-childButtons" id="{className}-UserButtons">
+                                <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
+                                    <setting name="value"><text>Create New User</text></setting>
+                                    <setting name="colour">Light</setting>
+                                    <setting name="click">UserUserManagerScreen.showCreatePanel('createUser')</setting>
+                                </widget>
+                                &nbsp;
+                                <widget type="GUI/Button" id="UserManagerScreen-addExistingUser">
+                                    <setting name="value"><text>Link Existing</text></setting>
+                                    <setting name="colour">Light</setting>
+                                    <setting name="click">UserUserManagerScreen.addExistingAsset();</setting>
+                                </widget>
+                            </div>
+                        </div>
+
+                        <div id="{className}-childGroupDetailsWrapper">
+                            <div class="{className}-childGroupDetails">
+                                <div class="{className}-assetIcon childGroupCount"></div><span><text>Groups</text>:</span> <span class="{className}-count {className}-count-group">{groupInfo:childGroupCount}</span>
+                                <div class="{className}-addMoreText {className}-addMoreText-group" onclick="dfx.toggleClass(dfx.getId('{className}-childGroupDetailsWrapper'), 'active')"><span><text>Add More</text></span><div class="{className}-addMoreText-toggle"></div></div>
+                            </div>
+                            <div class="{className}-childButtons" id="{className}-GroupButtons">
+                                <widget type="GUI/Button" id="UserManagerScreen-addNewGroup">
+                                    <setting name="value"><text>Create New Group</text></setting>
+                                    <setting name="colour">Light</setting>
+                                    <setting name="click">UserUserManagerScreen.showCreatePanel('createGroup')</setting>
+                                </widget>
+                                &nbsp;
+                                <widget type="GUI/Button" id="UserManagerScreen-addExistingGroup">
+                                    <setting name="value"><text>Link Existing</text></setting>
+                                    <setting name="colour">Light</setting>
+                                    <setting name="click">UserUserManagerScreen.addExistingAsset();</setting>
+                                </widget>
+                            </div>
+                        </div>
+                    </content>
+                </setting>
+            </widget>
 
             <div class="{className}-parentGroups">
                 <h5><text>Belongs to Groups :</text></h5>

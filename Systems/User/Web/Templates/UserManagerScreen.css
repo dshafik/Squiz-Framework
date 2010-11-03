@@ -63,14 +63,69 @@
     height: 10px;
 }
 
-.UserManagerScreen-childUserDetails,
-.UserManagerScreen-childGroupDetails {
-    font-weight: bold;
-    line-height: 32px;
-    border-bottom: 1px solid #CCC;
+.UserManagerScreen-addMoreText {
+    color: #777;
+    float: right;
+    overflow: hidden;
+    cursor: pointer;
 }
 
-#UserManagerScreen-infoSection,
+.UserManagerScreen-childButtons {
+    padding: 10px;
+    border-bottom: 1px solid #CCC;
+    overflow: hidden;
+    background-color: #F7F7F7;
+    text-align: center;
+}
+
+.UserManagerScreen-childButtons {
+    display: none;
+}
+
+#UserManagerScreen-childGroupDetailsWrapper.active .UserManagerScreen-addMoreText-toggle,
+#UserManagerScreen-childUserDetailsWrapper.active .UserManagerScreen-addMoreText-toggle {
+    background-position: 0 -14px;
+}
+
+#UserManagerScreen-childGroupDetailsWrapper.active .UserManagerScreen-childButtons,
+#UserManagerScreen-childUserDetailsWrapper.active .UserManagerScreen-childButtons {
+    display: block;
+}
+
+.UserManagerScreen-childGroupDetails span,
+.UserManagerScreen-childUserDetails span {
+    color: #777;
+}
+
+span.UserManagerScreen-count {
+    font-weight: bold;
+    color: #000;
+}
+
+.UserManagerScreen-addMoreText-toggle {
+    background: url(/__web/Systems/GUI/Web/expander.png) no-repeat 0 0;
+    float: right;
+    height: 14px;
+    margin: 12px 8px 8px;
+    width: 14px;
+}
+
+.UserManagerScreen-childUserDetails,
+.UserManagerScreen-childGroupDetails {
+    line-height: 40px;
+    border-bottom: 1px solid #CCC;
+    background-color: #FFF;
+    padding: 0 5px;
+}
+
+.UserManagerScreen-count-user {
+    margin-left: 20px;
+}
+
+.UserManagerScreen-count-group {
+    margin-left: 13px;
+}
+
 #UserManagerScreen-createSection {
     border-top: 1px solid #DDD;
 }
@@ -98,7 +153,7 @@
 .UserManagerScreen-childUserDetails .UserManagerScreen-assetIcon,
 .UserManagerScreen-childGroupDetails .UserManagerScreen-assetIcon {
     background: url(../../AssetTypes/User/Web/icon_user_s.png) no-repeat 50% 50%;
-    height: 32px;
+    height: 40px;
     width: 36px;
     float: left;
 }
