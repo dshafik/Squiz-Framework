@@ -1310,6 +1310,7 @@ class PatchingActions
         }
 
         $result = json_decode($result['result'], TRUE);
+error_log(var_export($result, 1), 3, '/var/www/mysource4/analytics/error_log');
         $status = $result['result']['status'];
         switch ($status) {
             case 'OK_UPDATES_AVAILABLE':
@@ -1366,9 +1367,11 @@ class PatchingActions
                     $toDownload[$newPatchRevision] = $updates[$newPatchRevision];
                 }
 
+error_log(var_export($toDownload, 1), 3, '/var/www/mysource4/analytics/error_log');
                 foreach ($toDownload as $revision => $info) {
                     $update[$revision] = $info;
                     $status            = Patching::wsDownloadUpdate($info);
+error_log(var_export($status, 1), 3, '/var/www/mysource4/analytics/error_log');
                     if ($status === TRUE) {
                         // Extract the patch and register.
                         $patchName = str_replace('.tar.gz', '', $update[$revision]['filename']);
@@ -1592,6 +1595,9 @@ class PatchingActions
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
         $response = curl_exec($ch);
         $curlinfo = curl_getinfo($ch);
+
+error_log(var_export($response, 1), 3, '/var/www/mysource4/analytics/error_log');
+error_log(var_export($curlinfo, 1), 3, '/var/www/mysource4/analytics/error_log');
         curl_close($ch);
         fclose($fp);
         fclose($hp);
@@ -1608,6 +1614,7 @@ class PatchingActions
             }
         }
 
+error_log(var_export($headers, 1), 3, '/var/www/mysource4/analytics/error_log');
         // Get the current product information.
         $priKeyPath = BaseSystem::getDataDir('SquizSuite').'/privatekey.pem';
         $priKey     = openssl_pkey_get_private('file://'.$priKeyPath);
