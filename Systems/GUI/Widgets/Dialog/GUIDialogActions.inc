@@ -201,7 +201,7 @@ class GUIDialogActions
         echo '<div class="'.$class.'-top">';
         echo '<div class="'.$class.'-title">'.Util::getArrayIndex($settings, 'title', '').'</div>';
         echo '<div class="'.$class.'-subTitle">'.Util::getArrayIndex($settings, 'subTitle', '').'</div>';
-        echo '<div class="'.$class.'-closeIcon" onclick="GUI.getWidget(\''.$id.'\').close(this);"></div>';
+        echo '<div class="'.$class.'-closeIcon '.$id.'-closeIcon" onclick="GUI.getWidget(\''.$id.'\').close(this);"></div>';
         echo '</div>';
 
         // Middle section.
