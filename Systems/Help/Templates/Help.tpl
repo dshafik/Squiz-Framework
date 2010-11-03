@@ -17,6 +17,7 @@
     <setting name="position">fixed</setting>
     <setting name="posRight">25px</setting>
     <setting name="posTop">70px</setting>
+    <setting name="persistent">true</setting>
     <setting name="content">
         <content>
             <div class="Help-controls">
