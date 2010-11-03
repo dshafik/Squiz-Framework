@@ -8,7 +8,7 @@
     <div id="{className}-createUser-wrapper">
         <!-- Group Info section -->
         <div id="{className}-infoSection">
-            <widget type="GUI/Box" id="{className}-infoSection-box">
+            <widget type="GUI/Box" id="UserManagerScreen-infoSection-box">
                 <setting name="title"><text>Group Members</text></setting>
                 <setting name="content">
                     <content>
