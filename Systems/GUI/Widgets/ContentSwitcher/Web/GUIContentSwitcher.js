@@ -175,6 +175,31 @@ GUIContentSwitcher.prototype = {
     {
         this.loadMode(this.current.system, this.current.modeid);
 
+    },
+
+    canSwitch: function(showConfirmMessage)
+    {
+        if (!this.current) {
+            return true;
+        }
+
+        if (GUI.isTemplateModified(this.current.system + ':' + this.current.modeid, true) === true) {
+            if (showConfirmMessage === false) {
+                // Template is modified so the default action is no switch..
+                return false;
+            }
+
+            if (GUI.confirmUnload() === true) {
+                // User clicked cancel so can switch.
+                return true;
+            } else {
+                // User clicked cancel so cannot switch.
+                return false;
+            }
+        }
+
+        return true;
+
     }
 
 }

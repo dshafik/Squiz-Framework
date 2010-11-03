@@ -62,20 +62,22 @@ GUIScreenSwitcher.prototype = {
             var domId      = self.id + '-' + itemId;
 
             dfx.addEvent(dfx.getId(domId), 'click', function(evt) {
-                if (self.current !== null) {
-                    var oldDomId = self.id + '-' + self.current.modeid;
+                var current = self.current;
+                if (self.loadMode(itemSystem, itemId) !== false) {
+                    if (current !== null) {
+                        var oldDomId = self.id + '-' + current.modeid;
 
-                    dfx.removeClass(dfx.getId(oldDomId), 'hover');
-                    dfx.addClass(dfx.getId(oldDomId), 'inactive');
-                    dfx.removeClass(dfx.getId(oldDomId), 'selected');
-                }//end if
+                        dfx.removeClass(dfx.getId(oldDomId), 'hover');
+                        dfx.addClass(dfx.getId(oldDomId), 'inactive');
+                        dfx.removeClass(dfx.getId(oldDomId), 'selected');
+                    }//end if
 
-                dfx.addClass(this, 'selected');
-                dfx.removeClass(this, 'inactive');
-                dfx.removeClass(this, 'hover');
+                    dfx.addClass(this, 'selected');
+                    dfx.removeClass(this, 'inactive');
+                    dfx.removeClass(this, 'hover');
 
-                self.fireItemChangedCallbacks(itemId, itemSystem);
-                self.loadMode(itemSystem, itemId);
+                    self.fireItemChangedCallbacks(itemId, itemSystem);
+                }
             });
 
             dfx.addEvent(dfx.getId(domId), 'mouseover', function(evt) {
@@ -134,12 +136,14 @@ GUIScreenSwitcher.prototype = {
     {
         // Unload the current template and call parent function.
         if (this.current !== null) {
-            GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
+            if (GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid)) === false) {
+                return false;
+            }
         }
 
         GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
         GUIContentSwitcher.prototype.loadMode.call(this, system, modeid);
-
+        return true;
     }
 
 };

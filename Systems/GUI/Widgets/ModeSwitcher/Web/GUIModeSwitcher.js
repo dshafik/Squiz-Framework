@@ -51,7 +51,8 @@ function GUIModeSwitcher(id, settings)
     this.calculateSwitcherWidth(true);
 
     this.addExpandEvent();
-    this.addModeClickEvent();
+
+    this._confirmedSwitch = false;
 
     // Add the inital item template to GUI's template list.
     var itemsCount = settings._items.length;
@@ -292,38 +293,42 @@ GUIModeSwitcher.prototype = {
 
     },
 
-    addModeClickEvent: function()
+    buttonClicked: function(button)
     {
-        var self           = this;
-        var buttons        = dfx.getTag('a', dfx.getId(this.id));
-        var dynamicButtons = this._getDynamicButtons();
-        dfx.addEvent(buttons, 'click', function(e) {
-            var btn = dfx.getMouseEventTarget(e);
-            btn     = btn.parentNode;
-            dfx.removeClass('selected', dynamicButtons);
-            dfx.addClass('selected', btn);
+        var dynamicButtons    = this._getDynamicButtons();
+        this._confirmedSwitch = true;
+        if (this.canSwitch() === false) {
+            return;
+        }
 
-            if (self._isStaticButton(btn) === false) {
-                var index = 0;
-                for (var node = btn.previousSibling; node; node = node.previousSibling) {
-                    if (dfx.isTag(node, 'li') === true) {
-                        index++;
-                    }
+        var btn = button.parentNode;
+        dfx.removeClass('selected', dynamicButtons);
+        dfx.addClass('selected', btn);
+
+        if (this._isStaticButton(btn) === false) {
+            var index = 0;
+            for (var node = btn.previousSibling; node; node = node.previousSibling) {
+                if (dfx.isTag(node, 'li') === true) {
+                    index++;
                 }
-
-                self._lastVisibleButtonIndex = index;
             }
 
-            self.collapse();
-        });
+            this._lastVisibleButtonIndex = index;
+        }
 
+        this.collapse();
+
+        GUIContentSwitcher.prototype.buttonClicked.call(this, button);
     },
 
     loadMode: function(system, modeid)
     {
         // Unload the current template and call parent function.
         if (this.current !== null) {
-            GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid));
+            var forceSwitch = this._confirmedSwitch;
+            if (GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid), forceSwitch) === false) {
+                return false;
+            }
         }
 
         GUI.addTemplate(system + ':' + dfx.ucFirst(modeid));
