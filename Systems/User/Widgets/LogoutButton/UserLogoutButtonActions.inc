@@ -51,7 +51,7 @@ class UserLogoutButtonActions
         $ivContents     = '<p>'._('Are you sure you want to logout?').'</p>';
         $buttonSettings = array(
                            'value'  => _('Logout'),
-                           'click'  => 'window.location=window.location.href.toString() + \'?sq_logout=true\'',
+                           'click'  => 'window.location=dfx.addToQueryString(window.location.href.toString(), {sq_logout: true})',
                            'colour' => 'Dark',
                           );
         $ivContents    .= GUI::createWidget($id.'-ivbuttonYes', 'GUIButton', $buttonSettings);
