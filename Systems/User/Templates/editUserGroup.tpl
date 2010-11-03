@@ -96,23 +96,28 @@
                     <label for="UserManagerScreen-newUser-firstName-input"><text>First Name</text></label>
                     <widget type="GUI/TextBox" id="UserManagerScreen-newUser-firstName">
                         <setting name="size">17</setting>
+                        <setting name="enablesSaveButton">false</setting>
                     </widget>
                 </div>
                 <div class="{className}-col-right">
                     <label for="UserManagerScreen-newUser-lastName-input"><text>Last Name</text></label>
                     <widget type="GUI/TextBox" id="UserManagerScreen-newUser-lastName">
                         <setting name="size">17</setting>
+                        <setting name="enablesSaveButton">false</setting>
                     </widget>
                 </div>
                 <div class="{className}-fieldGap"></div>
                 <label for="UserManagerScreen-newUser-email-input"><text>Email</text></label>
                 <widget type="GUI/TextBox" id="UserManagerScreen-newUser-email">
                     <setting name="size">38</setting>
+                    <setting name="enablesSaveButton">false</setting>
                 </widget>
 
                 <div class="{className}-fieldGap"></div>
                 <label for="UserManagerScreen-newUser-username-input"><text>Username</text></label>
-                <widget type="GUI/TextBox" id="UserManagerScreen-newUser-username" />
+                <widget type="GUI/TextBox" id="UserManagerScreen-newUser-username">
+                    <setting name="enablesSaveButton">false</setting>
+                </widget>
 
                 <div class="{className}-fieldGap"></div>
                 <label for="UserManagerScreen-newUser-password-input"><text>Password</text></label>
@@ -140,6 +145,7 @@
                 <div class="{className}-editFolder-createGroup-col-left">
                     <label for="UserManagerScreen-newGroup-groupName-input"><text>Group Name</text></label>
                     <widget type="GUI/TextBox" id="UserManagerScreen-newGroup-groupName">
+                        <setting name="enablesSaveButton">false</setting>
                         <setting name="size">20</setting>
                     </widget>
                 </div>
@@ -153,3 +159,4 @@
         </div>
     </div>
 </div>
+<div id="userManager-deleteButton" onclick="UserUserManagerScreen.toggleMarkForDeletion();"></div>

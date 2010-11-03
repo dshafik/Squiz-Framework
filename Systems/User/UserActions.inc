@@ -449,7 +449,10 @@ class UserActions
         if (empty($orphanedUsers) === FALSE) {
             foreach ($orphanedUsers as $assetid) {
                 if (Asset::isAssetid($assetid) === TRUE && $assetid > 0) {
-                    Asset::delete($assetid);
+                    $users = User::getSuperUsers($assetid, TRUE);
+                    if (empty($users) === TRUE) {
+                        Asset::delete($assetid);
+                    }
                 }
             }
 
@@ -1128,7 +1131,7 @@ class UserActions
         $types = Asset::getTypeOfAsset($children);
 
         foreach ($children as $child) {
-            $iconPath = Asset::getTypeIconPath($types[$child]);
+            $iconPath = Asset::getTypeIconPath(Util::getArrayIndex($types, $child, 'asset'));
 
             // If this child is a user folder then get info from usersFolder array.
             $class = 'UserManagerScreen';
@@ -1497,11 +1500,27 @@ class UserActions
         }
 
         try {
+            Channels::includeSystem('Attribute');
+
             DAL::beginTransaction();
             $assetType = Util::getArrayIndex($tplData, 'assetType');
             $assetid   = Util::getArrayIndex($tplData, 'assetid');
+            $deleted   = Util::getArrayIndex($tplData, 'deleted');
 
-            Channels::includeSystem('Attribute');
+            if ($deleted === TRUE) {
+                Channels::includeSystem('Asset');
+                if (Asset::isAssetid($assetid) === TRUE && $assetid > 0) {
+                    $users = User::getSuperUsers($assetid, TRUE);
+                    if (empty($users) === TRUE) {
+                        Asset::delete($assetid);
+                    } else {
+                        return array('errors' => _('Cannot remove a Super User'));
+                    }
+                }
+
+                return array('success' => TRUE);
+            }
+
             switch ($assetType) {
                 case 'user':
                     // Save user details.

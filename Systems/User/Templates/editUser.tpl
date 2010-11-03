@@ -98,3 +98,4 @@
         </div>
     </div>
 </div>
+<div id="userManager-deleteButton" onclick="UserUserManagerScreen.toggleMarkForDeletion();"></div>

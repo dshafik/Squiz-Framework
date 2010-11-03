@@ -162,6 +162,32 @@ span.UserManagerScreen-count {
     background-image: url(../../AssetTypes/UserGroup/Web/icon_userGroup_s.png);
 }
 
+#userManager-deleteButton {
+    background: url(/__web/Systems/GUI/Web/delete.png) no-repeat 0 0;
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    right: 50px;
+    top: 70px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+#UserManagerScreen-deleteOverlay {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    background: url(/__web/Systems/GUI/Web/delete_overlay.png);
+    z-index: 1;
+    left: 0;
+    top: 0;
+    -moz-border-radius: 0 9px 9px 0;
+}
+
+#userManager-deleteButton.deleted {
+    background-position: 0 -16px;
+}
+
 .UserManagerScreen-editUser-top,
 .UserManagerScreen-editFolder-top,
 .UserManagerScreen-editUserGroup-top {

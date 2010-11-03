@@ -183,7 +183,26 @@ var UserUserManagerScreen = new function()
 
            groupsList.generateItems(itemsData);
         });
-    },
+    };
+
+    this.toggleMarkForDeletion = function() {
+        var id    = 'UserManagerScreen-deleteOverlay';
+        var delEl = dfx.getId(id);
+        if (!delEl) {
+            // Add delete overlay.
+            var del = document.createElement('div');
+            del.id  = id;
+
+            dfx.getId('userManager-editPane').appendChild(del);
+            dfx.addClass(dfx.getId('userManager-deleteButton'), 'deleted');
+        } else {
+            dfx.remove(delEl);
+            dfx.removeClass(dfx.getId('userManager-deleteButton'), 'deleted');
+        }
+
+        GUI.setModified('User::UserManagerScreen', true);
+
+    };
 
     this.resetPassword = function() {
         var elem   = dfx.getId('UserManagerScreen-editExistingUser-resetPasswordBox');
@@ -227,35 +246,39 @@ var UserUserManagerScreen = new function()
         var assetType = dfx.attr(editorPanel, 'assetType');
         var assetid   = GUI.getWidget('userManager-assetBrowser').getValue().pop();
 
-        switch (assetType) {
-            case 'user':
-                idPrefix           += '-editUser-existingUser';
-                saveData.first_name = GUI.getWidget(idPrefix + '-firstName').getValue();
-                saveData.last_name  = GUI.getWidget(idPrefix + '-lastName').getValue();
-                saveData.email      = GUI.getWidget(idPrefix + '-email').getValue();
-                saveData.username   = GUI.getWidget(idPrefix + '-username').getValue();
-                saveData.status     = GUI.getWidget(idPrefix + '-toggleStatus').getValue();
-                saveData.parents    = GUI.getWidget('UserManagerScreen-parentsList').getValue();
-                saveData.password   = GUI.getWidget(idPrefix + '-password').getValue();
-            break;
+        if (dfx.getId('UserManagerScreen-deleteOverlay')) {
+            saveData.deleted = true;
+        } else {
+            switch (assetType) {
+                case 'user':
+                    idPrefix           += '-editUser-existingUser';
+                    saveData.first_name = GUI.getWidget(idPrefix + '-firstName').getValue();
+                    saveData.last_name  = GUI.getWidget(idPrefix + '-lastName').getValue();
+                    saveData.email      = GUI.getWidget(idPrefix + '-email').getValue();
+                    saveData.username   = GUI.getWidget(idPrefix + '-username').getValue();
+                    saveData.status     = GUI.getWidget(idPrefix + '-toggleStatus').getValue();
+                    saveData.parents    = GUI.getWidget('UserManagerScreen-parentsList').getValue();
+                    saveData.password   = GUI.getWidget(idPrefix + '-password').getValue();
+                break;
 
-            case 'userGroup':
-                idPrefix        += '-editUserGroup';
-                saveData.name    = GUI.getWidget(idPrefix + '-groupName').getValue();
-                saveData.parents = GUI.getWidget('UserManagerScreen-parentsList').getValue();
-            break;
+                case 'userGroup':
+                    idPrefix        += '-editUserGroup';
+                    saveData.name    = GUI.getWidget(idPrefix + '-groupName').getValue();
+                    saveData.parents = GUI.getWidget('UserManagerScreen-parentsList').getValue();
+                break;
 
-            default:
-                // Check if there is a implementer for this type.
-                if (!_screenData[assetType]) {
-                    GUI.message('developer', 'Failed to get asset type from editor panel', 'warning');
-                    return null;
-                } else {
-                    var objName = _screenData[assetType].jsObjectName;
-                    saveData    = window[objName].getValue(assetType);
-                }
-            break;
-        }//end switch
+                default:
+                    // Check if there is a implementer for this type.
+                    if (!_screenData[assetType]) {
+                        GUI.message('developer', 'Failed to get asset type from editor panel', 'warning');
+                        return null;
+                    } else {
+                        var objName = _screenData[assetType].jsObjectName;
+                        saveData    = window[objName].getValue(assetType);
+                    }
+                break;
+            }//end switch
+        }//end if
 
         saveData.assetType = assetType;
         saveData.assetid   = assetid;
@@ -284,6 +307,9 @@ var UserUserManagerScreen = new function()
     };
 
     var _reloadBrowser = function() {
+        var template = GUI.getCurrentTemplate();
+        GUI.setModified(template, false);
+
         _reloading = true;
         GUI.getWidget('userManager-assetBrowser').reload();
     };
