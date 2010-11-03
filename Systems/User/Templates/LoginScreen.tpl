@@ -18,12 +18,14 @@
                 <p id="LoginError" class="error">&nbsp;</p>
                 <label for="loginName-input"><text>Username</text></label>
                 <widget type="GUI/TextBox" id="loginName">
+                    <setting name="requiresSave">false</setting>
                     <setting name="focus">true</setting>
                 </widget>
                 <br />
                 <label for="loginPassword-input"><text>Password</text></label>
                 <widget type="GUI/TextBox" id="loginPassword">
                     <setting name="type">password</setting>
+                    <setting name="requiresSave">false</setting>
                 </widget>
                 <p>
                     <widget type="GUI/Button" id="LoginSubmitButton">
