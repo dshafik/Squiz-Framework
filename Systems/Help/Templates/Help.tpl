@@ -29,6 +29,7 @@
                 <a href="javascript:void(0);" onclick="Help.general();" class="Help-control-button general" title="{generalButtonTitle}"></a>
                 <widget id="Help-search" type="GUI/TextBox">
                     <setting name="size">20</setting>
+                    <setting name="requiresSave">false</setting>
                     <setting name="hint"><text>Search...</text></setting>
                 </widget>
                 <dataProvider action="Help::getSystemsMenu" />
