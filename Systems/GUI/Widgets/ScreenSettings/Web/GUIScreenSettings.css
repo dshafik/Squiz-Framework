@@ -11,7 +11,7 @@
     padding: 13px;
     background-image: -moz-linear-gradient(0% 0 -90deg, #F6F6F6, #AAA);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F6F6F6), to(#AAA));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F6F6F6, endColorstr=#AAA);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F6F6F6, endColorstr=#AAAAAA);
 }
 
 .GUIScreenSettings-title-value {
@@ -30,7 +30,7 @@
     padding: 0 10px;
     background-image: -moz-linear-gradient(0% 0 -90deg, #F6F6F6, #BBB);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F6F6F6), to(#BBB));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F6F6F6, endColorstr=#BBB);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F6F6F6, endColorstr=#BBBBBB);
     line-height: 23px;
     font-size: 13px;
 }

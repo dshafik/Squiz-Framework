@@ -28,7 +28,7 @@
     overflow: hidden;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #2C2C2C), color-stop(50%, #000));
     background-image: -moz-linear-gradient(top, #2C2C2C 15%, #000 50%);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#2C2C2C, endColorstr=#000);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#2C2C2C, endColorstr=#000000);
     -moz-border-radius-topright: 0;
     -moz-border-radius-bottomright: 0;
     border-top-right-radius: 0;

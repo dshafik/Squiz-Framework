@@ -97,14 +97,14 @@ button.buttonNew {
     background-color: #282828;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #2C2C2C), color-stop(50%, #000));
     background-image: -moz-linear-gradient(top, #2C2C2C 15%, #000 50%);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#2C2C2C, endColorstr=#000);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#2C2C2C, endColorstr=#000000);
     -webkit-box-shadow: rgba(0,0,0,1) 0px 0px 3px inset;
     -moz-box-shadow: rgba(0,0,0,1) 0px 0px 3px inset;
 }
 button.buttonNew:hover {
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #3d3d3d), color-stop(50%, #111));
     background-image: -moz-linear-gradient(top, #3d3d3d 15%, #111 50%);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#3d3d3d, endColorstr=#111);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#3d3d3d, endColorstr=#111111);
 }
 button.buttonNew span {
     padding-right: 20px;
