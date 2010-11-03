@@ -136,7 +136,7 @@ GUIScreenSwitcher.prototype = {
     {
         // Unload the current template and call parent function.
         if (this.current !== null) {
-            if (GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid)) === false) {
+            if (this.canSwitch() === false || GUI.unloadTemplate(this.current.system + ':' + dfx.ucFirst(this.current.modeid), true) === false) {
                 return false;
             }
         }

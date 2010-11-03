@@ -584,7 +584,10 @@ var GUI = new function()
                 _modifiedWidgets[widget.id] = true;
 
                 // Set the template of this widget as modified as well.
-                _modifiedTemplates[widget.settings.template.system + ':' + widget.settings.template.name] = true;
+                // And add it to the lineage since it requires a save.
+                var newTemplate = widget.settings.template.system + ':' + widget.settings.template.name;
+                _modifiedTemplates[newTemplate] = true;
+                this.addTemplate(newTemplate);
             } else if (_modifiedWidgets[widget.id] === true) {
                 delete _modifiedWidgets[widget.id];
             }
