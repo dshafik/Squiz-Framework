@@ -9,13 +9,26 @@
 
     <div id="{className}-createUser-wrapper">
         <div id="{className}-infoSection">
-            <div class="{className}-childUserDetails">
-                <div class="{className}-assetIcon ldapConnectionCount"></div> : {groupInfo:childGroupCount}
-                <widget type="GUI/Button" id="UserManagerScreen-addNewLDAPConnection">
-                    <setting name="value"><text>+ New Connection</text></setting>
-                    <setting name="click">UserUserManagerScreen.showCreatePanel('createLDAPConnection');</setting>
-                </widget>
-            </div>
+          <widget type="GUI/Box" id="UserManagerScreen-infoSection-box">
+                <setting name="title"><text>LDAP Connections</text></setting>
+                <setting name="content">
+                    <content>
+                        <div id="{className}-childUserDetailsWrapper">
+                            <div class="{className}-ldapConnectionDetails {className}-childUserDetails">
+                                <div class="{className}-assetIcon ldapConnectionCount"></div><span><text>LDAP Connections</text>:</span> <span class="{className}-count {className}-count-ldapConnections">{groupInfo:childGroupCount}</span>
+                                <div class="{className}-addMoreText {className}-addMoreText-ldapConnection" onclick="dfx.toggleClass(dfx.getId('{className}-childUserDetailsWrapper'), 'active')"><span><text>Add More</text></span><div class="{className}-addMoreText-toggle"></div></div>
+                            </div>
+                            <div class="{className}-childButtons" id="{className}-LDAPConnectionButtons">
+                                <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
+                                    <setting name="value"><text>Create New Connection</text></setting>
+                                    <setting name="colour">Light</setting>
+                                    <setting name="click">UserUserManagerScreen.showCreatePanel('createLDAPConnection')</setting>
+                                </widget>
+                            </div>
+                        </div>
+                    </content>
+                </setting>
+            </widget>
         </div>
         <div id="{className}-createSection" class="UserManagerScreen-createPanel">
             <div id="UserManagerScreen-createLDAPConnection" style="display:none;" class="UserManagerScreen-createPanel">

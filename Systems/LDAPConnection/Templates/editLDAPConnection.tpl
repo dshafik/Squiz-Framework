@@ -154,3 +154,4 @@
         </widget>
     </div>
 </div>
+<div id="userManager-deleteButton" class="userManager-deleteButton-ldapConnection" onclick="UserUserManagerScreen.toggleMarkForDeletion();"></div>
