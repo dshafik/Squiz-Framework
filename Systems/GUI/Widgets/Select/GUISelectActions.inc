@@ -45,11 +45,25 @@ class GUISelectActions
     protected static $options;
 
     /**
-     * Custom class for the select widget. 
+     * Custom class for the select widget.
      *
      * @var string
      */
     protected static $customClass;
+
+    /**
+     * If FALSE the Save button will not be enabled when widget value is changed.
+     *
+     * @var boolean
+     */
+    protected static $enablesSaveButton = TRUE;
+
+    /**
+     * If FALSE the GUI.setModified method will not be called when value is changed.
+     *
+     * @var boolean
+     */
+    protected static $requiresSave = TRUE;
 
 
     /**
@@ -83,6 +97,10 @@ class GUISelectActions
         GUISelect::paintItems($settings);
 
         echo '</select>';
+
+        // Set default settings for requiresSave and enablesSaveButton.
+        $settings['requiresSave']      = Util::getArrayIndex($settings, 'requiresSave', self::$requiresSave);
+        $settings['enablesSaveButton'] = Util::getArrayIndex($settings, 'enablesSaveButton', self::$enablesSaveButton);
 
         return $settings;
 

@@ -111,7 +111,7 @@ GUISelect.prototype = {
         if (self.currentValue !== newValue) {
             self.currentValue = newValue;
             selectBox.setSelectedItems(newValue);
-            GUI.setModified(self, true);
+            self._setModified(true);
 
             self.fireChangeCallbacks(newValue, domEvent);
         }
@@ -121,7 +121,22 @@ GUISelect.prototype = {
     revert: function()
     {
         this.setValue(this.settings.selected);
-        GUI.setModified(self, false);
+        GUI.setModified(this, false);
+    },
+
+    _setModified: function(status)
+    {
+        // If this widget does not require save then there is no reason to call setModified.
+        if (this.settings.requiresSave === false) {
+            return;
+        }
+
+        if (this.settings.enablesSaveButton === false) {
+            GUI.setModified(this, status, true);
+        } else {
+            GUI.setModified(this, status, false);
+        }
+
     }
 
 };
