@@ -46,24 +46,29 @@
                 <div class="{className}-col-left">
                     <label for="UserManagerScreen-newUser-firstName-input"><text>First Name</text></label>
                     <widget type="GUI/TextBox" id="UserManagerScreen-newUser-firstName">
+                        <setting name="enablesSaveButton">false</setting>
                         <setting name="size">17</setting>
                     </widget>
                 </div>
                 <div class="{className}-col-right">
                     <label for="UserManagerScreen-newUser-lastName-input"><text>Last Name</text></label>
                     <widget type="GUI/TextBox" id="UserManagerScreen-newUser-lastName">
+                        <setting name="enablesSaveButton">false</setting>
                         <setting name="size">17</setting>
                     </widget>
                 </div>
                 <div class="{className}-fieldGap"></div>
                 <label for="UserManagerScreen-newUser-email-input"><text>Email</text></label>
                 <widget type="GUI/TextBox" id="UserManagerScreen-newUser-email">
+                    <setting name="enablesSaveButton">false</setting>
                     <setting name="size">38</setting>
                 </widget>
 
                 <div class="{className}-fieldGap"></div>
                 <label for="UserManagerScreen-newUser-username-input"><text>Username</text></label>
-                <widget type="GUI/TextBox" id="UserManagerScreen-newUser-username" />
+                <widget type="GUI/TextBox" id="UserManagerScreen-newUser-username">
+                    <setting name="enablesSaveButton">false</setting>
+                </widget>
 
                 <div class="{className}-fieldGap"></div>
                 <label for="UserManagerScreen-newUser-password-input"><text>Password</text></label>
@@ -92,6 +97,7 @@
                     <label for="UserManagerScreen-newGroup-groupName-input"><text>Group Name</text></label>
                     <widget type="GUI/TextBox" id="UserManagerScreen-newGroup-groupName">
                         <setting name="size">20</setting>
+                        <setting name="enablesSaveButton">false</setting>
                     </widget>
                 </div>
                 <div class="{className}-editFolder-addToOtherGroup">

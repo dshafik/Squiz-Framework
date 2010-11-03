@@ -49,6 +49,14 @@ var UserUserManagerScreen = new function()
             assetid: assetid
         };
 
+
+        // Check if template was modified.
+        if (GUI.isTemplateModified() === true) {
+            if (GUI.unloadTemplate(GUI.getCurrentTemplate()) === false) {
+                return false;
+            }
+        }
+
         GUI.loadContent('User', 'loadUserManagerEditContents', dfx.getId('userManager-editPane'), params, function() {
             var parentsList = GUI.getWidget('UserManagerScreen-parentsList');
             if (!parentsList) {
