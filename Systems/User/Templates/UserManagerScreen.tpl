@@ -50,7 +50,7 @@
 <widget type="GUI/Intervention" id="UserManagerScreen-lastLinkIntervention-user">
     <setting name="elementContents">
         <content>
-            <p><text>This is the last remaining location for this user. Removing this link will remove them from the system. Are you sure you want to do this?</text></p>
+            <p><text>This is the last remaining location for this user. Removing this link will remove the user from the system. Are you sure you want to do this?</text></p>
             <widget type="GUI/Button" id="UserManagerScreen-lastLinkIntervention-ok">
                 <setting name="value"><text>Remove</text></setting>
                 <setting name="colour">Dark</setting>
