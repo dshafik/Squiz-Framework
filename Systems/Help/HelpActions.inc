@@ -248,9 +248,9 @@ class HelpActions
             $contents .= '</head><body class="Help-iframe pageNotFound">';
 
             ob_start();
-            $msg = _('There are no help articles for the screen that you are currently viewing.');
-            Help::printMessageBox($msg, '', 'info', TRUE);
-            $contents .= ob_get_contents();
+                $msg = _('There are no help articles for the screen that you are currently viewing.');
+                Help::printMessageBox($msg, '', 'info', TRUE);
+                $contents .= ob_get_contents();
             ob_end_clean();
 
             $contents .= '</html></body>';
@@ -297,7 +297,7 @@ class HelpActions
                         $msg = _('In order to understand this article, please perform the following steps');
                         ob_start();
                             self::_printStepsBox($msg, _('Hide this message'), $steps);
-                        $boxContent = ob_get_contents();
+                            $boxContent = ob_get_contents();
                         ob_end_clean();
                         $contents = str_replace('<h1', $boxContent.'<h1', $contents);
                     }
@@ -378,6 +378,8 @@ class HelpActions
             } else {
                 // Search for each class name individually.
                 $pipedClasses   = str_replace(' ', '|', $className);
+                $pipedClasses   = ltrim($pipedClasses, '|');
+                $pipedClasses   = rtrim($pipedClasses, '|');
                 $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\".*('.$pipedClasses.').*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
                 $contentResults = array();
                 exec($cmd, $contentResults);
@@ -1099,7 +1101,7 @@ class HelpActions
         } else if ($summaryTags->length === 1) {
             $summary = trim($summaryTags->item(0)->nodeValue);
         } else {
-            //throw new ChannelException(sprintf(_('Article must have a summary tag: %s.'), $articleFile));
+            // throw new ChannelException(sprintf(_('Article must have a summary tag: %s.'), $articleFile));
         }
 
         $screenTitle     = '';
@@ -1920,8 +1922,8 @@ class HelpActions
             ) {
                 foreach ($templateArticles[strtolower($section)] as $title => $info) {
                     ob_start();
-                    Help::getPage($info['id']);
-                    $contents .= ob_get_contents();
+                        Help::getPage($info['id']);
+                        $contents .= ob_get_contents();
                     ob_clean();
                 }
             } else {
