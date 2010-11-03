@@ -67,6 +67,7 @@ class UserLogoutButtonActions
                        'targetElementid'  => $id,
                        'elementContents'  => $ivContents,
                        'fixedPositioning' => TRUE,
+                       'persistent'       => TRUE,
                       );
         echo GUI::createWidget($id.'-intervention', 'GUIIntervention', $ivSettings);
 
