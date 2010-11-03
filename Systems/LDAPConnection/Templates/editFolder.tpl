@@ -19,7 +19,7 @@
                                 <div class="{className}-addMoreText {className}-addMoreText-ldapConnection" onclick="dfx.toggleClass(dfx.getId('{className}-childUserDetailsWrapper'), 'active')"><span><text>Add More</text></span><div class="{className}-addMoreText-toggle"></div></div>
                             </div>
                             <div class="{className}-childButtons" id="{className}-LDAPConnectionButtons">
-                                <widget type="GUI/Button" id="UserManagerScreen-addNewUser">
+                                <widget type="GUI/Button" id="UserManagerScreen-addNewLDAPConnection">
                                     <setting name="value"><text>Create New Connection</text></setting>
                                     <setting name="colour">Light</setting>
                                     <setting name="click">UserUserManagerScreen.showCreatePanel('createLDAPConnection')</setting>
