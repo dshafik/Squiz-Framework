@@ -2005,15 +2005,7 @@ error_log(var_export($headers, 1), 3, '/var/www/mysource4/analytics/error_log');
                                      'colContent' => $scheduleMsg,
                                     ),
                       );
-        } else {
-            $noPatMsg = _('No updates are available');
-            $rows[]   = array(
-                         'patchId' => array(
-                                       'colspan'    => 4,
-                                       'colContent' => $noPatMsg,
-                                      ),
-                        );
-        }//end if
+        }
 
         $expander = '<span class="PatchingScreen-expander">&nbsp;</span>';
         foreach ($patches as $patch) {

@@ -28,7 +28,7 @@
                                 <value>
                                     <content>
                                         <div class="PatchingScreen-activateWrap">
-                                            <span><text>Demo System</text></span>
+                                            <span class="PatchingScreen-systemid"><text>Demo System</text></span>
                                             <widget type="GUI/Button" id="PatchingScreen-activateDemoBtn">
                                                 <setting name="value"><text>Activate Demo</text></setting>
                                                 <setting name="click"><![CDATA[PatchingPatchingScreen.toggleActivation()]]></setting>
@@ -154,11 +154,11 @@
                     <id>newUpdates</id>
                     <label><text>New Updates</text></label>
                     <itemContent>
-                        <!--text>No updates are available</text-->
                         <widget type="GUI/Table" id="newUpdates-table">
                             <setting name="alternate">false</setting>
                             <setting name="allowDelete">false</setting>
                             <setting name="hideHeader">false</setting>
+                            <setting name="noItemsMsg"><text>No updates are available</text></setting>
                             <setting name="columns">
                                 <patchId>
                                     <name><text>Patch ID</text></name>
@@ -183,11 +183,11 @@
                     <id>installedUpdates</id>
                     <label><text>Installed Updates</text></label>
                     <itemContent>
-                        <!--text>No updates have been installed</text-->
                         <widget type="GUI/Table" id="installedUpdates-table">
                             <setting name="alternate">false</setting>
                             <setting name="allowDelete">false</setting>
                             <setting name="hideHeader">false</setting>
+                            <setting name="noItemsMsg"><text>No updates have been installed</text></setting>
                             <setting name="columns">
                                 <patchId>
                                     <name><text>Patch ID</text></name>

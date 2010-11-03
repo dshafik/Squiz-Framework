@@ -49,13 +49,15 @@ var PatchingPatchingScreen = new function()
             self.hideRecipients();
         }
 
-        this._notifyToggleBtn.addToggleOnCallback(function(e) {
-            self.showRecipients();
-        });
+        if (this._notifyToggleBtn) {
+            this._notifyToggleBtn.addToggleOnCallback(function(e) {
+                self.showRecipients();
+            });
 
-        this._notifyToggleBtn.addToggleOffCallback(function(e) {
-            self.hideRecipients();
-        });
+            this._notifyToggleBtn.addToggleOffCallback(function(e) {
+                self.hideRecipients();
+            });
+        }
 
         if (this._notify === false && this._notificationRecipients.length > 0) {
             this.hideRecipients();

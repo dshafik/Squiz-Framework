@@ -56,7 +56,7 @@ div.PatchingScreen-activateWrap span.PatchingScreen-subscriptionInfo {
     float: right;
 }
 
-div.PatchingScreen-activateWrap span {
+div.PatchingScreen-activateWrap span.PatchingScreen-systemid {
     float: left;
     margin-top: 5px;
 }
