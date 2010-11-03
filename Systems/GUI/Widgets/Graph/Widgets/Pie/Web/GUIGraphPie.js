@@ -34,15 +34,18 @@ GUIGraphPie.prototype = {
         // Attach the API user token to the URL, and replace the tag with
         // one with the new URL. (Simply updating the 'data' tag does not work in
         // Webkit.)
-        var objectTag      = dfx.getId(this.id);
-        var container      = objectTag.parentNode;
-        var objectTagClone = dfx.cloneNode(objectTag);
+        var container = dfx.getId(this.id + '-container');
 
-        var url = sfapi.attachTokenToURL(dfx.attr(objectTag, 'tempurl'));
-        dfx.attr(objectTagClone, 'data', url);
+        var objectTag = document.createElement('object');
+        dfx.attr(objectTag, 'id', this.id);
+        dfx.attr(objectTag, 'type', 'image/svg+xml');
+        dfx.setStyle(objectTag, 'width', this.settings.size + 'px');
+        dfx.setStyle(objectTag, 'height', this.settings.size + 'px');
 
-        dfx.remove(objectTag);
-        dfx.prepend(container, objectTagClone);
+        var url = sfapi.attachTokenToURL(dfx.attr(container, 'tempurl'));
+        dfx.attr(objectTag, 'data', url);
+
+        dfx.prepend(container, objectTag);
 
     }
 };

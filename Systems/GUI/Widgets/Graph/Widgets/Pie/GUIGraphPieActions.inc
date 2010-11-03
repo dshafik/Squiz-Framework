@@ -181,8 +181,8 @@ class GUIGraphPieActions
         $params['fileName'] = $baseName;
         $url = Web::appendQueryString($params, $url);
 
-        echo '<span class="GUIGraphPie-container" id="'.$settings['widget']['id'].'-container">';
-        echo '<object tempurl="'.$url.'"';
+        echo '<span class="GUIGraphPie-container" id="'.$settings['widget']['id'].'-container" tempurl="'.$url.'">';
+        echo '<span tempurl="'.$url.'"';
         echo ' style="width: '.$size.'px; height: '.$size.'px;"';
         echo ' type="image/svg+xml" id="'.$settings['widget']['id'].'">'."\n";
         echo '</object>'."\n";
@@ -405,6 +405,7 @@ class GUIGraphPieActions
     public static function getSVGContents($fileName)
     {
         // Generate a new random file name.
+        Web::header('connection', 'close');
         $fileDir  = BaseSystem::getDataDir('GUIGraphPie').'/svg-temp';
         $fileName = $fileDir.'/'.$fileName.'.svg';
 
