@@ -110,7 +110,7 @@ GUITextBox.prototype = {
         if (value !== textBox.value) {
             // Only do something if the value is different from the current value.
             textBox.value = value;
-            self._setModified(true);
+            this._setModified(true);
         }
 
     },
