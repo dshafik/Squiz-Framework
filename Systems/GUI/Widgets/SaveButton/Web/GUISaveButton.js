@@ -60,12 +60,31 @@ GUISaveButton.prototype = {
         GUI.addModifiedCallback(function(widgetid, modified) {
             if (modified === true) {
                 self.enable();
+            } else if (self._canDisable() === true) {
+                self.disable();
             }
         });
 
         GUI.addRevertedCallback(function() {
             self.disable();
         });
+
+        GUI.addTemplateRemovedCallback(function() {
+            if (self._canDisable() === true) {
+                self.disable();
+            }
+        });
+
+    },
+
+    _canDisable: function()
+    {
+        // Check if there are modifed templates or widgets.
+        if (GUI.hasModifiedTemplates() === false && GUI.hasModifiedWidgets() === false) {
+            return true;
+        }
+
+        return false;
 
     },
 

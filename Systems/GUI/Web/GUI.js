@@ -83,6 +83,10 @@ var GUI = new function()
             return true;
         }
 
+        if (_modifiedWidgets[id]) {
+            delete _modifiedWidgets[id];
+        }
+
         return false;
     };
 
@@ -206,8 +210,15 @@ var GUI = new function()
         return true;
     };
 
-    this.confirmUnload = function()
-    {
+    this.hasModifiedTemplates = function() {
+        return !dfx.isEmpty(GUI._modifiedTemplates);
+    };
+
+    this.hasModifiedWidgets = function() {
+        return !dfx.isEmpty(GUI._modifiedWidgets);
+    };
+
+    this.confirmUnload = function() {
         var msg = 'You have unsaved changes.\n\nPress OK to continue and lose these changes or Cancel to stay on the current screen.';
         return confirm(msg);
     };
