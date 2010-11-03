@@ -168,15 +168,14 @@ class GUITextBoxActions
         $hint      = Util::getArrayIndex($settings, 'hint', self::$hint);
         $usingHint = FALSE;
         $value     = trim($value);
-
-        if (empty($value) === TRUE) {
+        if ($value === self::$defaultValue) {
             $value = Util::getArrayIndex(
                 $settings,
                 'defaultValue',
                 self::$defaultValue
             );
 
-            if (empty($value) === TRUE && empty($hint) === FALSE) {
+            if ($value === self::$defaultValue && empty($hint) === FALSE) {
                 $value     = $hint;
                 $usingHint = TRUE;
             }
