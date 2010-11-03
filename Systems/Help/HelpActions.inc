@@ -1100,8 +1100,6 @@ class HelpActions
             throw new ChannelException(sprintf(_('Article has more than 1 summary tag: %s.'), $articleFile));
         } else if ($summaryTags->length === 1) {
             $summary = trim($summaryTags->item(0)->nodeValue);
-        } else {
-            // throw new ChannelException(sprintf(_('Article must have a summary tag: %s.'), $articleFile));
         }
 
         $screenTitle     = '';
@@ -1921,10 +1919,15 @@ class HelpActions
                 && count($templateArticles[strtolower($section)]) === 1
             ) {
                 foreach ($templateArticles[strtolower($section)] as $title => $info) {
-                    ob_start();
-                        Help::getPage($info['id']);
-                        $contents .= ob_get_contents();
-                    ob_clean();
+                    $pageContents = Help::getPage($info['id']);
+
+                    // Get everything between first H1 to closing body tag..
+                    $h1Pos        = strpos($pageContents, '<h1>');
+                    $endBodyPos   = strpos($pageContents, '</body>');
+                    $pageContents = substr($pageContents, $h1Pos, ($endBodyPos - $h1Pos));
+
+                    // Add the sub page to main page contents.
+                    $contents .= '<br />'.$pageContents;
                 }
             } else {
                 $contents .= '<h2>'.$section.'</h2>';
@@ -1934,8 +1937,8 @@ class HelpActions
                 }
 
                 $contents .= '</ul>';
-            }
-        }
+            }//end if
+        }//end foreach
 
         $contents .= '</div>';
 
