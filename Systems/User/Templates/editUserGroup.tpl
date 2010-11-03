@@ -159,4 +159,4 @@
         </div>
     </div>
 </div>
-<div id="userManager-deleteButton" onclick="UserUserManagerScreen.toggleMarkForDeletion();"></div>
+<div id="userManager-deleteButton" class="userManager-deleteButton-group" onclick="UserUserManagerScreen.toggleMarkForDeletion();"></div>
