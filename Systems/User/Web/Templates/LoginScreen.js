@@ -109,7 +109,8 @@ var UserLoginScreen = new function()
         dfx.setStyle(buttonSpan, 'visibility', 'hidden');
         var spinner = document.createElement('img');
         spinner.src = '/__web/Systems/User/Web/Templates/save_inact.gif';
-        dfx.setStyle(spinner, 'margin-top', '-16px');
+        dfx.setStyle(spinner, 'top', '-15px');
+        dfx.setStyle(spinner, 'position', 'relative');
         button.appendChild(spinner);
     }
 
