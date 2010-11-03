@@ -416,6 +416,43 @@ var GUI = new function()
         this.fireReloadTemplateCallbacks(template);
     };
 
+    this.getTemplateWidgetValues = function(templateid)
+    {
+        var self   = this;
+        var values = {};
+        var isEmpty = true;
+
+        // Template it self may have a getValue function.
+        // The templateData variable is a reserved var.
+        var tplSystemName   = templateid.split(':')[0];
+        var tplTemplateName = templateid.split(':')[1];
+        var tplClassName    = tplSystemName + tplTemplateName;
+
+        if (window[tplClassName] && window[tplClassName].getValue) {
+            values.templateData = window[tplClassName].getValue();
+            isEmpty = false;
+        }
+
+        dfx.foreach(this.widgetTemplates[templateid], function(widgetid) {
+            var widget = self.getWidget(widgetid);
+            if (!widget || !widget.getValue) {
+                // Invalid object ref. or widget has no getValue function.
+                return;
+            }
+
+            isEmpty = false;
+            values[widgetid] = widget.getValue();
+            return true;
+        });
+
+        if (isEmpty === true) {
+            return null;
+        }
+
+        return values;
+
+    };
+
     this.save = function() {
         // Show loader.
         GUI.queueOverlay({
@@ -430,32 +467,8 @@ var GUI = new function()
         // Retrieve the save values in reverse order.
         for (var i = (ln - 1); i >= 0; i--) {
             var template     = this.templateLineage[i];
-            var isEmpty      = true;
-            values[template] = {};
-
-            // Template it self may have a getValue function.
-            // The templateData variable is a reserved var.
-            var tplSystemName   = template.split(':')[0];
-            var tplTemplateName = template.split(':')[1];
-            var tplClassName    = tplSystemName + tplTemplateName;
-
-            if (window[tplClassName] && window[tplClassName].getValue) {
-                values[template].templateData = window[tplClassName].getValue();
-                isEmpty = false;
-            }
-
-            dfx.foreach(self.widgetTemplates[template], function(widgetid) {
-                var widget = self.getWidget(widgetid);
-                if (!widget || !widget.getValue) {
-                    // Invalid object ref. or widget has no getValue function.
-                    return;
-                }
-
-                isEmpty = false;
-                values[template][widgetid] = widget.getValue();
-            });
-
-            if (isEmpty === true) {
+            values[template] = self.getTemplateWidgetValues(template);
+            if (values[template] === null) {
                 // Nothing to save for this template.
                 delete values[template];
             }
