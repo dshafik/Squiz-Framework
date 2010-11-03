@@ -182,7 +182,7 @@ class GUIGraphPieActions
         $url = Web::appendQueryString($params, $url);
 
         echo '<span class="GUIGraphPie-container" id="'.$settings['widget']['id'].'-container">';
-        echo '<object data="'.$url.'"';
+        echo '<object tempurl="'.$url.'"';
         echo ' style="width: '.$size.'px; height: '.$size.'px;"';
         echo ' type="image/svg+xml" id="'.$settings['widget']['id'].'">'."\n";
         echo '</object>'."\n";

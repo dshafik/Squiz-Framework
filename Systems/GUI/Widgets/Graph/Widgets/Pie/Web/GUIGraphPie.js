@@ -38,7 +38,7 @@ GUIGraphPie.prototype = {
         var container      = objectTag.parentNode;
         var objectTagClone = dfx.cloneNode(objectTag);
 
-        var url = sfapi.attachTokenToURL(dfx.attr(objectTag, 'data'));
+        var url = sfapi.attachTokenToURL(dfx.attr(objectTag, 'tempurl'));
         dfx.attr(objectTagClone, 'data', url);
 
         dfx.remove(objectTag);
