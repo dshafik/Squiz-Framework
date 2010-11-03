@@ -297,13 +297,14 @@ class SimplePermissionActions implements PermissionActions
         }
 
         $listSettings = array(
-                         'items'          => $listItems,
-                         'allowDelete'    => TRUE,
-                         'noItemsMsg'     => _('There are no users assigned to this role'),
-                         'itemsGenerator' => array(
-                                              'system' => 'Permission',
-                                              'action' => 'generatePermissionScreenListItems',
-                                             ),
+                         'items'             => $listItems,
+                         'allowDelete'       => TRUE,
+                         'customDeleteClass' => 'PermissionScreen-deleteIcon',
+                         'noItemsMsg'        => _('There are no users assigned to this role'),
+                         'itemsGenerator'    => array(
+                                                 'system' => 'Permission',
+                                                 'action' => 'generatePermissionScreenListItems',
+                                                ),
                         );
 
         $usersList = GUI::createWidget($id.'-list', 'GUIList', $listSettings);
