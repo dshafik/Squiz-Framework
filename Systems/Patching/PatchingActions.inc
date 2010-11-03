@@ -1816,7 +1816,7 @@ error_log(var_export($headers, 1), 3, '/var/www/mysource4/analytics/error_log');
         $size = filesize($patchFile);
         $sha1 = sha1_file($patchFile);
 
-        // Check if need to check for update according to interval setting.
+        // Check the patch file size and hash.
         $ops    = array(
                    'name' => $name,
                    'sha1' => $sha1,
