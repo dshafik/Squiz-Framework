@@ -171,6 +171,12 @@ class GUIDialogActions
      */
     protected static $posBottom = NULL;
 
+    /**
+     * If TRUE then the dialog window will stay open even if the template/screen is changed.
+     *
+     * @var string
+     */
+    protected static $persistent = FALSE;
 
     /**
      * Prints widgets content.

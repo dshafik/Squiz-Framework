@@ -65,6 +65,14 @@ function GUIDialog(id, settings)
         });
     }//end if
 
+    if (this.settings.persistent !== true) {
+        // If the persistent settings is not true then close the dialog when ever a
+        // template is unloaded, most likely due to screen switch.
+        GUI.addTemplateRemovedCallback(function() {
+            self.close();
+        });
+    }
+
     if (this.settings.draggable === true) {
         jQuery(this.elem).draggable({
             handle: dfx.getClass('GUIDialog-top', this.elem)[0],
