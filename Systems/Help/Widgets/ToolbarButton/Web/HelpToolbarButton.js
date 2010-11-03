@@ -35,8 +35,6 @@ function HelpToolbarButton(id, settings)
     this.settings  = settings;
     this.className = settings.widget.type;
 
-    this._loaded = false;
-
     this.init();
 
 }
@@ -51,15 +49,14 @@ HelpToolbarButton.prototype = {
 
     },
 
-    _loadHelp: function(showAfterLoad, pageid)
+    _loadHelp: function(pageid)
     {
-        var self = this;
+        var self    = this;
         var options = {
             modal: false
         };
 
         GUI.loadTemplate('Help', 'Help.tpl', null, function() {
-            self._loaded = true;
             self.showHelp(pageid);
         }, options);
 
@@ -69,7 +66,7 @@ HelpToolbarButton.prototype = {
     {
         var dialog = dfx.getId('Help-dialog');
         if (!dialog || dfx.getElementHeight(dialog) === 0) {
-            this._loadHelp(true);
+            this._loadHelp();
         } else {
             dfx.removeClass(dfx.getId(this.id), 'active');
             GUI.getWidget('Help-dialog').close();
@@ -79,8 +76,9 @@ HelpToolbarButton.prototype = {
 
     showHelp: function(pageid)
     {
-        if (this._loaded === false) {
-            this._loadHelp(true, pageid);
+        var dialog = dfx.getId('Help-dialog');
+        if (!dialog || dfx.getElementHeight(dialog) === 0) {
+            this._loadHelp(pageid);
             return;
         }
 
@@ -93,8 +91,8 @@ HelpToolbarButton.prototype = {
 
         // Initialise the main Help widget.
         Help.init();
-
         Help.refresh(pageid);
+
     }
 
 };
