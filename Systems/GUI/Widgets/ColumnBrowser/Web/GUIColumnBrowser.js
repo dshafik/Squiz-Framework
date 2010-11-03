@@ -374,7 +374,12 @@ GUIColumnBrowser.prototype = {
                 selected = selected.shift();
                 if (self.selectItem(selected, -1) === false && self.selectItem(selected, -2) === false) {
                     while (self.selectItem(selected, -1) === false && lineage.length > 0) {
+                        var prevSelected = selected;
                         selected = lineage.pop();
+                        if (selected === null) {
+                            self.selectItem(prevSelected, -2);
+                            return;
+                        }
                     }
                 }
             }

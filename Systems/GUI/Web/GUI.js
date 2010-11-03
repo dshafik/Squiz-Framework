@@ -203,19 +203,19 @@ var GUI = new function()
                     }
                 }
             }
-        } else if (!_modifiedTemplates[template]) {
-            return false;
+        } else if (_modifiedTemplates[template]) {
+            return true;
         }
 
-        return true;
+        return false;
     };
 
     this.hasModifiedTemplates = function() {
-        return !dfx.isEmpty(GUI._modifiedTemplates);
+        return !dfx.isEmpty(_modifiedTemplates);
     };
 
     this.hasModifiedWidgets = function() {
-        return !dfx.isEmpty(GUI._modifiedWidgets);
+        return !dfx.isEmpty(_modifiedWidgets);
     };
 
     this.confirmUnload = function() {
@@ -576,6 +576,12 @@ var GUI = new function()
                 _modifiedTemplates[widget] = true;
             } else if (_modifiedTemplates[widget] === true) {
                 delete _modifiedTemplates[widget];
+
+                // Also set the child widgets to not modified.
+                var self = this;
+                dfx.foreach(this.widgetTemplates[widget], function(idx) {
+                    self.setModified(self.widgetTemplates[widget][idx], false, true);
+                });
             }
 
             if (dontFireEvents !== true) {
