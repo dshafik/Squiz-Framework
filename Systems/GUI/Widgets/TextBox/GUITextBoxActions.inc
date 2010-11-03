@@ -123,6 +123,20 @@ class GUITextBoxActions
      */
     protected static $hintAsDefault = FALSE;
 
+    /**
+     * If FALSE the Save button will not be enabled when widget value is changed.
+     *
+     * @var boolean
+     */
+    protected static $enablesSaveButton = TRUE;
+
+    /**
+     * If FALSE the GUI.setModified method will not be called when value is changed.
+     *
+     * @var boolean
+     */
+    protected static $requiresSave = TRUE;
+
 
     /**
      * Prints this widgets content.
@@ -211,6 +225,10 @@ class GUITextBoxActions
         if (Util::getArrayIndex($settings, 'focus', self::$focus) === TRUE) {
              echo '<script>dfx.addLoadEvent(function() {document.getElementById("'.$id.'-input").focus();});</script>';
         }
+
+        // Set default settings for requiresSave and enablesSaveButton.
+        $settings['requiresSave']      = Util::getArrayIndex($settings, 'requiresSave', self::$requiresSave);
+        $settings['enablesSaveButton'] = Util::getArrayIndex($settings, 'enablesSaveButton', self::$enablesSaveButton);
 
         return $settings;
 

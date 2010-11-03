@@ -69,7 +69,7 @@ GUITextBox.prototype = {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
-                GUI.setModified(self, true);
+                self._setModified(true);
             }
 
             self.fireKeyPressCallbacks(value, e);
@@ -79,7 +79,7 @@ GUITextBox.prototype = {
             if (value !== this.value) {
                 // If the value of the box has changed, set it modified.
                 value = this.value;
-                GUI.setModified(self, true);
+                self._setModified(true);
             }
 
             self.fireKeyUpCallbacks(value, e);
@@ -110,7 +110,7 @@ GUITextBox.prototype = {
         if (value !== textBox.value) {
             // Only do something if the value is different from the current value.
             textBox.value = value;
-            GUI.setModified(this, true);
+            self._setModified(true);
         }
 
     },
@@ -160,6 +160,21 @@ GUITextBox.prototype = {
         }
 
         return false;
+
+    },
+
+    _setModified: function(status)
+    {
+        // If this widget does not require save then there is no reason to call setModified.
+        if (this.settings.requiresSave === false) {
+            return;
+        }
+
+        if (this.settings.enablesSaveButton === false) {
+            GUI.setModified(this, status, true);
+        } else {
+            GUI.setModified(this, status, false);
+        }
 
     }
 
