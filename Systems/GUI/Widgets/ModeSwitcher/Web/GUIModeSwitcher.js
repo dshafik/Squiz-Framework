@@ -232,9 +232,12 @@ GUIModeSwitcher.prototype = {
         dfx.attr(this._staticBtnContainer, 'state', 1);
 
         var self = this;
+        // Add a magic 2px as in IE8 the mode switch arrow looks funky expanded without it.
+        // Guess 2px because the expand shows 2 new buttons and there is a 1px error per button
+        var newWidth = this._staticButtonsWidth + this._dynamicButtonsWidth + 2;
         dfx.attr(this._sliderElement, 'state', 1);
         dfx.animate(this._sliderElement, {
-            width: (this._staticButtonsWidth + this._dynamicButtonsWidth)
+            width: newWidth
         }, seconds, function() {
             self.autoCollapse(collapseTime);
         });
