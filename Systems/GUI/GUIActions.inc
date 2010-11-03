@@ -1444,39 +1444,37 @@ class GUIActions
             if ($child->nodeType === XML_ELEMENT_NODE
                 && isset($tagTypes[$child->tagName]) === TRUE
             ) {
-                if (self::$_isReCacheTemplate === FALSE) {
-                    $condition = $child->getAttribute('condition');
+                $condition = $child->getAttribute('condition');
 
-                    // Get the system name so we can include it.
-                    list($systemName, $method) = explode('::', $condition);
-                    if (empty($method) === FALSE) {
-                        $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
-                    }
+                // Get the system name so we can include it.
+                list($systemName, $method) = explode('::', $condition);
+                if (empty($method) === FALSE) {
+                    $php .= 'Channels::includeSystem(\''.$systemName.'\');'."\n";
+                }
 
-                    // Replace kewords.
-                    $condition = self::_replaceVarKeywords($condition, FALSE);
+                // Replace kewords.
+                $condition = self::_replaceVarKeywords($condition, FALSE);
 
-                    // Print the if, else block.
-                    $php .= $tagTypes[$child->tagName];
+                // Print the if, else block.
+                $php .= $tagTypes[$child->tagName];
 
-                    switch ($child->tagName) {
-                        case 'if':
-                            $php .= ' (('.$condition.') === TRUE) {'."\n";
-                        break;
+                switch ($child->tagName) {
+                    case 'if':
+                        $php .= ' (('.$condition.') === TRUE) {'."\n";
+                    break;
 
-                        case 'if-not':
-                            $php .= ' (('.$condition.') === FALSE) {'."\n";
-                        break;
+                    case 'if-not':
+                        $php .= ' (('.$condition.') === FALSE) {'."\n";
+                    break;
 
-                        case 'if-null':
-                            $php .= ' (('.$condition.') === NULL) {'."\n";
-                        break;
+                    case 'if-null':
+                        $php .= ' (('.$condition.') === NULL) {'."\n";
+                    break;
 
-                        default:
-                            $php .= " {\n";
-                        break;
-                    }
-                }//end if
+                    default:
+                        $php .= " {\n";
+                    break;
+                }
 
                 foreach ($child->childNodes as $condChild) {
                     $parseTagRes = self::_parseTag($condChild, $varName);
@@ -1493,9 +1491,7 @@ class GUIActions
                     }
                 }
 
-                if (self::$_isReCacheTemplate === FALSE) {
-                    $php .= "\n} ";
-                }
+                $php .= "\n} ";
             }//end if
         }//end foreach
 
