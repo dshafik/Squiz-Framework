@@ -44,6 +44,12 @@ var GUI = new function()
         return this.widgetStore[id];
     };
 
+    window.onbeforeunload = function(e) {
+        if (GUI.isTemplateModified() === true) {
+            return 'You have unsaved changes!!!';
+        }
+    };
+
     this.addWidget = function(id, obj) {
         if (!obj.id || !obj.settings || !obj.settings.template) {
             return;
@@ -140,18 +146,27 @@ var GUI = new function()
         return url;
     };
 
-    this.unloadTemplate = function(parent) {
+    this.unloadTemplate = function(parent, force) {
         var self = this;
         var ln   = this.templateLineage.length;
         if (this.templateLineage.inArray(parent) === true) {
             for (var i = (ln - 1); i >= 0; i--) {
                 var p = this.templateLineage[i];
+                if (force !== true && this.isTemplateModified(p) === true) {
+                    if (this.confirmUnload() === false) {
+                        return false;
+                    }
+                }
+
                 dfx.foreach(this.widgetTemplates[p], function(idx) {
                     self.removeWidget(idx);
                 });
 
                 delete self.widgetTemplates[p];
                 this.templateLineage.pop();
+                if (_modifiedTemplates[p]) {
+                    delete _modifiedTemplates[p];
+                }
 
                 if (p === parent) {
                     this.fireTemplateRemovedCallbacks(parent);
@@ -159,6 +174,42 @@ var GUI = new function()
                 }
             }
         }
+    };
+
+    this.isTemplateModified = function(template, checkChildTemplates) {
+        if (_reverting === true) {
+            // If we are reverting template data and template is being reloaded
+            // this method may get called so return false.
+            return false;
+        }
+
+        template = template || GUI.getCurrentTemplate();
+
+        if (checkChildTemplates === true) {
+            if (this.templateLineage.inArray(template) === true) {
+                var ln = this.templateLineage.length;
+                for (var i = (ln - 1); i >= 0; i--) {
+                    var p = this.templateLineage[i];
+                    if (this.isTemplateModified(p, false) === true) {
+                        return true;
+                    }
+
+                    if (p === template) {
+                        return false;
+                    }
+                }
+            }
+        } else if (!_modifiedTemplates[template]) {
+            return false;
+        }
+
+        return true;
+    };
+
+    this.confirmUnload = function()
+    {
+        var msg = 'You have unsaved changes.\n\nPress OK to continue and lose these changes or Cancel to stay on the current screen.';
+        return confirm(msg);
     };
 
     this.addTemplate = function(template) {
@@ -499,7 +550,7 @@ var GUI = new function()
         this.fireRevertedCallbacks();
     };
 
-    this.setModified = function(widget, state) {
+    this.setModified = function(widget, state, dontFireEvents) {
         if (_reverting === true) {
             return;
         }
@@ -513,16 +564,23 @@ var GUI = new function()
                 delete _modifiedTemplates[widget];
             }
 
-            this.fireModifiedCallbacks(widget, state);
+            if (dontFireEvents !== true) {
+                this.fireModifiedCallbacks(widget, state);
+            }
         } else {
             // It's an object, hence we believe this is a widget.
             if (state === true) {
                 _modifiedWidgets[widget.id] = true;
+
+                // Set the template of this widget as modified as well.
+                _modifiedTemplates[widget.settings.template.system + ':' + widget.settings.template.name] = true;
             } else if (_modifiedWidgets[widget.id] === true) {
                 delete _modifiedWidgets[widget.id];
             }
 
-            this.fireModifiedCallbacks(widget.id, state);
+            if (dontFireEvents !== true) {
+                this.fireModifiedCallbacks(widget.id, state);
+            }
         }
     };
 
