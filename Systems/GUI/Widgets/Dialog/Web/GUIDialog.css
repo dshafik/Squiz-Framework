@@ -35,14 +35,18 @@ ui-draggable .GUIDialog-top {
 }
 
 .GUIDialog-middle {
-    margin: 0 5px;
-    border: 1px solid #AAA;
+    margin: 0 6px;
+    border: 1px solid #DADADA;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    overflow: auto;
 }
 
 .GUIDialog-bottom {
     overflow: hidden;
     border: 1px solid transparent;
     margin-top: 5px;
+    min-height: 8px;
 }
 
 .GUIDialog-title {
