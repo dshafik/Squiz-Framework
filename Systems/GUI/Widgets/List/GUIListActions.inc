@@ -53,6 +53,13 @@ class GUIListActions
     protected static $allowDelete = FALSE;
 
     /**
+     * Custom Delete class.
+     *
+     * @var string
+     */
+    protected static $customDeleteClass = '';
+
+    /**
      * The items generator channel.
      *
      * @var array
@@ -128,14 +135,19 @@ class GUIListActions
      */
     protected static function paintItem($itemid, array $item, array $settings)
     {
-        $id    = $settings['widget']['id'];
-        $class = $settings['widget']['type'];
+        $id                = $settings['widget']['id'];
+        $class             = $settings['widget']['type'];
+        $deleteClass       = 'GUI-delete';
+        $customDeleteClass = Util::getArrayIndex($settings, 'customDeleteClass', '');
+        if (empty($customDeleteClass) === FALSE) {
+            $deleteClass .= ' '.$customDeleteClass;
+        }
 
         echo '<li itemid="'.$itemid.'">';
 
         echo '<div class="'.$class.'-dragHandle"></div>';
         echo '<div class="'.$class.'-itemContent">'.$item['itemContent'].'</div>';
-        echo '<div class="GUI-delete"><span class="GUI-deleteIcon" onclick="GUI.getWidget(\''.$id.'\').toggleDelete(this.parentNode.parentNode);"/></div>';
+        echo '<div class="'.$deleteClass.'"><span class="GUI-deleteIcon" onclick="GUI.getWidget(\''.$id.'\').toggleDelete(this.parentNode.parentNode);"/></div>';
 
         echo '</li>';
 
@@ -150,7 +162,7 @@ class GUIListActions
      *                         using the given rowData.
      * @param array $settings  The widget settings.
      *
-     * @return void
+     * @return string
      * @throws ChannelException If invalid API channel is specified.
      *
      * @api            read
