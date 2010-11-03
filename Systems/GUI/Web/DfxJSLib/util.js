@@ -499,7 +499,7 @@ dfx.objDiff = function(obj1, obj2)
 
 dfx.baseUrl = function(fullUrl)
 {
-    var qStartIdx = fullUrl.search(/\?/);
+    var qStartIdx = fullUrl.search(/\?|#/);
     if (qStartIdx === -1) {
         return fullUrl;
     } else {
@@ -519,7 +519,14 @@ dfx.queryString = function(url)
     if (qStartIdx === -1) {
         return result;
     } else {
-        var queryStr = url.substr(qStartIdx + 1, (url.length - qStartIdx));
+        var aStartIdx = url.search(/\#/);
+        if (aStartIdx === -1) {
+            var anchorPartAdj = 0;
+        } else {
+            var anchorPartAdj = url.length - aStartIdx + 1;
+        }
+        // QryStr part is between ? and # in the URL
+        var queryStr = url.substr(qStartIdx + 1, url.length - qStartIdx - anchorPartAdj);
         if (queryStr.length > 0) {
             var pairs = queryStr.split('&');
             var len   = pairs.length;
@@ -541,10 +548,27 @@ dfx.queryString = function(url)
 };
 
 /**
+ * Returns the anchor part of the URL.  Blank if no # or
+ * hash followed by the actual anchor name
+ */
+dfx.anchorPart = function(url)
+{
+    var aStartIdx = url.search(/\#/);
+    if (aStartIdx === -1) {
+        return '';
+    } else {
+        var anchorStr = url.substr(aStartIdx, (url.length - aStartIdx));
+        return anchorStr;
+    }//end if
+
+};
+
+/**
  * Adds given (var => value) list to the given URLs query string.
  */
 dfx.addToQueryString = function(url, addQueries)
 {
+
     var mergedUrl        = '';
     var baseUrl          = dfx.baseUrl(url);
     var queryStringArray = dfx.queryString(url);
@@ -561,6 +585,11 @@ dfx.addToQueryString = function(url, addQueries)
         mergedUrl = baseUrl + queryStr.substr(0, (queryStr.length - 1));
     } else {
         mergedUrl = url;
+    }
+
+    var anchorPartURL = dfx.anchorPart(url);
+    if (anchorPartURL.length > 0) {
+        mergedUrl = mergedUrl + anchorPartURL;
     }
 
     return mergedUrl;
