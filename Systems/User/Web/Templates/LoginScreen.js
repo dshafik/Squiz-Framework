@@ -25,6 +25,13 @@ var UserLoginScreen = new function()
 {
     this.hashEnabled = true;
 
+    var _loadingAnim = null;
+    if (document.images) {
+        // Preload loading animation.
+        _loadingAnim     = new Image(16,16);
+        _loadingAnim.src = '/__web/Systems/User/Web/Templates/save_inact.gif'
+    }
+
     this.displayError = function(msg) {
         dfx.setHtml(dfx.getId('LoginError'), msg);
     };
@@ -60,10 +67,10 @@ var UserLoginScreen = new function()
             }
         };
 
+        self.showLoadingAnimation();
         if (this.hashEnabled === true) {
             params.step     = 'req_chal';
             params.username = username;
-            self.showLoadingAnimation();
             GUI.sendRequest('User', 'processAuthentication', params, function(data) {
                 // Username exists and get the challenge string back.
                 data = dfx.jsonDecode(data.result);
@@ -107,8 +114,7 @@ var UserLoginScreen = new function()
 
         var buttonSpan = dfx.getTag('span', button)[0];
         dfx.setStyle(buttonSpan, 'visibility', 'hidden');
-        var spinner = document.createElement('img');
-        spinner.src = '/__web/Systems/User/Web/Templates/save_inact.gif';
+        var spinner = _loadingAnim;
         dfx.setStyle(spinner, 'top', '-15px');
         dfx.setStyle(spinner, 'position', 'relative');
         button.appendChild(spinner);
