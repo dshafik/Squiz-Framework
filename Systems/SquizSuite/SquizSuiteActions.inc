@@ -2456,7 +2456,9 @@ class SquizSuiteActions
     private static function _saveAddNewProduct(array $data)
     {
         // New Product.
-        $newProductURL = Util::getArrayIndex($data, 'squizSuite-new-apiURL', '');
+        include_once 'Libs/Security/Security.inc'; 
+        $newProductURL = Security::getRequestData('squizSuite-new-apiURL', '', TRUE, $data);
+        $newProductURL = trim($newProductURL);
         if (empty($newProductURL) === FALSE) {
             Channels::includeSystem('API');
             $apiSuffix = API::getAPISuffix();
