@@ -12,6 +12,8 @@ button.GUIButton {
     -moz-border-radius: 25%;
     *padding: 0 0em; /* IE 7 Target */
     outline: none;
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
 }
 button.GUIButton .GUIButtonLabel {
     display: block;
@@ -34,31 +36,52 @@ button.GUIButton .GUIButtonIcon {
 }
 button.buttonDefault {
     border-color: #606060;
+    border-top-color: #777;
     color: #fff;
-    text-shadow: 0px -1px 1px #555;
+    text-shadow: 0px -1px 0px #555;
     background-color: #848484;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#a9a9a9), to(#626161));
     background-image: -moz-linear-gradient(#a9a9a9, #626161);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#a9a9a9, endColorstr=#626161);
     position: relative;
 }
+button.buttonDefault:hover {
+    text-shadow: 0px -1px 1px #333;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#999), to(#555));
+    background-image: -moz-linear-gradient(#999, #555);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#999999, endColorstr=#555555);
+}
 button.buttonLight {
     border-color: #a3a3a3;
+    border-top-color: #CCC;
     color: #444;
-    text-shadow: 0px 1px 1px #FFF;
+    text-shadow: 0px 1px 0px #FFF;
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     background-color: #dbdbdb;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f8f8f8), to(#c0c0c0));
     background-image: -moz-linear-gradient(0% 0% -90deg, #f8f8f8, #c0c0c0);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#f8f8f8, endColorstr=#c0c0c0);
 }
+button.buttonLight:hover {
+    color: #222;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F4F4F4), to(#b0b0b0));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #F4F4F4, #b0b0b0);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F4F4F4, endColorstr=#b0b0b0);
+}
 button.buttonDark {
-    border-color: #1a1a1a #1a1a1a #555;
+    border-color: #1a1a1a #1a1a1a #333;
     color: #fff;
     text-shadow: 0px -1px 1px #000;
     background-color: #282828;
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#474747), to(#0c0c0c));
-    background-image: -moz-linear-gradient(0% 0% -90deg, #474747, #0c0c0c);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#474747, endColorstr=#0c0c0c);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#565656), to(#111));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #565656, #111);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#565656, endColorstr=#111111);
+}
+button.buttonDark:hover {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#333), to(#000));
+    background-image: -moz-linear-gradient(0% 0% -90deg, #333, #000);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#333333, endColorstr=#000000);
 }
 
 /* New (Wizards) */
