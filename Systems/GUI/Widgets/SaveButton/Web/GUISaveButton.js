@@ -75,6 +75,12 @@ GUISaveButton.prototype = {
             }
         });
 
+        GUI.addSavedCallback(function() {
+            if (self._canDisable() === true) {
+                self.disable();
+            }
+        });
+
     },
 
     _canDisable: function()

@@ -61,6 +61,13 @@ class GUIInterventionActions
      */
     protected static $fixedPositioning = FALSE;
 
+    /**
+     * If TRUE then the intervention popup will stay open even if the template/screen is changed.
+     *
+     * @var string
+     */
+    protected static $persistent = FALSE;
+
 
     /**
      * Prints widgets content.

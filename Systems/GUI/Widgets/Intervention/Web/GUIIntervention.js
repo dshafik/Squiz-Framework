@@ -67,13 +67,22 @@ GUIIntervention.prototype = {
             });
         }
 
+        if (this.settings.persistent !== true) {
+            // If the persistent settings is not true then hide when ever a
+            // template is unloaded, most likely due to screen switch.
+            var self = this;
+            GUI.addTemplateRemovedCallback(function() {
+                self.hide(null, true);
+            });
+        }
+
     },
 
-    hide: function(info)
+    hide: function(info, dontFireEvents)
     {
         dfx.removeClass(this.elem, 'visible');
 
-        if (this.settings.onclose) {
+        if (this.settings.onclose && dontFireEvents !== true) {
             eval(this.settings.onclose + '.call(this, info, this._data);');
         }
 
@@ -171,9 +180,11 @@ GUIIntervention.prototype = {
                 break;
             }
 
-            var scrollCoords = dfx.getScrollCoords();
-            posX -= scrollCoords['x'];
-            posY -= scrollCoords['y'];
+            if (this.settings.fixedPositioning === true) {
+                var scrollCoords = dfx.getScrollCoords();
+                posX -= scrollCoords['x'];
+                posY -= scrollCoords['y'];
+            }
 
             dfx.addClass(element, parts[0]);
             dfx.addClass(element, parts[1]);

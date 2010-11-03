@@ -508,6 +508,9 @@ var GUI = new function()
                     self.dequeueOverlay('loading');
                     setTimeout(function() {
                         self.dequeueOverlay('saved');
+                        _modifiedWidgets   = {};
+                        _modifiedTemplates = {};
+                        self.fireSavedCallbacks();
                     }, 1000);
                 });
             } else {
@@ -745,6 +748,7 @@ var GUI = new function()
 
     this.addWidgetEvent(this, 'modified');
     this.addWidgetEvent(this, 'reverted');
+    this.addWidgetEvent(this, 'saved');
     this.addWidgetEvent(this, 'requestComplete');
     this.addWidgetEvent(this, 'reloadTemplate');
     this.addWidgetEvent(this, 'templateAdded');
