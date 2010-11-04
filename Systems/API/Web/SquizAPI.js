@@ -135,8 +135,15 @@ sfapi.createURL = function(system, action, format, params)
 {
     format = format || 'json';
 
+    var queryString   = '';
+    var queryStrIndex = sfapi.rootUrl.indexOf('?');
+    if (queryStrIndex >= 0) {
+        queryString   = sfapi.rootUrl.substr(queryStrIndex);
+        sfapi.rootUrl = sfapi.rootUrl .substr(0, queryStrIndex);
+    }
+
     var url = sfapi.rootUrl + '/' + sfapi.rootUrlSuffix;
-    url    += '/' + format + '/' + system + '/' + action;
+    url    += '/' + format + '/' + system + '/' + action + queryString;
 
     return url;
 
