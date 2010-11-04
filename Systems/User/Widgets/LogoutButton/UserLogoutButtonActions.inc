@@ -50,24 +50,24 @@ class UserLogoutButtonActions
 
         $ivContents     = '<p>'._('Are you sure you want to logout?').'</p>';
         $buttonSettings = array(
-                           'value'  => _('Logout'),
-                           'click'  => 'window.location=dfx.addToQueryString(window.location.href.toString(), {sq_logout: true})',
-                           'colour' => 'Dark',
-                          );
-        $ivContents    .= GUI::createWidget($id.'-ivbuttonYes', 'GUIButton', $buttonSettings);
-        $buttonSettings = array(
                            'value'  => _('Cancel'),
                            'click'  => 'dfx.removeClass(dfx.getId(\''.$id.'\'), \'active\');GUI.getWidget(\''.$id.'-intervention\').hide();',
                            'colour' => 'Dark',
                           );
         $ivContents    .= GUI::createWidget($id.'-ivbuttonNo', 'GUIButton', $buttonSettings);
+        $buttonSettings = array(
+                           'value'  => _('Logout'),
+                           'click'  => 'window.location=dfx.addToQueryString(window.location.href.toString(), {sq_logout: true})',
+                           'colour' => 'Dark',
+                          );
+        $ivContents    .= GUI::createWidget($id.'-ivbuttonYes', 'GUIButton', $buttonSettings);
 
         Channels::includeSystem('GUI');
         $ivSettings = array(
                        'targetElementid'  => $id,
                        'elementContents'  => $ivContents,
-                       'fixedPositioning' => TRUE,
-                       'persistent'       => TRUE,
+                       'fixedPositioning' => true,
+                       'persistent'       => true,
                       );
         echo GUI::createWidget($id.'-intervention', 'GUIIntervention', $ivSettings);
 
