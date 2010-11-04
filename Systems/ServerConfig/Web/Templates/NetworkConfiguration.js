@@ -56,11 +56,10 @@ var NetworkConfiguration = new function()
                     var iid = setInterval(function() {
                         params = {action: 'checkNetworkConfigUpdate'};
                         GUI.sendRequest('ServerConfig', 'saveNetworkConfiguration', params, function(res) {
-                            res = dfx.jsonDecode(res);
                             if (res.result === 'true') {
                                 self.showCompleteMessage('success');
                                 clearInterval(iid);
-                            } else if (res === 'failed') {
+                            } else if (res === 'false') {
                                 self.showCompleteMessage('failed');
                                 clearInterval(iid);
                             }
@@ -68,11 +67,8 @@ var NetworkConfiguration = new function()
                     }, 10000);
                 } else if (data.result === 'failed') {
                     alert('The new network settings caused the system to stop responding. The previous settings have been restored.');
-                } else {
-                    res = dfx.jsonDecode(res);
-                    if (dfx.isset(res.result) === true && res.result === 'invalid') {
-                        alert(res.field + ' is not a valid IP address.');
-                    }
+                } else if (data.result === 'invalid') {
+                    alert('Invalid IP address has been entered.');
                 }//end if
             });
         });
@@ -102,8 +98,14 @@ var NetworkConfiguration = new function()
         dfx.hideElement(this._ipTableDOM);
         dfx.hideElement(this._savingMsgDOM);
         dfx.hideElement(this._savingProgDOM);
-        dfx.showElement(this._completeMsgSuccess);
-        dfx.showElement(this._completeMsgFailed);
+        if (type === 'success') {
+            dfx.showElement(this._completeMsgSuccess);
+            dfx.hideElement(this._completeMsgFailed);
+        } else if (type === 'failed') {
+            dfx.hideElement(this._completeMsgSuccess);
+            dfx.showElement(this._completeMsgFailed);
+        }
+
         dfx.hideElement(this._confirmBtnDOM);
     };
 

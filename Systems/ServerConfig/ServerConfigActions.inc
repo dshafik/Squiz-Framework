@@ -202,10 +202,17 @@ class ServerConfigActions
                 $matches = array();
                 preg_match($regexes[$type]['reg'], $interfaces, $matches);
                 if (empty($matches) === FALSE) {
-                    self::$_networkConfCache[$type.'1'] = (int) $matches[1];
-                    self::$_networkConfCache[$type.'2'] = (int) $matches[2];
-                    self::$_networkConfCache[$type.'3'] = (int) $matches[3];
-                    self::$_networkConfCache[$type.'4'] = (int) $matches[4];
+                    if ($type === 'gateway') {
+                        self::$_networkConfCache[$type.'1'] = (int) $matches[2];
+                        self::$_networkConfCache[$type.'2'] = (int) $matches[3];
+                        self::$_networkConfCache[$type.'3'] = (int) $matches[4];
+                        self::$_networkConfCache[$type.'4'] = (int) $matches[5];
+                    } else {
+                        self::$_networkConfCache[$type.'1'] = (int) $matches[1];
+                        self::$_networkConfCache[$type.'2'] = (int) $matches[2];
+                        self::$_networkConfCache[$type.'3'] = (int) $matches[3];
+                        self::$_networkConfCache[$type.'4'] = (int) $matches[4];
+                    }
                 } else {
                     self::$_networkConfCache[$type.'1'] = $regexes[$type]['def'][0];
                     self::$_networkConfCache[$type.'2'] = $regexes[$type]['def'][1];
@@ -375,7 +382,7 @@ class ServerConfigActions
         }//end foreach
 
         if ($valid === FALSE) {
-            return 'failed';
+            return 'invalid';
         }
 
         $interfaces  = 'auto lo'."\n";
@@ -447,28 +454,30 @@ class ServerConfigActions
             $returnVal = NULL;
             exec($command, $output, $returnVal);
             return 'failed';
-        } else if (file_exists($dataDirPath.'/network_changes_applied') === FALSE) {
+        }
+
+        if (file_exists($dataDirPath.'/network_changes_applied') === FALSE) {
             // Cron hasn't run yet.
             return 'false';
-        } else {
-            // Okay, the changes applied and the script got here!
-            // Let's remove old settings now so that cron won't put the
-            // original settings back.
-            $command   = 'rm '.$dataDirPath.'/hostname_old ';
-            $command  .= $dataDirPath.'/mailname_old ';
-            $command  .= $dataDirPath.'/interfaces_old ';
-            $command  .= $dataDirPath.'/resolv.conf_old ';
-            $command  .= $dataDirPath.'/network_changes_applied';
-            $output    = array();
-            $returnVal = NULL;
-            exec($command, $output, $returnVal);
+        }
 
-            if ($returnVal === 0) {
-                return 'true';
-            } else {
-                return 'false';
-            }
-        }//end if
+        // Okay, the changes applied and the script got here!
+        // Let's remove old settings now so that cron won't put the
+        // original settings back.
+        $command   = 'rm '.$dataDirPath.'/hostname_old ';
+        $command  .= $dataDirPath.'/mailname_old ';
+        $command  .= $dataDirPath.'/interfaces_old ';
+        $command  .= $dataDirPath.'/resolv.conf_old ';
+        $command  .= $dataDirPath.'/network_changes_applied';
+        $output    = array();
+        $returnVal = NULL;
+        exec($command, $output, $returnVal);
+
+        if ($returnVal === 0) {
+            return 'true';
+        } else {
+            return 'false';
+        }
 
     }//end _checkNetworkConfigUpdate()
 
