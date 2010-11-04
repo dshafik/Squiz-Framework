@@ -615,6 +615,23 @@ var GUI = new function()
                 }
             } else if (_modifiedWidgets[widget.id] === true) {
                 delete _modifiedWidgets[widget.id];
+
+                if (widget.settings && widget.settings.template) {
+                    var template = widget.settings.template.system + ':' + widget.settings.template.name;
+                    if (_modifiedTemplates[template]) {
+                        var hasModifiedWidgets = false;
+                        // Check if there are any other widgets that are modified in this template.
+                        dfx.foreach(this.widgetTemplates[template], function(widgetid) {
+                            if (_modifiedWidgets[widgetid]) {
+                                hasModifiedWidgets = true;
+                            }
+                        });
+
+                        if (hasModifiedWidgets === false) {
+                            delete _modifiedTemplates[template];
+                        }
+                    }
+                }
             }
 
             if (dontFireEvents !== true) {
