@@ -137,7 +137,7 @@ class GUIListActions
     {
         $id                = $settings['widget']['id'];
         $class             = $settings['widget']['type'];
-        $deleteClass       = 'GUI-delete';
+        $deleteClass       = 'GUI-delete '.$id.'-deleteIcon';
         $customDeleteClass = Util::getArrayIndex($settings, 'customDeleteClass', '');
         if (empty($customDeleteClass) === FALSE) {
             $deleteClass .= ' '.$customDeleteClass;
