@@ -66,7 +66,7 @@ class PatchingSystem extends BaseSystem
                               'schedule'       => FALSE,
                               'threshold'      => 2,
                               'last_checked'   => time(),
-                              'check_interval' => 3600 * 12,
+                              'check_interval' => 3600,
                              );
             Channels::includeSystem('SystemConfig');
             SystemConfig::setConfig('Patching', $configDefault);

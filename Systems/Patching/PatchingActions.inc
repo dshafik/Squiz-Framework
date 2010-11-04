@@ -559,6 +559,29 @@ class PatchingActions
 
 
     /**
+     * Updates last_checked timestamp so that next cron will check updates.
+     *
+     * This action manually winds back 'last_check' timestamp more than
+     * 'check_interval', so that during the next cron run will definitely
+     * run wsCheckForUpdates() without interval skipping.
+     *
+     * @return void
+     *
+     * @api            write
+     * @api-permission superuser
+     */
+    public static function checkUpdateASAP()
+    {
+        $now    = time();
+        $config = Patching::getPatchingConfig();
+        $config['last_checked'] = $now - $config['check_interval'];
+        SystemConfig::setConfig('Patching', $config);
+        return 'updated';
+
+    }//end checkUpdateASAP()
+
+
+    /**
      * Gets the time till for next update check, based on config.
      *
      * Returns never if cron is not enabled.

@@ -41,9 +41,11 @@ var PatchingPatchingScreen = new function()
         this._notify = data.config.notify;
 
         this._notifyToggleBtn        = GUI.getWidget('PatchingScreen-notifyUpdates');
+        this._asapCheckBtnWdgt       = GUI.getWidget('PatchingScreen-checkAsapBtn');
         this._notificationRecipients = data.config.recipient;
         this._deleteNotificationUser = {};
         this._addNotificationUser    = [];
+
 
         if (this._notify === false) {
             self.hideRecipients();
@@ -168,14 +170,20 @@ var PatchingPatchingScreen = new function()
     this.checkUpdateASAP = function() {
         var self   = this;
         var params = {};
-        GUI.sendRequest('Patching', 'getNextUpdateCheckTime', params, function(data) {
-            var text = dfx.getClass(
-                'PatchingScreen-nextCheckString',
-                self._patchingSettingsDiv
-            )[0];
+        GUI.sendRequest('Patching', 'checkUpdateASAP', params, function(data) {
+            if (data.result === 'updated') {
+                GUI.sendRequest('Patching', 'getNextUpdateCheckTime', params, function(data) {
+                    var text = dfx.getClass(
+                        'PatchingScreen-nextCheckString',
+                        self._patchingSettingsDiv
+                    )[0];
 
-            dfx.setHtml(text, data.result);
+                    dfx.setHtml(text, data.result);
+                    self._asapCheckBtnWdgt.disable();
+                });
+            }
         });
+
     };
 
     this.addNotificationUser = function() {
