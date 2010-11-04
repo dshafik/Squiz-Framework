@@ -83,6 +83,19 @@ class GUIContentSwitcherActions
      */
     public static function paint(array $settings)
     {
+        $id    = $settings['widget']['id'];
+        $class = $settings['widget']['type'];
+
+        // May need to override initial item.
+        include_once 'Libs/Web/Web.inc';
+        include_once 'Libs/Security/Security.inc';
+        $url = Web::getCurrentUrl();
+        $queryString = Web::getQueryStringParams($url);
+
+        if (isset($queryString['sq_'.$id]) === TRUE) {
+            $settings['initialItem'] = $queryString['sq_'.$id];
+        }
+
         Channels::includeSystem('GUI');
         $initialItem = Util::getArrayIndex($settings, 'initialItem', NULL);
         if (empty($initialItem) === TRUE) {
