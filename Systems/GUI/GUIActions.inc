@@ -2373,7 +2373,7 @@ class GUIActions
         } else {
             $retVal = array(
                        'errors'    => $errors,
-                       'errorList' => self::_getSaveErrorList($errors),
+                       'errorList' => GUI::getSaveErrorList($errors),
                       );
         }
 
@@ -2389,7 +2389,7 @@ class GUIActions
      *
      * @return string
      */
-    private static function _getSaveErrorList(array $errors)
+    public static function getSaveErrorList(array $errors)
     {
         $content  = '<div class="GUI-overlay-errorList">';
         $content .= '<ul>';
@@ -2413,7 +2413,7 @@ class GUIActions
 
         return $content;
 
-    }//end _getSaveErrorList()
+    }//end getSaveErrorList()
 
 
     /**
