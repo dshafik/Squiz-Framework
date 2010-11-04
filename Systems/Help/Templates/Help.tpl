@@ -59,6 +59,22 @@
                         <arg>true</arg>
                     </dataProvider>
                 </div>
+                <div id="Help-dialog-msg-welcomeMsg" class="Help-dialog-msg">
+                    <var name="productType"><dataProvider action="SquizSuite::getProductType" /></var>
+                    <dataProvider action="Help::printMessageBox">
+                        <arg>
+                            <text>
+                                <value>Welcome to %s. Please take the time to read these general help articles and familiarise yourself with the system.</value>
+                                <args>
+                                    <arg>{productType}</arg>
+                                </args>
+                            </text>
+                        </arg>
+                        <arg><text>Hide this message</text></arg>
+                        <arg>info</arg>
+                        <arg>true</arg>
+                    </dataProvider>
+                </div>
                 <div class="Help-overlay" id="Help-overlay"></div>
                 <iframe name="Help-iframe" id="Help-iframe" frameborder="0" border="0" width="100%" height="100%" src=""></iframe>
             </div>

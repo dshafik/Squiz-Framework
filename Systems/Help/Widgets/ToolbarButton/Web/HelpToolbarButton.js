@@ -35,7 +35,14 @@ function HelpToolbarButton(id, settings)
     this.settings  = settings;
     this.className = settings.widget.type;
 
+    this._showWelcomeMsg = false;
+
     this.init();
+
+    if (this.settings._openOnLoad) {
+        this._showWelcomeMsg = true;
+        this.showHelp(this.settings._openOnLoad);
+    }
 
 }
 
@@ -91,7 +98,18 @@ HelpToolbarButton.prototype = {
 
         // Initialise the main Help widget.
         Help.init();
-        Help.refresh(pageid);
+
+        var callback = null;
+        if (this.settings._openOnLoad && this._showWelcomeMsg === true) {
+            var self = this;
+            callback = function() {
+                // Show the welcome message.
+                Help.showMessage('welcomeMsg');
+                self._showWelcomeMsg = false;
+            };
+        }
+
+        Help.refresh(pageid, callback);
 
     }
 

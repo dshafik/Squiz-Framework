@@ -45,6 +45,18 @@ class HelpToolbarButtonActions
 
         echo '<a title="'._('Click to view the help articles').'" id="'.$id.'" class="'.$class.' GUIToolbar-button"><div class="'.$class.'-icon"></div></a>';
 
+        // If this is the first login for this user show the "General" articles on page load.
+        Channels::includeSystem('Session');
+        $helpDisplayed = Session::getSessionData('Help', 'helpDisplayed');
+        if ($helpDisplayed !== TRUE) {
+            $firstLogin = Session::getSessionData('User', 'firstLogin');
+            if ($firstLogin === TRUE) {
+                $settings['_openOnLoad'] = 'general.html';
+            }
+        }
+
+        Session::setSessionData('Help', 'helpDisplayed', TRUE);
+
         return $settings;
 
     }//end paint()

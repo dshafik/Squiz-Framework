@@ -23,12 +23,13 @@
 
 var Help = new function()
 {
-    var _apiURL        = null;
-    var _searchURL     = null;
-    var _systemInfos   = {};
-    var _currentSystem = null;
-    var _iframe        = null;
-    var _loadPageOpts  = null;
+    var _apiURL              = null;
+    var _searchURL           = null;
+    var _systemInfos         = {};
+    var _currentSystem       = null;
+    var _iframe              = null;
+    var _loadPageOpts        = null;
+    var _pageLoadedCallback  = null;
 
     this.init = function() {
         var elem = dfx.getId('Help-dialog');
@@ -118,7 +119,8 @@ var Help = new function()
         });
     };
 
-    this.refresh = function(pageid) {
+    this.refresh = function(pageid, callback) {
+        _pageLoadedCallback = callback;
         if (!pageid) {
             this.loadIndexPage();
         } else {
@@ -167,6 +169,12 @@ var Help = new function()
         });
 
         _handlePageLoadOptions();
+
+        if (_pageLoadedCallback) {
+            _pageLoadedCallback.call(self);
+            _pageLoadedCallback = null;
+        }
+
         self.hideMessages();
     };
 
