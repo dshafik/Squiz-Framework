@@ -22,13 +22,18 @@ if [ -f "${INTERFACES_FILE}" -o -f "${RESOLV_FILE}" -o -f "$HOSTNAME_FILE" -o -f
     cp /etc/hostname "${HOSTNAME_FILE_OLD}"
     cp /etc/mailname "${MAILNAME_FILE_OLD}"
 
+    chown www-data:www-data "${INTERFACES_FILE_OLD}"; chmod 755 "${INTERFACES_FILE_OLD}"
+    chown www-data:www-data "${RESOLV_FILE_OLD}";     chmod 755 "${RESOLV_FILE_OLD}"
+    chown www-data:www-data "${HOSTNAME_FILE_OLD}";   chmod 755 "${HOSTNAME_FILE_OLD}"
+    chown www-data:www-data "${MAILNAME_FILE_OLD}";   chmod 755 "${MAILNAME_FILE_OLD}"
+
     # in case mv has '-i' set, get rid of it.
     unalias mv 2>/dev/null
 
-    mv -f "${INTERFACES_FILE}" /etc/network/interfaces
-    mv -f "${RESOLV_FILE}" /etc/resolv.conf
-    mv -f "${HOSTNAME_FILE}" /etc/hostname
-    mv -f "${MAILNAME_FILE}" /etc/mailname
+    mv -f "${INTERFACES_FILE}" /etc/network/interfaces; chown root:root /etc/network/interfaces; chmod 644 /etc/network/interfaces
+    mv -f "${RESOLV_FILE}" /etc/resolv.conf;            chown root:root /etc/resolv.conf;        chmod 644 /etc/resolv.conf
+    mv -f "${HOSTNAME_FILE}" /etc/hostname;             chown root:root /etc/hostname;           chmod 644 /etc/hostname
+    mv -f "${MAILNAME_FILE}" /etc/mailname;             chown root:root /etc/mailname;           chmod 644 /etc/mailname
 
     # restart the network
     /etc/init.d/networking restart
@@ -46,16 +51,18 @@ if [ -f "${INTERFACES_FILE}" -o -f "${RESOLV_FILE}" -o -f "$HOSTNAME_FILE" -o -f
     # tell the client that the changes have been applied so they can delete old
     # settings if they can get to.
     touch "${APPLIED_FLAG_FILE}"
+    chown www-data:www-data "${APPLIED_FLAG_FILE}"; chmod 755 "${APPLIED_FLAG_FILE}"
+
     exit
 fi
 
 # old backup file still exist! obviously the client couldn't get back to the server.
 # let's put the old settings back so that the administrator can access the site again.
 if [ -f "${APPLIED_FLAG_FILE}" -o -f "${INTERFACES_FILE_OLD}" -o -f "${INTERFACES_FILE_OLD}" -o -f "${INTERFACES_FILE_OLD}" -o -f "${INTERFACES_FILE_OLD}" ]; then
-    mv -f "${INTERFACES_FILE_OLD}" /etc/network/interfaces
-    mv -f "${RESOLV_FILE_OLD}" /etc/resolv.conf
-    mv -f "${HOSTNAME_FILE_OLD}" /etc/hostname
-    mv -f "${MAILNAME_FILE_OLD}" /etc/mailname
+    mv -f "${INTERFACES_FILE_OLD}" /etc/network/interfaces; chown root:root /etc/network/interfaces; chmod 644 /etc/network/interfaces
+    mv -f "${RESOLV_FILE_OLD}" /etc/resolv.conf;            chown root:root /etc/resolv.conf;        chmod 644 /etc/resolv.conf
+    mv -f "${HOSTNAME_FILE_OLD}" /etc/hostname;             chown root:root /etc/hostname;           chmod 644 /etc/hostname
+    mv -f "${MAILNAME_FILE_OLD}" /etc/mailname;             chown root:root /etc/mailname;           chmod 644 /etc/mailname
 
     # restart the network
     /etc/init.d/networking restart
@@ -73,6 +80,6 @@ if [ -f "${APPLIED_FLAG_FILE}" -o -f "${INTERFACES_FILE_OLD}" -o -f "${INTERFACE
     # tell the client that their previous settings failed!
     touch "${NEW_SETTING_FAILED_FLAG_FILE}"
 
-    rm  "${APPLIED_FLAG_FILE}"
+    rm "${APPLIED_FLAG_FILE}"
     exit;
 fi
