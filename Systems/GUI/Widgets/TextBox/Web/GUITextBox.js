@@ -91,6 +91,9 @@ GUITextBox.prototype = {
     {
         var widgetElement = dfx.getId(this.id);
         var textBox       = dfx.getClass('input', widgetElement)[0];
+        if (!textBox) {
+            return '';
+        }
 
         var value = textBox.value;
         if (this.settings.hintAsDefault !== true) {
