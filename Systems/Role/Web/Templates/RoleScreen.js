@@ -50,6 +50,7 @@ var RoleRoleScreen = new function()
         _prevSelectedRole = GUI.getWidget('rolesList').getSelectedItemId();
         if (_prevSelectedRole !== undefined) {
             GUI.getWidget('role-name').setValue(_data[_prevSelectedRole].name);
+            GUI.setModified(GUI.getWidget('role-name'), false);
         }
 
         // Add event call back for SettingsBox item selection.
@@ -101,6 +102,7 @@ var RoleRoleScreen = new function()
 
         // Change the role name field.
         GUI.getWidget('role-name').setValue(role.name);
+        GUI.setModified(GUI.getWidget('role-name'), false);
 
         // Set the toggle button values.
         var toggleButtons = dfx.getClass('GUIToggleButton', dfx.getClass('RoleScreen-unrestrictedToggle'));
@@ -117,6 +119,8 @@ var RoleRoleScreen = new function()
            } else {
                toggleWidget.setValue(false, true);
            }
+
+           GUI.setModified(toggleWidget, false);
         });
 
         // Update the privilege settings on the screen using roles granted list.
@@ -364,8 +368,8 @@ var RoleRoleScreen = new function()
     };
 
     this.saved = function() {
-        GUI.reloadTemplate('Role:RoleScreen');
         GUI.setModified(this, false);
+        GUI.reloadTemplate('Role:RoleScreen');
     };
 
 };
