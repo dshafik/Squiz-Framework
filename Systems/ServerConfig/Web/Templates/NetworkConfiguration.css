@@ -1,0 +1,179 @@
+body.NetworkConfiguration {
+    background: #404040 none;
+}
+
+.NetworkConfigurationWrap {
+    font-family: arial;
+    top: 45% !important;
+    left: 50%;
+    margin-left: -262px;
+    margin-top: -163.5px;
+    visibility: visible;
+    color: #FFF;
+    position: fixed;
+    z-index: 1001;
+}
+
+.NetworkConfiguration-top {
+    background: url(network_config_header_bg.png) no-repeat 0 0;
+    height: 164px;
+    width: 524px;
+    overflow: hidden;
+}
+
+.NetworkConfiguration-top-headerText {
+    background: transparent none no-repeat scroll 0 0;
+    width: 415px;
+    padding: 0;
+    margin: 97px auto 0 auto;
+    text-align: center;
+    height: 51px;
+    font-size: 28px;
+}
+
+.NetworkConfiguration-middle {
+    background: url(mid_bg.png) repeat-y;
+    height: 100%;
+    overflow: hidden;
+    width: 524px;
+}
+
+.NetworkConfiguration-middle-text {
+    border-bottom: none;
+    margin: 10px 0 0 60px;
+    width: 403px;
+    font-size: 13px;
+    padding-bottom: 11px;
+}
+
+.NetworkConfiguration-middle ul {
+    margin: 0 0 0 60px;
+    width: 405px;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
+    padding: 0;
+}
+
+.NetworkConfiguration-bottom {
+    background: url(footer_bg.png) no-repeat 0 0;
+    margin-top: 0;
+    height: 92px;
+    width: 524px;
+}
+
+.NetworkConfiguration-session-wrap {
+    font-size: 12px;
+    border-bottom: 1px dotted #636363;
+    padding-bottom: 4px;
+    padding-top: 7px;
+}
+
+.NetworkConfiguration-session-wrap.last {
+    border-bottom: none;
+}
+
+.NetworkConfiguration-session-radio-wrap {
+    float: left;
+    overflow: hidden;
+    padding: 0px 5px 0 0;
+    position: relative;
+    width: 254px;
+}
+
+.EditingAutoSave-session-text-wrap {
+    font-size: 11px;
+    overflow: hidden;
+    position: relative;
+    width: 145px;
+}
+
+#NetworkConfiguration-confirm {
+    padding-left: 230px;
+    padding-top: 20px;
+}
+
+.NetworkConfiguration-formTable {
+    margin: 15px 0 15px 80px;
+    text-align: right;
+    font-family: verdana;
+    font-size: 12px;
+}
+
+.NetworkConfiguration-formTable input.ipaddress {
+    background-color: #EEE;
+    padding: 3px;
+    border: 1px solid #000;
+    width: 36px;
+    margin-right: 10px;
+    float: left;
+}
+
+.NetworkConfiguration-formTable .NetworkConfiguration-titleCol {
+    padding-right: 15px;
+}
+
+.NetworkConfiguration-formTable hr {
+    border: none;
+    border-top: 1px dotted;
+    width: 105%;
+}
+
+.NetworkConfiguration-dot {
+    background: transparent url(images/dot.png) no-repeat 50% 100%;
+    float: left;
+}
+
+#confirm {
+    margin: 20px 0 0 230px;
+}
+
+.NetworkConfiguration-savingMessage {
+    border-bottom: medium none;
+    font-size: 13px;
+    margin: 10px 0 0 93px;
+    padding-bottom: 11px;
+    width: 403px;
+}
+
+.NetworkConfiguration-savingProgress {
+    border-bottom: medium none;
+    font-size: 13px;
+    margin: 10px 0 0 60px;
+    padding-bottom: 11px;
+    width: 403px;
+}
+
+.NetworkConfiguration-loaderWrap {
+    background: url("black_bg.png") no-repeat scroll 0 0 transparent;
+    height: 133px;
+    left: 50%;
+    margin-left: -66px;
+    margin-top: -28px;
+    position: relative;
+    top: 0;
+    width: 133px;
+}
+
+.NetworkConfiguration-image {
+    margin: 42px 0 0 42px;
+}
+
+.NetworkConfiguration-completeMessage.success {
+    background: url("save_success.png") no-repeat scroll 74px 0 transparent;
+    height: 114px;
+    margin: 10px 0 0 125px;
+    width: 100%;
+}
+
+.NetworkConfiguration-completeMessage.failed {
+    background: url("connection_fail.png") no-repeat scroll 74px 4px transparent;
+    height: 114px;
+    margin: 10px 0 0 125px;
+    width: 270px;
+}
+
+.hidden {
+    display: none;
+    visibility: hidden;
+}

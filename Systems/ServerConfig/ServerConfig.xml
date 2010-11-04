@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+    <switcher>
+      <required>yes</required>
+      <method>isIPRequest</method>
+      <switch_event>ServerConfig::paintNetworkConfiguration</switch_event>
+      <action>SquizAnalytics::paint</action>
+      <fatal>no</fatal>
+      <parameters />
+    </switcher>
+  </plugs>
+</system>
