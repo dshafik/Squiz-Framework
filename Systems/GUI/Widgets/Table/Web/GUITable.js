@@ -132,7 +132,7 @@ GUITable.prototype = {
                 colCount++;
             });
 
-            dfx.setHtml(this._loadingRow, '<td colspan="' + colCount + '"><img src="' + GUI.getWidgetURL('GUI/Table') + '/ajax-loader.gif" /></td>');
+            dfx.setHtml(this._loadingRow, '<td colspan="' + colCount + '"></td>');
         }
 
         // Hide no Items msg.
@@ -230,7 +230,7 @@ GUITable.prototype = {
                 colCount++;
             });
 
-            dfx.setHtml(this._loadingRow, '<td colspan="' + colCount + '"><img src="' + GUI.getWidgetURL('GUI/Table') + '/ajax-loader.gif" /></td>');
+            dfx.setHtml(this._loadingRow, '<td colspan="' + colCount + '"></td>');
         }
 
         // Hide no Items msg.

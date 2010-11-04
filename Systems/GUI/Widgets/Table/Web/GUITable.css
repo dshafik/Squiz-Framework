@@ -78,7 +78,7 @@ table.GUITable {
 }
 
 .GUITable tr.loadingRow td {
-    background-color: #EEE;
+    background: url(ajax-loader.gif) no-repeat 50% 50% #EEE;
     vertical-align: middle;
     text-align: center;
     height: 2.5em;
