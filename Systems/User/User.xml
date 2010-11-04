@@ -11,6 +11,14 @@
 
     <runner>
       <required>yes</required>
+      <method>processAuthentication</method>
+      <action listen="before">ServerConfig::paintNetworkConfiguration</action>
+      <fatal>no</fatal>
+      <parameters/>
+    </runner>
+
+    <runner>
+      <required>yes</required>
       <method>userLoggedin</method>
       <action listen="after">User::loginUser</action>
       <fatal>no</fatal>
