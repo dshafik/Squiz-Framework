@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
  *
  * @package    Framework
- * @subpackage LDAP
+ * @subpackage LDAPConnection
  * @author     Squiz Pty Ltd <products@squiz.net>
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
