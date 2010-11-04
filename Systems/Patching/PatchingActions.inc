@@ -1149,6 +1149,7 @@ class PatchingActions
             case 'OK':
                 // Set patching config.
                 $patchingConfig['systemid'] = $systemid;
+                $patchingConfig['notify']   = FALSE;
                 Channels::includeSystem('SystemConfig');
                 SystemConfig::setConfig('Patching', $patchingConfig);
                 return TRUE;
