@@ -539,11 +539,18 @@ class UserActions
             return;
         }
 
-        Channels::includeSystem('Attribute');
         $userid = User::getCurrentUserid();
 
         if (empty($userid) === TRUE) {
             return;
+        }
+
+        Channels::includeSystem('Attribute');
+
+        $lastLogin = Attribute::getAttributeValue($userid, 'last_login');
+        if (empty($lastLogin) === TRUE) {
+            Channels::includeSystem('Session');
+            Session::setSessionData('User', 'firstLogin', TRUE);
         }
 
         include_once 'Libs/String/String.inc';
@@ -569,7 +576,7 @@ class UserActions
         }
 
         Channels::includeSystem('Session');
-        Session::setSessionData('User', 'CurrentUserid', NULL);
+        Session::destroySession();
 
         return TRUE;
 
