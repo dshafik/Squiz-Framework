@@ -103,6 +103,7 @@ class PatchingActions
                       'label' => _('Revision'),
                       'value' => Patching::getCurrentRevision(),
                      );
+
         return $summary;
 
     }//end addProductSummary()
