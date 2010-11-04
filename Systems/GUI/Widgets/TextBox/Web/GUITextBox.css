@@ -27,3 +27,8 @@
 input.GUITextBox.usingHint {
     color: #AAA;
 }
+
+input.GUITextBox[disabled='disabled'] {
+    background-color: #EEE;
+    color: #444;
+}
