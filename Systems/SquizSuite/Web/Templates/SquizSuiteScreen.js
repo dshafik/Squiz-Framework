@@ -109,8 +109,6 @@ var SquizSuiteSquizSuiteScreen = new function()
         if (_liveProductsIdx.length > 0) {
             self._initLiveProductStatus(0, null);
         }
-
-        GUI.setModified(this, true);
     };
 
     this.toggleProductDetails = function(span) {
@@ -141,6 +139,8 @@ var SquizSuiteSquizSuiteScreen = new function()
             dfx.addClass(row, 'deleted');
             _deletedProducts[systemid] = true;
         }
+
+        GUI.setModified('SquizSuite:SquizSuiteScreen', true);
     };
 
     this.addProduct = function() {
