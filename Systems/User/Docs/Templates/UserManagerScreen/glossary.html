@@ -11,7 +11,7 @@ This section allows you to view the <glossary id="User-user">users</glossary> an
 <h1 elemid="UserManagerScreen-infoSection">Group Members Section</h1>
 This section shows the number of <glossary id="User-user">users</glossary> and <glossary id="User-user_group">users groups</glossary> that have been created in the selected <glossary id="User-user_group">user group</glossary>. You can also create new users and groups and add existing users and groups.
 
-<-- User Details -->
+<!-- User Details -->
 <h1 elemclass="UserManagerScreen-childUserDetails">Users Details</h1>
 This section shows the number of <glossary id="User-user">users</glossary> that have been created in the selected <glossary id="User-user_group">user group</glossary>. You can create new users or add existing users to the group by clicking <glossary id="User-UserManagerScreen-add_more_users_button">Add More</glossary>.
 
@@ -24,7 +24,10 @@ This button allows you to create a new <glossary id="User-user">user</glossary> 
 <h1 elemid="UserManagerScreen-addExistingUser">Link Existing User Button</h1>
 This button allows you to add an existing <glossary id="User-user">user</glossary> to the <glossary id="User-user_group">user group</glossary> that you have selected.
 
-<-- User Group Details -->
+<h1 elemclass="userManager-deleteButton-user">Delete User Icon</h1>
+This icon allows you to delete the selected <glossary id="User-user">user</glossary> from the system. When you click this icon, the user will remain on the screen but it will be disabled. It will be deleted when you click <glossary id="GUI-save_button">Save</glossary>. If you marked the wrong user for deletion, click the icon once again.
+
+<!-- User Group Details -->
 <h1 elemclass="UserManagerScreen-childGroupDetails">User Group Details</h1>
 This section shows the number of <glossary id="User-user_group">user groups</glossary> that have been created in the selected <glossary id="User-user_group">user group</glossary>. You can create new user groups or add existing user groups to the group by clicking <glossary id="User-UserManagerScreen-add_more_user_groups_button">Add More</glossary>.
 
@@ -37,15 +40,18 @@ This button allows you to create a new <glossary id="User-user_group">user group
 <h1 elemid="UserManagerScreen-addExistingGroup">Link Existing Group Button</h1>
 This button allows you to add an existing <glossary id="User-user_group">user group</glossary> to the <glossary id="User-user_group">user group</glossary> that you have selected.
 
+<h1 elemclass="userManager-deleteButton-group">Delete User Group Icon</h1>
+This icon allows you to delete the selected <glossary id="User-user_group">user group</glossary> from the system. When you click this icon, the group will remain on the screen but it will be disabled. It will be deleted when you click <glossary id="GUI-save_button">Save</glossary>. If you marked the wrong group for deletion, click the icon once again.<br><br><b>Please note, any users that have been created in this group and have not been linked into other groups will also be deleted.</b>
+
 <!-- Belongs to Section -->
 <h1 elemclass="UserManagerScreen-parentGroups">Belongs to Groups Section</h1>
-This section lists the <glossary id="User-user_group">user groups</glossary> that the selected <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> belong to. To add the user or group to another user group, click Add to another Group. To remove the user or group from a user group, click the <glossary id="User-UserManagerScreen-delete_icon">Delete icon</glossary>.
+This section lists the <glossary id="User-user_group">user groups</glossary> that the selected <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> belong to. To add the user or group to another user group, click Add to another Group. To remove the user or group from a user group, click the <glossary id="User-UserManagerScreen-delete_from_group_icon">Delete icon</glossary>.
 
-<h1>Delete Icon</h1>
-This icon allows you to remove a <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> from a <glossary id="User-user_group">user group</glossary>. When you click this icon, the user or user group will remain on the screen but it will be disabled. It will be removed when you click <glossary id="GUI-save_button">Save</glossary>. If you marked the wrong user or user group for deletion, click this icon once again. The user or user group will not be deleted.
+<h1>Delete From Group Icon</h1>
+This icon allows you to remove the selected <glossary id="User-user">user</glossary> or <glossary id="User-user_group">user group</glossary> from another group. When you click this icon, the user or group will remain on the screen but it will be disabled. It will be removed when you click <glossary id="GUI-save_button">Save</glossary>. If you marked the wrong user or group for deletion, click this icon once again. The user or user group will not be deleted.
 
 <h1 elemid="UserManagerScreen-addToAnotherGroup">Add User to Another Group Button</h1>
-This button allows you to add the select <glossary id="User-user">user</glossary> to another <glossary id="User-user_group">user group</glossary>. When you do this, the user will receive any permissions that have been granted or denied to the selected <glossary id="User-user_group">user group</glossary>.
+This button allows you to add the selected <glossary id="User-user">user</glossary> to another <glossary id="User-user_group">user group</glossary>. When you do this, the user will receive any permissions that have been granted or denied to the selected <glossary id="User-user_group">user group</glossary>.
 
 <h1 elemid="UserManagerScreen-editUserGroup-addToGroup">Add Group to Another Group Button</h1>
 This button allows you to add the selected <glossary id="User-user_group">user group</glossary> to another <glossary id="User-user_group">user group</glossary>. When you do this, the users in the group will receive any permissions that have been granted or denied to the selected <glossary id="User-user_group">user group</glossary>.
@@ -112,11 +118,17 @@ The value that is entered into this field is used as the name of the <glossary i
 <h1 elemclass="LDAP">LDAP Connection</h1>
 An LDAP Connection allows you to connect the system to an LDAP directory, which can be either OpenLDAP or Active Directory. Users will then be able to log into the system by using their LDAP username and password.
 
-<h1 elemid="UserManagerScreen-addNewLDAPConnection">New Connection Button</h1>
-This button allows you to add a new <glossary id="User-UserManagerScreen-ldap_connection">LDAP connection</glossary>. When you click this button, additional fields will appear on the screen.
+<h1 elemclass="UserManagerScreen-ldapConnectionDetails">LDAP Connections Details</h1>
+This section shows the number of <glossary id="User-UserManagerScreen-ldap_connection">LDAP connections</glossary> that have been created in the system. You can create new LDAP connections by clicking <glossary id="User-UserManagerScreen-add_more_ldap_connections_button">Add More</glossary>.
 
-<h1 elemclass="ldapConnectionCount">LDAP Connection Icon</h1>
-This icon indicates the number of <glossary id="User-UserManagerScreen-ldap_connection">LDAP connections</glossary> that have been created in the system.
+<h1 elemclass="UserManagerScreen-addMoreText-ldapConnection">Add More LDAP Connections Button</h1>
+This button will show the <glossary id="User-UserManagerScreen-create_new_connection_button">Create New Connection button</glossary>.
+
+<h1 elemid="UserManagerScreen-addNewLDAPConnection">Create New Connection Button</h1>
+This button allows you to create a new <glossary id="User-UserManagerScreen-ldap_connection">LDAP connection</glossary>.
+
+<h1 elemclass="userManager-deleteButton-ldapConnection">Delete LDAP Connection Icon</h1>
+This icon allows you to delete the selected <glossary id="User-UserManagerScreen-ldap_connection">LDAP connection</glossary> from the system. When you click this icon, the connection will remain on the screen but it will be disabled. It will be deleted when you click <glossary id="GUI-save_button">Save</glossary>. If you marked the wrong connection for deletion, click the icon once again.
 
 <!-- Create Connection -->
 <h1 elemid="UserManagerScreen-cancelCreate">Cancel LDAP Connection Button</h1>
