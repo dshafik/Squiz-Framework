@@ -56,4 +56,26 @@
       </select>
     </primary>
   </query>
+
+  <query id="removeAssetsByConnectionid">
+    <primary>
+      <delete from="asset">
+         <where>
+            <in table="asset" column="assetid">
+                <select>
+                    <fields>
+                      <field table="asset_connection" column="localid" />
+                    </fields>
+                    <from>
+                      <table>asset_connection</table>
+                    </from>
+                    <where>
+                      <equal table="asset_connection" column="connection">:connection</equal>
+                    </where>
+                </select>
+            </in>
+         </where>
+      </delete>
+    </primary>
+  </query>
 </queries>

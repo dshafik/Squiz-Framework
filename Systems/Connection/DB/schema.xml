@@ -19,7 +19,7 @@
         <foreign-key name="asset_connection_fk1" foreign-table="asset" on-delete="CASCADE">
           <column references="assetid">localid</column>
         </foreign-key>
-        <foreign-key name="asset_connection_fk2" foreign-table="asset" on-delete="CASCADE">
+        <foreign-key name="asset_connection_fk2" foreign-table="asset">
           <column references="assetid">connection</column>
         </foreign-key>
       </constraints>

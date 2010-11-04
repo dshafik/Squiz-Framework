@@ -40,5 +40,15 @@
                 <parameter>userid</parameter>
             </modify-parameters>
         </modifier>
+
+        <runner>
+          <required>yes</required>
+          <method>removeConnectionAssets</method>
+          <action listen="before">Asset::delete</action>
+          <fatal>yes</fatal>
+          <parameters>
+            <parameter>assetid</parameter>
+          </parameters>
+        </runner>
     </plugs>
 </system>

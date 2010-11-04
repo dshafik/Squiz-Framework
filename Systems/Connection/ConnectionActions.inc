@@ -272,6 +272,29 @@ class ConnectionActions
     }//end createChildAsset()
 
 
+    /**
+     * Removes assets that belong to the specified connection.
+     *
+     * @param string $connection The connection asset id.
+     *
+     * @return void
+     * @throws ChannelException If the assets cannot be removed.
+     */
+    public static function removeConnectionAssets($connection)
+    {
+        try {
+            DAL::beginTransaction();
+            // Delete all assets which belong to this connection.
+            DAL::executeQuery('Connection', 'removeAssetsByConnectionid');
+            DAL::commit();
+        } catch (ChannelException $e) {
+            DAL::rollback();
+            throw new ChannelException($e->getMessage());
+        }
+
+    }//end removeConnectionAssets()
+
+
 }//end class
 
 ?>
