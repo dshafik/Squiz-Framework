@@ -490,6 +490,9 @@ var GUI = new function()
                 self.dequeueOverlay('loading');
             } else if (data.result.success) {
                 dfx.foreach(data.result.success, function(templateKey) {
+                    _modifiedWidgets   = {};
+                    _modifiedTemplates = {};
+
                     var retVal = data.result.success[templateKey];
                     // For each template that returned a success call their "saved"
                     // method to perform extra actions.
@@ -521,8 +524,6 @@ var GUI = new function()
                     self.dequeueOverlay('loading');
                     setTimeout(function() {
                         self.dequeueOverlay('saved');
-                        _modifiedWidgets   = {};
-                        _modifiedTemplates = {};
                         self.fireSavedCallbacks();
                     }, 1000);
                 });
