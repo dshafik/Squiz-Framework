@@ -96,7 +96,6 @@ var PatchingPatchingScreen = new function()
             });
         }
 
-        GUI.setModified(this, true);
     };
 
     this.showRecipients = function() {
