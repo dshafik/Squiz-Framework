@@ -5,7 +5,7 @@
       <required>yes</required>
       <method>isIPRequest</method>
       <switch_event>ServerConfig::paintNetworkConfiguration</switch_event>
-      <action>SquizAnalytics::paint</action>
+      <action>MySource::main</action>
       <fatal>no</fatal>
       <parameters />
     </switcher>
