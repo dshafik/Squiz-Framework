@@ -397,7 +397,11 @@ class Debug
     public static function getCallingFunc()
     {
         $bt   = debug_backtrace();
-        $file = substr($bt[2]['file'], (strrpos($bt[2]['file'], '/') + 1));
+        if (isset($bt[2]['file']) === FALSE) {
+            $file = substr($bt[1]['file'], (strrpos($bt[1]['file'], '/') + 1));
+        } else {
+            $file = substr($bt[2]['file'], (strrpos($bt[2]['file'], '/') + 1));
+        }
         $res  = '';
         if (isset($bt[3]) === TRUE) {
             if (isset($bt[3]['class']) === TRUE) {
@@ -407,7 +411,12 @@ class Debug
             }
         }
 
-        $res .= ' ('.$file.' line '.$bt[2]['line'].')';
+        if (isset($bt[2]['line']) === FALSE) {
+            $line = $bt[1]['line'];
+        } else {
+            $line = $bt[2]['line'];
+        }
+        $res .= ' ('.$file.' line '.$line.')';
         return $res;
 
     }//end getCallingFunc()
