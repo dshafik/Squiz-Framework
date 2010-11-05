@@ -367,7 +367,7 @@ class HelpActions
             }
 
             // Search for the class names.
-            $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\".*'.$className.'.*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+            $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\"'.$className.'\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
             $contentResults = array();
             exec($cmd, $contentResults);
             if (empty($contentResults) === FALSE) {
@@ -380,7 +380,7 @@ class HelpActions
                 $pipedClasses   = str_replace(' ', '|', $className);
                 $pipedClasses   = ltrim($pipedClasses, '|');
                 $pipedClasses   = rtrim($pipedClasses, '|');
-                $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\".*('.$pipedClasses.').*\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
+                $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\"('.$pipedClasses.')\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
                 $contentResults = array();
                 exec($cmd, $contentResults);
                 if (empty($contentResults) === FALSE) {
