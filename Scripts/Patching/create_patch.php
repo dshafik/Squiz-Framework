@@ -87,11 +87,11 @@ if ($argc !== 4) {
     // Generate the patch diff file.
     // This bit works out what files have been added/deleted.
     echo "Generating diff and script\t\t\t\t";
-
-    // Diff excluding the data dir.
     $script  = "#!/bin/bash\n\n";
     $script .= generateAddScript($to, $from);
     $script .= generateDelScript($to, $from);
+
+    // Diff excluding the data dir.
     exec("diff -aur -x data $from $to > patch.diff");
 
     if ($productT === 'cms') {
