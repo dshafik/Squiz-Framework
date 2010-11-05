@@ -765,18 +765,163 @@ class LDAPConnectionActions
      *
      * @return array
      */
-    public static function getUserGroups($shadowid, $retVal)
+    public static function getUserGroups($shadowid, $directParentsOnly=FALSE, $retVal)
     {
         Channels::includeSystem('Asset');
         if (Asset::isAssetid($shadowid) === TRUE) {
-            return $retVal;
-        }
+            if ($shadowid >= 0) {
+                return $retVal;
+            } else {
+                // Get LDAP groups.
+                Channels::includeSystem('Connection');
+                $remoteid = Connection::getShadowidFromLocalid($shadowid);
 
-        $data = self::_getEntry($shadowid);
+                if ($directParentsOnly === TRUE) {
+                    $parents = self::_getUserGroups($remoteid, 1, 1);
+                } else {
+                    $parents = self::_getUserGroups($remoteid);
+                }
+
+                foreach ($parents as $parent) {
+                    $parentid = $parent['parentid'];
+                    // Might have a localid.
+                    $parts   = Connection::splitShadowid($parentid);
+                    $localid = Connection::getLocalid($parts['connection'], '_dn---'.$parts['remoteid'].'_');
+                    if ($localid !== FALSE) {
+                        $retVal[] = $localid;
+                    } else {
+                        $retVal[] = $parentid;
+                    }
+                }
+
+                $retVal = array_unique($retVal);
+            }
+        }
 
         return $retVal;
 
     }//end getUserGroups()
+
+
+    /**
+     * Retrieves parents of a remote asset.
+     *
+     * @param string $remoteid Remote asset ID.
+     * @param mixed  $minLevel The minimum level to get the parent.
+     * @param mixed  $maxLevel The maximum level to get the parent
+     *                         Get all levels if min and max are both zero.
+     *
+     * @return array
+     */
+    private static function _getUserGroups(
+        $remoteid,
+        $minLevel=NULL,
+        $maxLevel=NULL
+    ) {
+        Channels::includeSystem('Connection');
+        $parts        = Connection::splitShadowid($remoteid);
+        $connectionid = $parts['connection'];
+        $remote       = self::_getDNFromRemoteid($remoteid);
+
+        Channels::includeSystem('Attribute');
+        $conn     = LDAPConnection::getConnection($connectionid);
+        $groupids = array();
+
+        // First, find where this user belong to. Some groups might define it. (direct parents).
+        $groupMember = self::_getConfigValue($connectionid, 'groupAttributes', 'groupMembers');
+        $filter      = '('.$groupMember.'='.$remote.')';
+        $sr          = LDAP::search($conn, self::_getConfigValue($connectionid, 'details', 'baseDN'), $filter);
+        $entries     = LDAP::getEntries($conn, $sr);
+        $data1       = LDAP::getData($entries);
+        foreach ($data1 as $data) {
+            $groupids[] = $data['dn'];
+        }
+
+        // Now, does user have groupMembership field? (direct parents).
+        $matches  = array();
+        $memberOf = self::_getConfigValue($connectionid, 'groupAttributes', 'groupMembership');
+        $regex    = '|'.$memberOf.'=([^,]+),(.*)|i';
+        $data2    = array();
+        preg_match_all($regex, $remote, $matches);
+        if (empty($matches[1]) === FALSE) {
+            $groupName = array_shift($matches[1]);
+            $groupDn   = array_shift($matches[2]);
+            $baseDn    = $memberOf.'='.$groupName.','.$groupDn;
+            $filter    = '(&(objectClass=organizationalUnit)('.$memberOf.'='.$groupName.'))';
+            $sr        = LDAP::search($conn, $baseDn, $filter);
+            $entries   = LDAP::getEntries($conn, $sr);
+            $data2     = LDAP::getData($entries);
+            foreach ($data2 as $data) {
+                $groupids[] = $data['dn'];
+            }
+        }//end if
+
+        // Okay. Now, let's extract ALL the groups in the heirarchy
+        // where the user belongs to from groupid.
+        $baseDNSetting = self::_getConfigValue($connectionid, 'details', 'baseDN');
+        $basednLen   = strlen($baseDNSetting);
+        $newGroupids = array();
+        foreach ($groupids as $groupid) {
+            $basednPos     = strpos($groupid, $baseDNSetting);
+            $newGroupids[] = $groupid;
+            if ($maxLevel !== 1 && $basednPos === (strlen($groupid) - $basednLen)) {
+                $basednSubStr = substr($groupid, 0, ($basednPos - 1));
+                $parts        = explode(',', $basednSubStr);
+                $partsLen     = count($parts);
+                if ($partsLen > 1) {
+                    $subStr = $baseDNSetting;
+                    for ($i = ($partsLen - 1); $i > 0; $i--) {
+                        $subStr        = $parts[$i].','.$subStr;
+                        $newGroupids[] = $subStr;
+                    }
+                }
+            } else {
+                $newGroupids = $groupids;
+            }
+        }//end foreach
+
+        $parents = array();
+        $unique  = array();
+        foreach ($newGroupids as $groupid) {
+            $assetid = $connectionid.'-'.$groupid;
+            $entry   = self::_getEntry($connectionid.'-'.$groupid);
+            if ($entry !== NULL) {
+                $assetid = $connectionid.'-'.self::_getRemoteId($connectionid, $entry);
+            }
+
+            $shadowid = Connection::getLocalid($connectionid, $groupid);
+            if ($shadowid !== FALSE) {
+                $assetid = $shadowid;
+            }
+
+            if (isset($unique[$assetid]) === FALSE) {
+                $parents[]        = array('parentid' => $assetid);
+                $unique[$assetid] = '1';
+            }
+        }
+
+        if ($minLevel === 1 && $maxLevel === 1) {
+            // Is the connection a direct parent?
+            $entry = self::_getEntry($remoteid);
+            $dn    = $entry['dn'];
+            $left  = rtrim(str_replace($baseDNSetting, '', $dn), ',');
+            $parts = explode(',', $left);
+            if (count($parts) === 1) {
+                if (isset($unique[$connectionid]) === FALSE) {
+                    $parents[]             = array('parentid' => $connectionid);
+                    $unique[$connectionid] = '1';
+                }
+            }
+        } else {
+            if (isset($unique[$connectionid]) === FALSE) {
+                $parents[]             = array('parentid' => $connectionid);
+                $unique[$connectionid] = '1';
+            }
+        }
+
+        return $parents;
+
+    }//end getParents()
 
 
     /**

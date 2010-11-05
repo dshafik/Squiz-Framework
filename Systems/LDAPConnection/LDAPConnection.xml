@@ -38,6 +38,7 @@
       <fatal>no</fatal>
       <parameters>
         <parameter>userid</parameter>
+        <parameter>directParentsOnly</parameter>
         <parameter>retval</parameter>
       </parameters>
    </refiner>
