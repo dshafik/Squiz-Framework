@@ -1477,17 +1477,27 @@ class GUIActions
                 }
 
                 foreach ($child->childNodes as $condChild) {
-                    $parseTagRes = self::_parseTag($condChild, $varName);
+                    $assignVarName = $varName;
+                    if ($condChild->tagName === 'value') {
+                        // The 'value' tags are used as array indexes and therefore
+                        // if condition should not override the assignTo variable
+                        // when calling parseTag.
+                        $assignVarName = $assignTo;
+                    }
+
+                    $parseTagRes = self::_parseTag($condChild, $assignVarName);
                     if (empty($parseTagRes) === TRUE) {
                         continue;
                     }
 
                     $php .= $parseTagRes."\n";
 
-                    if ($assignTo === NULL) {
-                        $php .= 'echo (isset('.$varName.') === TRUE ? '.$varName." : '');\n";
-                    } else {
-                        $php .= $assignTo.' = (isset('.$varName.') === TRUE ? '.$varName." : '');\n";
+                    if ($condChild->tagName !== 'value') {
+                        if ($assignTo === NULL) {
+                            $php .= 'echo (isset('.$assignVarName.') === TRUE ? '.$assignVarName." : '');\n";
+                        } else {
+                            $php .= $assignTo.' = (isset('.$assignVarName.') === TRUE ? '.$assignVarName." : '');\n";
+                        }
                     }
                 }
 
