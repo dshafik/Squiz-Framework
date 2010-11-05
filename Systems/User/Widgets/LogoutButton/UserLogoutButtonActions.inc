@@ -43,8 +43,14 @@ class UserLogoutButtonActions
         $id    = $settings['widget']['id'];
         $class = $settings['widget']['type'];
 
-        echo '<a id="'.$id.'" class="'.$class.' GUIToolbar-button" title="'._('Click to logout').'"';
-        echo ' onclick="dfx.addClass(dfx.getId(\''.$id.'\'), \'active\');GUI.getWidget(\''.$id.'-intervention\').show();"><div class="'.$class.'-icon"></div></a>';
+        Channels::includeSystem('User');
+        Channels::includeSystem('Attribute');
+        $userid   = User::getCurrentUserid();
+        $userName = Attribute::getAttributeValue($userid, 'name');
+
+        echo '<a id="'.$id.'" class="'.$class.' GUIToolbar-button" title="';
+        printf(_('Currently logged in as %s (#%s). Click to logout.'), $userName, $userid);
+        echo '" onclick="dfx.addClass(dfx.getId(\''.$id.'\'), \'active\');GUI.getWidget(\''.$id.'-intervention\').show();"><div class="'.$class.'-icon"></div></a>';
 
         Channels::includeSystem('GUI');
 
@@ -66,8 +72,8 @@ class UserLogoutButtonActions
         $ivSettings = array(
                        'targetElementid'  => $id,
                        'elementContents'  => $ivContents,
-                       'fixedPositioning' => true,
-                       'persistent'       => true,
+                       'fixedPositioning' => TRUE,
+                       'persistent'       => TRUE,
                       );
         echo GUI::createWidget($id.'-intervention', 'GUIIntervention', $ivSettings);
 
