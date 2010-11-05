@@ -52,6 +52,16 @@
                             <where>
                                 <or>
                                     <equal table="role_privilege" column="privilege">:privilege</equal>
+                                    <equal table="role_privilege" column="privilege">
+                                        <function function="concat">
+                                            <arg>:privilege</arg>
+                                            <arg>'.%'</arg>
+                                        </function>
+                                    </equal>
+                                    <like>
+                                        <value>:privilege</value>
+                                        <field table="role_privilege" column="privilege"/>
+                                    </like>
                                     <like>
                                         <field table="role_privilege" column="privilege"/>
                                         <function function="concat">
