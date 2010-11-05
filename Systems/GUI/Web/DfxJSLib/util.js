@@ -564,6 +564,21 @@ dfx.anchorPart = function(url)
 };
 
 /**
+ * Returns given URL without the anchor part if it was given.
+ */
+dfx.noAnchorPartUrl = function(url)
+{
+    var aStartIdx = url.search(/\#/);
+    if (aStartIdx === -1) {
+        return url;
+    } else {
+        var url = url.substr(0, aStartIdx);
+        return url;
+    }//end if
+
+};
+
+/**
  * Adds given (var => value) list to the given URLs query string.
  */
 dfx.addToQueryString = function(url, addQueries)
