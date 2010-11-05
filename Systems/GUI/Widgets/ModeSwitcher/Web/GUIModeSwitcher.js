@@ -233,7 +233,7 @@ GUIModeSwitcher.prototype = {
 
         var self = this;
         // Add a magic 2px as in IE8 the mode switch arrow looks funky expanded without it.
-        // Guess 2px because the expand shows 2 new buttons and there is a 1px error per button
+        // Guess 2px because the expand shows 2 new buttons and there is a 1px error per button.
         var newWidth = this._staticButtonsWidth + this._dynamicButtonsWidth + 2;
         dfx.attr(this._sliderElement, 'state', 1);
         dfx.animate(this._sliderElement, {
@@ -245,6 +245,9 @@ GUIModeSwitcher.prototype = {
         dfx.animate(this._dynamicBtnContainer, {
             left: (this._staticButtonsWidth - this._leftMargin)
         }, seconds);
+
+        var expanderSpan = dfx.getClass('GUIModeSwitcher-expander', dfx.getId(this.id))[0];
+        dfx.addClass(expanderSpan, 'expanded');
 
     },
 
@@ -274,6 +277,9 @@ GUIModeSwitcher.prototype = {
                 left: this._getSlideOffset()
             }, this._slideTime);
         }
+
+        var expanderSpan = dfx.getClass('GUIModeSwitcher-expander', dfx.getId(this.id))[0];
+        dfx.removeClass(expanderSpan, 'expanded');
 
     },
 
@@ -322,6 +328,7 @@ GUIModeSwitcher.prototype = {
         this.collapse();
 
         GUIContentSwitcher.prototype.buttonClicked.call(this, button);
+
     },
 
     loadMode: function(system, modeid)
