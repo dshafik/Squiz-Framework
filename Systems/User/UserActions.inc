@@ -366,10 +366,14 @@ class UserActions
         Channels::includeSystem('Asset');
         if (Asset::isAssetid($userid) === TRUE) {
             Channels::includeSystem('Linking');
+
+            $typeFilter   = Asset::getChildTypes('userGroup', NULL, TRUE);
+            $typeFilter[] = 'userGroup';
+
             if ($directParentsOnly === FALSE) {
-                $parentQ = Linking::getParents($userid, 0, 65525, array('userGroup'));
+                $parentQ = Linking::getParents($userid, 0, 65525, $typeFilter);
             } else {
-                $parentQ = Linking::getImmediateParents($userid, NULL, array('userGroup'));
+                $parentQ = Linking::getImmediateParents($userid, NULL, $typeFilter);
             }
 
             $groupids = DAL::getAssoc($parentQ, 0);
