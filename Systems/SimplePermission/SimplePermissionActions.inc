@@ -101,8 +101,13 @@ class SimplePermissionActions implements PermissionActions
 
         if ($userid === NULL) {
             $userid = User::getCurrentUserid();
-            Channels::modifyBasket('userid', $userid);
         }
+
+        // Get groups.
+        $groups   = User::getUserGroups($userid);
+        $groups[] = $userid;
+
+        Channels::modifyBasket('userid', $groups);
 
         $query  = DAL::getQuery('SimplePermission', 'hasPermission');
         $result = (bool) DAL::getOne($query);

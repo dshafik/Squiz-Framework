@@ -40,7 +40,7 @@
                 </from>
                 <where>
                     <equal table="permission" column="resource">:resource</equal>
-                    <equal table="permission" column="userid">:userid</equal>
+                    <in table="permission" column="userid">:userid</in>
                     <in table="permission" column="roleid">
                         <select>
                             <fields>
