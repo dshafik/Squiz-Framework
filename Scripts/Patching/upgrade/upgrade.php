@@ -154,6 +154,52 @@ Configuration::addAttribute(
     0
 );
 
+
+// Install new asset types.
+echo "Adding asset types...";
+Channels::includeSystem('AssetType');
+AssetType::install('redirect', 'Redirect', 'CMSAssets', 'asset');
+AssetType::install('searchPage', 'Search Page', 'Search', 'page');
+include '/var/www/mysource4/htdocs/data/AssetType/AssetPaths.inc';
+$paths['redirect']   = '/var/www/mysource4/htdocs/Systems/CMSAssets/AssetTypes/RedirectAssetType';
+$paths['searchpage'] = '/var/www/mysource4/htdocs/Systems/Search/AssetTypes/SearchPageAssetType';
+file_put_contents(
+    '/var/www/mysource4/htdocs/data/AssetType/AssetPaths.inc',
+    '<?php'."\n".'$paths = '.var_export($paths, 1).';'."\n".'?>'."\n"
+);
+echo "[Done]\n";
+
+
+echo "Reload Wizard XML Files...\n";
+// Create the data/Wizard dir if it does not exist.
+require_once 'Libs/FileSystem/FileSystem.inc';
+$dataPath    = '/var/www/mysource4/htdocs/data/Wizard/Wizards';
+$wizards     = array();
+$systemsPath = Channels::getSystemsPath();
+if (file_exists($systemsPath) === TRUE) {
+    $postfix = '_wizard.xml';
+    $wizards = FileSystem::listDirectory($systemsPath, array('.xml'), TRUE, TRUE, $postfix);
+}
+
+// Copy all the wizards in to the data/Wizard/Wizards directory.
+foreach ($wizards as $wizardPath) {
+    $baseName = FileSystem::getBaseName($wizardPath);
+    copy($wizardPath, $dataPath.'/'.$baseName);
+}
+echo "[Done]\n";
+
+
+echo "Rename MySource Matrix connection...\n";
+AssetType::updateTypeName('mySourceMatrixConnection', 'Squiz Matrix Connection');
+echo "[Done]\n";
+
+
+echo "Install SearchBoxDesignArea.\n";
+Channels::includeSystem('Design');
+Design::writeDesignAreasCacheFile();
+echo "[Done]\n";
+
+
 // This should come at the very very END!
 echo "Put the cron script back....";
     $cronContent = '* * * * * root /var/www/mysource4/htdocs/Scripts/network_update.sh
