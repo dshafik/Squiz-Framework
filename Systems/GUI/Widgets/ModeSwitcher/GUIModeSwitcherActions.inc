@@ -53,10 +53,9 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
         echo '<div id="'.$id.'" class="Switcher GUIContentSwitcher '.$class.' GUI-alignLeft">';
         echo '  <div class="'.$class.'-overflow GUI-alignLeft">';
 
-
-        $total    = count($settings['items']);
-        $count    = 1;
         $items    = Util::getArrayIndex($settings, 'items', array());
+        $total    = count($items);
+        $count    = 1;
         $initItem = Util::getArrayIndex($settings, 'initialItem', NULL);
         $selected = '';
 
@@ -72,7 +71,7 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
 
         // If only one expandable button would exist, then make that button static
         // instead.
-        $expandableButtons = count($settings['items']) - $staticButtons;
+        $expandableButtons = ($total - $staticButtons);
         if ($expandableButtons === 1) {
             $staticButtons++;
             $expandableButtons = 0;
