@@ -96,12 +96,33 @@ class GUIContentSwitcherActions
             $settings['initialItem'] = $queryString['sq_'.$id];
         }
 
+        $screens = array();
+        if (isset($settings['items']) === TRUE) {
+            $screens = $settings['items'];
+        }
+
         Channels::includeSystem('GUI');
         $initialItem = Util::getArrayIndex($settings, 'initialItem', NULL);
         if (empty($initialItem) === TRUE) {
             // Use the first item.
             if (empty($settings['items']) === FALSE) {
-                $settings['initialItem'] = $settings['items'][0]['id'];
+                $current = reset($settings['items']);
+                $settings['initialItem'] = $current['id'];
+            }
+        } else if (empty($screens) === FALSE) {
+            // Check if initial item is in the items list, if not use the first
+            // item as the initial item.
+            $found = FALSE;
+            foreach ($screens as $screen) {
+                if ($settings['initialItem'] === $screen['id']) {
+                    $found = TRUE;
+                    break;
+                }
+            }
+
+            if ($found === FALSE) {
+                $current = reset($screens);
+                $settings['initialItem'] = $current['id'];
             }
         }
 
