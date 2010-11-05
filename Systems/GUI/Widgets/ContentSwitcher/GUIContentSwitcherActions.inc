@@ -138,7 +138,7 @@ class GUIContentSwitcherActions
         }
 
         $settings['_items'] = array();
-        foreach ($settings['items'] as $item) {
+        foreach ($screens as $item) {
             unset($item['itemContent']);
             $settings['_items'][] = $item;
         }
@@ -217,11 +217,7 @@ class GUIContentSwitcherActions
     {
         $content = '';
         Channels::includeSystem('GUI');
-        $items = $settings['items'];
-
-        if (empty($items) === TRUE) {
-            throw new ChannelException('No items were specified for content switcher');
-        }
+        $items = Util::getArrayIndex($settings, 'items', array());
 
         $content .= '<div id="'.$settings['widget']['id'].'-itemContents">';
         foreach ($items as $item) {
