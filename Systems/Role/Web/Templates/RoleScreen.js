@@ -62,6 +62,7 @@ var RoleRoleScreen = new function()
 
         // Add role item delete toggle event.
         GUI.getWidget('rolesList').addItemToggledCallback(function(itemid, deleted, itemElement) {
+            GUI.setModified('Role::RoleScreen', true);
             // Item was deleted or re-added.
             if (deleted === true) {
                 removedRoles[itemid] = true;
@@ -216,6 +217,7 @@ var RoleRoleScreen = new function()
     var _handleClick = function(e, topElem) {
         var target = dfx.getMouseEventTarget(e);
         if (dfx.hasClass(target, 'RoleScreen-privListItem-toggle') === true) {
+            GUI.setModified('Role::RoleScreen', true);
             if (changeToggleState(target.parentNode) === true) {
                 return;
             }
