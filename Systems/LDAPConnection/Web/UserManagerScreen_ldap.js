@@ -62,7 +62,7 @@ var UserUserManagerScreen_ldap = new function()
                 //    content: [response]
                 //});
             } else {
-                browserWidget.reload();
+                UserUserManagerScreen.reloadBrowser();
             }
         }, 'raw');
     };
