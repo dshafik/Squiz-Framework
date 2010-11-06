@@ -2014,7 +2014,6 @@ class HelpActions
 
             $href  = 'Help.closeMenu();Help.loadIndexPage(\''.$systemName.'\');';
             $html .= '<li onclick="'.$href.'" id="Help-dialog-sysMenuItem-'.$systemName.'" >';
-            $html .= '<div style="background-image:url('.$iconURL.')" class="Help-systemsMenu-itemIcon">&nbsp;</div>';
             $html .= '<a href="javascript:'.$href.'">'.$systemTitle.'</a>';
             $html .= '<div class="Help-systemsMenu-selectedIcon"></div>';
             $html .= '</li>';
