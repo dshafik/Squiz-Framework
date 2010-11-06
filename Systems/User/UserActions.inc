@@ -1653,6 +1653,8 @@ class UserActions
         Channels::includeSystem('Linking');
         Channels::includeSystem('Asset');
 
+        $disableAccount = FALSE;
+
         // Update parent groups.
         $currentGroups = User::getUserGroups($assetid, TRUE);
         $removedGroups = Util::getArrayIndex($parents, 'removed');
@@ -1661,9 +1663,7 @@ class UserActions
                 if (Linking::isLastLink($assetid) === TRUE
                     && Asset::isTypeOf($assetid, 'user') === TRUE
                 ) {
-                    // Set user account status to inactive so that they cannot login.
-                    Channels::includeSystem('Configuration');
-                    Configuration::setAttributeValue($assetid, 'status', FALSE);
+                    $disableAccount = TRUE;
                 }
 
                 Linking::deleteLink($groupid, $assetid);
@@ -1681,9 +1681,16 @@ class UserActions
                     && in_array($newGroupid, $currentGroups) === FALSE
                     && (Asset::isTypeOf($newGroupid, 'userGroup') === TRUE || in_array($newGroupid, $usersFolders) === TRUE)
                 ) {
+                    $disableAccount = FALSE;
                     Linking::createLink($newGroupid, $assetid);
                 }
             }
+        }
+
+        if ($disableAccount === TRUE) {
+            // Set user account status to inactive so that they cannot login.
+            Channels::includeSystem('Configuration');
+            Configuration::setAttributeValue($assetid, 'status', FALSE);
         }
 
     }//end _saveAssetParentGroups()
