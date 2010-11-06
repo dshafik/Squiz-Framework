@@ -29,9 +29,9 @@
 }
 
 .UserManagerScreen-userManager-item.LDAP {
-    background-position: 100% -152px;
+    background-position: 118px -152px;
 }
 
 .GUIColumnBrowser-item-button.selected .UserManagerScreen-userManager-item.LDAP {
-    background-position: 100% -228px;
+    background-position: 118px -228px;
 }
