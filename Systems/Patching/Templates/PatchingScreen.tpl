@@ -101,7 +101,7 @@
                             <items>
                                 <value>
                                     <content>
-                                        <div class="PatchingScreen-activateWrap">
+                                        <div id="PatchingScreen-checkASAPSection" class="PatchingScreen-activateWrap">
                                             <span class="PatchingScreen-nextCheckString">
                                                 <dataProvider action="Patching::getNextUpdateCheckTime" />
                                             </span>
@@ -114,7 +114,7 @@
                                 </value>
                                 <value>
                                     <content>
-                                        <div class="PatchingScreen-activateWrap">
+                                        <div id="PatchingScreen-LastUpdatedSection" class="PatchingScreen-activateWrap">
                                             <span><text>Last Updated</text></span>
                                             <span class="PatchingScreen-lastUpdatedString">
                                                 <dataProvider action="Patching::getLastUpdatedTime" />
@@ -124,7 +124,7 @@
                                 </value>
                                 <value>
                                     <content>
-                                        <div class="PatchingScreen-activateWrap">
+                                        <div id="PatchingScreen-UpdateSubscriptionSection" class="PatchingScreen-activateWrap">
                                             <span>Update Subscription</span>
                                             <span class="PatchingScreen-subscriptionInfo">
                                                 <dataProvider action="Patching::getSubscriptionInfo" />

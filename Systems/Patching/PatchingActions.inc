@@ -1953,7 +1953,7 @@ class PatchingActions
         $notify     = $config['notify'];
 
         // Notification Toggle button.
-        $toggleBtnRow = '<div class="PatchingScreen-activateWrap"><span>'._('Notify of New Updates').'</span>%s</div>';
+        $toggleBtnRow = '<div id="PatchingScreen-NotifyNewUpdatesSection" class="PatchingScreen-activateWrap"><span>'._('Notify of New Updates').'</span>%s</div>';
         $toggleBtn    = GUI::createWidget(
             'PatchingScreen-notifyUpdates',
             'GUIToggleButton',
@@ -1965,6 +1965,7 @@ class PatchingActions
         // Notification User List row. It will be only shown
         // if the notification is activated.
         Channels::includeSystem('User');
+        
         foreach ($recipients as $userid) {
             $user = User::getUserById($userid);
             $name = ucwords($user['first_name'].' '.$user['last_name']);
