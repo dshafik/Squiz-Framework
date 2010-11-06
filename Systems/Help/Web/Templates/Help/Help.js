@@ -23,13 +23,13 @@
 
 var Help = new function()
 {
-    var _apiURL              = null;
-    var _searchURL           = null;
-    var _systemInfos         = {};
-    var _currentSystem       = null;
-    var _iframe              = null;
-    var _loadPageOpts        = null;
-    var _pageLoadedCallback  = null;
+    var _apiURL             = null;
+    var _searchURL          = null;
+    var _systemInfos        = {};
+    var _currentSystem      = null;
+    var _iframe             = null;
+    var _loadPageOpts       = null;
+    var _pageLoadedCallback = null;
 
     this.init = function() {
         var elem = dfx.getId('Help-dialog');
@@ -60,10 +60,6 @@ var Help = new function()
             dfx.setStyle(iframe, 'height', (contentSize.height - navHeight - 27) + 'px');
         });
 
-        /*setInterval(function() {
-            Help.pointer.updateLinkIconStates(dfx.getIframeDocument(_iframe));
-        }, 1500);*/
-
         GUI.addRequestCompleteCallback(function() {
             // Each time a GUI request is completed update link icon states incase
             // new content is available.
@@ -80,6 +76,8 @@ var Help = new function()
                 }
 
                 self.search(value);
+                dfx.preventDefault(e);
+                return false;
             }
         });
 
