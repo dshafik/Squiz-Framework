@@ -73,6 +73,8 @@ var GUI = new function()
     };
 
     this.removeWidget = function(id) {
+        var removed = false;
+
         if (this.widgetStore[id]) {
             if (this.widgetStore[id].removeWidget) {
                 this.widgetStore[id].removeWidget();
@@ -80,14 +82,14 @@ var GUI = new function()
 
             this.widgetStore[id] = null;
             delete this.widgetStore[id];
-            return true;
+            removed = true;
         }
 
         if (_modifiedWidgets[id]) {
             delete _modifiedWidgets[id];
         }
 
-        return false;
+        return removed;
     };
 
     this.createWidget = function(type, id, settings, creator) {
