@@ -187,6 +187,7 @@ class GUIScreenSettingsActions
      */
     public static function printItem($itemid, $itemContent, array $settings, $index)
     {
+        $id      = $settings['widget']['id'];
         $class   = $settings['widget']['type'];
         $warning = FALSE;
 
@@ -228,7 +229,7 @@ class GUIScreenSettingsActions
             );
 
             if ($allowRemove === TRUE) {
-                echo '<div class="GUI-delete"><span class="GUI-deleteIcon" /></div>';
+                echo '<div class="GUI-delete"><span class="GUI-deleteIcon '.$id.'-deleteItem" /></div>';
             }
         }
 
