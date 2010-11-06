@@ -74,11 +74,18 @@ class GUITextBoxActions
     protected static $type = 'text';
 
     /**
-     * Disabled field for 'checkbox' type.
+     * Disabled field.
      *
      * @var string
      */
     protected static $disabled = FALSE;
+
+    /**
+     * Readonly field.
+     *
+     * @var string
+     */
+    protected static $readonly = FALSE;
 
     /**
      * If TRUE then the input box will have the focus.
@@ -212,9 +219,14 @@ class GUITextBoxActions
 
         echo '" '.$name.' type="'.$type.'" value="'.$value.'" size="'.$size.'"'.$maxlength;
 
+        // If someone put both of disabled and readonly to be TRUE,
+        // it will use disabled as a setting.
         $disabled = Util::getArrayIndex($settings, 'disabled', self::$disabled);
+        $readonly = Util::getArrayIndex($settings, 'readonly', self::$readonly);
         if ($disabled === TRUE) {
             echo ' disabled="disabled"';
+        } else if ($readonly === TRUE) {
+            echo ' readonly="readonly"';
         }
 
         echo ' />';
