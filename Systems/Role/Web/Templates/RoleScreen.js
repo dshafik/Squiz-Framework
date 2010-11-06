@@ -356,6 +356,8 @@ var RoleRoleScreen = new function()
 
         // Focus textbox so that user can type in the new name.
         GUI.getWidget('role-name').select();
+
+        GUI.setModified('Role::RoleScreen', true);
     };
 
     this.getValue = function() {
@@ -370,7 +372,7 @@ var RoleRoleScreen = new function()
     };
 
     this.saved = function() {
-        GUI.setModified(this, false);
+        GUI.setModified('Role::RoleScreen', false);
         GUI.reloadTemplate('Role:RoleScreen');
     };
 
