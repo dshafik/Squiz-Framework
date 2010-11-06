@@ -52,26 +52,18 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
 
-if ($argc !== 4) {
-    echo "Usage: php create_patch.php <PRODUCT_TYPE> <FROM_REV>:<FROM_FRAMEWORK_REV> <TO_REV>:<TO_FRAMEWORK_REV>\n";
+if ($argc !== 3) {
+    echo "Usage: php create_patch.php <FROM_REV>:<FROM_FRAMEWORK_REV> <TO_REV>:<TO_FRAMEWORK_REV>\n";
     exit;
 } else {
-    $productTypes = array(
-                     'cms',
-                     'analytics',
-                     'search',
-                     'update',
-                     'ci'
-                    );
-
-    $productT = strtolower(trim($argv[1]));
-    if (in_array($productT, $productTypes) === FALSE) {
-        echo "Invalid product type has been entered.\n";
+    $productT = getProductType();
+    if ($productT === 'unknown') {
+        echo "Unknown product type.\n";
         exit;
     }
 
-    $from = $argv[2];
-    $to   = $argv[3];
+    $from = $argv[1];
+    $to   = $argv[2];
 
     $parts   = explode(':', $from);
     $from    = $parts[0];
@@ -81,8 +73,8 @@ if ($argc !== 4) {
     $to    = $parts[0];
     $toFrm = $parts[1];
 
-    rebakeSystem($to, $toFrm, 'TO');
-    rebakeSystem($from, $fromFrm, 'FROM');
+    rebakeSystem($productT, $to, $toFrm, 'TO');
+    rebakeSystem($productT, $from, $fromFrm, 'FROM');
 
     // Generate the patch diff file.
     // This bit works out what files have been added/deleted.
@@ -141,38 +133,21 @@ if ($argc !== 4) {
 
 
 /**
- * Checks out a rebake a particular system.
+ * Rebake the exported system.
  *
- * @param integer $revision The revision of the system.
+ * @param string  $productT   Type of the product like cms, analytics.
+ * @param integer $revision   Product revision number to export.
+ * @param integer $frameRev   Framework revision number to export.
+ * @param string  $systemType Type of the system to create a patch like FROM, TO.
  *
  * @return void
  */
-function rebakeSystem($revision, $frameRev, $systemType='')
+function rebakeSystem($productT, $revision, $frameRev, $systemType='')
 {
-    // Get the clean code first from subversion repository.
-    // Since the time to exporting is long, we will cache the
-    // file and use it by copying it.
-    // Also, the way it gets the repository should be dynamic as
-    // we now have multiple product repositories.
-    $command = 'svn info '.dirname(__FILE__).'/../../ | grep "URL:"';
-    $isCMS   = FALSE;
-    $output  = array();
-    exec($command, $output);
-    if (count($output) === 1) {
-        $output = $output[0];
-        if (strpos($output, 'URL: ') === 0) {
-            $output    = str_replace('URL: ', '', $output);
-            $sourceURL = trim($output);
-        }
-    } else {
-        $isCMS     = TRUE;
-        $sourceURL = 'https://cvs.squiz.net/svn/mysource/trunk';
-    }
-
-    $basename = basename($sourceURL);
-    $command  = 'rm -rf '.$revision.' patch '.$basename;
+    $sourceURL = getSourceURL();
+    $basename  = basename($sourceURL);
+    $command   = 'rm -rf '.$revision.' patch '.$basename;
     exec($command);
-
     exportVersion($revision, $frameRev, $sourceURL);
 
     echo "Copying from the exported revision $revision_export\n";
@@ -206,7 +181,7 @@ function rebakeSystem($revision, $frameRev, $systemType='')
     }
 
     $script = 'mv '.$basename.' patch && ';
-    if ($isCMS === TRUE) {
+    if ($productT === 'cms') {
         $script .= 'mkdir patch/web && ';
     }
 
@@ -228,14 +203,13 @@ function rebakeSystem($revision, $frameRev, $systemType='')
     $realPathEsc  = str_replace('/', '\/', $realPath);
     $patchPathEsc = str_replace('/', '\/', $patchPath);
     $command      = "find patch | xargs grep -l '$realPath' | xargs sed -i -e 's/$realPathEsc/$patchPathEsc/g'";
-    echo $command."\n";
     exec($command);
 
     // Clean and rebake.
     echo "\tBaking revision $revision\n";
     $script  = 'cd patch && ';
 
-    if ($isCMS === TRUE) {
+    if ($productT === 'cms') {
         $script .= 'php clean.php --patch && ';
     } else {
         $script .= 'php Scripts/clean.php && ';
@@ -252,6 +226,15 @@ function rebakeSystem($revision, $frameRev, $systemType='')
             if (file_exists($filePath) === TRUE) {
                 $res = unlink($filePath);
             }
+        }
+
+        if ($productT === 'cms' && $systemType === 'FROM') {
+            // CMS Product, always remove the minified JS files
+            // from the FROM system so that the new minified files
+            // can be added all the time.
+            $script  = 'rm '.$revision.'/web/mysource.jgz;';
+            $script .= 'rm '.$revision.'/web/dfx.jgz;';
+            exec($script);
         }
     } else if ($systemType !== '' && $systemType === 'TO') {
         foreach ($paths_to_remove_after_baking_TO_system as $path) {
@@ -473,6 +456,41 @@ function echoDone()
     echo exec('echo -n "[ " ; echo -en "\033[0;32mDone" ; tput sgr0 ; echo " ]"')."\n";
 
 }//end echoDone()
+
+function getProductType()
+{
+    $productTypes = array(
+                     'https://cvs.squiz.net/svn/mysource/trunk'  => 'cms',
+                     'https://cvs.squiz.net/svn/squiz-analytics' => 'analytics',
+                     'https://cvs.squiz.net/svn/squiz-search'    => 'search',
+                    );
+
+    $sourceURL = getSourceURL();
+    if ($sourceURL === FALSE) {
+        return 'unknown';
+    }
+
+    return $productTypes[$sourceURL];
+
+}//end getProductType()
+
+function getSourceURL()
+{
+    $command = 'svn info '.dirname(__FILE__).'/../../ | grep "URL:"';
+    $output  = array();
+    exec($command, $output);
+    if (count($output) === 1) {
+        $output = $output[0];
+        if (strpos($output, 'URL: ') === 0) {
+            $output    = str_replace('URL: ', '', $output);
+            $sourceURL = trim($output);
+            return $sourceURL;
+        }
+    }
+
+    return FALSE;
+
+}//end getSourceURL()
 
 
 ?>
