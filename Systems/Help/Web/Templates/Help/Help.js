@@ -46,9 +46,10 @@ var Help = new function()
         var navHeight = parseInt(dfx.getElementHeight(dfx.getClass('Help-controls', elem)[0]));
         var iframe    = dfx.getId('Help-iframe');
         _iframe       = iframe;
-        iframe.onload = function(e) {
+
+        dfx.addEvent(iframe, 'load', function() {
             self.iframeLoaded();
-        }
+        });
 
         var midElem    = dfx.getClass('GUIDialog-middle', elem)[0];
         var initHeight = parseInt(dfx.getElementHeight(midElem));
