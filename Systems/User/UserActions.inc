@@ -796,7 +796,7 @@ class UserActions
     {
         $currentUserid = User::getCurrentUserid();
         if ($currentUserid === $userid) {
-            throw new ChannelException(_('You cannot remove your self from super users list'));
+            throw new ChannelException(_('You cannot remove yourself from the Super Users list'));
         }
 
         try {
@@ -1308,7 +1308,7 @@ class UserActions
     {
         Channels::includeSystem('User');
         if (User::isSystemAdministrator() === FALSE) {
-            throw new ChannelException(_('You must be a super user to access this screen'));
+            throw new ChannelException(_('You must be a super user to be able to access this screen'));
         }
 
         $errors = array();
@@ -1525,7 +1525,7 @@ class UserActions
                     if (empty($users) === TRUE) {
                         Asset::delete($assetid);
                     } else {
-                        return array('errors' => _('Cannot remove a Super User'));
+                        return array('errors' => _('You cannot delete a Super User'));
                     }
                 }
 
