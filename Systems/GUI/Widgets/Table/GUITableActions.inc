@@ -45,6 +45,20 @@ class GUITableActions
     protected static $selectable = TRUE;
 
     /**
+     * If FALSE the Save button will not be enabled when widget value is changed.
+     *
+     * @var boolean
+     */
+    protected static $enablesSaveButton = TRUE;
+
+    /**
+     * If FALSE the GUI.setModified method will not be called when value is changed.
+     *
+     * @var boolean
+     */
+    protected static $requiresSave = TRUE;
+
+    /**
      * List of table columns.
      *
      * Expected array structure is array('columnid' => 'Column Title').

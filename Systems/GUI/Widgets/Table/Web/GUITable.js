@@ -182,7 +182,7 @@ GUITable.prototype = {
             }
 
             dfx.remove(tmp);
-            GUI.setModified(self, true);
+            self._setModified.call(self, true);
 
             if (callback) {
                 callback.call(self, rows);
@@ -281,7 +281,7 @@ GUITable.prototype = {
             }
 
             dfx.remove(tmp);
-            GUI.setModified(self, true);
+            self._setModified.call(self, true);
 
             if (callback) {
                 callback.call(self, rows);
@@ -305,7 +305,7 @@ GUITable.prototype = {
             dfx.removeClass(rowElement, 'deleted');
         }
 
-        GUI.setModified(this, true);
+        this._setModified(true);
 
     },
 
@@ -447,6 +447,21 @@ GUITable.prototype = {
         }
 
         dfx.removeClass(this.elem, 'noItems');
+
+    },
+
+    _setModified: function(status)
+    {
+        // If this widget does not require save then there is no reason to call setModified.
+        if (this.settings.requiresSave === false) {
+            return;
+        }
+
+        if (this.settings.enablesSaveButton === false) {
+            GUI.setModified(this, status, true);
+        } else {
+            GUI.setModified(this, status, false);
+        }
 
     }
 
