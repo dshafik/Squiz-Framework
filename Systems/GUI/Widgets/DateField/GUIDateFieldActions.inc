@@ -58,56 +58,70 @@ class GUIDateFieldActions
      */
     protected static $yearRange = NULL;
 
+    /**
+     * If FALSE the Save button will not be enabled when widget value is changed.
+     *
+     * @var boolean
+     */
+    protected static $enablesSaveButton = TRUE;
 
-	/**
-	 * Returns this widget's content.
-	 *
-	 * @param array $settings The list of settings for this widget.
-	 *
-	 * @return void
-	 */
-	public static function paint(array $settings=array())
-	{
-	    $defaultYears = array(
-	                     'min' => 1900,
-	                     'max' => 2100,
-	                    );
+    /**
+     * If FALSE the GUI.setModified method will not be called when value is changed.
+     *
+     * @var boolean
+     */
+    protected static $requiresSave = TRUE;
 
-	    $widgetPrefix = $settings['widget']['id'];
-	    $widgetClass  = $settings['widget']['type'];
-	    $yearRange    = Util::getArrayIndex($settings, 'yearRange', $defaultYears);
-	    $initialDate  = Util::getArrayIndex($settings, 'initialDate', date('Y-m-d'));
-	    $inline       = Util::getArrayIndex($settings, 'inline', FALSE);
 
-	    if ($inline === TRUE) {
-	        $enclosingTag = 'span';
-	    } else {
-	        $enclosingTag = 'div';
-	    }
+    /**
+     * Returns this widget's content.
+     *
+     * @param array $settings The list of settings for this widget.
+     *
+     * @return void
+     */
+    public static function paint(array $settings=array())
+    {
+        $defaultYears = array(
+                         'min' => 1900,
+                         'max' => 2100,
+                        );
 
-	    // If we were given a numeric initial date, then turn it into
-	    // an ISO8601 date.
-	    if (is_numeric($initialDate) === TRUE) {
-	        $initialDate = date('Y-m-d', $initialDate);
-	    }
+        $widgetPrefix = $settings['widget']['id'];
+        $widgetClass  = $settings['widget']['type'];
+        $yearRange    = Util::getArrayIndex($settings, 'yearRange', $defaultYears);
+        $initialDate  = Util::getArrayIndex($settings, 'initialDate', date('Y-m-d'));
+        $inline       = Util::getArrayIndex($settings, 'inline', FALSE);
 
-	    $dateParts = explode('-', substr($initialDate, 0, 10));
+        if ($inline === TRUE) {
+            $enclosingTag = 'span';
+        } else {
+            $enclosingTag = 'div';
+        }
 
-	    echo '<'.$enclosingTag.' id="'.$widgetPrefix.'" class="'.$widgetClass.'">';
+        // If we were given a numeric initial date, then turn it into
+        // an ISO8601 date.
+        if (is_numeric($initialDate) === TRUE) {
+            $initialDate = date('Y-m-d', $initialDate);
+        }
 
-	    $dayOptions = array();
-	    for ($i = 1; $i <= 31; $i++) {
-	        $dayOptions[$i] = $i;
-	    }
+        $dateParts = explode('-', substr($initialDate, 0, 10));
 
-	    $selectSettings = array(
-	                       'options'  => $dayOptions,
-	                       'selected' => (int) $dateParts[2],
-	                      );
-	    echo GUI::createWidget($widgetPrefix.'-day', 'GUISelect', $selectSettings);
-	    echo ' ';
+        echo '<'.$enclosingTag.' id="'.$widgetPrefix.'" class="'.$widgetClass.'">';
 
-	    $monthOptions = array(
+        $dayOptions = array();
+        for ($i = 1; $i <= 31; $i++) {
+            $dayOptions[$i] = $i;
+        }
+
+        $selectSettings = array(
+                           'options'  => $dayOptions,
+                           'selected' => (int) $dateParts[2],
+                          );
+        echo GUI::createWidget($widgetPrefix.'-day', 'GUISelect', $selectSettings);
+        echo ' ';
+
+        $monthOptions = array(
                          1  => _('Jan'),
                          2  => _('Feb'),
                          3  => _('Mar'),
@@ -122,59 +136,59 @@ class GUIDateFieldActions
                          12 => _('Dec'),
                         );
 
-	    $selectSettings = array(
-	                       'options'  => $monthOptions,
-	                       'selected' => (int) $dateParts[1],
-	                      );
-	    echo GUI::createWidget($widgetPrefix.'-month', 'GUISelect', $selectSettings);
-	    echo ' ';
+        $selectSettings = array(
+                           'options'  => $monthOptions,
+                           'selected' => (int) $dateParts[1],
+                          );
+        echo GUI::createWidget($widgetPrefix.'-month', 'GUISelect', $selectSettings);
+        echo ' ';
 
-	    foreach ($yearRange as $yearRangeIndex => &$yearRangePart) {
-	        if (substr($yearRangePart, 0, 1) === '+') {
-	            // Adding years from the current year if the first character is '+'.
-	            $yearDiff = substr($yearRangePart, 1);
-	            if (is_numeric($yearDiff) === TRUE) {
-	                $yearRangePart = date('Y') + $yearDiff;
-	            } else {
-	                $yearRangePart = $defaultYears[$yearRangeIndex];
-	            }
-	        } else if (substr($yearRangePart, 0, 1) === '-') {
-	            // Subtracting years from the current year if the first character is '-'.
-	            $yearDiff = substr($yearRangePart, 1);
-	            if (is_numeric($yearDiff) === TRUE) {
-	                $yearRangePart = date('Y') - $yearDiff;
-	            } else {
-	                $yearRangePart = $defaultYears[$yearRangeIndex];
-	            }
-	        } else if (is_numeric($yearRangePart) === FALSE) {
-	            // If not numeric, fail it.
-	            $yearRangePart = $defaultYears[$yearRangeIndex];
-	        }//end if
-	    }//end foreach
+        foreach ($yearRange as $yearRangeIndex => &$yearRangePart) {
+            if (substr($yearRangePart, 0, 1) === '+') {
+                // Adding years from the current year if the first character is '+'.
+                $yearDiff = substr($yearRangePart, 1);
+                if (is_numeric($yearDiff) === TRUE) {
+                    $yearRangePart = date('Y') + $yearDiff;
+                } else {
+                    $yearRangePart = $defaultYears[$yearRangeIndex];
+                }
+            } else if (substr($yearRangePart, 0, 1) === '-') {
+                // Subtracting years from the current year if the first character is '-'.
+                $yearDiff = substr($yearRangePart, 1);
+                if (is_numeric($yearDiff) === TRUE) {
+                    $yearRangePart = date('Y') - $yearDiff;
+                } else {
+                    $yearRangePart = $defaultYears[$yearRangeIndex];
+                }
+            } else if (is_numeric($yearRangePart) === FALSE) {
+                // If not numeric, fail it.
+                $yearRangePart = $defaultYears[$yearRangeIndex];
+            }//end if
+        }//end foreach
 
-	    unset($yearRangePart);
+        unset($yearRangePart);
 
-	    $yearOptions = array();
-	    for ($i = $yearRange['min']; $i <= $yearRange['max']; $i++) {
-	        $yearOptions[$i] = $i;
-	    }
+        $yearOptions = array();
+        for ($i = $yearRange['min']; $i <= $yearRange['max']; $i++) {
+            $yearOptions[$i] = $i;
+        }
 
-	    $selectSettings = array(
-	                       'options'  => $yearOptions,
-	                       'selected' => (int) $dateParts[0],
-	                      );
-	    echo GUI::createWidget($widgetPrefix.'-year', 'GUISelect', $selectSettings);
+        $selectSettings = array(
+                           'options'  => $yearOptions,
+                           'selected' => (int) $dateParts[0],
+                          );
+        echo GUI::createWidget($widgetPrefix.'-year', 'GUISelect', $selectSettings);
 
-	    echo '</'.$enclosingTag.'>';
+        echo '</'.$enclosingTag.'>';
 
-	    // Replace the initial date and year range with the sanitised versions
-	    // for the JavaScript to munch on.
-	    $settings['yearRange']   = $yearRange;
-	    $settings['initialDate'] = $initialDate;
+        // Replace the initial date and year range with the sanitised versions
+        // for the JavaScript to munch on.
+        $settings['yearRange']   = $yearRange;
+        $settings['initialDate'] = $initialDate;
 
-		return $settings;
+        return $settings;
 
-	}//end paint()
+    }//end paint()
 
 
 }//end class

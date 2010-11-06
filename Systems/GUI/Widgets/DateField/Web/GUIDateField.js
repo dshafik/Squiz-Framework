@@ -23,108 +23,108 @@
 
 function GUIDateField(id, settings)
 {
-	this.id       = id;
-	this.settings = settings;
+    this.id       = id;
+    this.settings = settings;
 
-	this._currentValue = this.settings.initialDate;
-	this._dayWidget    = GUI.getWidget(this.id + '-day');
-	this._monthWidget  = GUI.getWidget(this.id + '-month');
-	this._yearWidget   = GUI.getWidget(this.id + '-year');
+    this._currentValue = this.settings.initialDate;
+    this._dayWidget    = GUI.getWidget(this.id + '-day');
+    this._monthWidget  = GUI.getWidget(this.id + '-month');
+    this._yearWidget   = GUI.getWidget(this.id + '-year');
 
-	this.changeEnabled = false;
+    this.changeEnabled = false;
 
-	// Add a widget for the date changing.
-	GUI.addWidgetEvent(this, 'change');
+    // Add a widget for the date changing.
+    GUI.addWidgetEvent(this, 'change');
 
-	this.init();
+    this.init();
 }
 
 GUIDateField.prototype = {
-	/**
-	 * Initialises the Date Field widget.
-	 */
-	init: function()
-	{
-	    var self = this;
-	    this.validateDate();
+    /**
+     * Initialises the Date Field widget.
+     */
+    init: function()
+    {
+        var self = this;
+        this.validateDate();
 
-	    this._dayWidget.addChangeCallback(function() {
+        this._dayWidget.addChangeCallback(function() {
             if (self.changeEnabled === true) {
                 self.dateChanged.call(self);
             }
-	    });
+        });
 
-	    this._monthWidget.addChangeCallback(function() {
-            if (self.changeEnabled === true) {
-                self.dateChanged.call(self);
-	        }
-	    });
-
-	    this._yearWidget.addChangeCallback(function() {
+        this._monthWidget.addChangeCallback(function() {
             if (self.changeEnabled === true) {
                 self.dateChanged.call(self);
             }
-	    });
+        });
 
-	    this.changeEnabled = true;
-	},
+        this._yearWidget.addChangeCallback(function() {
+            if (self.changeEnabled === true) {
+                self.dateChanged.call(self);
+            }
+        });
 
-	validateDate: function()
-	{
-	    var day   = this._dayWidget.getValue()[0];
-	    var month = this._monthWidget.getValue()[0];
-	    var year  = this._yearWidget.getValue()[0];
+        this.changeEnabled = true;
+    },
 
-	    var leapYear = false;
-	    if (year % 100 === 0) {
-	        if (year % 400 === 0) {
-	            leapYear = true;
-	        }
-	    } else {
-	        if (year % 4 === 0) {
-	            leapYear = true;
-	        }
-	    }//end if
+    validateDate: function()
+    {
+        var day   = this._dayWidget.getValue()[0];
+        var month = this._monthWidget.getValue()[0];
+        var year  = this._yearWidget.getValue()[0];
 
-	    // Calculate how many days there should be in the month.
-	    var maxDay = 31;
-	    if (month === '02') {
-	        if (leapYear === true) {
-	            maxDay = 29;
-	        } else {
-	            maxDay = 28;
-	        }
-	    } else {
-	        var monthsWith30Days = ['04', '06', '09', '11'];
-	        if (monthsWith30Days.inArray(month) === true) {
-	            maxDay = 30;
-	        }
-	    }//end if
+        var leapYear = false;
+        if (year % 100 === 0) {
+            if (year % 400 === 0) {
+                leapYear = true;
+            }
+        } else {
+            if (year % 4 === 0) {
+                leapYear = true;
+            }
+        }//end if
 
-	    // If a month/year change has caused the day to fall out of range,
-	    // change it. Don't fire an additional dateChanged event for this.
-	    if (day > maxDay) {
-	        var oldCE = this.changeEnabled;
-	        this.changeEnabled = false;
-	        this._dayWidget.setValue([maxDay.toString()]);
-	        this.changeEnabled = oldCE;
-	    }
+        // Calculate how many days there should be in the month.
+        var maxDay = 31;
+        if (month === '02') {
+            if (leapYear === true) {
+                maxDay = 29;
+            } else {
+                maxDay = 28;
+            }
+        } else {
+            var monthsWith30Days = ['04', '06', '09', '11'];
+            if (monthsWith30Days.inArray(month) === true) {
+                maxDay = 30;
+            }
+        }//end if
 
-	    // Disable any days in the month that are not valid for this month/year
-	    // selection.
-	    var daySelect = dfx.getId(this._dayWidget.id);
-	    for (var i = 0; i < daySelect.options.length; i++) {
-	        var option = daySelect.options[i];
-	        if (parseInt(option.value, 10) > maxDay) {
-	            option.disabled = true;
-	        } else {
-	            option.disabled = false;
-	        }
-	    }
-	},
+        // If a month/year change has caused the day to fall out of range,
+        // change it. Don't fire an additional dateChanged event for this.
+        if (day > maxDay) {
+            var oldCE = this.changeEnabled;
+            this.changeEnabled = false;
+            this._dayWidget.setValue([maxDay.toString()]);
+            this.changeEnabled = oldCE;
+        }
 
-	dateChanged: function()
-	{
+        // Disable any days in the month that are not valid for this month/year
+        // selection.
+        var daySelect = dfx.getId(this._dayWidget.id);
+        for (var i = 0; i < daySelect.options.length; i++) {
+            var option = daySelect.options[i];
+            if (parseInt(option.value, 10) > maxDay) {
+                option.disabled = true;
+            } else {
+                option.disabled = false;
+            }
+        }
+    },
+
+    dateChanged: function()
+    {
         this.validateDate();
         var newValue = this.getValue();
 
@@ -136,26 +136,27 @@ GUIDateField.prototype = {
         if (this.currentValue !== newValue) {
             this.currentValue = newValue;
             this.fireChangeCallbacks(newValue);
+            this._setModified(true);
         }
-	},
+    },
 
-	getValue: function()
-	{
-	    var ok = true;
+    getValue: function()
+    {
+        var ok = true;
 
-	    if (this._dayWidget.getValue().length === 0) {
-	        ok = false;
-	    }
+        if (this._dayWidget.getValue().length === 0) {
+            ok = false;
+        }
 
-	    if (this._monthWidget.getValue().length === 0) {
-	        ok = false;
-	    }
+        if (this._monthWidget.getValue().length === 0) {
+            ok = false;
+        }
 
-	    if (this._yearWidget.getValue().length === 0) {
-	        ok = false;
-	    }
+        if (this._yearWidget.getValue().length === 0) {
+            ok = false;
+        }
 
-	    if (ok === true) {
+        if (ok === true) {
             var day   = this._dayWidget.getValue()[0];
             var month = this._monthWidget.getValue()[0];
             var year  = this._yearWidget.getValue()[0];
@@ -172,31 +173,52 @@ GUIDateField.prototype = {
         } else {
             return null;
         }
-	},
+    },
 
-	setValue: function(newDate)
-	{
-	    var dateParts = newDate.split(/-/);
-	    var oldCE = this.changeEnabled;
+    setValue: function(newDate)
+    {
+        var dateParts = newDate.split(/-/);
+        var oldCE = this.changeEnabled;
 
-	    this.changeEnabled = false;
+        this.changeEnabled = false;
 
-	    this._yearWidget.setValue([parseInt(dateParts[0], 10).toString()]);
-	    this._monthWidget.setValue([parseInt(dateParts[1], 10).toString()]);
-	    this._dayWidget.setValue([parseInt(dateParts[2], 10).toString()]);
+        this._yearWidget.setValue([parseInt(dateParts[0], 10).toString()]);
+        this._monthWidget.setValue([parseInt(dateParts[1], 10).toString()]);
+        this._dayWidget.setValue([parseInt(dateParts[2], 10).toString()]);
 
-	    // Now fire the event in one go.
-	    this.changeEnabled = oldCE;
-	    this.dateChanged();
-	},
+        // Now fire the event in one go.
+        this.changeEnabled = oldCE;
+        this.dateChanged();
+    },
 
-	getDateObject: function()
-	{
-	    return new Date(this.getValue());
-	},
+    getDateObject: function()
+    {
+        return new Date(this.getValue());
+    },
 
-	revert: function()
-	{
-	    this.setValue(this.settings.initialDate);
-	}
+    revert: function()
+    {
+        this.setValue(this.settings.initialDate);
+    },
+
+    _setModified: function(status)
+    {
+        // Unset the widgets' modified state, so we have a single modified state
+        // for the entire widget.
+        GUI.setModified(this._dayWidget, false);
+        GUI.setModified(this._monthWidget, false);
+        GUI.setModified(this._yearWidget, false);
+
+        // If this widget does not require save then there is no reason to call setModified.
+        if (this.settings.requiresSave === false) {
+            return;
+        }
+
+        if (this.settings.enablesSaveButton === false) {
+            GUI.setModified(this, status, true);
+        } else {
+            GUI.setModified(this, status, false);
+        }
+
+    }
 };
