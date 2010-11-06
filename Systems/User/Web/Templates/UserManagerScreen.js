@@ -290,6 +290,14 @@ var UserUserManagerScreen = new function()
         _reloadBrowser();
     };
 
+    this.reloadBrowser = function() {
+        var template = GUI.getCurrentTemplate();
+        GUI.setModified(template, false);
+
+        _reloading = true;
+        GUI.getWidget('userManager-assetBrowser').reload();
+    };
+
     var _showAssetPicker = function(callback) {
         var options = {
             modal: true
@@ -307,11 +315,7 @@ var UserUserManagerScreen = new function()
     };
 
     var _reloadBrowser = function() {
-        var template = GUI.getCurrentTemplate();
-        GUI.setModified(template, false);
-
-        _reloading = true;
-        GUI.getWidget('userManager-assetBrowser').reload();
+        UserUserManagerScreen.reloadBrowser();
     };
 
 };
