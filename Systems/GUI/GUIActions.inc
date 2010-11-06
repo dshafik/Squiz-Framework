@@ -331,7 +331,7 @@ class GUIActions
 
             foreach (self::$_browserTypes as $bType => $parent) {
                 if (strpos(basename($file), '.'.$bType.'.') !== FALSE) {
-                    if (isset($browserSpecificCSS[$bType]) === FALSE) {
+                    if (isset($allCSSFiles[$bType]) === FALSE) {
                         $allCSSFiles[$bType] = array();
                     }
 
