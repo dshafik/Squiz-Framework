@@ -2079,7 +2079,7 @@ class SquizSuiteActions
                        );
 
             if (strpos($product['status'], 'pending') === 0) {
-                $setting['disabled'] = TRUE;
+                $setting['readonly'] = TRUE;
             }
 
             $colContent  = '<div class="SquizSuiteScreen-productDetailWrap">';
