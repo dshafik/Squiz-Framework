@@ -224,6 +224,7 @@ class GUIColumnBrowserActions
         $children   = Util::getArrayIndex($itemInfo, 'children', array());
         $childCount = Util::getArrayIndex($itemInfo, 'childCount', NULL);
         $isButton   = Util::getArrayIndex($itemInfo, 'isButton', FALSE);
+        $title      = Util::getArrayIndex($itemInfo, 'title', $itemid);
 
         if ($childCount === NULL && empty($children) === TRUE) {
             $childCount = count($children);
@@ -236,7 +237,7 @@ class GUIColumnBrowserActions
 
         $selectedClass = '';
         if ($selected === TRUE) {
-            $selectedClass = ' selected';
+            $selectedClass = ' selected lastClicked';
         }
 
         $content = trim($content);
@@ -244,7 +245,7 @@ class GUIColumnBrowserActions
             $content = '&nbsp;';
         }
 
-        echo '<div itemid="'.$itemid.'" class="'.$class.$buttonClass.$selectedClass.'" childcount="'.$childCount.'">';
+        echo '<div itemid="'.$itemid.'" itemtitle="'.$title.'" class="'.$class.$buttonClass.$selectedClass.'" childcount="'.$childCount.'">';
         echo '<div class="'.$class.'-content'.$buttonClass.'">';
         echo $content;
         echo '</div>';

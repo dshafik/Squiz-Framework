@@ -140,13 +140,14 @@ GUIColumnBrowser.prototype = {
 
         dfx.addClass(itemElement, 'selected');
 
+        // Remove lastClicked class from all elements and add it to the new clicked element.
+        // This class is used to determine the element that is the parent of next column,
+        // since there can be more than 1 selected item we cannot use that..
+        dfx.removeClass(dfx.getClass('lastClicked', itemElement.parentNode), 'lastClicked');
+        dfx.addClass(itemElement, 'lastClicked');
+
         // Show the children of this item in the next column.
         this.showChildren(itemElement);
-
-        // Update lineage widget if its available.
-        if (this._lineageWidget) {
-            this._lineageWidget.setLineage(this.getLineage());
-        }
 
         this.fireItemClickedCallbacks(dfx.attr(itemElement, 'itemid'), dfx.attr(itemElement, 'childcount'), itemElement);
 
@@ -209,6 +210,11 @@ GUIColumnBrowser.prototype = {
 
         // Hide all other columns that shouldnt be visible.
         this._hideColumn((parentLevel + 2));
+
+        // Update lineage widget if its available.
+        if (this._lineageWidget) {
+            this._lineageWidget.setLineage(this.getLineage());
+        }
 
     },
 
@@ -292,7 +298,7 @@ GUIColumnBrowser.prototype = {
 
     getLineage: function(asArray)
     {
-        var selectedItems = dfx.getClass('GUIColumnBrowser-column-card visible', this.elem);
+        var selectedItems = dfx.getClass('GUIColumnBrowser-item selected lastClicked', this.elem);
         var sln           = selectedItems.length;
         var lineage       = null;
         if (asArray === true) {
@@ -303,8 +309,13 @@ GUIColumnBrowser.prototype = {
 
         for (var i = 0; i < sln; i++) {
             var selected = selectedItems[i];
-            var itemid   = dfx.attr(selected, 'parentid');
-            var title    = dfx.attr(selected, 'parentTitle');
+            if (dfx.hasClass(selected.parentNode, 'visible') !== true) {
+                continue;
+            }
+
+            // Find the last clicked element.
+            var itemid = dfx.attr(selected, 'itemid');
+            var title  = dfx.attr(selected, 'itemtitle');
 
             if (!itemid) {
                 itemid = null;
@@ -315,6 +326,10 @@ GUIColumnBrowser.prototype = {
             } else {
                 lineage[itemid] = title;
             }
+        }
+
+        if (asArray === true) {
+            lineage.unshift(null);
         }
 
         return lineage;
@@ -370,19 +385,9 @@ GUIColumnBrowser.prototype = {
             dfx.empty(wrapper);
             dfx.setHtml(wrapper, contents);
 
-            if (selected.length > 0) {
-                selected = selected.shift();
-                if (self.selectItem(selected, -1) === false && self.selectItem(selected, -2) === false) {
-                    while (self.selectItem(selected, -1) === false && lineage.length > 0) {
-                        var prevSelected = selected;
-                        selected = lineage.pop();
-                        if (selected === null) {
-                            self.selectItem(prevSelected, -2);
-                            return;
-                        }
-                    }
-                }
-            }
+            var selection = dfx.getClass('GUIColumnBrowser-item selected lastClicked', this.elem);
+            selected      = selection.pop();
+            dfx.trigger(selected, 'click');
         }, 'raw');
 
     }
