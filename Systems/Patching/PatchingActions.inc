@@ -226,7 +226,7 @@ class PatchingActions
      * @since  4.0.0
      * @return void
      */
-    private static function _extractPatch($name)
+    public static function extractPatch($name)
     {
         // Unzip tar file into data dir and register patch.
         $dataDir   = BaseSystem::getDataDir('Patching');
@@ -240,7 +240,7 @@ class PatchingActions
         mkdir($targetDir, 0777);
         exec('tar -xvzf '.$filepath.' -C '.$targetDir);
 
-    }//end _extractPatch()
+    }//end extractPatch()
 
 
     /**
@@ -253,7 +253,7 @@ class PatchingActions
      */
     private static function _extractPatchNote($name)
     {
-        self::_extractPatch($name);
+        Patchingh::extractPatch($name);
 
         $dataDir   = BaseSystem::getDataDir('Patching');
         $targetDir = $dataDir.'/'.$name;
