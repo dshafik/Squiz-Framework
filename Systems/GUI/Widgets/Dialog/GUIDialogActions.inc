@@ -133,7 +133,7 @@ class GUIDialogActions
      *
      * @var string
      */
-    protected static $position = 'absolute';
+    protected static $position = 'fixed';
 
     /**
      * The left position of the dialog.
