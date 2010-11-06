@@ -1,5 +1,6 @@
 #userLogoutButton {
     -moz-border-radius: 14px 0 0 14px;
+    padding-left: 3px;
 }
 
 #userLogoutButton.GUIToolbar-button .UserLogoutButton-icon {
