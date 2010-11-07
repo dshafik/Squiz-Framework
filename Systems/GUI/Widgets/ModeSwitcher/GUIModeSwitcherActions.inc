@@ -80,7 +80,7 @@ class GUIModeSwitcherActions extends GUIContentSwitcherActions
         $settings['numberOfStaticButton'] = $staticButtons;
 
         $classes = array('SwitcherList');
-        if ($total === 1) {
+        if ($total < 2) {
             $classes[] = 'oneButton';
         } else if ($expandableButtons === 0) {
             $classes[] = 'noOverflow';
