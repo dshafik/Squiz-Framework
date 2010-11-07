@@ -65,7 +65,7 @@ GUITable.prototype = {
                     self._rowClicked(target);
                     break;
                 } else if (dfx.isTag(target, 'div') === true && dfx.hasClass(target, 'GUI-delete') === true) {
-                    self.toggleRow(target.parentNode.parentNode.parentNode);
+                    self.toggleRow.call(self, target.parentNode.parentNode.parentNode);
                     break;
                 } else if (dfx.hasClass(target, 'GUITable-colRemovedOverlay') === true) {
                     // Delete overlay was clicked, do nothing.
