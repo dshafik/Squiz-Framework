@@ -95,6 +95,7 @@ label.GUI-requiredField {
 .GUI-overlayOpacity {
     background-color: #000;
     opacity: 0.85;
+    filter: alpha(opacity = 85);
     position: absolute;
     width: 100%;
     height: 100%;
