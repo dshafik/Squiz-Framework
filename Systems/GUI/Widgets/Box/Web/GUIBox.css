@@ -34,6 +34,7 @@
 .GUIBox-content {
     position: relative;
     border: 1px solid #dcdcdc;
+    background-color: #FFF;
     border-top: none;
     border-bottom-left-radius: 9px;
     border-bottom-right-radius: 9px;
