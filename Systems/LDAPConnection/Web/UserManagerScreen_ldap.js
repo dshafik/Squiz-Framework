@@ -80,6 +80,7 @@ var UserUserManagerScreen_ldap = new function()
 
         switch (assetType) {
             case 'LDAPUser':
+            case 'LDAPUserGroup':
                 details.assetid = dfx.jsonEncode((browserWidget.getValue()).pop());
                 details.parents = GUI.getWidget('UserManagerScreen-parentsList').getValue();
             break;

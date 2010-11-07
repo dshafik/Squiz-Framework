@@ -462,7 +462,7 @@ class LDAPConnectionActions
 
 
     /**
-     * Blocker for the Linking::getImmediateChildren().
+     * Refiner for the Linking::getImmediateChildren().
      *
      * @param string       $parentid      The ID of the parent asset.
      * @param boolean      $withSortOrder If TRUE, the result query returns
@@ -474,40 +474,42 @@ class LDAPConnectionActions
      */
     public static function getImmediateChildren(
         $parentid,
-        $withSortOrder=FALSE,
-        $types=array()
+        $withSortOrder,
+        $types,
+        $retval
     ) {
-        $conn         = NULL;
-        $remote       = FALSE;
-        $connectionid = NULL;
-
         Channels::includeSystem('Asset');
-        if (Asset::isAssetid($parentid) === TRUE) {
-            // Is a valid assetid check if its an LDAPConnection asset, if it is
-            // get the LDAP connection.
-            $conn = LDAPConnection::getConnection($parentid);
-            if ($conn === NULL) {
-                // Do not block not an LDAP asset.
-                return FALSE;
-            }
+        Channels::includeSystem('Connection');
 
-            $connectionid = $parentid;
-        } else {
-            // Could be a connection asset.
-            Channels::includeSystem('Connection');
+        if (Asset::isAssetid($parentid) === TRUE) {
+            // Could be a Connection asset or could be a remote asset with
+            // a local ID.
+            $remoteid = Connection::getShadowidFromLocalid($parentid);
+            if ($remoteid === NULL) {
+                // Assume it is a connection ID, which will be checked later.
+                $connectionid = $parentid;
+            } else {
+                $parentid = $remoteid;
+            }
+        }
+
+        // Note we are checking the new parentid here, which may
+        // have been changed above.
+        $remote = FALSE;
+        if (Asset::isAssetid($parentid) === FALSE) {
             $parts = Connection::splitShadowid($parentid);
             if ($parts === FALSE) {
-                // Do not block not a connection asset.
-                return FALSE;
+                return $retval;
             }
 
             $remote       = TRUE;
-            $conn         = LDAPConnection::getConnection($parts['connection']);
             $connectionid = $parts['connection'];
-        }//end if
+        }
 
+        // Now we check if the connection belongs to us.
+        $conn = LDAPConnection::getConnection($connectionid);
         if ($conn === NULL) {
-            return FALSE;
+            return $retval;
         }
 
         $connInfo = LDAPConnection::getConnectionInfo($connectionid);
@@ -577,7 +579,8 @@ class LDAPConnectionActions
             $children = array_unique($children);
         }
 
-        return $children;
+        $retval = array_merge($children, $retval);
+        return $retval;
 
     }//end getImmediateChildren()
 
@@ -706,7 +709,6 @@ class LDAPConnectionActions
      */
     public static function getTypeOfAsset($shadowid)
     {
-        $assetTypes = 'asset';
         Channels::includeSystem('Asset');
         if (is_array($shadowid) === FALSE) {
             if (Asset::isAssetid($shadowid) === TRUE) {
@@ -717,35 +719,34 @@ class LDAPConnectionActions
             if ($data !== NULL && isset($data['assetType']) === TRUE) {
                 $assetTypes = $data['assetType'];
             }
-        } else {
-            // First get Asset system to return local asset types.
-            $localAssetids = array();
-            foreach ($shadowid as $index => $id) {
-                if (Asset::isAssetid($id) === TRUE) {
-                    $localAssetids[] = $id;
-                    unset($shadowid[$index]);
-                }
-            }
 
-            // If no shadow ids then do not block.
-            if (empty($shadowid) === TRUE) {
-                return FALSE;
-            }
+            return $assetTypes;
+        }
 
-            $localTypes = array();
-            if (empty($localAssetids) === FALSE) {
-                $localTypes = Asset::getTypeOfAsset($localAssetids);
+        // First get Asset system to return local asset types.
+        $localAssetids = array();
+        foreach ($shadowid as $index => $id) {
+            if (Asset::isAssetid($id) === TRUE) {
+                $localAssetids[] = $id;
+                unset($shadowid[$index]);
             }
+        }
 
-            // Get LDAP types.
-            $ldapTypes = array();
-            foreach ($shadowid as $id) {
-                $data           = self::_getEntry($id);
-                $ldapTypes[$id] = $data['assetType'];
-            }
+        // If no shadow ids then do not block.
+        if (empty($shadowid) === TRUE) {
+            return FALSE;
+        }
 
-            $assetTypes = array_merge($ldapTypes, $localTypes);
-        }//end if
+        $assetTypes = array();
+        if (empty($localAssetids) === FALSE) {
+            $assetTypes = Asset::getTypeOfAsset($localAssetids);
+        }
+
+        // Get LDAP types.
+        foreach ($shadowid as $id) {
+            $data           = self::_getEntry($id);
+            $assetTypes[$id] = $data['assetType'];
+        }
 
         return $assetTypes;
 

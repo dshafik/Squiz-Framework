@@ -28,10 +28,34 @@ Asset::includeAsset('asset');
 /**
  * LDAPUserGroupAssetType.
  *
- * Represents an individual user.
+ * Represents an group of users.
  */
 class LDAPUserGroupAssetType extends AssetAssetType
 {
+
+
+    /**
+     * Saves User Manager Screen changes for an LDAP group.
+     *
+     * @param array $data Save data.
+     *
+     * @return void
+     *
+     * @api            write
+     * @api-permission superuser
+     */
+    public static function saveUserManagerScreen(array $data)
+    {
+        Channels::includeSystem('Asset');
+        if (Asset::isAssetid($data['assetid']) === TRUE) {
+            Channels::includeSystem('Connection');
+            $shadowid = Connection::getShadowidFromLocalid($data['assetid']);
+            if ($shadowid === NULL) {
+                throw new ChannelException(_('Not a valid LDAP User'));
+            }
+        }
+
+    }//end saveUserManagerScreen()
 
 
 }//end class

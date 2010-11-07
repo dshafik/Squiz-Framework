@@ -1,16 +1,18 @@
 <?xml version="1.0"?>
 <system>
   <plugs>
-     <blocker>
+    <refiner>
       <required>yes</required>
       <method>getImmediateChildren</method>
       <action>Linking::getImmediateChildren</action>
+      <fatal>no</fatal>
       <parameters>
         <parameter>parentid</parameter>
         <parameter>withSortOrder</parameter>
         <parameter>types</parameter>
+        <parameter>retval</parameter>
       </parameters>
-    </blocker>
+   </refiner>
 
     <blocker>
       <required>yes</required>
