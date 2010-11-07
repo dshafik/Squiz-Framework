@@ -44,6 +44,20 @@ class GUIToggleButtonActions
      */
     protected static $toggleAction = NULL;
 
+    /**
+     * If FALSE the Save button will not be enabled when widget value is changed.
+     *
+     * @var boolean
+     */
+    protected static $enablesSaveButton = TRUE;
+
+    /**
+     * If FALSE the GUI.setModified method will not be called when value is changed.
+     *
+     * @var boolean
+     */
+    protected static $requiresSave = TRUE;
+
 
     /**
      * Prints this widgets content.

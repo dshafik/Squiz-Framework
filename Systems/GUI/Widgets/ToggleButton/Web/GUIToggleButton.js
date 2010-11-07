@@ -75,7 +75,7 @@ GUIToggleButton.prototype = {
         var glowMask = dfx.getClass('toggle', widgetElement)[0];
 
         if (isInitValue !== true) {
-            GUI.setModified(self, true);
+            self._setModified.call(self, true);
         }
 
         if (isInitValue === true) {
@@ -108,7 +108,7 @@ GUIToggleButton.prototype = {
         var glowMask = dfx.getClass('toggle', widgetElement)[0];
 
         if (isInitValue !== true) {
-            GUI.setModified(self, true);
+            self._setModified.call(self, true);
         }
 
         if (isInitValue === true) {
@@ -140,5 +140,21 @@ GUIToggleButton.prototype = {
             this.setValue(this.settings.value);
         }
 
+    },
+
+    _setModified: function(status)
+    {
+        // If this widget does not require save then there is no reason to call setModified.
+        if (this.settings.requiresSave === false) {
+            return;
+        }
+
+        if (this.settings.enablesSaveButton === false) {
+            GUI.setModified(this, status, true);
+        } else {
+            GUI.setModified(this, status, false);
+        }
+
     }
+
 }
