@@ -105,7 +105,7 @@ class GUIAssetPickerActions
         }
 
         Channels::includeSystem('Linking');
-        $children = DAL::getAssoc(Linking::getImmediateChildren($rootNode, FALSE), 0);
+        $children = Linking::getImmediateChildren($rootNode, FALSE);
 
         $data = array();
 
@@ -127,7 +127,7 @@ class GUIAssetPickerActions
                     );
 
             // Get number of kids.
-            $childKids          = DAL::getAssoc(Linking::getImmediateChildren($child, FALSE), 0);
+            $childKids          = Linking::getImmediateChildren($child, FALSE);
             $item['childCount'] = count($childKids);
 
             $data[] = $item;
