@@ -200,7 +200,7 @@ var UserUserManagerScreen = new function()
             dfx.removeClass(dfx.getId('userManager-deleteButton'), 'deleted');
         }
 
-        GUI.setModified('User::UserManagerScreen', true);
+        GUI.setModified('User:UserManagerScreen', true);
 
     };
 
