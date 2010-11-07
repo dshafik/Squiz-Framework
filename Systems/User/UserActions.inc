@@ -925,11 +925,13 @@ class UserActions
             Channels::includeSystem('Attribute');
             Channels::includeSystem('Linking');
 
+            // Do this here so it gets the first asset ID.
+            $globalUsersFolder = User::getGlobalUsersFolderid();
+
             $folderid = Asset::create('folder');
             Attribute::setAttributeValue($folderid, 'name', $title);
 
             // Link it under global users group.
-            $globalUsersFolder = User::getGlobalUsersFolderid();
             Linking::createLink($globalUsersFolder, $folderid);
 
             $usersFolder = array();
@@ -1181,20 +1183,21 @@ class UserActions
                 $children[] = $folderid;
             }
         } else {
-            // Check read permission here incase the function is called by another system
+            // Check read permission here in case the function is called by another system
             // (e.g. by a dataProvider).
             if (Permission::hasPermission($parentid, 'asset.read.content') === FALSE) {
                 return array();
             }
 
             Channels::includeSystem('Linking');
-            $children = DAL::getAssoc(Linking::getImmediateChildren($parentid, FALSE), 0);
+            $children = Linking::getImmediateChildren($parentid, FALSE);
         }
 
         $data = array();
 
         Channels::includeSystem('Attribute');
         Channels::includeSystem('Asset');
+
         $types = Asset::getTypeOfAsset($children);
 
         foreach ($children as $child) {
@@ -1234,7 +1237,7 @@ class UserActions
             }//end if
 
             // Get number of kids.
-            $childKids          = DAL::getAssoc(Linking::getImmediateChildren($child, FALSE), 0);
+            $childKids          = Linking::getImmediateChildren($child, FALSE);
             $item['childCount'] = count($childKids);
 
             $data[] = $item;
@@ -1438,7 +1441,7 @@ class UserActions
         Channels::includeSystem('Linking');
 
         $name     = Attribute::getAttributeValue($assetid, 'name');
-        $children = DAL::getAssoc(Linking::getImmediateChildren($assetid, FALSE), 0);
+        $children = Linking::getImmediateChildren($assetid, FALSE);
         $types    = Asset::getTypeOfAsset($children);
 
         $info['name']            = $name;
@@ -1509,8 +1512,12 @@ class UserActions
         }
 
         $data = array();
+
+        Channels::includeSystem('Asset');
         foreach ($groups as $groupid) {
-            $data[$groupid] = User::getUserGroupData($groupid);
+            if (Asset::isAssetid($groupid) === TRUE) {
+                $data[$groupid] = User::getUserGroupData($groupid);
+            }
         }
 
         return $data;
@@ -1743,7 +1750,7 @@ class UserActions
             }
         }
 
-        if ($disableAccount === TRUE) {
+        if ($disableAccount === TRUE && $assetid > 0) {
             // Set user account status to inactive so that they cannot login.
             Channels::includeSystem('Configuration');
             Configuration::setAttributeValue($assetid, 'status', FALSE);
