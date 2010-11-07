@@ -676,7 +676,7 @@ class LinkingActions
 
 
     /**
-     * Returns getImmediateChildren Query object.
+     * Returns an array of immediate children.
      *
      * @param string       $parentid      The ID of the parent asset.
      * @param boolean      $withSortOrder If TRUE, the result query returns
@@ -690,22 +690,29 @@ class LinkingActions
         $withSortOrder=FALSE,
         $types=array()
     ) {
-        Channels::includeSystem('Context');
+        Channels::includeSystem('Asset');
+        if (Asset::isAssetid($parentid) === FALSE) {
+            return array();
+        }
+
         // Get the context assetid, SQL:getDirectChildren() method requres the
         // context in assetid.
+        Channels::includeSystem('Context');
         $parentid = Context::getAssetid($parentid, NULL, TRUE);
         Channels::modifyBasket('parentid', $parentid);
 
-        $result = DAL::getDALQuery(
+        $query = DAL::getDALQuery(
             'Linking',
             'getImmediateChildren',
             'executeQuery'
         );
+
         if (empty($types) === FALSE) {
             Channels::includeSystem('AssetType');
-            $result = AssetType::filterAssetsByTypes($result, $types);
+            $query = AssetType::filterAssetsByTypes($query, $types);
         }
 
+        $result = DAL::getAssoc($query, 0);
         return $result;
 
     }//end getImmediateChildren()
@@ -856,7 +863,7 @@ class LinkingActions
 
             // Get the parent links of old context.
             $oldParents  = DAL::getAssoc(Linking::getParents($assetid, 1, 1), 0);
-            $oldChildren = DAL::getAssoc(Linking::getImmediateChildren($assetid), 0);
+            $oldChildren = Linking::getImmediateChildren($assetid);
             $showInMenu  = array();
 
             foreach ($oldParents as $oldParentid) {
