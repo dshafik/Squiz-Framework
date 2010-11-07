@@ -39,12 +39,16 @@
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #3D3D3D), color-stop(50%, #111111));
     background-image: -moz-linear-gradient(top , #3D3D3D 15%, #111111 50%);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#3D3D3D, endColorstr=#111111);
+    -webkit-box-shadow: rgba(0,0,0,0.4) 0px 1px 2px inset;
+    -moz-box-shadow: rgba(0,0,0,0.4) 0px 1px 2px inset;
 }
 
 .GUIToolbar-button.active {
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #2B65B6), color-stop(50%, #032347));
     background-image: -moz-linear-gradient(top , #2B65B6 15%, #032347 50%);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#2B65B6, endColorstr=#032347);
+    -webkit-box-shadow: rgba(0,0,0,0.4) 0px 1px 2px inset;
+    -moz-box-shadow: rgba(0,0,0,0.4) 0px 1px 2px inset;
 }
 
 .GUIToolbar-button div {
