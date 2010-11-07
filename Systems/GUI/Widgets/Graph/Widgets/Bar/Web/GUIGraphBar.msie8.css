@@ -1,0 +1,7 @@
+.GUIGraphBar .tooltip {
+    border-color: #a5a5a5;
+}
+
+.GUIGraphBar .tooltipArrow {
+    background-image: url(arrow-top-ie.png);
+}
