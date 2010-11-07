@@ -162,6 +162,11 @@ class PatchingCron implements CronScript
         $rootDir = dirname(dirname(dirname(dirname(__FILE__))));
 
         $patchResultPath = $patchDir.'/patch.result';
+
+        // Turn off the system cron service before we apply.
+        file_put_contents($patchResultPath, '[Turn off the system cron service.]'."\n", FILE_APPEND);
+        exec('/etc/init.d/cron stop');
+
         file_put_contents($patchResultPath, '[Applying Patch Begins]'."\n", FILE_APPEND);
         file_put_contents($patchResultPath, '[Start running Pre upgrade scripts]'."\n", FILE_APPEND);
         self::runUpgradeScripts('pre', $rootDir, $patchDir);
@@ -171,8 +176,7 @@ class PatchingCron implements CronScript
         if (file_exists($patchDir.'/patch.sh') === TRUE) {
             $script  = 'cd '.$rootDir.' && ';
             $script .= 'cp '.$patchDir.'/patch.sh . && ';
-            $script .= 'sh patch.sh >> '.$patchResultPath.' && ';
-            $script .= 'rm patch.sh';
+            $script .= 'sh patch.sh >> '.$patchResultPath;
             exec($script);
         }
 
@@ -180,7 +184,7 @@ class PatchingCron implements CronScript
         if (file_exists($patchDir.'/patch.diff') === TRUE) {
             // Do a dry run to check for error.
             file_put_contents($patchResultPath, '[Start running dry run]'."\n", FILE_APPEND);
-            $dryRun = 'patch --dry-run -d '.$rootDir.' -p1 -i '.$patchResultPath;
+            $dryRun = 'patch --dry-run -d '.$rootDir.' -p1 -i '.$patchDir.'/patch.diff';
             $output = array();
             $retval = 0;
             exec($dryRun, $output, $retval);
@@ -202,16 +206,18 @@ class PatchingCron implements CronScript
         file_put_contents($patchResultPath, '[Start running Post upgrade scripts]'."\n", FILE_APPEND);
         self::runUpgradeScripts('post', $rootDir, $patchDir);
 
-        // Remove cached css files in the web dir.
-        file_put_contents($patchResultPath, '[Removing cached CSS files in Web directory]'."\n", FILE_APPEND);
-        $cachedCss = glob($rootDir.'/web/Skins/defaultSkin/*.css');
-        foreach ($cachedCss as $file) {
-            unlink($file);
+        if (file_exists($rootDir.'/web/Skins/defaultSkin') === TRUE) {
+            // Remove cached css files in the web dir.
+            file_put_contents($patchResultPath, '[Removing cached CSS files in Web directory]'."\n", FILE_APPEND);
+            $cachedCss = glob($rootDir.'/web/Skins/defaultSkin/*.css');
+            foreach ($cachedCss as $file) {
+                unlink($file);
+            }
         }
 
         // Re-generate Help documentation.
-        file_put_contents($patchResultPath, '[Re-generate Help documentation]'."\n", FILE_APPEND);        
-        $helpScriptCommand = 'php '.$rootDir.'/Systems/Help/Scripts/generate_docs.php';        
+        file_put_contents($patchResultPath, '[Re-generate Help documentation]'."\n", FILE_APPEND);
+        $helpScriptCommand = 'php '.$rootDir.'/Systems/Help/Scripts/generate_docs.php';
         exec($helpScriptCommand);
 
         // Update the *_create_wizard.xml file for asset type wizards.
@@ -228,6 +234,9 @@ class PatchingCron implements CronScript
         file_put_contents($patchResultPath, '[Clean up firefox cache.]'."\n", FILE_APPEND);
         exec('rm /root/.mozilla/firefox/squiz/Cache/*');
 
+        // Turn the system cron back on.
+        exec('/etc/init.d/cron start');
+        file_put_contents($patchResultPath, '[Turn on the system cron service]'."\n", FILE_APPEND);
         file_put_contents($patchResultPath, '[applyPatch() function returning TRUE]'."\n", FILE_APPEND);
         return TRUE;
 
