@@ -116,6 +116,8 @@ class SimplePermissionActions implements PermissionActions
 
         $userids[] = $userid;
         Channels::modifyBasket('userid', $userids);
+        Channels::addToBasket('resource', $resource);
+        Channels::addToBasket('privilege', $privilege);
 
         $query  = DAL::getQuery('SimplePermission', 'hasPermission');
         $result = (bool) DAL::getOne($query);
