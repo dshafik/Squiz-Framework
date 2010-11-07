@@ -51,6 +51,7 @@
  * @copyright  2010 Squiz Pty Ltd (ACN 084 670 600)
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt GPLv2
  */
+
 if ($argc !== 3) {
     echo "Usage: php create_patch.php <FROM_REV>:<FROM_FRAMEWORK_REV> <TO_REV>:<TO_FRAMEWORK_REV>\n";
     exit;
@@ -60,8 +61,6 @@ if ($argc !== 3) {
         echo "Unknown product type.\n";
         exit;
     }
-
-    $patchDir = realpath(dirname(__FILE__).'/../CurrentPatch/').'/';
 
     $from = $argv[1];
     $to   = $argv[2];
@@ -145,22 +144,21 @@ if ($argc !== 3) {
  */
 function rebakeSystem($productT, $revision, $frameRev, $systemType='')
 {
-    global $patchDir;
-    $sourceURL  = getSourceURL();
-    $basename   = basename($sourceURL);
-    $command    = 'rm -rf '.$patchDir.$revision.' '.$patchDir.'patch '.$patchDir.$basename;
+    $sourceURL = getSourceURL();
+    $basename  = basename($sourceURL);
+    $command   = 'rm -rf '.$revision.' patch '.$basename;
     exec($command);
     exportVersion($revision, $frameRev, $sourceURL);
 
     echo "Copying from the exported revision $revision_export\n";
-    $command = 'cp -R '.$patchDir.$revision.'_export '.$patchDir.$basename;
+    $command = 'cp -R '.$revision.'_export '.$basename;
     exec($command);
 
     // These files must be removed and it is also used in install.inc
     // for all installations.
-    include $patchDir.'patch.inc';
+    include 'patch.inc';
     foreach ($paths_to_remove as $path) {
-        exec("rm -rf ".$patchDir."$basename$path");
+        exec("rm -rf $basename$path");
     }
 
     // Okay, now this is patch specific remove file list to generate
@@ -168,26 +166,26 @@ function rebakeSystem($productT, $revision, $frameRev, $systemType='')
     // Do we have any files to be removed before baking?
     if ($systemType !== '' && $systemType === 'FROM') {
         foreach ($paths_to_remove_before_baking_FROM_system as $path) {
-            $filePath = $patchDir.$basename.$path;
+            $filePath = $basename.$path;
             if (file_exists($filePath) === TRUE) {
                 unlink($filePath);
             }
         }
     } else if ($systemType !== '' && $systemType === 'TO') {
         foreach ($paths_to_remove_before_baking_TO_system as $path) {
-            $filePath = $patchDir.$basename.$path;
+            $filePath = $basename.$path;
             if (file_exists($filePath) === TRUE) {
                 unlink($filePath);
             }
         }
     }
 
-    $script = 'mv '.$patchDir.$basename.' '.$patchDir.'patch && ';
+    $script = 'mv '.$basename.' patch && ';
     if ($productT === 'cms') {
-        $script .= 'mkdir '.$patchDir.'patch/web && ';
+        $script .= 'mkdir patch/web && ';
     }
 
-    $script .= 'chmod 777 -R '.$patchDir.'patch && ';
+    $script .= 'chmod 777 -R patch && ';
 
     exec('psql -U postgres -l | grep mysource | wc -l', $dbExist);
     if ($dbExist[0] !== '0') {
@@ -201,7 +199,7 @@ function rebakeSystem($productT, $revision, $frameRev, $systemType='')
     // Change the root dir and db name.
     echo "\tChanging root dir and db name\n";
     $realPath     = '/var/www/mysource4/htdocs';
-    $patchPath    = $patchDir.'/patch';
+    $patchPath    = dirname(__FILE__).'/patch';
     $realPathEsc  = str_replace('/', '\/', $realPath);
     $patchPathEsc = str_replace('/', '\/', $patchPath);
     $command      = "find patch | xargs grep -l '$realPath' | xargs sed -i -e 's/$realPathEsc/$patchPathEsc/g'";
@@ -209,7 +207,7 @@ function rebakeSystem($productT, $revision, $frameRev, $systemType='')
 
     // Clean and rebake.
     echo "\tBaking revision $revision\n";
-    $script  = 'cd '.$patchDir.'patch && ';
+    $script  = 'cd patch && ';
 
     if ($productT === 'cms') {
         $script .= 'php clean.php --patch && ';
@@ -217,14 +215,14 @@ function rebakeSystem($productT, $revision, $frameRev, $systemType='')
         $script .= 'php Scripts/clean.php && ';
     }
 
-    $script .= "cd $patchDir && mv patch $revision";
+    $script .= "cd ../ && mv patch $revision";
     echo $script."\n";
     exec($script);
 
     // Do we have any files to be removed before baking?
     if ($systemType !== '' && $systemType === 'FROM') {
         foreach ($paths_to_remove_after_baking_FROM_system as $path) {
-            $filePath = $patchDir.$revision.$path;
+            $filePath = $revision.$path;
             if (file_exists($filePath) === TRUE) {
                 $res = unlink($filePath);
             }
@@ -234,13 +232,13 @@ function rebakeSystem($productT, $revision, $frameRev, $systemType='')
             // CMS Product, always remove the minified JS files
             // from the FROM system so that the new minified files
             // can be added all the time.
-            $script  = 'rm '.$patchDir.$revision.'/web/mysource.jgz;';
-            $script .= 'rm '.$patchDir.$revision.'/web/dfx.jgz;';
+            $script  = 'rm '.$revision.'/web/mysource.jgz;';
+            $script .= 'rm '.$revision.'/web/dfx.jgz;';
             exec($script);
         }
     } else if ($systemType !== '' && $systemType === 'TO') {
         foreach ($paths_to_remove_after_baking_TO_system as $path) {
-            $filePath = $patchDir.$revision.$path;
+            $filePath = $revision.$path;
             if (file_exists($filePath) === TRUE) {
                 unlink($filePath);
             }
@@ -265,12 +263,10 @@ function rebakeSystem($productT, $revision, $frameRev, $systemType='')
 function exportVersion($revision, $frameRev, $sourceURL)
 {
     // First export the product revision first.
-    global $patchDir;
-
     echo "Exporting revision $revision\n";
     if (file_exists($revision.'_export') === FALSE) {
         $basename = basename($sourceURL);
-        $command  = 'svn export -r '.$revision.' '.$sourceURL.' '.$patchDir.$revision.'_export';
+        $command  = 'svn export -r '.$revision.' '.$sourceURL.' '.$revision.'_export';
         exec($command);
     }
 
@@ -286,17 +282,17 @@ function exportVersion($revision, $frameRev, $sourceURL)
             exec($command, $output);
 
             $externalTxt = trim(implode("\n", $output));
-            file_put_contents($patchDir.$externalCachePath, $externalTxt);
+            file_put_contents($externalCachePath, $externalTxt);
         } else {
             $externalTxt = file_get_contents($externalCachePath);
         }
 
-        if (file_exists($patchDir.$revision.'_framework') === FALSE) {
-            mkdir($patchDir.$revision.'_framework');
+        if (file_exists($revision.'_framework') === FALSE) {
+            mkdir($revision.'_framework');
         }
 
-        if (file_exists($patchDir.$revision.'_framework'.$dir) === FALSE) {
-            mkdir($patchDir.$revision.'_framework'.$dir);
+        if (file_exists($revision.'_framework'.$dir) === FALSE) {
+            mkdir($revision.'_framework'.$dir);
         }
 
         $lines = explode("\n", $externalTxt);
@@ -306,7 +302,7 @@ function exportVersion($revision, $frameRev, $sourceURL)
             }
 
             $parts    = explode(' ', $line);
-            $destPath = $patchDir."${revision}_framework$dir/${parts[1]}";
+            $destPath = "${revision}_framework$dir/${parts[1]}";
             if (file_exists($destPath) === FALSE) {
                 $externalURL = $parts[0];
                 echo "    Getting $externalURL@$frameRev\n";
@@ -317,8 +313,7 @@ function exportVersion($revision, $frameRev, $sourceURL)
 
             // Copy over the external directory with the one from
             // the framework export directory.
-            $command  = "rm -rf ".$patchDir."${revision}_export$dir/${parts[1]} && ";
-            $command .= "cp -R ".$patchDir."${revision}_framework$dir/${parts[1]} ".$patchDir."${revision}_export$dir/${parts[1]}";
+            $command = "rm -rf ${revision}_export$dir/${parts[1]} && cp -R ${revision}_framework$dir/${parts[1]} ${revision}_export$dir/${parts[1]}";
             exec($command);
         }//end foreach
     }//end foreach
@@ -481,7 +476,7 @@ function getProductType()
 
 function getSourceURL()
 {
-    $command = 'svn info '.dirname(__FILE__).'/../ | grep "URL:"';
+    $command = 'svn info '.dirname(__FILE__).'/../../ | grep "URL:"';
     $output  = array();
     exec($command, $output);
     if (count($output) === 1) {
