@@ -29,7 +29,6 @@
 }
 
 .GUIToolbar-button {
-    border-top: 1px solid #000;
     cursor: pointer;
     height: 25px;
     width: 32px;
