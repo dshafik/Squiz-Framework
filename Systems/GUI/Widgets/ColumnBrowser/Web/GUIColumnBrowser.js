@@ -208,6 +208,11 @@ GUIColumnBrowser.prototype = {
         dfx.removeClass(dfx.getClass('GUIColumnBrowser-column active', this.elem), 'active');
         dfx.addClass(parentColumnElement, 'active');
 
+        var self = this;
+        setTimeout(function() {
+            jQuery(self.elem).scrollTo('100%', 200, {axis:'x'});
+        }, 150);
+
         // Hide all other columns that shouldnt be visible.
         this._hideColumn((parentLevel + 2));
 
