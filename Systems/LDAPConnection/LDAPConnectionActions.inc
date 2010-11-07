@@ -521,7 +521,7 @@ class LDAPConnectionActions
             // LDAP user or group.
             $startdn = self::_getDNFromRemoteid($parentid);
 
-            // Group Member has been specified. Combine the result
+            // Group Member has been specified. Combine the results
             // if there are any.
             $gm = strtolower(self::_getConfigValue($parts['connection'], 'groupAttributes', 'groupMembers'));
             if ($gm !== '') {
@@ -530,15 +530,15 @@ class LDAPConnectionActions
                     // TODO: Do a single search instead of multiple.
                     if (is_array($asset[$gm]) === TRUE) {
                         foreach ($asset[$gm] as $dn) {
-                            $entry = self::_getEntry($parts['connection'].'-_dn---'.$dn.'_');
+                            $entry = self::_getEntry($connectionid.'-_dn---'.$dn.'_');
                             if ($entry !== NULL) {
-                                $groupMembers[] = $parts['connection'].'-'.self::_getRemoteId($parts['connection'], $entry);
+                                $groupMembers[] = $connectionid.'-'.self::_getRemoteId($connectionid, $entry);
                             }
                         }
                     } else {
-                        $entry = self::_getEntry($parts['connection'].'-_dn---'.$asset[$gm].'_');
+                        $entry = self::_getEntry($connectionid.'-_dn---'.$asset[$gm].'_');
                         if ($entry !== NULL) {
-                            $groupMembers[] = $parts['connection'].'-'.self::_getRemoteId($parts['connection'], $entry);
+                            $groupMembers[] = $connectionid.'-'.self::_getRemoteId($connectionid, $entry);
                         }
                     }
                 }
@@ -563,18 +563,13 @@ class LDAPConnectionActions
         $children = array();
 
         foreach ($data as &$d) {
-            $d['assetType'] = self::_getAssetTypeFromObjectClass($d['objectclass']);
-            $id             = self::_getRemoteId($connectionid, $d);
-            $rid            = $connectionid.'-'.$id;
-
-            self::_addToCache($parentid, $d);
-
             if ($startdn === $d['dn']) {
                 // Exclude itself.
                 continue;
             }
 
-            $children[] = $rid;
+            $d['assetType'] = self::_getAssetTypeFromObjectClass($d['objectclass']);
+            $children[]     = $connectionid.'-'.self::_getRemoteId($connectionid, $d);
         }
 
         if (empty($groupMembers) === FALSE) {
@@ -782,11 +777,10 @@ class LDAPConnectionActions
                     $parents = self::_getUserGroups($remoteid);
                 }
 
-                foreach ($parents as $parent) {
-                    $parentid = $parent['parentid'];
-                    // Might have a localid.
+                // Convert remote ID to local IDs.
+                foreach ($parents as $parentid) {
                     $parts   = Connection::splitShadowid($parentid);
-                    $localid = Connection::getLocalid($parts['connection'], '_dn---'.$parts['remoteid'].'_');
+                    $localid = Connection::getLocalid($parts['connection'], $parts['remoteid']);
                     if ($localid !== FALSE) {
                         $retVal[] = $localid;
                     } else {
@@ -854,7 +848,7 @@ class LDAPConnectionActions
             foreach ($data2 as $data) {
                 $groupids[] = $data['dn'];
             }
-        }//end if
+        }
 
         // Okay. Now, let's extract ALL the groups in the heirarchy
         // where the user belongs to from groupid.
@@ -881,22 +875,10 @@ class LDAPConnectionActions
         }//end foreach
 
         $parents = array();
-        $unique  = array();
         foreach ($newGroupids as $groupid) {
-            $assetid = $connectionid.'-'.$groupid;
-            $entry   = self::_getEntry($connectionid.'-'.$groupid);
+            $entry = self::_getEntry($connectionid.'-_dn---'.$groupid.'_');
             if ($entry !== NULL) {
-                $assetid = $connectionid.'-'.self::_getRemoteId($connectionid, $entry);
-            }
-
-            $shadowid = Connection::getLocalid($connectionid, $groupid);
-            if ($shadowid !== FALSE) {
-                $assetid = $shadowid;
-            }
-
-            if (isset($unique[$assetid]) === FALSE) {
-                $parents[]        = array('parentid' => $assetid);
-                $unique[$assetid] = '1';
+                $parents[] = $connectionid.'-'.self::_getRemoteId($connectionid, $entry);
             }
         }
 
@@ -907,21 +889,16 @@ class LDAPConnectionActions
             $left  = rtrim(str_replace($baseDNSetting, '', $dn), ',');
             $parts = explode(',', $left);
             if (count($parts) === 1) {
-                if (isset($unique[$connectionid]) === FALSE) {
-                    $parents[]             = array('parentid' => $connectionid);
-                    $unique[$connectionid] = '1';
-                }
+                $parents[] = $connectionid;
             }
         } else {
-            if (isset($unique[$connectionid]) === FALSE) {
-                $parents[]             = array('parentid' => $connectionid);
-                $unique[$connectionid] = '1';
-            }
+            $parents[] = $connectionid;
         }
 
+        $parents = array_unique($parents);
         return $parents;
 
-    }//end getParents()
+    }//end _getUserGroups()
 
 
     /**
@@ -1188,9 +1165,9 @@ class LDAPConnectionActions
     private static function _getRemoteId($connectionid, array $asset)
     {
         $ldapAttr = '';
-        if ($asset['assetType'] === 'user') {
+        if ($asset['assetType'] === 'LDAPUser') {
             $ldapAttr = self::_getConfigValue($connectionid, 'uniqueIdSettings', 'uniqueIdUsers');
-        } else if ($asset['assetType'] === 'userGroup') {
+        } else if ($asset['assetType'] === 'LDAPUserGroup') {
             $ldapAttr = self::_getConfigValue($connectionid, 'uniqueIdSettings', 'uniqueIdGroups');
         }
 
