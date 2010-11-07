@@ -86,7 +86,7 @@ class GUITabPaneActions
             }
 
             $tabButtons .= '<li class="'.$class.'-tab tabButton-'.$tab['id'].$firstTabClass.$initialTabClass.'">';
-            $tabButtons .= '<a href="javascript:'.$clickAct.'" title="'.$tabTitle.'">'.$tab['label'].'</a>';
+            $tabButtons .= '<a href="javascript:'.$clickAct.'" title="'.$tabTitle.'" onclick="'.$clickAct.' return false;">'.$tab['label'].'</a>';
             $tabButtons .= '</li>';
 
             $tabContents .= '<div class="'.$class.'-tabContent tabContent-'.$tab['id'].$initialTabClass.'">';
