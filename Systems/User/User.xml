@@ -34,5 +34,17 @@
       <fatal>no</fatal>
       <parameters />
     </runner>
+
+    <switcher>
+      <required>no</required>
+      <method>isUserGroupsCached</method>
+      <switch_event>User::getUserGroupsFromCache</switch_event>
+      <action>User::getUserGroups</action>
+      <fatal>no</fatal>
+      <parameters>
+        <parameter>userid</parameter>
+        <parameter>directParentsOnly</parameter>
+      </parameters>
+    </switcher>
   </plugs>
 </system>

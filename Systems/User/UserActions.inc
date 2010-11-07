@@ -416,6 +416,55 @@ class UserActions
 
 
     /**
+     * Returns if the user groups for the specified user is cached.
+     *
+     * This is a switch (User::getUserGroupsFromCache) plug tester.
+     *
+     * @param string  $userid            Userid to check.
+     * @param boolean $directParentsOnly If TRUE then only the direct parents will be
+     *                                   returned.
+     *
+     * @return boolean
+     */
+    public static function isUserGroupsCached($userid, $directParentsOnly)
+    {
+        if ($userid !== NULL && (string) $userid === (string) User::getCurrentUserid()) {
+            Channels::includeSystem('Session');
+            $cachedGroups = Session::getSessionData('User', 'cachedGroups');
+            if (empty($cachedGroups) === FALSE) {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
+
+    }//end isUserGroupsCached()
+
+
+    /**
+     * Return the cached list of user groups which the given user belongs to.
+     *
+     * @param string  $userid            Userid to check.
+     * @param boolean $directParentsOnly If TRUE then only the direct parents will be
+     *                                   returned.
+     *
+     * @return array
+     */
+    public static function getUserGroupsFromCache($userid, $directParentsOnly=FALSE)
+    {
+        Channels::includeSystem('Session');
+        $cachedGroups = Session::getSessionData('User', 'cachedGroups');
+
+        if ($directParentsOnly === TRUE) {
+            return $cachedGroups['direct'];
+        }
+
+        return $cachedGroups['all'];
+
+    }//end getUserGroupsFromCache()
+
+
+    /**
      * Removes orphaned user/userGroup assets from the system.
      *
      * This is a runner plug to Maintenance::perform.
@@ -560,6 +609,13 @@ class UserActions
         include_once 'Libs/String/String.inc';
         $currTime = String::tsIso8601(time());
         Attribute::setAttributeValue($userid, 'last_login', $currTime);
+
+        // Cache user's groups.
+        $userGroups = array(
+                       'all'    => User::getUserGroups($userid),
+                       'direct' => User::getUserGroups($userid, TRUE),
+                      );
+        Session::setSessionData('User', 'cachedGroups', $userGroups);
 
     }//end userLoggedin()
 
