@@ -1,0 +1,12 @@
+button.buttonSave .GUIButtonLabel {
+    top: -1px;
+    position: relative;
+}
+
+.GUIButton.buttonSave[disabled="disabled"] .GUIButtonLabel {
+    filter: alpha(opacity = 10);
+}
+
+button.buttonSaveRevert .GUIButtonLabel {
+    filter: alpha(opacity = 0);
+}

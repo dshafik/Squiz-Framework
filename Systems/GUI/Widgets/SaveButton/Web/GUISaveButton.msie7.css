@@ -1,0 +1,22 @@
+button.buttonSave {
+    padding: 0 20px 0 12px;
+}
+
+button.buttonSave .GUIButtonLabel {
+    top: -1px;
+    position: relative;
+}
+
+button.buttonSaveRevert .GUIButtonLabel {
+    filter: alpha(opacity = 0);
+    width: 1px;
+    overflow: hidden;
+}
+
+.GUISaveButtonActive button.buttonSave {
+    padding: 0 20px 0 12px;
+}
+
+.GUISaveButtonActive button.buttonSaveRevert {
+    padding: 0;
+}

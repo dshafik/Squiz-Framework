@@ -1,0 +1,13 @@
+button.GUIButton {
+    border: none;
+    padding: 0 0em;
+}
+button.GUIButton .GUIButtonLabel {
+    margin-top: -2px;
+}
+button.GUIButton .GUIButtonIcon {
+    right: 2px;
+}
+button.GUIButton .GUIButtonIcon {
+    top: 0;
+}

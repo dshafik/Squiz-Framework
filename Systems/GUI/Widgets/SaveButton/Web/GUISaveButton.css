@@ -16,13 +16,9 @@ button.buttonSaveRevert {
     background-image: -moz-linear-gradient(top, #555 0%, #000 70%);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#464646, endColorstr=#010101);
 }
-button.buttonSave::-moz-focus-inner, /* Moz target */
-button.buttonSaveRevert::-moz-focus-inner {
-    border: none;
-}
+
 button.buttonSave {
     padding: 0 23px 0 25px;
-    *padding: 0 20px 0 12px; /* IE 7 Target */
     -moz-border-radius-topright: 0;
     -moz-border-radius-bottomright: 0;
     border-top-right-radius: 0;
@@ -47,10 +43,6 @@ button.buttonSaveRevert .GUIButtonIcon {
     background-image: url(revert-bg.png);
 }
 
-@-moz-document url-prefix() { /* Moz Target */
-    button.buttonSaveRevert .GUIButtonIcon { top: 0px;}
-}
-
 .GUISaveButton:hover button.buttonSave,
 .GUISaveButton:hover button.buttonSaveRevert {
     cursor: not-allowed;
@@ -58,9 +50,6 @@ button.buttonSaveRevert .GUIButtonIcon {
 
 button.buttonSaveRevert .GUIButtonLabel {
     opacity: 0;
-    filter: alpha(opacity = 0);
-    *width: 1px; /* IE 7 Target */
-    *overflow: hidden; /* IE 7 Target */
 }
 
 /* Active state overrides */
@@ -74,7 +63,6 @@ button.buttonSaveRevert .GUIButtonLabel {
 }
 .GUISaveButtonActive button.buttonSave {
     padding: 0 23px 0 25px;
-    *padding: 0 20px 0 12px; /* IE 7 Target */
     -moz-border-radius-topright: 0;
     -moz-border-radius-bottomright: 0;
     border-top-right-radius: 0;
@@ -86,7 +74,6 @@ button.buttonSaveRevert .GUIButtonLabel {
     left: -7px;
     width: 31px;
     padding: 0;
-    *padding: 0; /* IE 7 Target */
     -moz-border-radius-topleft: 0;
     -moz-border-radius-bottomleft: 0;
     border-top-left-radius: 0;

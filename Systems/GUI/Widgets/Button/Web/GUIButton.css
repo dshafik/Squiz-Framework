@@ -7,10 +7,8 @@ button.GUIButton {
     font-family: Verdana;
     font-size: 11px;
     border: 1px solid;
-    *border: none;
     border-radius: 14px;
     -moz-border-radius: 25%;
-    *padding: 0 0em; /* IE 7 Target */
     outline: none;
     -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
     -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
@@ -18,15 +16,10 @@ button.GUIButton {
 button.GUIButton .GUIButtonLabel {
     display: block;
     line-height: 1.8em;
-    *margin-top: -2px; /* IE 7 Target */
-}
-@-moz-document url-prefix() { /* Moz Target */
-    button.GUIButton .GUIButtonLabel { margin-top: -4px;}
 }
 button.GUIButton .GUIButtonIcon {
     position: absolute;
     right: 9px;
-    *right: 2px;
     top: 5px;
     top: 3px/9;
     width: 20px;
