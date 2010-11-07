@@ -131,6 +131,6 @@ button.buttonSaveRevert .GUIButtonLabel {
 }
 
 #save-intervention .GUIIntervention-content button {
-    margin-top:10px;
-    min-width:45%;
+    margin-top: 10px;
+    width: 100px;
 }
