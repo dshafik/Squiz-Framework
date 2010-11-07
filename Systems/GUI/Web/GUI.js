@@ -307,7 +307,7 @@ var GUI = new function()
                 // Show error message.
                 GUI.queueOverlay({
                     icon: 'error',
-                    content: '<p>' + exception + '</p><br /><button class="GUIButton buttonDark" type="button" onclick="javascript:GUI.dequeueOverlay(\'error\');">Close</button>'
+                    content: '<p>' + exception + '</p><br /><button class="GUIButton buttonDark" type="button" onclick="javascript:GUI.dequeueOverlay(\'error\');"><span class="GUIButtonLabel">Close</span></button>'
                 });
 
                 if (errorCallback) {
