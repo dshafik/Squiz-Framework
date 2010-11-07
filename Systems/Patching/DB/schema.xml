@@ -8,6 +8,7 @@
         <column type="VARCHAR" size="25" allow-null="false">name</column>
         <column type="TIMESTAMP" allow-null="true">scheduled</column>
         <column type="TIMESTAMP" allow-null="true">patched</column>
+        <column type="TIMESTAMP" allow-null="true">installed</column>
         <column type="ASSETID" allow-null="false">userid</column>
         <column type="VARCHAR" size="50" allow-null="false">patch_sha1</column>
       </columns>

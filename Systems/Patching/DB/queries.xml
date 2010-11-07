@@ -6,11 +6,13 @@
       <insert>
         <fields table="patching">
           <field>name</field>
+          <field>installed</field>
           <field>userid</field>
           <field>patch_sha1</field>
         </fields>
         <values>
           <value column="name">:name</value>
+          <value column="installed">:installed</value>
           <value column="userid">:userid</value>
           <value column="patch_sha1">:sha1</value>
         </values>
@@ -62,6 +64,9 @@
             <field table="patching" column="patched"/>
           </is-null>
         </where>
+        <order-by direction="ASC">
+          <field column="installed" table="patching" />
+        </order-by>
       </select>
     </primary>
     <alternate>
@@ -106,6 +111,9 @@
             <field table="patching" column="patched"/>
           </is-null>
         </where>
+        <order-by direction="ASC">
+          <field column="installed" table="patching" />
+        </order-by>
       </select>
     </primary>
   </query>
@@ -131,6 +139,9 @@
             <field table="patching" column="patched"/>
           </is-null>
         </where>
+        <order-by direction="ASC">
+          <field column="installed" table="patching" />
+        </order-by>
       </select>
     </primary>
   </query>

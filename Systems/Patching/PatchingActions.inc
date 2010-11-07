@@ -320,7 +320,10 @@ class PatchingActions
             $userid = 0;
         }
 
+        include_once 'Libs/String/String.inc';
+        $installed = String::tsIso8601(time());
         Channels::addToBasket('userid', $userid);
+        Channels::addToBasket('installed', $installed);
 
         try {
             $baseQuery = DAL::getDALQuery('Patching', 'registerPatch', 'executeQuery');
@@ -400,6 +403,11 @@ class PatchingActions
         Channels::includeSystem('User');
         $userid = User::getCurrentUserid();
 
+        $config = Patching::getPatchingConfig();
+        $config['scheduled_time'] = $scheduled;
+        Channels::includeSystem('SystemConfig');
+        SystemConfig::setConfig('Patching', $config);
+
         Channels::addToBasket('scheduled', $scheduled);
         Channels::addToBasket('userid', $userid);
 
@@ -476,7 +484,6 @@ class PatchingActions
             }
         }
 
-        sort($result);
         return $result;
 
     }//end getPendingPatches()
@@ -777,6 +784,9 @@ class PatchingActions
         $mainText .= 'system.</p><p>It is recommended that you install this ';
         $mainText .= 'update in order to receive new features and bug fixes.';
         $mainText .= '</p><p style="color:#666">The patch contains the following changes:</p>';
+
+        $to = self::_getReceipientsEmailAddress();
+        include_once 'Libs/Web/Email.inc';
         foreach ($names as $patchName) {
             $note = '<p style="margin-left:2px">'.nl2br(Patching::getPatchNote($patchName)).'</p>';
             $body = '<table width="100%">
@@ -795,8 +805,7 @@ class PatchingActions
                       </table>
                     </tr>
                     </table>';
-            Message::addMessage($config['recipient'], $subject, $body, NULL, array('title' => 'Up to Date Notification'));
-            Message::sendMessages();
+            Email::sendHtmlEmail($to, $subject, $body);
         }//end foreach
 
     }//end _sendNewPatchMessage()
@@ -842,6 +851,26 @@ class PatchingActions
         return $body;
 
     }//end _getNewPatchMessageBody()
+
+
+    /**
+     * Return the receipients email address.
+     *
+     * @return string
+     */
+    private static function _getReceipientsEmailAddress()
+    {
+        Channels::includeSystem('Attribute');
+        $config = Patching::getPatchingConfig();
+        $emails = array();
+        foreach ($config['recipient'] as $rid) {
+            $emails[] = Attribute::getAttributeValue($rid, 'email');
+        }
+
+        $to = implode(', ', $emails);
+        return $to;
+
+    }//end _getReceipientsEmailAddress()
 
 
     /**
@@ -895,9 +924,9 @@ class PatchingActions
                           </tr>
                           </table>';
 
-            Channels::includeSystem('Message');
-            Message::addMessage($config['recipient'], $subject, $body, NULL, array('title' => 'Up to Date Notification'));
-            Message::sendMessages();
+            include_once 'Libs/Web/Email.inc';
+            $to = self::_getReceipientsEmailAddress();
+            Email::sendHtmlEmail($to, $subject, $body);
         }//end if
 
     }//end sendWarningMessage()
@@ -955,9 +984,9 @@ class PatchingActions
                       </tr>
                       </table>';
 
-        Channels::includeSystem('Message');
-        Message::addMessage($config['recipient'], $subject, $body, NULL, array('title' => 'Up to Date Notification'));
-        Message::sendMessages();
+        include_once 'Libs/Web/Email.inc';
+        $to = self::_getReceipientsEmailAddress();
+        Email::sendHtmlEmail($to, $subject, $body);
 
     }//end sendInternalErrorMessage()
 
@@ -1359,7 +1388,9 @@ class PatchingActions
                                 // TODO: Body needs to be fixed.
                                 $subject = 'Invalid Patch has been removed';
                                 $body    = $patchInfo['name'].' is no longer valid, so it has been removed.';
-                                Email::sendHtmlEmail($config['recipient'], $subject, $body);
+
+                                $to = self::_getReceipientsEmailAddress();
+                                Email::sendHtmlEmail($to, $subject, $body);
                             }
                         }
                     } else {
@@ -1374,7 +1405,9 @@ class PatchingActions
                                     // TODO: Body needs to be fixed.
                                     $subject = 'The scheduled patch has been re-downloaded';
                                     $body    = $patchInfo['name'].' is no longer valid, so it has been redownloaded and unscheduled.';
-                                    Email::sendHtmlEmail($config['recipient'], $subject, $body);
+
+                                    $to = self::_getReceipientsEmailAddress();
+                                    Email::sendHtmlEmail($to, $subject, $body);
                                 }
                             }
                         } else {
@@ -1406,13 +1439,17 @@ class PatchingActions
                         if ($config['notify'] === TRUE) {
                             $subject = 'New MySource Mini update available';
                             $body    = self::_getNewPatchMessageBody($subject, $patchName);
-                            Email::sendHtmlEmail($config['recipient'], $subject, $body);
+
+                            $to = self::_getReceipientsEmailAddress();
+                            Email::sendHtmlEmail($to, $subject, $body);
                         }
                     } else {
                         if ($config['notify'] === TRUE) {
                             $subject = 'Downloading the Patch has been FAILED';
                             $body    = $patchInfo['name'].' is no longer valid, so it has been removed.';
-                            Email::sendHtmlEmail($config['recipient'], $subject, $body);
+
+                            $to = self::_getReceipientsEmailAddress();
+                            Email::sendHtmlEmail($to, $subject, $body);
                         }
 
                         break;
@@ -2017,7 +2054,11 @@ class PatchingActions
                 array('value' => $scheduled)
             );
 
-            $scheduleMsg .= self::_getScheduleTimePicker(time(), $scheduled);
+            if ($scheduled === TRUE) {
+                $scheduleMsg .= self::_getScheduleTimePicker(strtotime($config['scheduled_time']), $scheduled);
+            } else {
+                $scheduleMsg .= self::_getScheduleTimePicker(time(), $scheduled);
+            }
 
             $rows[] = array(
                        'patchId' => array(
@@ -2093,7 +2134,7 @@ class PatchingActions
             $time = time();
         }
 
-        $today    = getdate();
+        $today    = getdate($time);
         $selected = array();
 
         $selected['day']   = ($today['mday'] - 1);
@@ -2296,12 +2337,12 @@ class PatchingActions
                       'December',
                      );
 
-        $time  = strtotime($day.' '.$monthsStr[(int) $month].' '.$year);
         $day   = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleDay'));
         $month = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleMonth'));
         $year  = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleYear'));
         $hour  = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleHour'));
         $min   = array_pop(Util::getArrayIndex($data, 'PatchingScreen-scheduleMin'));
+        $time  = strtotime(((int) $day + 1).' '.$monthsStr[(int) $month].' '.$year);
 
         Channels::includeSystem('Cron');
         $cronTypes    = Cron::getCronTypes();
