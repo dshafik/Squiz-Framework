@@ -106,3 +106,15 @@
 .RoleScreen-privListItem.enabled.expand .RoleScreen-privListItem-toggle {
     background: url(status-parent.png) no-repeat 0 -22px;
 }
+
+.RolesScreenMainContent.has-roles .show-on-no-roles {
+    display: none;
+}
+
+.RolesScreenMainContent.no-roles .hide-on-no-roles {
+    display: none;
+}
+
+.RolesScreenMainContent-no-roles-exist {
+    font-size: 15px;
+}

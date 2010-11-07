@@ -268,6 +268,21 @@ class RoleActions
 
 
     /**
+     * Returns the number of roles in the system.
+     *
+     * Used for showing or hiding
+     *
+     * @return integer
+     */
+    public static function getRoleCount()
+    {
+        $roles = Role::getRoles();
+        return count($roles);
+
+    }//end getRoles()
+
+
+    /**
      * Returns all the roles in the system.
      *
      * @return array

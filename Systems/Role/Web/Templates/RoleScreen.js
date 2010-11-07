@@ -357,6 +357,10 @@ var RoleRoleScreen = new function()
         // Focus textbox so that user can type in the new name.
         GUI.getWidget('role-name').select();
 
+        // Remove any "no roles" class on the content.
+        dfx.addClass(dfx.getClass('RolesScreenMainContent'), 'has-roles');
+        dfx.removeClass(dfx.getClass('RolesScreenMainContent'), 'no-roles');
+
         GUI.setModified('Role:RoleScreen', true);
     };
 

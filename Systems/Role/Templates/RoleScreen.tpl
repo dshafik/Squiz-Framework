@@ -3,6 +3,16 @@
         <exception><text>You must be a super user to access this screen</text></exception>
     </if-not>
 </condition>
+<var name="roleClass">
+    <condition>
+        <if condition="Role::getRoleCount() === 0">
+            <content>no-roles</content>
+        </if>
+        <else>
+            <content>has-roles</content>
+        </else>
+    </condition>
+</var>
 
 <div id="RolesScreen">
     <div class="RolesSettingsBoxContainer GUI-screen-left">
@@ -31,7 +41,11 @@
         </widget>
         <!-- End Roles Screen settings box -->
     </div>
-    <div class="RolesScreenMainContent GUI-screen-right">
+    <div class="RolesScreenMainContent GUI-screen-right {roleClass}">
+        <div class="show-on-no-roles">
+            <div class="RolesScreenMainContent-no-roles-exist"><text>No roles exist to configure.</text></div>
+        </div>
+        <div class="hide-on-no-roles">
         <widget type="GUI/TabPane" id="role-switcher">
             <setting name="tabs">
                 <dataProvider action="Role::getPrivilegeListForRolesScreen" />
@@ -47,6 +61,7 @@
                 </content>
             </setting>
         </widget>
+        </div>
     </div>
     <dataProvider action="Role::getRolesScreenInitCode">
         <arg></arg>
