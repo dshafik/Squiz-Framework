@@ -145,7 +145,7 @@ body.NetworkConfiguration {
 }
 
 .NetworkConfiguration-loaderWrap {
-    background: url("black_bg.png") no-repeat scroll 0 0 transparent;
+    background: url(black_bg.png) no-repeat scroll 0 0 transparent;
     height: 133px;
     left: 50%;
     margin-left: -66px;
@@ -160,14 +160,14 @@ body.NetworkConfiguration {
 }
 
 .NetworkConfiguration-completeMessage.success {
-    background: url("save_success.png") no-repeat scroll 74px 0 transparent;
+    background: url(save_success.png) no-repeat scroll 74px 0 transparent;
     height: 114px;
     margin: 10px 0 0 125px;
     width: 100%;
 }
 
 .NetworkConfiguration-completeMessage.failed {
-    background: url("connection_fail.png") no-repeat scroll 74px 4px transparent;
+    background: url(connection_fail.png) no-repeat scroll 74px 4px transparent;
     height: 114px;
     margin: 10px 0 0 125px;
     width: 270px;

@@ -100,10 +100,14 @@ var NetworkConfiguration = new function()
         dfx.hideElement(this._savingProgDOM);
         if (type === 'success') {
             dfx.showElement(this._completeMsgSuccess);
+            dfx.removeClass(this._completeMsgSuccess, 'hidden')
+
             dfx.hideElement(this._completeMsgFailed);
         } else if (type === 'failed') {
-            dfx.hideElement(this._completeMsgSuccess);
             dfx.showElement(this._completeMsgFailed);
+            dfx.removeClass(this._completeMsgFailed, 'hidden')
+
+            dfx.hideElement(this._completeMsgSuccess);
         }
 
         dfx.hideElement(this._confirmBtnDOM);
