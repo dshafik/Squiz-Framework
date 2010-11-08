@@ -119,12 +119,11 @@ class PatchingCron implements CronScript
         // Tells debian where to get operating system updates from.
         Channels::includeSystem('SquizSuite');
         $currProduct = SquizSuite::getProduct();
-        $sourcesList = $currProduct['connection']['sourcesList'];
         $status      = Patching::wsReleaseStatus();
         if ($status === 'GA') {
-            @FileSystem::filePutContents($sourcesList, 'deb http://aptrepo-stable.squiz.net/ stable main');
+            @FileSystem::filePutContents('/etc/apt/sources.list', 'deb http://aptrepo-stable.squiz.net/ stable main');
         } else {
-            @FileSystem::filePutContents($sourcesList, 'deb http://aptrepo-beta.squiz.net/ stable main');
+            @FileSystem::filePutContents('/etc/apt/sources.list', 'deb http://aptrepo-beta.squiz.net/ stable main');
         }
 
         // Issues a system reboot command if required.
