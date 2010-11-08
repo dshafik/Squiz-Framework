@@ -253,7 +253,7 @@ class PatchingActions
      */
     private static function _extractPatchNote($name)
     {
-        Patchingh::extractPatch($name);
+        Patching::extractPatch($name);
 
         $dataDir   = BaseSystem::getDataDir('Patching');
         $targetDir = $dataDir.'/'.$name;
@@ -542,6 +542,7 @@ class PatchingActions
             $targetDir = $dataDir.'/'.$patch['name'];
             if (is_dir($targetDir) === TRUE) {
                 $filename = $targetDir.'/patch.inc';
+
                 if (file_exists($filename) === TRUE) {
                     include $filename;
                     if (empty($patchInfo) === FALSE) {
@@ -551,6 +552,7 @@ class PatchingActions
                         if (isset($patchInfo['reboot']) === TRUE) {
                             $result[$i]['reboot'] = $patchInfo['reboot'];
                         }
+
                     }
                 } else {
                     $result[$i]['from']   = 'NA';
