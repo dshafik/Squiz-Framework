@@ -368,7 +368,7 @@
                 </div>
                 <div id="savingProgress" class="NetworkConfiguration-savingProgress hidden">
                     <div class="NetworkConfiguration-loaderWrap">
-                        <img src="http://172.16.198.141/__web/Skins/defaultSkin/HTMLCanvasWidget/black.gif" class="NetworkConfiguration-image" />
+                        <img src="/__web/Systems/ServerConfig/Web/Templates/black.gif" class="NetworkConfiguration-image" />
                     </div>
                 </div>
                 <!-- Progress message Ends -->
