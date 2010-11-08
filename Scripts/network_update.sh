@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# If NTP service is dead, restart it.
+status=`/usr/sbin/invoke-rc.d ntp status 2>/dev/null`; if [ $? -gt 0 ]; then /usr/sbin/invoke-rc.d ntp start 1>/dev/null; fi
+
 FILE_LOCATION="/var/www/mysource4/htdocs/data"
 
 INTERFACES_FILE="${FILE_LOCATION}/interfaces"
