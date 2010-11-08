@@ -205,7 +205,7 @@ GUIModeSwitcher.prototype = {
             self._mouseOver = true;
         }, function(e) {
             self._mouseOver = false;
-            if (dfx.attr(self._staticBtnContainer, 'state') === '1') {
+            if (dfx.attr(self._staticBtnContainer, 'state') === 'opened') {
                 self.autoCollapse();
             }
         });
@@ -214,8 +214,8 @@ GUIModeSwitcher.prototype = {
 
     toggle: function()
     {
-        var state = parseInt(dfx.attr(this._staticBtnContainer, 'state'));
-        if (state === 1) {
+        var state = dfx.attr(this._staticBtnContainer, 'state');
+        if (state === 'opened') {
             this.collapse();
         } else {
             this.expand();
@@ -229,13 +229,10 @@ GUIModeSwitcher.prototype = {
 
         clearTimeout(this._autoCollapseT);
 
-        dfx.attr(this._staticBtnContainer, 'state', 1);
+        dfx.attr(this._staticBtnContainer, 'state', 'opened');
 
         var self = this;
-        // Add a magic 2px as in IE8 the mode switch arrow looks funky expanded without it.
-        // Guess 2px because the expand shows 2 new buttons and there is a 1px error per button.
-        var newWidth = this._staticButtonsWidth + this._dynamicButtonsWidth + 2;
-        dfx.attr(this._sliderElement, 'state', 1);
+        var newWidth = this._staticButtonsWidth + this._dynamicButtonsWidth;
         dfx.animate(this._sliderElement, {
             width: newWidth
         }, seconds, function() {
@@ -266,7 +263,7 @@ GUIModeSwitcher.prototype = {
             var lastButtonWidth = dfx.getElementWidth(dynamicButtons[lastButtonIndex]);
         }
 
-        dfx.attr(this._staticBtnContainer, 'state', 0);
+        dfx.attr(this._staticBtnContainer, 'state', 'closed');
 
         if (animate === true) {
             dfx.animate(this._sliderElement, {
