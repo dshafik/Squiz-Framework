@@ -1,7 +1,8 @@
 .GUITabPane-top {
     list-style: none;
     border-bottom: 1px solid #CCC;
-    height: 24px;
+    height: 30px;
+    margin-bottom: 6px;
 }
 
 .GUITabPane-tab {
@@ -19,7 +20,7 @@
     float: left;
     line-height: 24px;
     outline: none;
-    padding: 0 20px;
+    padding: 3px 20px;
     background-color: #F8F8F8;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #F8F8F8), color-stop(100%, #BEBEBE));
     background-image: -moz-linear-gradient(top, #F8F8F8 15%, #BEBEBE 100%);
