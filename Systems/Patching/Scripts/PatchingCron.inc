@@ -116,13 +116,11 @@ class PatchingCron implements CronScript
         }
 
         SystemConfig::setConfig('Patching', $config);
-
         // Tells debian where to get operating system updates from.
         Channels::includeSystem('SquizSuite');
         $currProduct = SquizSuite::getProduct();
         $sourcesList = $currProduct['connection']['sourcesList'];
         $status      = Patching::wsReleaseStatus();
-
         if ($status === 'GA') {
             @FileSystem::filePutContents($sourcesList, 'deb http://aptrepo-stable.squiz.net/ stable main');
         } else {
@@ -152,6 +150,8 @@ class PatchingCron implements CronScript
         if ($valid === FALSE) {
             return FALSE;
         }
+
+        Patching::extractPatch($name);
 
         $dataDir  = BaseSystem::getDataDir('Patching');
         $patchDir = $dataDir.'/'.$name;
@@ -205,7 +205,6 @@ class PatchingCron implements CronScript
 
         file_put_contents($patchResultPath, '[Start running Post upgrade scripts]'."\n", FILE_APPEND);
         self::runUpgradeScripts('post', $rootDir, $patchDir);
-
         if (file_exists($rootDir.'/web/Skins/defaultSkin') === TRUE) {
             // Remove cached css files in the web dir.
             file_put_contents($patchResultPath, '[Removing cached CSS files in Web directory]'."\n", FILE_APPEND);
@@ -238,6 +237,7 @@ class PatchingCron implements CronScript
         exec('/etc/init.d/cron start');
         file_put_contents($patchResultPath, '[Turn on the system cron service]'."\n", FILE_APPEND);
         file_put_contents($patchResultPath, '[applyPatch() function returning TRUE]'."\n", FILE_APPEND);
+
         return TRUE;
 
     }//end applyPatch()
