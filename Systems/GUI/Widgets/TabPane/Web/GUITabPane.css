@@ -21,19 +21,23 @@
     outline: none;
     padding: 0 20px;
     background-color: #F8F8F8;
-    background-image: -moz-linear-gradient(center top , #F8F8F8 15%, #BEBEBE 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #F8F8F8), color-stop(100%, #BEBEBE));
+    background-image: -moz-linear-gradient(top, #F8F8F8 15%, #BEBEBE 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F8F8F8, endColorstr=#BEBEBE);
     border: 1px solid #CCC;
+    border-radius: 5px 5px 0 0;
     -moz-border-radius: 5px 5px 0 0;
     color: #000;
     margin-right: 5px;
     border-bottom: none;
-    -moz-box-shadow: 0 -4px 11px #DEDEDE;
+    -webkit-box-shadow: 0 -2px 3px #EDEDED;
+    -moz-box-shadow: 0 -2px 3px #EDEDED;
 }
 
 .GUITabPane-tab.active a {
     background-color: #FFF;
     background-image: none;
-    -moz-box-shadow: 0 -6px 14px #DEDEDE;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#FFFFFF, endColorstr=#FFFFFF);
 }
 
 .GUITabPane-tabContent {
