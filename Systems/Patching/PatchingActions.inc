@@ -664,8 +664,8 @@ class PatchingActions
                     $min = '1 minute';
                 }
 
-                $sec = ltrim($parts[1], '0');
-                if ($sec !== '1') {
+                $sec = (int) $parts[1];
+                if ($sec !== 1) {
                     $sec = $sec.' seconds';
                 } else {
                     $sec = '1 second';
@@ -679,8 +679,8 @@ class PatchingActions
                     $hr = '1 hour';
                 }
 
-                $min = ltrim($parts[1], '0');
-                if ($min !== '1') {
+                $min = (int) $parts[1];
+                if ($min !== 1) {
                     $min = $min.' minutes';
                 } else {
                     $min = '1 minute';
@@ -2002,7 +2002,7 @@ class PatchingActions
         // Notification User List row. It will be only shown
         // if the notification is activated.
         Channels::includeSystem('User');
-        
+
         foreach ($recipients as $userid) {
             $user = User::getUserById($userid);
             $name = ucwords($user['first_name'].' '.$user['last_name']);
