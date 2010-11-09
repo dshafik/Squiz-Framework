@@ -310,8 +310,8 @@ class SquizSuiteActions
             $decoded = json_decode($response['result'], TRUE);
             $cert    = $decoded['result'];
 
-            $systemid   = 'update_demo';
-            $systemName = 'Demo Squiz Update';
+            $systemid   = 'update-au-01';
+            $systemName = 'Squiz Update';
             $systemType = 'Squiz Update';
             $connection = array(
                            'url'  => $apiURL,
