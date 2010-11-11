@@ -345,52 +345,56 @@ class HelpActions
         $matchedId    = NULL;
         $matchedClass = NULL;
 
-        // Need to search each id individually so that we get the most relevant result.
-        foreach ($ids as $index => $id) {
-            if (empty($id) === FALSE) {
-                $id             = preg_replace('/[^a-z0-9_-\s]/i', '', $id);
-                $cmd            = 'grep -liE ".*<h1[^>]* elemid=\"'.$id.'\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
-                $contentResults = array();
-                exec($cmd, $contentResults);
-                if (empty($contentResults) === FALSE) {
-                    // Found the term.
-                    $glossaryid = basename(str_replace('.html', '', $contentResults[0]));
-                    $matchedId  = $id;
-                    break;
-                }
-            }
+        $pipedIds        = implode('|', $ids);
+        $pipedClassNames = implode(' ', $classNames);
+        $allClassNames   = explode(' ', $pipedClassNames);
+        $pipedClassNames = str_replace(' ', '|', $pipedClassNames);
 
-            $className = Util::getArrayIndex($classNames, $index, '');
-            $className = preg_replace('/[^a-z0-9_-\s]/i', '', $className);
-            if (empty($className) === TRUE) {
+        $cmd = 'grep -iE ".*<h1[^>]* elemid=\"('.$pipedIds.')\"\ elemclass=\"('.$pipedClassNames.'|\*)\".*>" '.$docsDir.'glossary-* | sed -r \'s/([^:]+):.*<h1 elemid="([^"]+)" elemclass="([^"]+)"[^>]*>.*/\1|\2|\3/\'';
+
+        $contentResults = array();
+        exec($cmd, $contentResults);
+        $lowestIndex = NULL;
+        foreach ($contentResults as $result) {
+            list($file, $elemid, $elemClass) = explode('|', $result);
+            $foundIndex = array_search($elemClass, $allClassNames);
+            if ($foundIndex === FALSE) {
                 continue;
             }
 
-            // Search for the class names.
-            $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\"'.$className.'\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
-            $contentResults = array();
-            exec($cmd, $contentResults);
-            if (empty($contentResults) === FALSE) {
-                // Found the term.
-                $glossaryid   = basename(str_replace('.html', '', $contentResults[0]));
-                $matchedClass = $className;
-                break;
-            } else {
-                // Search for each class name individually.
-                $pipedClasses   = str_replace(' ', '|', $className);
-                $pipedClasses   = ltrim($pipedClasses, '|');
-                $pipedClasses   = rtrim($pipedClasses, '|');
-                $cmd            = 'grep -liE ".*<h1[^>]* elemclass=\"('.$pipedClasses.')\".*" '.$docsDir.'* | grep -E ".*/glossary-.*"';
-                $contentResults = array();
-                exec($cmd, $contentResults);
-                if (empty($contentResults) === FALSE) {
-                    // Found the term.
-                    $glossaryid   = basename(str_replace('.html', '', $contentResults[0]));
-                    $matchedClass = $className;
+            if ($lowestIndex === NULL || $foundIndex < $lowestIndex) {
+                $lowestIndex  = $foundIndex;
+                $glossaryid   = basename(str_replace('.html', '', $file));
+                $matchedId    = $elemid;
+                $matchedClass = $elemClass;
+
+                if ($foundIndex === 0) {
                     break;
                 }
             }
         }//end foreach
+
+        if ($lowestIndex === NULL) {
+            // Could not match class names, try matching IDs.
+            foreach ($contentResults as $result) {
+                list($file, $elemid, $elemClass) = explode('|', $result);
+                $foundIndex = array_search($elemid, $ids);
+                if ($foundIndex === FALSE) {
+                    continue;
+                }
+
+                if ($lowestIndex === NULL || $foundIndex < $lowestIndex) {
+                    $lowestIndex  = $foundIndex;
+                    $glossaryid   = basename(str_replace('.html', '', $file));
+                    $matchedId    = $elemid;
+                    $matchedClass = $elemClass;
+
+                    if ($foundIndex === 0) {
+                        break;
+                    }
+                }
+            }
+        }//end if
 
         if ($glossaryid === NULL) {
             return _('Not found');

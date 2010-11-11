@@ -506,8 +506,13 @@ var Help = new function()
 
         var ln = elements.length;
         for (var i = 0; i < ln; i++) {
-            elemInfos.ids.push(elements[i].id);
-            elemInfos.classNames.push(elements[i].className);
+            if (elements[i].id) {
+                elemInfos.ids.push(elements[i].id);
+            }
+
+            if (elements[i].className) {
+                elemInfos.classNames.push(elements[i].className);
+            }
         }
 
         return elemInfos;
@@ -686,11 +691,13 @@ var Help = new function()
                             break;
                         }
                     }
+                } else if (elemClass && elemClass !== '*') {
+                    elem = dfx.getClass(elemClass, dfx.getId(elemid))[0];
                 } else {
                     // Get the elem element using the DOM element id.
                     elem = dfx.getId(elemid);
                 }
-            }
+            }//end if
 
             // If the specified elem is not in the DOM then we cannot pint to it.
             if (!elem) {
