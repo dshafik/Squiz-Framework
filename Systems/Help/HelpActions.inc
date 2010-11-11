@@ -976,7 +976,9 @@ class HelpActions
 
             if ($term->hasAttribute('elemid') === TRUE) {
                 self::$_widgetReferences['elemid'][$fileName] = $term->getAttribute('elemid');
-            } else if ($term->hasAttribute('elemclass') === TRUE) {
+            }
+
+            if ($term->hasAttribute('elemclass') === TRUE) {
                 self::$_widgetReferences['elemclass'][$fileName] = $term->getAttribute('elemclass');
             }
 
@@ -1179,12 +1181,16 @@ class HelpActions
         $iconEl = $dom->createElement('img');
         $iconEl->setAttribute('title', _('Click to show location on screen'));
 
+        if (empty($elemId) === TRUE && empty($elemClass) === TRUE) {
+            return NULL;
+        }
+
         if (empty($elemId) === FALSE) {
             $iconEl->setAttribute('elemid', $elemId);
-        } else if (empty($elemClass) === FALSE) {
+        }
+
+        if (empty($elemClass) === FALSE) {
             $iconEl->setAttribute('elemclass', $elemClass);
-        } else {
-            return NULL;
         }
 
         $iconEl->setAttribute(
@@ -1385,7 +1391,9 @@ class HelpActions
         $elemClass = NULL;
         if (isset(self::$_widgetReferences['elemid']['glossary-'.$id]) === TRUE) {
             $elemId = self::$_widgetReferences['elemid']['glossary-'.$id];
-        } else if (isset(self::$_widgetReferences['elemclass']['glossary-'.$id]) === TRUE) {
+        }
+
+        if (isset(self::$_widgetReferences['elemclass']['glossary-'.$id]) === TRUE) {
             $elemClass = self::$_widgetReferences['elemclass']['glossary-'.$id];
         }
 

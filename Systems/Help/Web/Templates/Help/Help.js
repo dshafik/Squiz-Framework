@@ -906,19 +906,21 @@ var Help = new function()
 
         updateLinkIconState: function(pointerIconElem) {
             // Find out if the element the icon is pointing to exists on the screen.
-            var elemid   = dfx.attr(pointerIconElem, 'elemid');
+            var elemid    = dfx.attr(pointerIconElem, 'elemid');
+            var elemClass = dfx.attr(pointerIconElem, 'elemClass');
             var refElems = [];
             if (elemid) {
                 var elem = dfx.getId(elemid);
                 if (elem) {
-                    refElems.push(elem);
+                    if (elemClass && elemClass !== '*') {
+                        refElems = dfx.getClass(elemClass, elem);
+                    } else {
+                        refElems.push(elem);
+                    }
                 }
+            } else if (!elemClass || elemClass === '*') {
+                return;
             } else {
-                var elemClass = dfx.attr(pointerIconElem, 'elemClass');
-                if (!elemClass) {
-                    return;
-                }
-
                 refElems = dfx.getClass(elemClass);
             }
 
