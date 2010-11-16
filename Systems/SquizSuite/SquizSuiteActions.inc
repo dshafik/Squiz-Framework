@@ -1239,15 +1239,8 @@ class SquizSuiteActions
                 ) {
                     // The final acknowlegement has been received.
                     // Send the list of my connected products for syncing.
-                    $allProducts = SquizSuite::getAllProducts();
-                    foreach ($allProducts as $product) {
-                        if ($product['current'] === TRUE
-                            || $product['systemid'] === $systemid
-                            || $product['status'] !== 'live'
-                        ) {
-                            continue;
-                        }
-
+                    $productsToSync = self::_getProductsToSync(array($systemid));
+                    foreach ($productsToSync as $product) {
                         $options  = array('sync_direction' => 'one');
                         $response = SquizSuite::sendMessage(
                             $product['systemid'],
@@ -1298,11 +1291,12 @@ class SquizSuiteActions
                         );
             $message  = self::_parseSuiteXML($xml, $required);
 
-            $systemid  = $message['system_id'];
+
+            $systemid = $message['system_id'];
             $systemUrl = $message['system_url'];
             $products  = $message['products'];
             foreach ($products as $product) {
-                // Does this product exist?
+                // Does this product already exist?
                 $p = SquizSuite::getProduct($product['systemid']);
                 if (empty($p) === FALSE) {
                     continue;
@@ -1321,14 +1315,8 @@ class SquizSuiteActions
             // Sync Direction is 'broadcast' so send out the message
             // to all the connected systems.
             if ($message['sync_direction'] === 'broadcast') {
-                $allProducts = SquizSuite::getAllProducts();
-                foreach ($allProducts as $product) {
-                    if ($product['current'] === TRUE
-                        || $product['status'] !== 'live'
-                    ) {
-                        continue;
-                    }
-
+                $productsToSync = self::_getProductsToSync();
+                foreach ($productsToSync as $product) {
                     $options  = array('sync_direction' => 'one');
                     $response = SquizSuite::sendMessage(
                         $product['systemid'],
@@ -1346,6 +1334,34 @@ class SquizSuiteActions
         }//end try
 
     }//end suiteProductSync()
+
+
+    /**
+     * Return the list of products to send suiteProductSync message.
+     *
+     * @param array $excludeSystemids Optional list of systemid to exclude.
+     *
+     * @return array
+     */
+    private static function _getProductsToSync(array $excludeSystemids=array())
+    {
+        $result      = array();
+        $allProducts = SquizSuite::getAllProducts();
+        foreach ($allProducts as $product) {
+            if ($product['current'] === TRUE
+                || in_array($product['systemid'], $excludeSystemids) === TRUE
+                || $product['status'] !== 'live'
+                || $product['type'] === 'Squiz Update'
+            ) {
+                continue;
+            }
+
+            $result[] = $product;
+        }
+
+        return $result;
+
+    }//end _getProductsToSync()
 
 
     /**
