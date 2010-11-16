@@ -692,6 +692,22 @@ dfx.arrayDiff = function(array1, array2, firstOnly)
 };
 
 /**
+ * Returns the keys of an array or keys of properties of an object as an indexed array.
+ */
+dfx.arrayKeys  = function(array)
+{
+    var ret = new Array();
+    var i = 0;
+    dfx.foreach(array, function(key) {
+        ret[i] = key;
+        i++;
+    });
+
+    return ret;
+
+};
+
+/**
  * Merges two objects together
  */
 dfx.objectMerge = function (ob1, ob2)
