@@ -852,6 +852,7 @@ class SquizSuiteActions
                 foreach ($products as $product) {
                     if ($product['current'] === FALSE
                         && $product['status'] === 'live'
+                        && $product['type'] !== 'Squiz Update'
                     ) {
                         $addSystem = TRUE;
                         if ($product['type'] === 'Squiz Matrix') {
