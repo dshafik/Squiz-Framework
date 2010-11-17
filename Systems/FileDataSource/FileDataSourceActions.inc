@@ -54,7 +54,7 @@ class FileDataSourceActions implements DataSourceActions
 
 
     /**
-     * Retrieves the value of one ore more attributes from one or more assets.
+     * Retrieves the value of one or more attributes from one or more assets.
      *
      * @param array|Query $assetids     List of asset ids.
      * @param array       $attributeids List of attribute ids.
@@ -70,7 +70,10 @@ class FileDataSourceActions implements DataSourceActions
                 $assetid = $assetid[0];
             }
 
-            $values[] = FileDataSourceFile::getValue($assetid, $attributeids[$pos]);
+            foreach($attributeids as $attribute) {
+                $values[$assetid][$attribute] = FileDataSourceFile::getValue($assetid, $attribute);
+            }
+
         }
 
         return $values;
