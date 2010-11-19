@@ -412,7 +412,7 @@ class ImageExportActions
         // We need to wait until a file is created.
         $created  = FALSE;
         $count    = 0;
-        $waitSecs = 25;
+        $waitSecs = 45;
 
         while ($created === FALSE) {
             sleep(1);
