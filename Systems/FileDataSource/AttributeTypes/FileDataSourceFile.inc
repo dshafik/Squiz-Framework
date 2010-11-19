@@ -127,9 +127,10 @@ class FileDataSourceFile extends DataSourceText
 
         self::_createHashDir($assetid);
         $file = self::getAttributeFilePath($assetid, $attributeid, TRUE);
-        // Remove the current file for this attribute.
-        if (file_exists($file) === TRUE) {
-            unlink($file);
+
+        if ($file === $value) {
+            // Nothing to update.
+            return FALSE;
         }
 
         rename($value, $file);
