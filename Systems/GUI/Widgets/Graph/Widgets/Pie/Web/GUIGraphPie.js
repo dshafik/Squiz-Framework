@@ -31,21 +31,30 @@ function GUIGraphPie(id, settings)
 
 GUIGraphPie.prototype = {
     init: function() {
-        // Attach the API user token to the URL, and replace the tag with
-        // one with the new URL. (Simply updating the 'data' tag does not work in
-        // Webkit.)
-        var container = dfx.getId(this.id + '-container');
+        var browser = dfx.browser();
 
-        var objectTag = document.createElement('object');
-        dfx.attr(objectTag, 'id', this.id);
-        dfx.attr(objectTag, 'type', 'image/svg+xml');
-        dfx.setStyle(objectTag, 'width', this.settings.size + 'px');
-        dfx.setStyle(objectTag, 'height', this.settings.size + 'px');
+        // Add the object tag if it's not IE, or it *is* IE but it's v.9 or later.
+        // Older IEs do not support it natively (and plugin support is flaky), also
+        // to hide any red X's that may appear due to lack of plugin at all.
+        if ((browser.type !== 'msie') || (parseInt(browser.version, 10) >= 9)) {
+            // Attach the API user token to the URL, and replace the tag with
+            // one with the new URL. (Simply updating the 'data' tag does not work in
+            // Webkit.)
+            var container = dfx.getId(this.id + '-container');
+            var tempUrl   = dfx.attr(container, 'tempurl');
 
-        var url = sfapi.attachTokenToURL(dfx.attr(container, 'tempurl'));
-        dfx.attr(objectTag, 'data', url);
+            if ((typeof tempUrl === 'string') && (tempUrl !== '')) {
+                var objectTag = document.createElement('object');
+                dfx.attr(objectTag, 'id', this.id);
+                dfx.attr(objectTag, 'type', 'image/svg+xml');
+                dfx.setStyle(objectTag, 'width', this.settings.size + 'px');
+                dfx.setStyle(objectTag, 'height', this.settings.size + 'px');
 
-        dfx.prepend(container, objectTag);
+                var url = sfapi.attachTokenToURL(tempUrl);
+                dfx.attr(objectTag, 'data', url);
 
+                dfx.prepend(container, objectTag);
+            }//end if
+        }//end if
     }
 };
