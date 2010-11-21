@@ -215,45 +215,47 @@ Util.Xml.getElementById = function(id, parent)
 
 };
 
+
 /**
  * returns a left trimmed string.
  *
  * @param {String} value The string to trim.
+ * @param {String} trimChars The different chars to trim off the left.
  *
  * @return {String}
  */
-dfx.ltrim = function(value)
-{
-    var re = /\s*((\S+\s*)*)/;
-    return value.replace(re, "$1");
+dfx.ltrim = function (str, trimChars) {
+    trimChars = trimChars || '\\s';
+    return str.replace(new RegExp('^[' + trimChars + ']+', 'g'), '');
 
-};
+}
 
 /**
  * returns a right trimmed string.
  *
  * @param {String} value The string to trim.
+ * @param {String} trimChars The different chars to trim off the right.
  *
  * @return {String}
  */
-dfx.rtrim = function(value)
-{
-    var re = /((\s*\S+)*)\s*/;
-    return value.replace(re, "$1");
+dfx.rtrim = function (str, trimChars) {
+    trimChars = trimChars || '\\s';
+    return str.replace(new RegExp('[' + trimChars + ']+$', 'g'), '');
 
-};
+}
 
 
 /**
  * returns a trimmed string.
  *
  * @param {String} value The string to trim.
+ * @param {String} trimChars The different chars to trim off both sides.
  *
  * @return {String}
  */
-dfx.trim = function(value)
+dfx.trim = function(value, trimChars)
 {
-    return dfx.ltrim(dfx.rtrim(value));
+    return dfx.ltrim(dfx.rtrim(value, trimChars), trimChars);
 
 };
 
@@ -611,6 +613,43 @@ dfx.addToQueryString = function(url, addQueries)
 
 };
 
+/**
+ * Adds given url path eg. about/dept to the given URL.
+ * Handles urls with query strings and/or anchors fine.
+ */
+dfx.addToPath = function(url, addPath)
+{
+    addPath = dfx.trim(addPath, '/');
+    if (addPath.length > 0) {
+        var mergedUrl        = '';
+        var baseUrl          = dfx.baseUrl(url);
+        var queryStringArray = dfx.queryString(url);
+        var anchorPartURL = dfx.anchorPart(url);
+
+        baseUrl = dfx.rtrim(baseUrl, '/');
+
+        mergedUrl = baseUrl + '/' + addPath;
+
+        if (!dfx.isEmpty(queryStringArray)) {
+            mergedUrl += '?';
+            dfx.foreach(queryStringArray, function(key) {
+                mergedUrl += key + '=' + queryStringArray[key] + '&';
+            });
+
+            mergedUrl = mergedUrl.substr(0, (mergedUrl.length - 1));
+        }
+
+        if (anchorPartURL.length > 0) {
+            mergedUrl += anchorPartURL;
+        }
+
+    } else {
+        var mergedUrl = url;
+    }
+
+    return mergedUrl;
+
+};
 
 /**
  * Return the filename without the path.
