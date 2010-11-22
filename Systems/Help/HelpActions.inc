@@ -1844,7 +1844,7 @@ class HelpActions
                 $screenTitle = $tplInfo['screenTitle'];
             }
 
-            $contents .= '<h2>'.$screenTitle.' <a href="javascript:parent.window.Help.loadPage(\''.$tplHref.'\');">==&gt;</a></h2>';
+            $contents .= '<h2><a href="javascript:parent.window.Help.loadPage(\''.$tplHref.'\');">'.$screenTitle.'</a></h2>';
             $contents .= '<p>'.$desc.'</p>';
         }
 
