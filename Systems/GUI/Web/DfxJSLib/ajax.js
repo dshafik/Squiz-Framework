@@ -29,9 +29,7 @@ dfx.get = function(url, data, callBack)
 {
     // No ajax requests should have an anchor part in the URL.
     // Also IE8 bug - Anchor becomes part of last query string value.
-    alert('request URL ' + url);
     url = dfx.noAnchorPartUrl(url);
-    alert('request URL2 ' + url);
     jQuery.get(url, data, callBack);
 
 };
