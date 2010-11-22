@@ -293,6 +293,16 @@ a.Help-control-button.general:active {
     text-decoration: underline;
 }
 
+.Help-iframe-templateList h2 a,
+.Help-iframe-templateList h2 a:visited {
+    padding-right: 20px;
+    background: transparent url(screen-link.png) 100% 2px no-repeat;
+}
+
+.Help-iframe-templateList h2 a:hover {
+    background-position: 100% -15px;
+}
+
 .Help-iframe .Help-glossary-letters a {
     text-decoration: none;
     color: #699FC7;
