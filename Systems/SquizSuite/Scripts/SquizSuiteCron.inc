@@ -38,6 +38,21 @@ class SquizSuiteCron implements CronScript
      */
     public function run()
     {
+        Channels::includeSystem('SystemConfig');
+        $config = SystemConfig::getConfig('SquizSuite');
+
+        // Ask the central server for new updates, if any.
+        $now = time();
+        if ($now > ($config['last_checked'] + $config['check_interval'])
+            || $config['check_asap'] === TRUE
+        ) {
+            Channels::includeSystem('SquizSuite');
+            SquizSuite::syncWithLiveProducts();
+
+            $config['last_checked'] = time();
+            $config['check_asap'] = FALSE;
+            SystemConfig::setConfig('SquizSuite', $config);
+        }
 
     }//end run()
 
