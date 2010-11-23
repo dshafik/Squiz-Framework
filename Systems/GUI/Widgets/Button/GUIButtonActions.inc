@@ -126,7 +126,7 @@ class GUIButtonActions
                 $onClick .= $function.'('.$args.')';
             } else {
                 $onClick .= $click;
-            }
+            }//end if
 
             $onClick .= ';"';
         }//end if

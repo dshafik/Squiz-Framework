@@ -62,5 +62,20 @@ GUIButton.prototype = {
     {
         this.button.disabled = true;
 
+    },
+
+    setValue: function(val)
+    {
+        this.button.value = val;
+        var label = dfx.getTag('span', this.button)[0];
+        dfx.setHtml(label, val);
+
+    },
+
+    getValue: function()
+    {
+        return this.button.value;
+
     }
+
 }
