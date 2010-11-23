@@ -1148,6 +1148,35 @@ class UserActions
 
 
     /**
+     * Returns user's email address in RFC 2822 format.
+     *
+     * For example, 'Foo Bar <foo@bar.com>'. If the user does not have
+     * email set, it will return an empty string.
+     *
+     * @param mixed $userid Userid to get the recipient email address.
+     *
+     * @return mixed
+     */
+    public static function getEmailRecipientAddress($userid)
+    {
+        Channels::includeSystem('Attribute');
+        $attrs  = array(
+                   'email',
+                   'first_name',
+                   'last_name',
+                  );
+        $values = Attribute::getAttributeValue($userid, $attrs);
+        if (empty($values['email']) === TRUE) {
+            return '';
+        }
+
+        $result = $values['first_name'].' '.$values['last_name'].' <'.$values['email'].'>';
+        return $result;
+
+    }//end getEmailRecipientAddress()
+
+
+    /**
      * Returns the child assets for specified parent asset.
      *
      * @param string $parentid The parent assetid.
