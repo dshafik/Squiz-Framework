@@ -335,11 +335,79 @@ class SquizSuiteActions
     /**
      * Get the list of all suite products.
      *
+     * @param boolean $includeCurrent If TRUE, the result includes the current product.
+     * @param boolean $includeDeleted If TRUE, the result includes the products
+     *                                marked for deletion.
+     * @param array   $excludeTypes   If specified, the types will be excluded from the result.
+     * @param array   $includeStatus  If specified, only the statuses specified will be returned.
+     *
      * @return array
      */
-    public static function getAllProducts()
+    public static function getProducts(
+        $includeCurrent=TRUE,
+        $includeDeleted=TRUE,
+        array $excludeTypes=array(),
+        array $includeStatus=array()
+    ) {
+        $query    = DAL::getDALQuery('SquizSuite', 'getAllProducts');
+        $products = DAL::getAssoc($query);
+
+        // Process serialized array first.
+        foreach ($products as &$product) {
+            $product['connection'] = unserialize($product['connection']);
+
+            // Adding to asset cache.
+            $systemid = $product['systemid'];
+            if (array_key_exists($systemid, self::$_productCache) === FALSE) {
+                self::$_productCache[$systemid] = $product;
+            }
+        }//end foreach
+
+        $result = array();
+        foreach ($products as $p) {
+            if ($includeCurrent === FALSE
+                && $p['current'] === TRUE
+            ) {
+                continue;
+            }
+
+            if ($includeDeleted === FALSE
+                && $p['sync_status'] === 'D'
+            ) {
+                continue;
+            }
+
+            if (empty($excludeTypes) === FALSE
+                && in_array($p['type'], $excludeTypes) === TRUE
+            ) {
+                continue;
+            }
+
+            if (empty($includeStatus) === FALSE
+                && in_array($p['status'], $includeStatus) === FALSE
+            ) {
+                continue;
+            }
+
+            $result[] = $p;
+        }//end foreach
+
+        return $result;
+
+    }//end getProducts()
+
+
+    /**
+     * Get the list of all live suite products.
+     *
+     * The product should be live, not marked for deletion
+     * and not the current one.
+     *
+     * @return array
+     */
+    public static function getLiveProducts()
     {
-        $query  = DAL::getDALQuery('SquizSuite', 'getAllProducts');
+        $query  = DAL::getDALQuery('SquizSuite', 'getLiveProducts');
         $result = DAL::getAssoc($query);
         foreach ($result as &$product) {
             $product['connection'] = unserialize($product['connection']);
@@ -352,30 +420,6 @@ class SquizSuiteActions
         }//end foreach
 
         return $result;
-
-    }//end getAllProducts()
-
-
-    /**
-     * Get the list of all live suite products.
-     *
-     * @return array
-     */
-    public static function getLiveProducts()
-    {
-        $liveProducts = array();
-        $allProducts  = SquizSuite::getAllProducts();
-        foreach ($allProducts as $product) {
-            if ($product['current'] === TRUE
-                || $product['status'] !== 'live'
-            ) {
-                continue;
-            }
-
-            $liveProducts[] = $product;
-        }
-
-        return $liveProducts;
 
     }//end getLiveProducts()
 
@@ -456,7 +500,7 @@ class SquizSuiteActions
      */
     public static function getCurrentProduct()
     {
-        $products = SquizSuite::getAllProducts();
+        $products = SquizSuite::getProducts();
         foreach ($products as $product) {
             if ($product['current'] === TRUE) {
                 return $product;
@@ -520,11 +564,17 @@ class SquizSuiteActions
      * @param string $systemid   The name of the product.
      * @param string $type       The type of the product to invite.
      * @param string $connection The connection details of the product.
+     * @param string $knowsMeAs  The systemid which the other product think
+     *                           the current product has.
      *
      * @return boolean
      */
-    public static function registerProduct($systemid, $type, $connection)
-    {
+    public static function registerProduct(
+        $systemid,
+        $type,
+        $connection,
+        $knowsMeAs=NULL
+    ) {
         if (is_array($connection) === TRUE) {
             Channels::modifyBasket('connection', serialize($connection));
         }
@@ -622,7 +672,7 @@ class SquizSuiteActions
             }
         }
 
-        $dom = self::_createSuiteMessageDOMTemplate();
+        $dom = self::_createSuiteMessageDOMTemplate($targetid);
         self::_createSuiteMessageDOM($dom, $msgType, $options);
         $xml = $dom->saveXML();
 
@@ -671,6 +721,7 @@ class SquizSuiteActions
         $currProductInfo = SquizSuite::getProduct();
         $userAgentStr    = self::$_userAgentPrefix.$currProductInfo['type'].'/4.0';
         $productInfo     = SquizSuite::getProduct($targetid);
+        $systemidKnownAs = SquizSuite::productKnowsMeAs($targetid);
 
         // Get the target API url.
         $apiURL = '';
@@ -693,7 +744,7 @@ class SquizSuiteActions
                     }
 
                     if (isset($message['_enc']['_systemid']) === FALSE) {
-                        $message['_enc']['_systemid'] = $currProductInfo['systemid'];
+                        $message['_enc']['_systemid'] = $systemidKnownAs;
                     }
 
                     if (isset($productInfo['connection']['username']) === TRUE) {
@@ -724,7 +775,7 @@ class SquizSuiteActions
                 }
 
                 if (isset($message['_enc']['_systemid']) === FALSE) {
-                    $message['_enc']['_systemid'] = $currProductInfo['systemid'];
+                    $message['_enc']['_systemid'] = $systemidKnownAs;
                 }
             }//end if
         }//end if
@@ -740,6 +791,29 @@ class SquizSuiteActions
         return $response;
 
     }//end sendRequest()
+
+
+    /**
+     * Returns the systemid of the other system know me as.
+     *
+     * @param string $systemid The systemid to query.
+     *
+     * @return string
+     */
+    public static function productKnowsMeAs($systemid)
+    {
+        $currProd = SquizSuite::getProduct();
+        $product  = SquizSuite::getProduct($systemid);
+        if (empty($product) === FALSE
+            && $product['knows_me_as'] !== NULL
+            && $currProd['systemid'] !== $product['knows_me_as']
+        ) {
+            return $product['knows_me_as'];
+        }
+
+        return $currProd['systemid'];
+
+    }//end productKnowsMeAs()
 
 
     /**
@@ -777,9 +851,13 @@ class SquizSuiteActions
      * Every suite messages are based on this template. It includes
      * systemid, system type and the URL of the system.
      *
+     * @param string $targetid System ID to send the message to OR
+     *                         the API URL when sendConnect message is being
+     *                         sent.
+     *
      * @return object
      */
-    private static function _createSuiteMessageDOMTemplate()
+    private static function _createSuiteMessageDOMTemplate($targetid)
     {
         Channels::includeSystem('API');
         $dom     = new DomDocument('1.0', 'utf-8');
@@ -787,7 +865,8 @@ class SquizSuiteActions
         $dom->appendChild($msgElem);
 
         // Get the product information about itself.
-        $productInfo = SquizSuite::getProduct();
+        $currProduct   = SquizSuite::getProduct();
+        $targetProduct = SquizSuite::getProduct($targetid);
 
         // System and Action requested.
         $sysidEl   = $dom->createElement('system_id');
@@ -795,10 +874,13 @@ class SquizSuiteActions
         $sysurlEl  = $dom->createElement('system_url');
         $sysNameEl = $dom->createElement('system_name');
 
-        API::buildResponseXMLDom($sysidEl, $productInfo['systemid']);
-        API::buildResponseXMLDom($systypeEl, $productInfo['type']);
-        API::buildResponseXMLDom($sysurlEl, $productInfo['connection']['url']);
-        API::buildResponseXMLDom($sysNameEl, $productInfo['connection']['name']);
+        // Note that this system is identifying itself as the target
+        // system thinks who I am!
+        API::buildResponseXMLDom($sysidEl, SquizSuite::productKnowsMeAs($targetid));
+
+        API::buildResponseXMLDom($systypeEl, $currProduct['type']);
+        API::buildResponseXMLDom($sysurlEl, $currProduct['connection']['url']);
+        API::buildResponseXMLDom($sysNameEl, $currProduct['connection']['name']);
         $msgElem->appendChild($sysidEl);
         $msgElem->appendChild($systypeEl);
         $msgElem->appendChild($sysurlEl);
@@ -845,15 +927,16 @@ class SquizSuiteActions
             break;
 
             case 'suiteProductSync':
-                $products   = SquizSuite::getAllProducts();
+                $incCurrent = FALSE;
+                $incDeleted = FALSE;
+                $excTypes   = array('Squiz Update');
+                $products   = SquizSuite::getProducts($incCurrent, $incDeleted, $excTypes);
+
                 $productsEl = $dom->createElement('products');
                 $productsEl->setAttribute('type', 'array');
                 $msgEl->appendChild($productsEl);
                 foreach ($products as $product) {
-                    if ($product['current'] === FALSE
-                        && $product['status'] === 'live'
-                        && $product['type'] !== 'Squiz Update'
-                    ) {
+                    if ($product['status'] === 'live') {
                         $addSystem = TRUE;
                         if ($product['type'] === 'Squiz Matrix') {
                             $username = Util::getArrayIndex(
@@ -1064,7 +1147,12 @@ class SquizSuiteActions
                 $connection['url']  = $systemUrl;
                 $connection['cert'] = $certificate;
                 $connection['name'] = $systemName;
-                SquizSuite::registerProduct($systemid, $systemType, $connection);
+                SquizSuite::registerProduct(
+                    $systemid,
+                    $systemType,
+                    $connection,
+                    $currProduct['systemid']
+                );
             }//end if
 
             // Now we are all good. Register the system and set the status
@@ -1126,7 +1214,7 @@ class SquizSuiteActions
             $systemType  = $message['system_type'];
             $certificate = $message['cert'];
 
-            $allProducts = SquizSuite::getAllProducts();
+            $allProducts = SquizSuite::getProducts();
             $productInfo = array();
             foreach ($allProducts as $product) {
                 if ($product['status'] === 'pending'
@@ -1151,6 +1239,7 @@ class SquizSuiteActions
             DAL::beginTransaction();
             // Connection Request accepted by the other system.
             // Remove the temporary product entry first.
+            $knowsMeAs = $productInfo['knows_me_as'];
             SquizSuite::removeProduct($productInfo['systemid']);
 
             $connection = array(
@@ -1158,9 +1247,9 @@ class SquizSuiteActions
                            'cert' => $certificate,
                            'name' => $systemName,
                           );
-            SquizSuite::registerProduct($systemid, $systemType, $connection);
+            SquizSuite::registerProduct($systemid, $systemType, $connection, $knowsMeAs);
             SquizSuite::updateProduct($systemid, 'status', 'live');
-
+            SquizSuite::updateProduct($systemid, 'sync_status', 'A');
             $response = SquizSuite::sendMessage($systemid, 'suiteConnectAckAck');
             $response = $response['result'];
             if (strpos($response, '<?xml') !== 0) {
@@ -1213,12 +1302,11 @@ class SquizSuiteActions
             // Parse the posted XML file. Exception will be thrown in case error occurs.
             $xml = self::_getDecryptedXML();
 
-            $required = array(
-                         'system_id',
-                         'system_url',
-                        );
-            $message  = self::_parseSuiteXML($xml, $required);
-
+            $required  = array(
+                          'system_id',
+                          'system_url',
+                         );
+            $message   = self::_parseSuiteXML($xml, $required);
             $systemid  = $message['system_id'];
             $systemUrl = $message['system_url'];
 
@@ -1232,24 +1320,7 @@ class SquizSuiteActions
 
             if ($productInfo['status'] === 'pending approval') {
                 SquizSuite::updateProduct($systemid, 'status', 'live');
-
-                // Update product shouldn't get involved with this.
-                $currProduct = SquizSuite::getCurrentProduct();
-                if ($currProduct['type'] !== 'Squiz Update'
-                    && $productInfo['type'] !== 'Squiz Update'
-                ) {
-                    // The final acknowlegement has been received.
-                    // Send the list of my connected products for syncing.
-                    $productsToSync = self::_getProductsToSync(array($systemid));
-                    foreach ($productsToSync as $product) {
-                        $options  = array('sync_direction' => 'one');
-                        $response = SquizSuite::sendMessage(
-                            $product['systemid'],
-                            'suiteProductSync',
-                            $options
-                        );
-                    }
-                }//end if
+                SquizSuite::updateProduct($systemid, 'sync_status', 'A');
             }//end if
 
             $response = 'ok';
@@ -1257,6 +1328,10 @@ class SquizSuiteActions
         } catch (Exception $e) {
             $errMsg  = 'suiteConnectAckAck failed.'."\n";
             $errMsg .= $e->getMessage()."\n";
+
+            // Re-throw exception here so that API system can send
+            // the proper error HTTP header.
+            throw new ChannelException($e->getMessage());
         }//end try
 
     }//end suiteConnectAckAck()
@@ -1284,16 +1359,14 @@ class SquizSuiteActions
             // Parse the posted XML file. Exception will be thrown in case error occurs.
             $xml = self::_getDecryptedXML();
 
-            $required = array(
-                         'system_id',
-                         'system_url',
-                         'products',
-                         'sync_direction',
-                        );
-            $message  = self::_parseSuiteXML($xml, $required);
-
-
-            $systemid = $message['system_id'];
+            $required  = array(
+                          'system_id',
+                          'system_url',
+                          'products',
+                          'sync_direction',
+                         );
+            $message   = self::_parseSuiteXML($xml, $required);
+            $systemid  = $message['system_id'];
             $systemUrl = $message['system_url'];
             $products  = $message['products'];
             foreach ($products as $product) {
@@ -1347,7 +1420,7 @@ class SquizSuiteActions
     private static function _getProductsToSync(array $excludeSystemids=array())
     {
         $result      = array();
-        $allProducts = SquizSuite::getAllProducts();
+        $allProducts = SquizSuite::getProducts();
         foreach ($allProducts as $product) {
             if ($product['current'] === TRUE
                 || in_array($product['systemid'], $excludeSystemids) === TRUE
@@ -1439,6 +1512,322 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the suite information this system knows.
+     *
+     * It includes the information about itself and all the
+     * systems it knows.
+     *
+     * @throws ChannelException Error occurred.
+     *
+     * @return array
+     *
+     * @api            read
+     * @api-permission superuser
+     */
+    public static function suiteProductInfo()
+    {
+        // Verify the User Agent string. Can we get the system type out of it?
+        self::_parseUserAgentString();
+
+        // Parse the posted XML file. Exception will be thrown in case error occurs.
+        $xml = self::_getDecryptedXML();
+
+        $required   = array(
+                       'system_id',
+                       'system_url',
+                       'system_name',
+                       'system_type',
+                      );
+        $message    = self::_parseSuiteXML($xml, $required);
+        $systemid   = $message['system_id'];
+        $systemUrl  = rtrim($message['system_url'], '/');
+        $systemName = $message['system_name'];
+        $systemType = $message['system_type'];
+
+        $currProd  = SquizSuite::getProduct();
+        $knowsMeAs = SquizSuite::productKnowsMeAs($systemid);
+        if ($currProd['systemid'] !== $knowsMeAs) {
+            // The requesting system thought my systemid was different.
+            // Now it knows the correct systemid as it requested my info,
+            // so it's time to update.
+            SquizSuite::updateProduct($systemid, 'knows_me_as', $currProd['systemid']);
+        }
+
+        $result = array(
+                   'systemid'  => $currProd['systemid'],
+                   'name'      => $currProd['connection']['name'],
+                   'apiurl'    => $currProd['connection']['url'],
+                   'cert'      => $currProd['connection']['cert'],
+                   'added'     => array(),
+                   'deleted'   => array(),
+                   'connected' => array(),
+                  );
+
+        // Get the information about the connected systems.
+        $incCurrent = FALSE;
+        $incDeleted = TRUE;
+        $excTypes   = array('Squiz Update');
+        $products   = SquizSuite::getProducts($incCurrent, $incDeleted, $excTypes);
+        foreach ($products as $p) {
+            if ($p['status'] !== 'live') {
+                // Only send the message about the live systems.
+                continue;
+            }
+
+            if ($p['sync_status'] === 'D') {
+                $result['deleted'][] = $p;
+            } else {
+                $result['connected'][] = $p;
+            }
+        }
+
+        return $result;
+
+    }//end suiteProductInfo()
+
+
+    /**
+     * Pull other suite system's information and sync itself.
+     *
+     * This action runs by SquizSuite cron job. It requests suite info
+     * to all live connected products and update the information accordingly
+     * such as systemid/name changes, new/deleted products and so on.
+     *
+     * @return void
+     */
+    public static function syncWithLiveProducts()
+    {
+        $liveProducts = SquizSuite::getLiveProducts();
+
+        $incCur      = FALSE;
+        $incDel      = TRUE;
+        $excTypes    = array('Squiz Update');
+        $allProducts = SquizSuite::getProducts($incCur, $incDel, $excTypes);
+
+        // First collect the systems marked for deletion or addition.
+        // Once it pulls from all live systems, and if everyone has
+        // the same addition/deletion, then we can remove sync_status.
+        // If any of the system hasn't got the message, then we will turn
+        // the flag to be FALSE, and sync_status will remain.
+        $markedForDeletion = array();
+        $markedForAddition = array();
+        foreach ($allProducts as $product) {
+            if ($product['sync_status'] === 'D') {
+                $markedForDeletion[$product['systemid']] = TRUE;
+            }
+
+            if ($product['sync_status'] === 'A') {
+                $markedForAddition[$product['systemid']] = TRUE;
+            }
+        }//end foreach
+
+        // Let's loop through each connected live systems and pull their information.
+        $connectionFailed = FALSE;
+        foreach ($allProducts as $product) {
+            if ($product['status'] !== 'live' || $product['sync_status'] === 'D') {
+                continue;
+            }
+
+            $response = SquizSuite::sendMessage($product['systemid'], 'suiteProductInfo');
+            $response = self::_getSuiteMessageResult($response);
+            if ($response === 'failed') {
+                $connectionFailed = TRUE;
+                continue;
+            }
+
+            // We are passing $markedForDeletion and $markedForAddition via reference,
+            // and each private function will modify the value so that we can determine
+            // whether remove/add sync_status or not.
+            self::_syncProductDetails($product, $response);
+            self::_syncDeletedProducts(
+                $response['deleted'],
+                $markedForDeletion,
+                $markedForAddition
+            );
+
+            self::_syncConnectedProducts(
+                $product['systemid'],
+                $response['connected'],
+                $markedForDeletion,
+                $markedForAddition
+            );
+        }//end foreach
+
+        // Once tt has contacted EVERY connected systems, then it can process
+        // sync_status.
+        if ($connectionFailed === FALSE) {
+            foreach ($markedForDeletion as $sysid => $canBeRemoved) {
+                if ($canBeRemoved === TRUE) {
+                    SquizSuite::removeProduct($sysid);
+                }
+            }
+
+            foreach ($markedForAddition as $sysid => $canBeAdded) {
+                if ($canBeAdded === TRUE) {
+                    SquizSuite::updateProduct($sysid, 'sync_status', '');
+                }
+            }
+        }//end if
+
+    }//end syncWithLiveProducts()
+
+
+    /**
+     * Sync the product details like product name, URL.
+     *
+     * @param array $product  Product information to sync with.
+     * @param array $response Response message from the product.
+     *
+     * @return void
+     */
+    private static function _syncProductDetails(array $product, array $response)
+    {
+        if ($product['systemid'] !== $response['systemid']) {
+            // The product's systemid it returns is not the same as
+            // the systemid it is using. The other system must been updated
+            // its systemid. Let's update our record as well.
+            SquizSuite::updateProduct($product['systemid'], 'systemid', $response['systemid']);
+        }
+
+    }//end _syncProductDetails()
+
+
+    /**
+     * Sync the deleted products.
+     *
+     * This is a helper function to fill up $markedForDeletion and
+     * $markedForAddition array for later processing.
+     *
+     * @param array $deleted            List of deleted products.
+     * @param array &$markedForDeletion List of deleted products to process later.
+     * @param array &$markedForAddition List of added products to process later.
+     *
+     * @return void
+     */
+    private static function _syncDeletedProducts(
+        array $deleted,
+        array &$markedForDeletion,
+        array &$markedForAddition
+    ) {
+        // Okay. This product has deleted some other products.
+        // Let's see what we can do.
+        foreach ($deleted as $p) {
+            $res = SquizSuite::getProduct($p['systemid']);
+            if (empty($res) === TRUE) {
+                // Good. I also deleted this system.
+                continue;
+            } else if ($res['sync_status'] === 'D') {
+                // Also good. I'm going to remove this too.
+                continue;
+            } else if ($res['status'] === 'live') {
+                // Okay. Im going to delete this.
+                SquizSuite::removeProduct($p['systemid']);
+
+                // Even though I just added, since you have deleted it
+                // I trust you more.
+                unset($markedForAddition[$p['systemid']]);
+            }
+        }
+
+    }//end _syncDeletedProducts()
+
+
+    /**
+     * Sync the deleted products.
+     *
+     * This is a helper function to fill up $markedForDeletion and
+     * $markedForAddition array for later processing.
+     *
+     * @param string $systemid           Current product's systemid.
+     * @param array  $connected          List of connected products.
+     * @param array  &$markedForDeletion List of deleted products to process later.
+     * @param array  &$markedForAddition List of added products to process later.
+     *
+     * @return void
+     */
+    private static function _syncConnectedProducts(
+        $systemid,
+        array $connected,
+        array &$markedForDeletion,
+        array &$markedForAddition
+    ) {
+        // Okay. This product has added some other products.
+        // Let's see what we can do.
+        $connectedIds = array();
+        foreach ($connected as $p) {
+            $res = SquizSuite::getProduct($p['systemid']);
+            if (empty($res) === TRUE) {
+                // Hmmmm... I think I need to add this one.
+                SquizSuite::registerProduct(
+                    $p['systemid'],
+                    $p['type'],
+                    $p['connection']
+                );
+                SquizSuite::updateProduct($p['systemid'], 'status', 'live');
+            } else if ($res['sync_status'] === 'D') {
+                // You have added something, but the system is marked for
+                // deletion here. I wouldn't do anything and I can't remove
+                // the entry yet.
+                $markedForDeletion[$p['systemid']] = FALSE;
+            } else if ($res['status'] !== 'live') {
+                // I have the same system, and the status is not live.
+                // But you have the system! so I trust you and will set
+                // my flag as live.
+                SquizSuite::updateProduct($p['systemid'], 'status', 'live');
+            }
+
+            $connectedIds[] = $p['systemid'];
+        }//end foreach
+
+        // Get all systemid which have been added to this system,
+        // but not existing in the other one.
+        $notAddedYet = array_diff(array_keys($markedForAddition), $connectedIds);
+        foreach ($notAddedYet as $notAddedId) {
+            if ($systemid !== $notAddedId) {
+                $markedForAddition[$notAddedId] = FALSE;
+            }
+        }
+
+    }//end _syncConnectedProducts()
+
+
+    /**
+     * Returns TRUE if product sync is scheduled for next cron run.
+     *
+     * @return boolean
+     */
+    public static function isProductSyncScheduled()
+    {
+        Channels::includeSystem('SystemConfig');
+        $config = SystemConfig::getConfig('SquizSuite');
+        return $config['check_asap'];
+
+    }//end isProductSyncScheduled()
+
+
+    /**
+     * Returns TRUE if there are products to sync.
+     *
+     * @return boolean
+     */
+    public static function productsToSyncExist()
+    {
+        $incCur    = FALSE;
+        $incDel    = FALSE;
+        $excTypes  = array('Squiz Update');
+        $incStatus = array('live');
+
+        $productsToSync = SquizSuite::getProducts($incCur, $incDel, $excTypes, $incStatus);
+        if (empty($productsToSync) === TRUE) {
+            return FALSE;
+        }
+
+        return TRUE;
+
+    }//end productsToSyncExist()
+
+
+    /**
      * Returns _enc field from $_POST var.
      *
      * If _enc field doesn't exist in $_POST, it will
@@ -1494,13 +1883,18 @@ class SquizSuiteActions
      */
     private static function _getSuiteMessageResult($response)
     {
-        $response = $response['result'];
-        if (strpos($response, '<?xml') !== 0) {
-            return FALSE;
+        $result   = $response['result'];
+        $curlInfo = $response['curlInfo'];
+        if (strpos($result, '<?xml') !== 0) {
+            return 'failed';
         } else {
+            if ($curlInfo['http_code'] !== 200) {
+                return 'failed';
+            }
+
             Channels::includeSystem('API');
             $dom = new DomDocument();
-            $dom->loadXML($response);
+            $dom->loadXML($result);
 
             $responseDom = $dom->getElementsByTagName('result')->item(0);
             $response    = API::getResponseFromXMLDom($responseDom);
@@ -2011,13 +2405,10 @@ class SquizSuiteActions
         $rows = array();
 
         $count       = 0;
-        $allProducts = SquizSuite::getAllProducts();
+        $incCurrent  = FALSE;
+        $incDeleted  = FALSE;
+        $allProducts = SquizSuite::getProducts($incCurrent, $incDeleted);
         foreach ($allProducts as $product) {
-            // Skip the current product.
-            if ($product['current'] === TRUE) {
-                continue;
-            }
-
             $systemid = $product['systemid'];
 
             $productName = _('Unknown').' ('.$product['systemid'].')';
@@ -2222,10 +2613,11 @@ class SquizSuiteActions
      */
     public static function getSquizSuiteScreenInitCode()
     {
-        $products = SquizSuite::getAllProducts();
+        $products = SquizSuite::getProducts();
         $data     = array(
                      'currentProduct'    => array(),
                      'connectedProducts' => array(),
+                     'refreshScheduled'  => SquizSuite::isProductSyncScheduled(),
                     );
 
         foreach ($products as $p) {
@@ -2278,6 +2670,25 @@ class SquizSuiteActions
                 }
             break;
 
+            // Refresh product status ASAP.
+            case 'refreshNow':
+                $schedule = Util::getArrayIndex($data, 'schedule', TRUE);
+                if ($schedule === FALSE) {
+                    // Do not even use the cron and update every information right now.
+                    SquizSuite::syncWithLiveProducts();
+                } else {
+                    // Schedule the next cron run to update product info.
+                    Channels::includeSystem('SystemConfig');
+                    $config = SystemConfig::getConfig('SquizSuite');
+                    if ($config['check_asap'] === FALSE) {
+                        $config['check_asap'] = TRUE;
+                        SystemConfig::setConfig('SquizSuite', $config);
+                    }
+                }
+
+                $retVal = TRUE;
+            break;
+
             // Save the connected system form fields.
             default:
                 $retVal = self::_saveSquizSuiteScreen($data);
@@ -2307,8 +2718,7 @@ class SquizSuiteActions
     private static function _saveSquizSuiteScreen(array $data)
     {
         include_once 'Libs/Util/Util.inc';
-        $retVal    = TRUE;
-        $broadcast = FALSE;
+        $retVal = TRUE;
 
         // Current product name.
         $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
@@ -2355,16 +2765,13 @@ class SquizSuiteActions
         $deletedProducts = Util::getArrayIndex($templateData, 'deletedProducts', array());
         foreach ($deletedProducts as $systemid => $delete) {
             if ($delete === TRUE) {
-                SquizSuite::removeProduct($systemid);
+                SquizSuite::updateProduct($systemid, 'sync_status', 'D');
             }
         }
 
-        $products = SquizSuite::getAllProducts();
+        $includeCurrent = FALSE;
+        $products       = SquizSuite::getProducts($includeCurrent);
         foreach ($products as $product) {
-            if ($product['current'] === TRUE) {
-                continue;
-            }
-
             $systemid = $product['systemid'];
             if ($product['status'] === 'live') {
                 $updated    = FALSE;
@@ -2395,7 +2802,6 @@ class SquizSuiteActions
                 ) {
                     $upConnection['username'] = $newUsername;
                     SquizSuite::updateProduct($systemid, 'connection', $upConnection);
-                    $broadcast = TRUE;
                 }
 
                 if ($newPassword !== NULL
@@ -2404,59 +2810,12 @@ class SquizSuiteActions
                 ) {
                     $upConnection['password'] = $newPassword;
                     SquizSuite::updateProduct($systemid, 'connection', $upConnection);
-                    $broadcast = TRUE;
-                }
-
-                if ($broadcast === TRUE) {
-                    $currProduct   = SquizSuite::getCurrentProduct();
-                    $targetProduct = SquizSuite::getProduct($systemid);
-                    if ($currProduct['type'] !== 'Squiz Update'
-                        && $targetProduct['type'] !== 'Squiz Update'
-                    ) {
-                        // Update product shouldn't get involved with this.
-                        $options  = array('sync_direction' => 'broadcast');
-                        $response = SquizSuite::sendMessage(
-                            $systemid,
-                            'suiteProductSync',
-                            $options
-                        );
-                    }
                 }
             }//end if
         }//end foreach
 
         // Add a new product.
         self::_saveAddNewProduct($data);
-
-        // Product name or URL has been changed. Send out the product update messages.
-        $updateType  = NULL;
-        $updateValue = NULL;
-        if ($nameUpdated === TRUE) {
-            $updateType  = 'name';
-            $updateValue = $currProductName;
-        } else if ($urlUpdated === TRUE) {
-            $updateType  = 'url';
-            $updateValue = array(
-                            'old' => $oldURL,
-                            'new' => $newURL,
-                           );
-        }
-
-        if ($updateType !== NULL && $updateValue !== NULL) {
-            $liveProducts = SquizSuite::getLiveProducts();
-            $options      = array(
-                             'updateType'  => $updateType,
-                             'updateValue' => $updateValue,
-                            );
-
-            foreach ($liveProducts as $product) {
-                $response = SquizSuite::sendMessage(
-                    $product['systemid'],
-                    'suiteProductUpdate',
-                    $options
-                );
-            }
-        }
 
         return $retVal;
 
@@ -2473,7 +2832,7 @@ class SquizSuiteActions
     private static function _saveAddNewProduct(array $data)
     {
         // New Product.
-        include_once 'Libs/Security/Security.inc'; 
+        include_once 'Libs/Security/Security.inc';
         $newProductURL = Security::getRequestData('squizSuite-new-apiURL', '', TRUE, $data);
         $newProductURL = trim($newProductURL);
         if (empty($newProductURL) === FALSE) {
@@ -2545,7 +2904,12 @@ class SquizSuiteActions
                         }
 
                         $connection = array('url' => $url);
-                        SquizSuite::registerProduct($tempid, $systemType, $connection);
+                        SquizSuite::registerProduct(
+                            $tempid,
+                            $systemType,
+                            $connection,
+                            $currProduct['systemid']
+                        );
                         SquizSuite::updateProduct($tempid, 'status', 'pending');
                     }
                 }//end if
@@ -2572,14 +2936,15 @@ class SquizSuiteActions
         $currProduct = SquizSuite::getProduct();
         $product     = SquizSuite::getProduct($systemid);
         if (empty($product['connection']) === FALSE) {
-            $msg = array(
-                    '_enc'            => array(
-                                          '_systemid' => $currProduct['systemid'],
-                                         ),
-                    '_pubKeySystemid' => $systemid,
-                   );
+            $msg      = array('_pubKeySystemid' => $systemid);
+            $response = SquizSuite::sendRequest(
+                $systemid,
+                'json',
+                'SquizSuite',
+                'getProductSummary',
+                $msg
+            );
 
-            $response = SquizSuite::sendRequest($systemid, 'json', 'SquizSuite', 'getProductSummary', $msg);
             if ($response['curlInfo']['http_code'] === 200) {
                 $response = json_decode($response['result'], TRUE);
                 $retVal   = $response['result'];
@@ -2616,22 +2981,12 @@ class SquizSuiteActions
                     $retVal = $exceptionDom->nodeValue;
                 }
             } else {
-                $currProduct   = SquizSuite::getCurrentProduct();
-                $targetProduct = SquizSuite::getProduct($systemid);
-                if ($currProduct['type'] !== 'Squiz Update'
-                    && $targetProduct['type'] !== 'Squiz Update'
-                ) {
-                    // Update product shouldn't get involved with this.
-                    $options  = array('sync_direction' => 'broadcast');
-                    $response = SquizSuite::sendMessage(
-                        $systemid,
-                        'suiteProductSync',
-                        $options
-                    );
-                }
-
-                $retVal = TRUE;
-            }//end if
+                // Sending suiteConnectAck message was successful, which means now
+                // the other system know my real systemid.
+                // I can safely update its knows_me_as field with my real systemid.
+                $currProduct = SquizSuite::getProduct();
+                SquizSuite::updateProduct($systemid, 'knows_me_as', $currProduct['systemid']);
+            }
         }//end if
 
         return $retVal;
