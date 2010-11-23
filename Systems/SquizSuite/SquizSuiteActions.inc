@@ -972,15 +972,6 @@ class SquizSuiteActions
                 }
             break;
 
-            case 'suiteProductUpdate':
-                $updateTypeEl = $dom->createElement('update_type');
-                $updateValEl  = $dom->createElement('update_value');
-                API::buildResponseXMLDom($updateTypeEl, $options['updateType']);
-                API::buildResponseXMLDom($updateValEl, $options['updateValue']);
-                $msgEl->appendChild($updateTypeEl);
-                $msgEl->appendChild($updateValEl);
-            break;
-
             default:
                 // No default behaviour.
             break;
@@ -1119,13 +1110,21 @@ class SquizSuiteActions
                         throw new ChannelException($errMsg);
                     } else {
                         if ($pingRes['curlInfo']['http_code'] === 200) {
-                            // The (supposed to be) sender might not be the sender.
-                            // The current ping message worked file.
-                            // Do not accept this request.
-                            $errMsg = 'The requested system is already registered.';
-                            throw new ChannelException($errMsg);
+                            if ($product['sync_status'] === 'D') {
+                                // The product has been removed and the message hasn't
+                                // been propagated to the all the connected systems.
+                                // So it can't accept the suite request yet.
+                                $errMsg = 'The requested system has been removed.';
+                                throw new ChannelException($errMsg);
+                            } else {
+                                // The (supposed to be) sender might not be the sender.
+                                // The current ping message worked fine.
+                                // Do not accept this request.
+                                $errMsg = 'The requested system is already registered.';
+                                throw new ChannelException($errMsg);
+                            }
                         }
-                    }
+                    }//end if
                 } else {
                     // The systemid exists and it's not live yet. But make sure
                     // it doesn't have URL or certificate yet before we accept the
@@ -1439,79 +1438,6 @@ class SquizSuiteActions
 
 
     /**
-     * Suite product update request handler.
-     *
-     * The connected system can send suiteProductUpdate message
-     * to deliver the information about any changes in the system.
-     * So, the receiver can update the details of the product.
-     *
-     * @return string
-     * @throws ChannelException Error occurred.
-     *
-     * @api            read
-     * @api-permission superuser
-     */
-    public static function suiteProductUpdate()
-    {
-        try {
-            // Verify the User Agent string. Can we get the system type out of it?
-            self::_parseUserAgentString();
-
-            // Parse the posted XML file. Exception will be thrown in case error occurs.
-            $xml = self::_getDecryptedXML();
-
-            include_once 'Libs/Security/Security.inc';
-            $required = array(
-                         'system_id',
-                         'system_url',
-                         'update_type',
-                         'update_value',
-                        );
-            $message  = self::_parseSuiteXML($xml, $required);
-
-            $systemid    = $message['system_id'];
-            $systemUrl   = $message['system_url'];
-            $updateType  = $message['update_type'];
-            $updateValue = $message['update_value'];
-            $product     = SquizSuite::getProduct($systemid);
-            switch($updateType) {
-                case 'name':
-                case 'cert':
-                    $product['connection'][$updateType] = $updateValue;
-                    SquizSuite::updateProduct(
-                        $systemid,
-                        'connection',
-                        $product['connection']
-                    );
-                break;
-
-                case 'url':
-                    if ($product['connection']['url'] === $updateValue['old']) {
-                        $product['connection']['url'] = $updateValue['new'];
-                        SquizSuite::updateProduct(
-                            $systemid,
-                            'connection',
-                            $product['connection']
-                        );
-                    }
-                break;
-
-                default:
-                    // Do nothing.
-                break;
-            }//end switch
-
-            $response = 'ok';
-            return $response;
-        } catch (Exception $e) {
-            $errMsg  = 'suiteProductUpdate failed.'."\n";
-            $errMsg .= $e->getMessage()."\n";
-        }//end try
-
-    }//end suiteProductUpdate()
-
-
-    /**
      * Returns the suite information this system knows.
      *
      * It includes the information about itself and all the
@@ -1632,6 +1558,9 @@ class SquizSuiteActions
             $response = self::_getSuiteMessageResult($response);
             if ($response === 'failed') {
                 $connectionFailed = TRUE;
+
+                // Send out warning email about the lost connection.
+                self::_sendConnectionFailEmail($product);
                 continue;
             }
 
@@ -1687,6 +1616,23 @@ class SquizSuiteActions
             // the systemid it is using. The other system must been updated
             // its systemid. Let's update our record as well.
             SquizSuite::updateProduct($product['systemid'], 'systemid', $response['systemid']);
+        }
+
+        $updated = FALSE;
+        if ($product['connection']['cert'] !== $response['cert']
+            || $product['connection']['name'] !== $response['name']
+        ) {
+            $product['connection']['cert'] = $response['cert'];
+            $product['connection']['name'] = $response['name'];
+            $updated = TRUE;
+        }
+
+        if ($updated === TRUE) {
+            SquizSuite::updateProduct(
+                $systemid,
+                'connection',
+                $product['connection']
+            );
         }
 
     }//end _syncProductDetails()
@@ -1789,6 +1735,80 @@ class SquizSuiteActions
         }
 
     }//end _syncConnectedProducts()
+
+
+    /**
+     * Send out the connection fail warning email.
+     *
+     * If the Patching system has recipient list, then it will send to them.
+     * If it is not defined, then it will use send out to the super users by
+     * default.
+     *
+     * @param array $product Product information failed to connect to.
+     *
+     * @return void
+     */
+    private static function _sendConnectionFailEmail(array $product)
+    {
+        $currProduct = SquizSuite::getProduct();
+        $isCMS       = FALSE;
+        if ($currProduct['type'] === 'Squiz CMS') {
+            $isCMS = TRUE;
+        }
+
+        Channels::includeSystem('Patching');
+        $config = Patching::getPatchingConfig();
+
+        $recipientIds = array();
+        if (empty($config['recipient']) === 'FALSE') {
+            $recipientIds = $config['recipient'];
+        } else {
+            Channels::includeSystem('User');
+            if ($isCMS === TRUE) {
+                $recipientIds = User::getSystemAdministrators();
+            } else {
+                $recipientIds = User::getSuperUsers();
+            }
+        }
+
+        if (empty($recipientIds) === TRUE) {
+            // Nobody to send.
+            return;
+        }
+
+        $emails = array();
+        foreach ($recipientIds as $userid) {
+            $email = User::getEmailRecipientAddress($userid);
+            if (empty($email) === FALSE) {
+                $emails[] = $email;
+            }
+        }
+
+        if (empty($emails) === TRUE) {
+            // No emails have been set for recipients.
+            return;
+        }
+
+        $to        = implode(', ', $emails);
+        $subject   = 'Failed to connect to '.$product['systemid'].' ('.$product['type'].').';
+        $mainText  = '<p>'.$currProduct['connection']['name'].' ('.$currProduct['systemid'].')';
+        $mainText .= ' failed to connect to ';
+        $mainText .= $product['connection']['name'].' ('.$product['systemid'].')';
+        $mainText .= ' via '.$product['connection']['url'].'</p>';
+
+        include_once 'Libs/Web/Email.inc';
+        $body = '<table width="100%">
+                 <tr><td colspan="2" style="height:22px;font: 16px arial; border-bottom:1px dotted #CCC; padding-bottom:10px;">'.$subject.'</td></tr>
+                 <tr>
+                   <td style="font: 12px arial;padding-top:10px;padding-right:10px;" valign="top">
+                  <p style="padding-top:15px;margin:0px;">'.$mainText.'</p>
+                  <br />
+                  </td>
+                </tr>
+                </table>';
+        Email::sendHtmlEmail($to, $subject, $body);
+
+    }//end _sendConnectionFailEmail()
 
 
     /**
@@ -2164,7 +2184,10 @@ class SquizSuiteActions
 
             if ($systemid !== NULL) {
                 $product = SquizSuite::getProduct($systemid);
-                if (empty($product) === FALSE && $product['status'] === 'live') {
+                if (empty($product) === FALSE
+                    && $product['status'] === 'live'
+                    && $product['sync_status'] !== 'D'
+                ) {
                     // This is the API request from the connected
                     // SquizSuite system.
                     // Setting suite system user TRUE will make this
