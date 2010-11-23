@@ -218,6 +218,14 @@ class PatchingCron implements CronScript
         $helpScriptCommand = 'php '.$rootDir.'/Systems/Help/Scripts/generate_docs.php';
         exec($helpScriptCommand);
 
+        // Re-generate API.
+        file_put_contents($patchResultPath, '[Re-generate API]'."\n", FILE_APPEND);
+        Channels::includeSystem('API');
+        API::removeAPI();
+        include_once 'Systems/API/APISystem.inc';
+        $system = new APISystem();
+        $system->install();
+
         // Update the *_create_wizard.xml file for asset type wizards.
         if (Channels::systemExists('Wizard') === TRUE) {
             file_put_contents($patchResultPath, '[Remove *_create_wizard.xml files.]'."\n", FILE_APPEND);
