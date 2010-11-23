@@ -987,6 +987,7 @@ class DAL
         self::$_inTransaction    = FALSE;
         self::$_transactionCount = 0;
         self::$_dbh              = NULL;
+        self::$_queryCache       = array();
 
     }//end dbClose()
 
