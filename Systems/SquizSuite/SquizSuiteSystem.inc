@@ -47,6 +47,16 @@ class SquizSuiteSystem extends BaseSystem
             touch($logFilePath);
         }
 
+        if (Channels::systemExists('SystemConfig') === TRUE) {
+            $configDefault = array(
+                              'check_asap'     => FALSE,
+                              'last_checked'   => time(),
+                              'check_interval' => 3600,
+                             );
+            Channels::includeSystem('SystemConfig');
+            SystemConfig::setConfig('SquizSuite', $configDefault);
+        }//end if
+
     }//end install()
 
 
