@@ -7,6 +7,9 @@
                 <column type="VARCHAR" size="50" allow-null="true">status</column>
                 <column type="BOOLEAN" allow-null="false" default="'0'">current</column>
                 <column type="CLOB" allow_null="true">connection</column>
+                <column type="VARCHAR" size="150" allow-null="true">knows_me_as</column>
+                <column type="VARCHAR" size="5" allow-null="true">sync_status</column>
+                <column type="TIMESTAMP" allow-null="true">last_contacted</column>
             </columns>
             <constraints>
                 <primary-key name="suite_product_pk">
