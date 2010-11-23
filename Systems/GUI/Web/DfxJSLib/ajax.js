@@ -78,28 +78,3 @@ dfx.cleanAjaxRequestUrl = function(url)
 
     return url;
 };
-
-dfx.toQueryStr = function(params)
-{
-    return jQuery.param(params);
-
-};
-
-dfx.addToQueryStr = function(url, params)
-{
-    if (typeof params !== "string") {
-        params = dfx.toQueryStr(params);
-    }
-
-    var m = url.match(/\?/);
-    if (dfx.isset(m) === true && m.length > 0) {
-        url += '&';
-    } else {
-        url += '?';
-    }
-
-    url += params;
-
-    return url;
-
-};
