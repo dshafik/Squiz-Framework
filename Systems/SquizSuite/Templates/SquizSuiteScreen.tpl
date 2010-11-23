@@ -39,14 +39,43 @@
     <widget type="GUI/Box" id="squizSuite-connectedProduct-box">
         <setting name="title"><text>Connected Products</text></setting>
         <setting name="headerContent">
-            <content>
-                <div class="addNewButtonContainer">
-                    <widget type="GUI/Button" id="addNewProduct">
-                        <setting name="value"><text>Add New</text></setting>
-                        <setting name="click">SquizSuiteSquizSuiteScreen.addProduct()</setting>
-                    </widget>
-                </div>
-            </content>
+            <condition>
+                <if condition="SquizSuite::productsToSyncExist()">
+                    <content>
+                        <div class="addNewButtonContainer">
+                            <widget type="GUI/Button" id="addNewProduct">
+                                <setting name="value"><text>Add New</text></setting>
+                                <setting name="click">SquizSuiteSquizSuiteScreen.addProduct()</setting>
+                            </widget>
+                        </div>
+                        <div class="refreshButtonContainer">
+                            <widget type="GUI/Button" id="refreshStatus">
+                                <setting name="value">
+                                    <condition>
+                                        <if condition="SquizSuite::isProductSyncScheduled()">
+                                            <text>Checking Now ...</text>
+                                        </if>
+                                        <else>
+                                            <text>Refresh Now</text>
+                                        </else>
+                                    </condition>
+                                </setting>
+                                <setting name="click">SquizSuiteSquizSuiteScreen.refreshNow(event)</setting>
+                            </widget>
+                        </div>
+                    </content>
+                </if>
+                <else>
+                    <content>
+                        <div class="addNewButtonContainer">
+                            <widget type="GUI/Button" id="addNewProduct">
+                                <setting name="value"><text>Add New</text></setting>
+                                <setting name="click">SquizSuiteSquizSuiteScreen.addProduct()</setting>
+                            </widget>
+                        </div>
+                    </content>
+                </else>
+            </condition>
         </setting>
         <setting name="content">
             <widget type="GUI/Table" id="connProductsTable">

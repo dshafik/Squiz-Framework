@@ -85,6 +85,12 @@ td.col-currStatusIcon, td.col-productStatusIcon {
     background-color: transparent;
 }
 
+#squizSuite-connectedProduct-box .addNewButtonContainer,
+#squizSuite-connectedProduct-box .refreshButtonContainer {
+    float: right;
+    margin: 0 10px 0 0;
+}
+
 td.col-currSummary, td.col-productSummary {
     padding-left: 15px;
 }

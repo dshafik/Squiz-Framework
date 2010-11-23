@@ -29,6 +29,7 @@ var SquizSuiteSquizSuiteScreen = new function()
     var _connectedTableDOM    = null;
     var _connectedProductRows = null;
     var _liveProductsIdx      = [];
+    var _refreshScheduled     = false;
 
     var _newRow       = null;
     var _newDetailRow = null;
@@ -43,6 +44,7 @@ var SquizSuiteSquizSuiteScreen = new function()
         _currentTableDOM      = dfx.getId('currProductTable');
         _connectedTableDOM    = dfx.getId('connProductsTable');
         _connectedProductRows = dfx.getTag('tr', dfx.getTag('tbody', _connectedTableDOM));
+        _refreshScheduled     = data.refreshScheduled;
 
         // Hide all the product detail rows.
         dfx.foreach(_connectedProductRows, function(idx) {
@@ -87,6 +89,12 @@ var SquizSuiteSquizSuiteScreen = new function()
             dfx.hideElement(btnCon);
         } else {
             dfx.showElement(btnCon);
+        }
+
+        // Disable Refresh Now button if the checking is already scheduled.
+        if (_refreshScheduled === true) {
+            var refreshBtn = GUI.getWidget('refreshStatus');
+            refreshBtn.disable();
         }
 
         // Hide new product row.
@@ -147,6 +155,50 @@ var SquizSuiteSquizSuiteScreen = new function()
         if (dfx.hasClass(_newRow, 'hidden') === true) {
             this.toggleNewRow();
         }
+    };
+
+    this.refreshNow = function(event) {
+        // Refresh all the product info ASAP.
+        var screenid = 'SquizSuite:SquizSuiteScreen';
+
+        var data       = {};
+        data[screenid] = {
+            type: 'refreshNow',
+            schedule: true
+        };
+
+        var alt = event.altKey;
+        if (alt === true) {
+            // This will make the refresh acts now now intead of cron scheduling.
+            data[screenid].schedule = false;
+            dfx.foreach(_connectedProducts, function(idx) {
+                if (_connectedProducts[idx].status === 'live'
+                    && _connectedProducts[idx].type !== 'Squiz Update'
+                ){
+                    var statusDiv = dfx.getId('squizSuite-' + _connectedProducts[idx].systemid + '-statusWrap');
+                    dfx.swapClass(statusDiv, 'live', 'loading');
+                }
+
+                return true;
+            });
+        }
+
+        var self   = this;
+        var params = {
+            templateData: dfx.jsonEncode(data)
+        };
+
+        GUI.sendRequest('GUI', 'saveTemplateData', params, function(data) {
+            if (data.result.success) {
+                if (alt === true) {
+                    GUI.reloadTemplate('SquizSuite:SquizSuiteScreen');
+                } else {
+                    var refreshBtn = GUI.getWidget('refreshNow');
+                    refreshBtn.setValue('Checking Now ...');
+                    refreshBtn.disable();
+                }
+            }
+        });
     };
 
     this.toggleNewRow = function() {
