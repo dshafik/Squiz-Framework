@@ -27,9 +27,7 @@ if (!window.dfx) {
 
 dfx.get = function(url, data, callBack)
 {
-    // No ajax requests should have an anchor part in the URL.
-    // Also IE8 bug - Anchor becomes part of last query string value.
-    url = dfx.noAnchorPartUrl(url);
+    url = dfx.cleanAjaxRequestUrl(url);
     jQuery.get(url, data, callBack);
 
 };
@@ -37,9 +35,7 @@ dfx.get = function(url, data, callBack)
 
 dfx.post = function(url, data, successCallback, errorCallback, timeout)
 {
-    // No ajax requests should have an anchor part in the URL.
-    // Also IE8 bug - Anchor becomes part of last query string value.
-    url = dfx.noAnchorPartUrl(url);
+    url = dfx.cleanAjaxRequestUrl(url);
     timeout = timeout || 20;
     jQuery.ajax({
         url: url,
@@ -52,7 +48,6 @@ dfx.post = function(url, data, successCallback, errorCallback, timeout)
 
 };
 
-
 /**
  * Retrieves JSON encoded data from the URL.
  *
@@ -61,11 +56,27 @@ dfx.post = function(url, data, successCallback, errorCallback, timeout)
  */
 dfx.getJSON = function(url, data, callBack)
 {
+    url = dfx.cleanAjaxRequestUrl(url);
+    jQuery.getJSON(url, data, callBack);
+
+};
+
+/**
+ * Returns a cleaned URL to make an ajax request with.
+ */
+dfx.cleanAjaxRequestUrl = function(url)
+{
+    if (typeof url !== 'string') {
+        // Do the jquery URL default to current location on undefined
+        // URL earlier so we can catch the IE8 hash tag bug
+        var url = location.href;
+    }
+
     // No ajax requests should have an anchor part in the URL.
     // Also IE8 bug - Anchor becomes part of last query string value.
     url = dfx.noAnchorPartUrl(url);
-    jQuery.getJSON(url, data, callBack);
 
+    return url;
 };
 
 dfx.toQueryStr = function(params)

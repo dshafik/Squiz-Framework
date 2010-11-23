@@ -555,13 +555,16 @@ dfx.queryString = function(url)
  */
 dfx.anchorPart = function(url)
 {
-    var aStartIdx = url.search(/\#/);
-    if (aStartIdx === -1) {
-        return '';
-    } else {
-        var anchorStr = url.substr(aStartIdx, (url.length - aStartIdx));
-        return anchorStr;
-    }//end if
+    if (typeof url === 'string') {
+        var aStartIdx = url.search(/\#/);
+        if (aStartIdx === -1) {
+            url = '';
+        } else {
+            url = url.substr(aStartIdx, (url.length - aStartIdx));
+        }//end if
+    }
+
+    return url;
 
 };
 
@@ -570,13 +573,15 @@ dfx.anchorPart = function(url)
  */
 dfx.noAnchorPartUrl = function(url)
 {
-    var aStartIdx = url.search(/\#/);
-    if (aStartIdx === -1) {
-        return url;
-    } else {
-        var url = url.substr(0, aStartIdx);
-        return url;
-    }//end if
+    if (typeof url === 'string') {
+        var aStartIdx = url.search(/\#/);
+        if (aStartIdx !== -1) {
+            var url = url.substr(0, aStartIdx);
+
+        }//end if
+    }
+
+    return url;
 
 };
 
@@ -610,6 +615,30 @@ dfx.addToQueryString = function(url, addQueries)
     }
 
     return mergedUrl;
+
+};
+
+dfx.removeFromQueryString = function (url, idenifier) {
+    if (url == undefined) {
+        url = '';
+    }
+    if (idenifier == undefined) {
+        idenifier = '';
+    }
+
+    // Remove the index we are after
+    var trimmedUrl = url.replace(new RegExp('&*' + idenifier + '=[^&\\s\#]*', 'g'), '');
+
+    // Remove any ? then nothing
+    trimmedUrl = trimmedUrl.replace(/^[?&]+|[?&]+$/g, '');
+
+    // Replace any leftover ?& with ?
+    trimmedUrl = trimmedUrl.replace(/\?&/g, '?');
+
+    // Replace any leftover ?# with #
+    trimmedUrl = trimmedUrl.replace(/\?\#/g, '\#');
+
+    return trimmedUrl;
 
 };
 
