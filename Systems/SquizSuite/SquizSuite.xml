@@ -31,4 +31,9 @@
       <fatal>no</fatal>
     </switcher>
   </plugs>
+  <cron_jobs>
+    <cron_job script="SquizSuiteCron.inc" name="Squiz Suite Update" interval="frequent">
+      <description>This job maintains communication between all your Squiz Suite connected products. It is recommended that you run this job frequently.</description>
+    </cron_job>
+  </cron_jobs>
 </system>
