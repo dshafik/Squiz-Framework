@@ -2743,106 +2743,156 @@ class SquizSuiteActions
         include_once 'Libs/Util/Util.inc';
         $retVal = TRUE;
 
-        // Current product name.
-        $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
-        if ($currProductName !== NULL) {
-            $nameUpdated = FALSE;
-            $currProduct = SquizSuite::getProduct();
-            if ($currProduct['connection']['name'] !== $currProductName) {
-                $nameUpdated        = TRUE;
-                $connection         = $currProduct['connection'];
-                $connection['name'] = $currProductName;
-                SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
-            }
-        }
-
-        // Current product URL.
-        $currProductURL = Util::getArrayIndex($data, 'squizSuite-currProductURL', '');
-        if ($currProductURL !== NULL) {
-            $newURL      = '';
-            $oldURL      = '';
-            $urlUpdated  = FALSE;
-            $currProduct = SquizSuite::getProduct();
-
-            Channels::includeSystem('API');
-            $apiSuffix      = API::getAPISuffix();
-            $currProductURL = rtrim($currProductURL, '/');
-            if (empty($currProductURL) === FALSE
-                && strpos($currProductURL, $apiSuffix) !== (strlen($currProductURL) - 5)
-            ) {
-                $currProductURL .= '/'.$apiSuffix;
+        try {
+            // Current product name.
+            $currProductName = Util::getArrayIndex($data, 'squizSuite-currProductName', NULL);
+            if ($currProductName !== NULL) {
+                $nameUpdated = FALSE;
+                $currProduct = SquizSuite::getProduct();
+                if ($currProduct['connection']['name'] !== $currProductName) {
+                    $nameUpdated        = TRUE;
+                    $connection         = $currProduct['connection'];
+                    $connection['name'] = $currProductName;
+                    SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
+                }
             }
 
-            if ($currProduct['connection']['url'] !== $currProductURL) {
-                $urlUpdated        = TRUE;
-                $connection        = $currProduct['connection'];
-                $oldURL            = $connection['url'];
-                $connection['url'] = $currProductURL;
-                $newURL            = $connection['url'];
-                SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
-            }
-        }//end if
+            // Current product URL.
+            $currProductURL = Util::getArrayIndex($data, 'squizSuite-currProductURL', '');
+            if ($currProductURL !== NULL) {
+                $newURL      = '';
+                $oldURL      = '';
+                $urlUpdated  = FALSE;
+                $currProduct = SquizSuite::getProduct();
 
-        // Deleted Product Connection.
-        $templateData    = Util::getArrayIndex($data, 'templateData', array());
-        $deletedProducts = Util::getArrayIndex($templateData, 'deletedProducts', array());
-        foreach ($deletedProducts as $systemid => $delete) {
-            if ($delete === TRUE) {
-                SquizSuite::updateProduct($systemid, 'sync_status', 'D');
-            }
-        }
-
-        $includeCurrent = FALSE;
-        $products       = SquizSuite::getProducts($includeCurrent);
-        foreach ($products as $product) {
-            $systemid = $product['systemid'];
-            if ($product['status'] === 'live') {
-                $updated    = FALSE;
-                $apiURL     = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-apiURL', NULL);
-                $connection = $product['connection'];
-                if ($apiURL !== NULL
-                    && $connection['url'] !== $apiURL
+                Channels::includeSystem('API');
+                $apiSuffix      = API::getAPISuffix();
+                $currProductURL = rtrim($currProductURL, '/');
+                if (empty($currProductURL) === FALSE
+                    && strpos($currProductURL, $apiSuffix) !== (strlen($currProductURL) - 5)
                 ) {
-                    $updated           = TRUE;
-                    $connection['url'] = $apiURL;
+                    $currProductURL .= '/'.$apiSuffix;
                 }
 
-                if ($updated === TRUE) {
-                    SquizSuite::updateProduct($systemid, 'connection', $connection);
+                if ($currProduct['connection']['url'] !== $currProductURL) {
+                    $urlUpdated        = TRUE;
+                    $connection        = $currProduct['connection'];
+                    $oldURL            = $connection['url'];
+                    $connection['url'] = $currProductURL;
+                    $newURL            = $connection['url'];
+                    SquizSuite::updateProduct($currProduct['systemid'], 'connection', $connection);
                 }
             }//end if
 
-            // Save Usernames and Passwords for Matrix products.
-            if ($product['type'] === 'Squiz Matrix') {
-                // Is Matrix continue...
-                $systemid     = $product['systemid'];
-                $upConnection = $product['connection'];
-                $newUsername  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-username', NULL);
-                $newPassword  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-password', NULL);
-                if ($newUsername !== NULL
-                    && (array_key_exists('username', $product['connection']) === FALSE
-                    || $newUsername !== $product['connection']['username'])
-                ) {
-                    $upConnection['username'] = $newUsername;
-                    SquizSuite::updateProduct($systemid, 'connection', $upConnection);
-                }
+            // Delete the connected product.
+            self::_saveDeleteProduct($data);
 
-                if ($newPassword !== NULL
-                    && (array_key_exists('password', $product['connection']) === FALSE
-                    || $newPassword !== $product['connection']['password'])
-                ) {
-                    $upConnection['password'] = $newPassword;
-                    SquizSuite::updateProduct($systemid, 'connection', $upConnection);
-                }
-            }//end if
-        }//end foreach
+            $includeCurrent = FALSE;
+            $products       = SquizSuite::getProducts($includeCurrent);
+            foreach ($products as $product) {
+                $systemid = $product['systemid'];
+                if ($product['status'] === 'live') {
+                    $updated    = FALSE;
+                    $apiURL     = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-apiURL', NULL);
+                    $connection = $product['connection'];
+                    if ($apiURL !== NULL
+                        && $connection['url'] !== $apiURL
+                    ) {
+                        $updated           = TRUE;
+                        $connection['url'] = $apiURL;
+                    }
 
-        // Add a new product.
-        self::_saveAddNewProduct($data);
+                    if ($updated === TRUE) {
+                        SquizSuite::updateProduct($systemid, 'connection', $connection);
+                    }
+                }//end if
+
+                // Save Usernames and Passwords for Matrix products.
+                if ($product['type'] === 'Squiz Matrix') {
+                    // Is Matrix continue...
+                    $systemid     = $product['systemid'];
+                    $upConnection = $product['connection'];
+                    $newUsername  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-username', NULL);
+                    $newPassword  = Util::getArrayIndex($data, 'squizSuite-'.$systemid.'-password', NULL);
+                    if ($newUsername !== NULL
+                        && (array_key_exists('username', $product['connection']) === FALSE
+                        || $newUsername !== $product['connection']['username'])
+                    ) {
+                        $upConnection['username'] = $newUsername;
+                        SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+                    }
+
+                    if ($newPassword !== NULL
+                        && (array_key_exists('password', $product['connection']) === FALSE
+                        || $newPassword !== $product['connection']['password'])
+                    ) {
+                        $upConnection['password'] = $newPassword;
+                        SquizSuite::updateProduct($systemid, 'connection', $upConnection);
+                    }
+                }//end if
+            }//end foreach
+
+            // Add a new product.
+            self::_saveAddNewProduct($data);
+        } catch (Exception $e) {
+            $retVal = $e->getMessage();
+        }//end try
 
         return $retVal;
 
     }//end _saveSquizSuiteScreen()
+
+
+    /**
+     * Helper function to process deleting a connected product.
+     *
+     * @param array $data Submitted data to process.
+     *
+     * @return void
+     */
+    private static function _saveDeleteProduct(array $data)
+    {
+        // Deleted Product Connection.
+        // Are there any live products left after the deletion?
+        // If so, mark the sync_status as 'D' for syncing. If there is
+        // no live products left to sync, just remove the products.
+        $templateData    = Util::getArrayIndex($data, 'templateData', array());
+        $deletedProducts = Util::getArrayIndex($templateData, 'deletedProducts', array());
+
+        $deletedProductids = array();
+        foreach ($deletedProducts as $systemid => $delete) {
+            if ($delete === TRUE) {
+                $deletedProductids[] = $systemid;
+            }
+        }
+
+        $incCurrent  = FALSE;
+        $incDeleted  = FALSE;
+        $excTypes    = array('Squiz Update');
+        $incStatus   = array('live');
+        $liveProdIds = array();
+        $result      = SquizSuite::getProducts($incCurrent, $incDeleted, $excTypes, $incStatus);
+        foreach ($result as $p) {
+            $liveProdIds[] = $p['systemid'];
+        }
+
+        $updateSyncStatus    = TRUE;
+        $productsToSyncAfter = array_diff($liveProdIds, $deletedProductids);
+        if (empty($productsToSyncAfter) === TRUE) {
+            $updateSyncStatus = FALSE;
+        }
+
+        foreach ($deletedProducts as $systemid => $delete) {
+            if ($delete === TRUE) {
+                if ($updateSyncStatus === TRUE) {
+                    SquizSuite::updateProduct($systemid, 'sync_status', 'D');
+                } else {
+                    SquizSuite::removeProduct($systemid);
+                }
+            }
+        }
+
+    }//end _saveDeleteProduct()
 
 
     /**
@@ -2851,6 +2901,7 @@ class SquizSuiteActions
      * @param array $data Submitted data to process.
      *
      * @return mixed
+     * @throws ChannelException Occurs when the processing failed.
      */
     private static function _saveAddNewProduct(array $data)
     {
@@ -2868,7 +2919,12 @@ class SquizSuiteActions
                 $url .= '/'.$apiSuffix;
             }
 
+            if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) {
+                $url = 'http://'.$url;
+            }
+
             // Check whether Update Product already exists.
+            // If the update server already exists, do not add the second one.
             $productType     = '';
             $getProdTypeURL  = $url;
             $getProdTypeURL .= '/json/SquizSuite/getProductType';
@@ -2880,7 +2936,24 @@ class SquizSuiteActions
                     // It is a Squiz Update system.
                     $updateProducts = SquizSuite::getProductsByType('Squiz Update');
                     if (empty($updateProducts) === FALSE) {
-                        return _('Update Product already exists');
+                        $errMsg = _('Update Product already exists');
+                        throw new ChannelException($errMsg);
+                    }
+                }
+            }
+
+            $incCurrent = FALSE;
+            $incDeleted = TRUE;
+            $excTypes   = array('Squiz Update');
+            $products   = SquizSuite::getProducts($incCurrent, $incDeleted, $excTypes);
+            foreach ($products as $product) {
+                if ($product['connection']['url'] === $url) {
+                    if ($product['sync_status'] === 'D') {
+                        $errMsg = _('The product is marked for deletion. Please wait until the live connected products sync.');
+                        throw new ChannelException($errMsg);
+                    } else {
+                        $errMsg = _('Product with the same URL already exists.');
+                        throw new ChannelException($errMsg);
                     }
                 }
             }
@@ -2905,14 +2978,24 @@ class SquizSuiteActions
                 $matrixTest = TRUE;
             }
 
+            Channels::includeSystem('API');
             if ($response['curlInfo']['http_code'] !== 200) {
-                $retVal = _($response['curlInfo']['http_code'].' response returned.');
+                $retVal   = _($response['curlInfo']['http_code'].' response returned.');
+                $response = $response['result'];
+                if (strpos($response, '<?xml') === 0) {
+                    $dom = new DomDocument();
+                    $dom->loadXML($response);
+                    $exceptionDom = $dom->getElementsByTagName('exception')->item(0);
+                    $exception    = API::getResponseFromXMLDom($exceptionDom);
+                    $retVal      .= ' '.$exception;
+                    throw new ChannelException($retVal);
+                }
             } else {
                 $response = $response['result'];
                 if (strpos($response, '<?xml') !== 0) {
-                    $retVal = _('Error occurred.');
+                    $retVal = _('Non XML response returned.');
+                    throw new ChannelException($retVal);
                 } else {
-                    Channels::includeSystem('API');
                     $dom = new DomDocument();
                     $dom->loadXML($response);
 
