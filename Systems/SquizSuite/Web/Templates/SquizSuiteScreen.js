@@ -193,7 +193,7 @@ var SquizSuiteSquizSuiteScreen = new function()
                 if (alt === true) {
                     GUI.reloadTemplate('SquizSuite:SquizSuiteScreen');
                 } else {
-                    var refreshBtn = GUI.getWidget('refreshNow');
+                    var refreshBtn = GUI.getWidget('refreshStatus');
                     refreshBtn.setValue('Checking Now ...');
                     refreshBtn.disable();
                 }
