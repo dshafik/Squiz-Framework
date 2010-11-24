@@ -1008,6 +1008,8 @@ class SquizSuiteActions
                 SquizSuite::updateProduct($systemid, 'status', 'live');
             }
 
+            SquizSuite::updateProduct($systemid, 'last_contacted', date('c'));
+
             $response = 'ok';
             return $response;
         } catch (Exception $e) {
@@ -1138,6 +1140,7 @@ class SquizSuiteActions
             // Now we are all good. Register the system and set the status
             // as pending. Then send acknowlegement message back.
             SquizSuite::updateProduct($systemid, 'status', 'pending approval');
+            SquizSuite::updateProduct($systemid, 'last_contacted', date('c'));
 
             DAL::commit();
 
@@ -1230,6 +1233,7 @@ class SquizSuiteActions
             SquizSuite::registerProduct($systemid, $systemType, $connection, $knowsMeAs);
             SquizSuite::updateProduct($systemid, 'status', 'live');
             SquizSuite::updateProduct($systemid, 'sync_status', 'A');
+            SquizSuite::updateProduct($systemid, 'last_contacted', date('c'));
             $response = SquizSuite::sendMessage($systemid, 'suiteConnectAckAck');
             $response = $response['result'];
             if (strpos($response, '<?xml') !== 0) {
@@ -1303,6 +1307,8 @@ class SquizSuiteActions
                 SquizSuite::updateProduct($systemid, 'sync_status', 'A');
             }//end if
 
+            SquizSuite::updateProduct($systemid, 'last_contacted', date('c'));
+
             $response = 'ok';
             return $response;
         } catch (Exception $e) {
@@ -1361,6 +1367,8 @@ class SquizSuiteActions
         self::_syncProductDetails($currRequesterInfo, $newRequesterInfo);
         self::_syncDeletedProducts($newRequesterInfo['deleted']);
         self::_syncConnectedProducts($message['system_id'], $newRequesterInfo['connected']);
+
+        SquizSuite::updateProduct($currRequesterInfo['systemid'], 'last_contacted', date('c'));
 
         $result              = self::_getSuiteProductInfo($currProdInfo);
         $result['knowsMeAs'] = SquizSuite::productKnowsMeAs($message['system_id']);
