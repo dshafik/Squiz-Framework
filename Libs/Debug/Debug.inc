@@ -396,13 +396,14 @@ class Debug
      */
     public static function getCallingFunc()
     {
-        $bt   = debug_backtrace();
+        $bt = debug_backtrace();
         if (isset($bt[2]['file']) === FALSE) {
             $file = substr($bt[1]['file'], (strrpos($bt[1]['file'], '/') + 1));
         } else {
             $file = substr($bt[2]['file'], (strrpos($bt[2]['file'], '/') + 1));
         }
-        $res  = '';
+
+        $res = '';
         if (isset($bt[3]) === TRUE) {
             if (isset($bt[3]['class']) === TRUE) {
                 $res = $bt[3]['class'].'::'.$bt[2]['function'];
@@ -416,6 +417,7 @@ class Debug
         } else {
             $line = $bt[2]['line'];
         }
+
         $res .= ' ('.$file.' line '.$line.')';
         return $res;
 
@@ -519,6 +521,92 @@ class Debug
         return "\n".implode("\n", array_reverse($functions))."\n";
 
     }//end getCallStack()
+
+
+    /**
+     * Prints the specified query results in table format.
+     *
+     * Note that this method does not use transactions and therefore any query that
+     * insert/update/deletes/etc will change the DB.
+     *
+     * @param string $query The query to execute.
+     *
+     * @return void
+     */
+    public static function printQueryResult($query)
+    {
+        $pdo     = DAL::query($query);
+        $results = $pdo->fetchAll(PDO::FETCH_ASSOC);
+
+        $colLengths = array();
+
+        foreach ($results as $res) {
+            foreach ($res as $col => $value) {
+                if (isset($colLengths[$col]) === FALSE) {
+                    // First get the column name length incase its longer than
+                    // all values.
+                    $colLengths[$col] = (strlen($col) + 2);
+                }
+
+                // Value length.
+                $valLength = strlen($value);
+                if ($colLengths[$col] < $valLength) {
+                    $colLengths[$col] = ($valLength + 1);
+                }
+            }
+        }
+
+        echo 'Results for: ['.$query."]\n\n";
+
+        if (empty($results) === TRUE) {
+            echo '(0 rows)'."\n";
+            return;
+        }
+
+        // Print columns.
+        foreach ($colLengths as $colName => $maxLength) {
+            echo ' '.str_pad($colName, $maxLength, ' ', STR_PAD_BOTH);
+            echo '|';
+        }
+
+        // Print the - under column names.
+        if (empty($colLengths) === FALSE) {
+            echo "\n".str_repeat('-', (array_sum($colLengths) + (count($colLengths) * 2)))."\n";
+        }
+
+        // Print results.
+        foreach ($results as $res) {
+            foreach ($res as $col => $value) {
+                $padType = STR_PAD_RIGHT;
+                if (is_numeric($value) === TRUE) {
+                    $padType = STR_PAD_LEFT;
+                } else {
+                    echo ' ';
+                }
+
+                echo str_pad($value, $colLengths[$col], ' ', $padType);
+
+                if ($padType === STR_PAD_LEFT) {
+                    echo ' ';
+                }
+
+                echo '|';
+            }
+
+            echo "\n";
+        }
+
+        // Print total results.
+        $totalResults = count($results);
+        if ($totalResults === 1) {
+            echo '('.$totalResults.' row)';
+        } else {
+            echo '('.$totalResults.' rows)';
+        }
+
+        echo "\n";
+
+    }//end printQueryResult()
 
 
 }//end class
