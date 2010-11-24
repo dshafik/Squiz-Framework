@@ -1431,10 +1431,11 @@ class GUIActions
     private static function _parseConditionTag(DOMNode $node, $assignTo=NULL)
     {
         $tagTypes = array(
-                     'if'      => 'if',
-                     'if-not'  => 'if',
-                     'else'    => 'else',
-                     'if-null' => 'if',
+                     'if'          => 'if',
+                     'if-not'      => 'if',
+                     'else'        => 'else',
+                     'if-null'     => 'if',
+                     'if-not-null' => 'if',
                     );
 
         $php     = '';
@@ -1469,6 +1470,10 @@ class GUIActions
 
                     case 'if-null':
                         $php .= ' (('.$condition.') === NULL) {'."\n";
+                    break;
+
+                    case 'if-not-null':
+                        $php .= ' (('.$condition.') !== NULL) {'."\n";
                     break;
 
                     default:
