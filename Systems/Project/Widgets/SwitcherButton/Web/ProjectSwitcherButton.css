@@ -1,0 +1,8 @@
+.ProjectSwitcherButton {
+    -moz-border-radius: 0 14px 14px 0;
+    padding-right: 5px;
+}
+
+.ProjectSwitcherButton div {
+    background: url(project_toolbarIcon.png) no-repeat;
+}

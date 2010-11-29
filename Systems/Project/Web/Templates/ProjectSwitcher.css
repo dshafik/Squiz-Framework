@@ -1,0 +1,126 @@
+#ProjectSwitcher-dialog .GUIDialog-top {
+    background-image: -moz-linear-gradient(0% 0 -90deg, #424242, #000000);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#424242), to(#000000));
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#424242, endColorstr=#000000);
+    border-color: #333;
+}
+
+#ProjectSwitcher-dialog .GUIDialog-title {
+    color: #FFF;
+}
+
+#ProjectSwitcher-dialog .GUIDialog-middle {
+    background-color: #DADADA;
+    border: 1px solid #DADADA;
+}
+
+#ProjectSwitcher-dialog .GUIDialog-closeIcon {
+    background-image: url(close.png);
+}
+
+#ProjectSwitcher-dialog .ProjectSwitcher-content {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+}
+
+#ProjectSwitcher-dialog .ProjectNoneFound {
+    color: #424242;
+    font-size: 18px;
+    margin-top: 225px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#ProjectSwitcher-dialog .ProjectEntry {
+    background-color: #FFF;
+    border: 1px solid #BBB;
+    height: 150px;
+    margin: 15px;
+    -webkit-box-shadow: 0 4px 5px #B1B1B1;
+    -moz-box-shadow: 0 4px 5px #B1B1B1;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=135, Color='#B1B1B1')";
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-bottomright: 5px;
+}
+
+#ProjectSwitcher-dialog .ProjectEntry:hover {
+    background-color: #EDF5FE;
+    border-color: #AAA;
+}
+
+#ProjectSwitcher-dialog .ProjectThumbnail {
+    float: left;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsTitle {
+    padding-bottom: 7px;
+    overflow: hidden;
+}
+
+#ProjectSwitcher-dialog a {
+    text-decoration: none;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsName {
+    color: #000;
+    float: left;
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsUrl {
+    background: url(project_arrowIcon.png) no-repeat scroll 0 0 transparent;
+    float: left;
+    height: 19px;
+    margin-left: 15px;
+    text-decoration: none;
+    width: 19px;
+}
+
+#ProjectSwitcher-dialog .ProjectDetails {
+    clear: right;
+    padding: 15px 15px 15px 240px;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsInactive {
+    font-size: 14px;
+    color: #B1B1B1;
+    font-weight: normal;
+    padding-right: 10px;
+    text-align: left;
+    width: 95%;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsSummaryTitle {
+    font-size: 13px;
+    color: #B1B1B1;
+    padding-right: 10px;
+    text-align: right;
+    width: 35%;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsSummaryTitle,
+#ProjectSwitcher-dialog .ProjectDetailsSummaryDescription {
+    float: left;
+    position: relative;
+    top: -7px;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsSummaryDescription {
+    top: -6px;
+    font-size: 12px;
+    color: #000;
+    font-weight: normal;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsSummaryLine1,
+#ProjectSwitcher-dialog .ProjectDetailsSummaryLine2 {
+    padding: 15px;
+}
+
+#ProjectSwitcher-dialog .ProjectDetailsSummaryLine1 {
+    border-bottom: 1px solid #E8E8E8;
+}

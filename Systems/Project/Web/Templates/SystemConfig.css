@@ -1,0 +1,16 @@
+#SystemConfig-screen-contents {
+    padding: 0;
+    margin: 0 30px;
+}
+
+#SystemConfig-screen-switcher {
+    margin: 0 20px 20px;
+}
+
+#SystemConfig-screen-contents h2 {
+    margin-bottom: 10px;
+}
+
+#SystemConfig-screen-contents .GUIBox {
+    margin: 1em 0 1.5em;
+}

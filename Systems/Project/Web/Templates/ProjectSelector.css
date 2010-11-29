@@ -1,0 +1,156 @@
+#ProjectProjectSelector-background {
+    background-color: #DADADA;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#ProjectProjectSelector-inner {
+    width: 600px;
+    margin: 88px auto 50px;
+    position: relative;
+}
+
+#ProjectProjectSelector-heading {
+    padding: 10px 15px;
+    margin-bottom: 30px;
+}
+
+#ProjectProjectSelector-heading-text {
+    float: left;
+    font-size: 20px;
+    color: #8A8A8A;
+    text-shadow: 0 1px 0 #FFF;
+}
+
+#ProjectProjectSelector-add-button {
+    float: right;
+}
+
+#ProjectProjectSelector-content-no-projects {
+    background-color: #EAEAEA;
+    border: 1px solid #AEAEAE;
+    color: #676767;
+    font-size: 20px;
+    height: 510px;
+    padding: 120px 50px 0;
+    text-align: center;
+    width: 80%;
+    margin: 0 auto 50px;
+    text-shadow: 0 1px 0 #FFF;
+    -webkit-box-shadow: 0 0 7px #AAA inset;
+    -moz-box-shadow: 0 0 7px #AAA inset;
+    border-radius: 9px;
+    -moz-border-radius: 9px;
+}
+
+#ProjectProjectSelector-content-no-projects p {
+    margin-bottom: 20px;
+}
+
+#ProjectProjectSelector-content {
+    clear: both;
+    margin-top: 15px;
+}
+
+#ProjectProjectSelector-content .ProjectNoneFound {
+    color: #424242;
+    font-size: 18px;
+    margin-top: 225px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#ProjectProjectSelector-content .ProjectEntry {
+    background-color: #FFF;
+    border: 1px solid #BBB;
+    height: 150px;
+    margin: 15px;
+    -webkit-box-shadow: 0 4px 5px #B1B1B1;
+    -moz-box-shadow: 0 4px 5px #B1B1B1;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=135, Color='#B1B1B1')";
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-bottomright: 5px;
+}
+#ProjectProjectSelector-content .ProjectEntry:hover {
+    background-color: #EDF5FE;
+    border-color: #AAA;
+}
+
+#ProjectProjectSelector-content .ProjectThumbnail {
+    float: left;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsTitle {
+    padding-bottom: 7px;
+    overflow: hidden;
+}
+
+#ProjectProjectSelector-content a {
+    text-decoration: none;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsName {
+    color: #000;
+    float: left;
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsUrl {
+    background: url(project_arrowIcon.png) no-repeat scroll 0 0 transparent;
+    float: left;
+    height: 19px;
+    margin-left: 15px;
+    text-decoration: none;
+    width: 19px;
+}
+
+#ProjectProjectSelector-content .ProjectDetails {
+    clear: right;
+    padding: 15px 15px 15px 240px;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsInactive {
+    font-size: 14px;
+    color: #B1B1B1;
+    font-weight: normal;
+    padding-right: 10px;
+    text-align: left;
+    width: 95%;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsSummaryTitle {
+    font-size: 13px;
+    color: #B1B1B1;
+    padding-right: 10px;
+    text-align: right;
+    width: 35%;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsSummaryTitle,
+#ProjectProjectSelector-content .ProjectDetailsSummaryDescription {
+    float: left;
+    position: relative;
+    top: -7px;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsSummaryDescription {
+    top: -6px;
+    font-size: 12px;
+    color: #000;
+    font-weight: normal;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsSummaryLine1,
+#ProjectProjectSelector-content .ProjectDetailsSummaryLine2 {
+    padding: 15px;
+}
+
+#ProjectProjectSelector-content .ProjectDetailsSummaryLine1 {
+    border-bottom: 1px solid #E8E8E8;
+}

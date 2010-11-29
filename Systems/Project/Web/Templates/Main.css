@@ -1,0 +1,111 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-width: 1240px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    font-family: arial, sans-serif;
+    font-size: 12px;
+    color: #000;
+    background-color: #FFF;
+    background-attachment: fixed;
+}
+
+#mode-contents {
+    background-position: top 50%;
+    background-repeat: repeat-x;
+    margin-top: 38px;
+}
+
+#screen-contents {
+    margin: 0 auto;
+    width: 800px;
+}
+
+#dashboard-area .left {
+    width: 265px;
+    position: fixed;
+    top: 38px;
+    left: 0;
+}
+
+#dashboard-area .inner-left {
+    padding: 15px 4px 0 14px;
+}
+
+#dashboard-area .right {
+    overflow: hidden;
+    padding: 15px 0 0 260px;
+}
+
+.graph-outer-block {
+    margin: 0 0 12px;
+}
+
+.one-third-block {
+    float: left;
+    vertical-align: top;
+    margin: 0 0 0 10px;
+    width: 32.4%;
+}
+
+.one-third-block:first-child {
+    margin-left: 0;
+}
+
+.one-half-block {
+    float: left;
+    width: 49.4%;
+    margin: 0 0 0 10px;
+}
+
+.one-half-block:first-child {
+    margin-left: 0;
+}
+
+.full-block {
+    float: left;
+    width: 99.4%;
+    margin: 0;
+}
+
+#SquizAnalyticsMain-container-date-switcher-inner {
+    color: #CCC;
+    padding: 0 10px;
+    cursor: default;
+}
+
+#SquizAnalyticsMain-container-date-switcher .GUI-focusTag {
+    border-radius: 20px;
+    -moz-border-radius: 20px;
+    padding: 1px 5px;
+    margin: 0 1px;
+    background-color: #5A5A5A;
+    border: none;
+    color: black;
+    text-shadow: none;
+    font-weight: bold;
+    background-image: -webkit-gradient(linear, 0% 50%, 0% 100%, from(#EEE), to(#777));
+    background-image: -moz-linear-gradient(0% 50% -90deg, #EEE, #777);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#EEE, endColorstr=#777);
+}
+
+#SquizAnalyticsMain-container-date-switcher #SquizAnalyticsMain-date-switcher-1.GUI-focusTag.months-selected-1,
+#SquizAnalyticsMain-container-date-switcher #SquizAnalyticsMain-date-switcher-3.GUI-focusTag.months-selected-3,
+#SquizAnalyticsMain-container-date-switcher #SquizAnalyticsMain-date-switcher-6.GUI-focusTag.months-selected-6 {
+    background-color: #2B65B6;
+    background-image: none;
+    filter: none;
+    color: white;
+    cursor: default;
+}
+
+#SquizAnalyticsMain-container-date-switcher .GUI-focusTag.hover {
+    cursor: pointer;
+    background-image: -webkit-gradient(linear, 0% 50%, 0% 100%, from(#ABABAB), to(#777));
+    background-image: -moz-linear-gradient(0% 50% -90deg, #ABABAB, #777);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ABABAB, endColorstr=#777);
+}
