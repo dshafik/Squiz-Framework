@@ -92,6 +92,7 @@ class GUITableActions
      * ).
      *
      * @var array
+     * @internal
      */
     protected static $rows = array();
 
