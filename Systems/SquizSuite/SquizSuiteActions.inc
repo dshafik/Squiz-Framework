@@ -148,6 +148,25 @@ class SquizSuiteActions
 
 
     /**
+     * Returns the system name of this product.
+     *
+     * Other systems need to refine this channel
+     * to provide their own data.
+     *
+     * @return string
+     *
+     * @api            read
+     * @api-permission public
+     */
+    public static function getProductSystemName()
+    {
+        $systemName = '';
+        return $systemName;
+
+    }//end getProductSystemName()
+
+
+    /**
      * Returns the default systemid for the type passed.
      *
      * @param string $productType Type of the product.
@@ -729,8 +748,8 @@ class SquizSuiteActions
     /**
      * Send a suite request to other system.
      *
-     * @param string $targetid The targetid of the destination system. 
-     * @param string $format   The format of the results. 
+     * @param string $targetid The targetid of the destination system.
+     * @param string $format   The format of the results.
      * @param string $system   The system on the destination system.
      * @param string $action   The function to call on the destination system.
      * @param array  $message  The message to send.
