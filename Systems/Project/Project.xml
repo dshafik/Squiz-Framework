@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<system>
+  <plugs>
+    <modifier>
+      <required>yes</required>
+      <method>gatherAPIProjectid</method>
+      <action>API::getActionParameters</action>
+      <fatal>yes</fatal>
+      <modify-parameters>
+        <parameter>gatheredData</parameter>
+      </modify-parameters>
+    </modifier>
+  </plugs>
+</system>

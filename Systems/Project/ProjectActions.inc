@@ -241,6 +241,25 @@ abstract class ProjectActions
 
 
     /**
+     * Put the current projectid into the API gatheredData array.
+     *
+     * This allows API calls to ommit the projectid and instead just use the
+     * projects's URL when making the request.
+     *
+     * @param array $gatheredData Additional values that can be used as argument
+     *                            values. Data will come from gatherer plugs.
+     *
+     * @return array
+     */
+    public static function gatherAPIProjectid(array $gatheredData)
+    {
+        $gatheredData['projectid'] = Project::getCurrentProjectId();
+        return $gatheredData;
+
+    }//end gatherAPIProjectid()
+
+
+    /**
      * Serve a project thumbnail.
      *
      * @param integer $projectId The ID of the project (NULL = current project).
