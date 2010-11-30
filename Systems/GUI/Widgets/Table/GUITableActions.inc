@@ -297,12 +297,19 @@ class GUITableActions
             // If we have a "rowContent" field, then this will be the contents, and
             // the rest will be options.
             $customRowClass = '';
+            $customRowAttrs = array();
             if (array_key_exists('rowContent', $row) === TRUE) {
                 $rowOptions = $row;
                 $row        = $row['rowContent'];
 
                 if (array_key_exists('rowClass', $rowOptions) === TRUE) {
                     $customRowClass = ' '.$rowOptions['rowClass'];
+                }
+
+                if (array_key_exists('rowAttrs', $rowOptions) === TRUE) {
+                    foreach($rowOptions['rowAttrs'] as $key => $val) {
+                        $customRowAttrs[] = $key.'="'.$val.'"';
+                    }
                 }
             }
 
@@ -328,7 +335,13 @@ class GUITableActions
 
             echo ' row-'.$classid;
             echo $customRowClass;
-            echo '">';
+            echo '"';
+
+            if (empty($customRowAttrs) === FALSE) {
+                echo ' '.implode(' ', $customRowAttrs);
+            }
+
+            echo '>';
 
             if (Util::getArrayIndex($settings, 'allowDelete', self::$allowDelete) === TRUE) {
                 if (isset($row['_remove']) === FALSE) {
