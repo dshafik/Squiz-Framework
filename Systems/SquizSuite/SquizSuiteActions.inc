@@ -584,9 +584,7 @@ class SquizSuiteActions
                 $incStatus  = array('live');
                 $products   = SquizSuite::getProducts($incCurrent, $incDeleted, $excTypes, $incStatus);
                 foreach ($products as $product) {
-                    if ($product['knows_me_as'] === NULL
-                        || $product['knows_me_as'] === $systemid
-                    ) {
+                    if ($product['knows_me_as'] === NULL) {
                         SquizSuite::updateProduct($product['systemid'], 'knows_me_as', $systemid);
                     }
                 }
@@ -1450,8 +1448,6 @@ class SquizSuiteActions
      */
     public static function syncWithLiveProducts()
     {
-        $liveProducts = SquizSuite::getLiveProducts();
-
         $incCur      = FALSE;
         $incDel      = TRUE;
         $excTypes    = array('Squiz Update');
@@ -1506,7 +1502,7 @@ class SquizSuiteActions
             // This product knew me as a different ID. But as the suiteSyncProduct
             // request was successful, it's safe to update my record.
             if ($currProductInfo['knowsMeAs'] !== $currProduct['systemid']) {
-                SquizSuite::updateProduct($product['systemid'], 'knows_me_as', $newProductInfo['systemid']);
+                SquizSuite::updateProduct($product['systemid'], 'knows_me_as', $currProduct['systemid']);
             }
 
             // We are passing $markedForDeletion and $markedForAddition via reference,
