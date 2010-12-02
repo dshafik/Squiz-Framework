@@ -226,6 +226,13 @@ class PatchingCron implements CronScript
         $system = new APISystem();
         $system->install();
 
+        // Minify Javascript and CSS files.
+        file_put_contents($patchResultPath, '[Minify Javascript and CSS files]'."\n", FILE_APPEND);
+        Channels::includeSystem('GUI');
+        GUI::minifyGzipJSFiles();
+        GUI::minifyCSSFiles();
+        system($rootdir.'/Scripts/fix_perms.sh');
+
         // Update the *_create_wizard.xml file for asset type wizards.
         if (Channels::systemExists('Wizard') === TRUE) {
             file_put_contents($patchResultPath, '[Remove *_create_wizard.xml files.]'."\n", FILE_APPEND);
