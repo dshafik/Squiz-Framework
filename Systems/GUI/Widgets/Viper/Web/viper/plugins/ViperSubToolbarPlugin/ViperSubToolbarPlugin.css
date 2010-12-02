@@ -1,0 +1,90 @@
+.ViperSubToolbar-wrapper {
+    height: 34px;
+    position: fixed;
+    top: 60px;
+    z-index: 800;
+    right: 50%;
+}
+
+.ViperSubToolbar {
+    position: relative;
+    height: 100%;
+    display: none;
+}
+
+.ViperSubToolbar.active {
+    display: block;
+}
+
+.ViperSubToolbar-left, .ViperSubToolbar-right {
+    height: 100%;
+    width: 16px;
+    position: absolute;
+    top: 0;
+    background: transparent url(subBar.png) no-repeat 0 0;
+}
+
+.ViperSubToolbar-left {
+    left: 0;
+    background-position: 0 0;
+}
+
+.ViperSubToolbar-right {
+    right: 0;
+    background-position: 0 -70px;
+}
+
+.ViperSubToolbar-mid {
+    background: transparent url(subBar.png) no-repeat 0 -35px;
+    background-repeat: repeat-x;
+    height: 100%;
+    margin: 0 16px;
+}
+
+.ViperSubToolbar-mid-wrapper {
+    padding-top: 3px;
+}
+
+.ViperSubToolbar-optsList-title {
+    float: left;
+}
+
+.ViperSubToolbar-optsList-right,
+.ViperSubToolbar-optsList-mid,
+.ViperSubToolbar-optsList-title-left,
+.ViperSubToolbar-optsList-title-mid,
+.ViperSubToolbar-optsList-title-right {
+    background-image: url(subBar-optionStrip.png);
+    height: 22px;
+    float: left;
+}
+
+.ViperSubToolbar-optsList-title-left {
+    background-position: 0 0;
+    width: 11px;
+}
+
+.ViperSubToolbar-optsList-title-mid {
+    background-repeat: repeat-x;
+    background-position: 0 -23px;
+    font: 11px arial;
+    color: #FFF;
+    padding: 0 8px;
+    line-height: 22px;
+}
+
+.ViperSubToolbar-optsList-title-right {
+    width: 9px;
+    background-position: -2px -46px;
+}
+
+.ViperSubToolbar-optsList-right {
+    width: 11px;
+    background-position: 0 -92px;
+}
+
+.ViperSubToolbar-optsList-mid {
+    background-position: 0 -69px;
+    font: 11px arial;
+    line-height: 22px;
+}

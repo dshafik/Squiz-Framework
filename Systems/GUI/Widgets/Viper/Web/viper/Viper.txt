@@ -1,0 +1,363 @@
+
+
+Viper Architecture
+------------------
+
+
+DOMRange Object.
+----------------
+
+    Overview
+    --------
+
+    The DOMRange object provides an interface to the methods that a Range Implementation
+    should implement. Most of the methods are derived from the W3C standard for document
+    ranges, but also incorporates methods from Internet Explorer's implementation, along
+    with some methods exclusive to the DOMRange object itself.
+
+    Before explaining more specific details of the range implementation, we should
+    cover some basic principles of document ranges.
+
+    A range represents an area within a document. This area can contain any nodes
+    within the document. In an essence, a range is similar to a DocumentFragment, in that
+    they represent a subset of the document itself. A range object is not limited
+    to the current selection. That is, a range can be created without modifying
+    the current selection and can perform the same operations as the current
+    selection - including replacing the selection with the area of document
+    represented in that range.
+
+    The  properties of the DOMRange object are derived from the W3C implementation
+    for document ranges. The primary properties are startContainer, startOffset,
+    endContainer and endOffset. startContainer and endContainer represent the containers
+    in which the start and end of the range boundary exists. These containers
+    can represent elements or text nodes. The startOffset and endOffset represent
+    the position in their respective containers that the range boundary exists. These
+    integer properties differ in representation depending on the type of node
+    that the container is. If the container is a text node, the offset represents
+    the number of characters within the text node that the range boundary exists.
+    If the container is an element, the offset represents the position of the child
+    in the childNodes property of that element, at which the range exists. In this case,
+    the range exists at the very start of the child node.
+
+    If the startContainer and endContainer are the same, and the startOffset and
+    endOffset are the same, the range is said to be collapsed. In any other case
+    the range is said to be expanded.
+
+    Manipulating the Range
+    ----------------------
+
+    A range can only be manipulated by changing the start and end boundary positions
+    that encompass the range. There are serveral methods within the DOMRange API
+    for manipulating ranges. These are:
+
+        public void setStart(DOMNode node, int offset);
+        public void setEnd(DOMNode node, int offset);
+        public void setStartBefore(DOMNode node);
+        public void setStartAfter(DOMNode node);
+        public void setEndBefore(DOMNode node);
+        public void setEndAfter(DOMNode node);
+        public void selectNode(DOMNode node);
+        public void selectNodeContents(DOMNode node);
+
+        public void moveStart(int unitType, int units);
+        public void moveEnd(int unitType, int units);
+
+    Inserting Nodes
+    ---------------
+
+    Nodes can be inserted into the document using the range object's insertNode()
+    method. Note that if the range's container is a text node, the text node will
+    be split at the offset, and the new node will be inserted directly after the splited
+    text node. This may cause problems as this increases the number of nodes in the document.
+
+    When viper inserts text into the document it first checks the node at which the
+    current range is at. If this node is a text node, it modifies this node to include
+    the inserted text rather than creating more text nodes. Also note that when calling
+    insertNode(), the range's startContainer and endContainer will be updated, but
+    not to the desired position, which is after the inserted node, so be sure to update
+    the range to the desired position after using the insertNode() method.
+
+    getRangeCoords.
+    ---------------
+
+    DOMRange also defines a method, getRangeCoords(), which returns the coordinates
+    of very beginning of them range. Internet explorer implements similar methods,
+    namely getBoundingClientRect and getClientRects, which seem to include the padding
+    of the element that the range is in, but ommits this if the range is on the second
+    line of text within the element. The getRangeCoords method ommits the padding
+    of the element so the return value is consistant regardless of the line that
+    that the range is on.
+
+    The mozilla implementation of this method is both complex and expensive,
+    due to the lack of any methods for retreieve coordinates of range.
+    The implementation is as follows:
+
+        1) clone the range.
+        2) collapse the clone range.
+        3) insert a span into the beginning of the range.
+        4) get the coordinates of the span.
+        5) remove the span.
+        5) join any text nodes that we split as a result of inserting the span.
+
+    Consider that this method is heavily utilised by viper when it must repaint
+    the caret when the user holds down the left arrow key. It's easy to understand
+    that this can be quite an expensive operation.
+
+    The mozilla bug web site recently had a feature request completed which
+    implemented the getBoundingClientRect method for elements. I contacted the
+    developer and inquired if the would be extended to ranges (similar to the
+    IE implementation). He mentioned that it would but gave no timeframe or milestone
+    version of when this would be completed. I confirmed that the
+    getBoundingClientRect() method is in the current beta version of firefox 3.
+    More details about this bug can be found at:
+
+        https://bugzilla.mozilla.org/show_bug.cgi?id=174397
+
+    confirmation that this is extending to ranges at:
+
+        http://groups.google.com/group/mozilla.dev.tech.layout/browse_thread/thread/206ef232aae07091/
+
+    The Selection Object.
+    ---------------------
+
+    The Selection object provides a cross-browser compatiple API for accessing
+    selections and for creating and adding ranges to the current selection.
+
+    You can add a new range to the selection via the selection object.
+
+        var range = ViperSelection.createRange();
+        ...
+        ViperSelection.addRange(range);
+
+    You can get the current range via the selection object.
+
+        var range = ViperSelection.getRangeAt(0);
+
+    If you want the get Viper's current range, you should use the getCurrentRange()
+    method of Viper, as it handles some inconsistancies for focus amongst the
+    common browsers.
+
+        var range = viper.getCurrentRange();
+
+    There are a few ways that you can create a new range. If you want your new
+    range to be based on the current range, or another range object that you
+    have access to, you can clone that range and then manipulate it accordinly.
+
+        var clone = range.cloneRange();
+
+    If you want to start with a new range object, then you can ask the selection
+    object to create you a fresh one.
+
+        var range = ViperSelection.createRange();
+
+IE Range
+-------
+
+    how containers and offsets are gathered.
+
+
+MozRange
+--------
+
+    how IE methods are implemented.
+
+
+Notes about Safari's Selection API
+-----------------------------------
+
+    Currently, safari does supply a method for retreiving the current range
+    object from the selection. Instead we have to create an empty range object
+    and then use the properties of the current selection to create a range.
+    This imposes a problem with updating ranges, since any modifications to the
+    range will not modify the current selection since the rangeObj property within
+    the range is not attached to the selection. To overcome this problem, the
+    mozilla range object must set itself to the current selection, if it was
+    constructed to represent the current selection. Furthermore, there is no
+    addRange method, so to achieve this it must utilise safari's setBaseAndExtent
+    method, which itself its rather rather painful to use.
+
+    The current nightly as of 17/07/07 and most probably some time before this,
+    derives its selection API from mozilla. This means that it contains
+    the getRangeAt method and addRange method. It would therefore be possible
+    to eliminate the formentioned problems, then bump the required version of
+    safari to a stable version once it has been released.
+
+
+Viper
+-----
+
+    Painting the Caret.
+    -------------------
+
+    Due to viper's direct editing approach within the document, it must paint a
+    caret at the appropriate location within the range. It does so by utilising
+    an absolutely position span element with a 1px border, which has its height set
+    to the appropriate size of the text or element that the range has selected.
+
+    Everytime the range is updated, the caret is redrawn using updateCaret().
+    This involves:
+
+        1) getting the coordinates of the range.
+        2) retrieving the backgorund color that the current range is in. The
+           inverse of this colour is the calculated, and set as the border color
+           of the caret span.
+        3) resizing the caret span to the appropriate text height.
+        4) setting the left and top style properties of the caret span to the
+           location of the range coordinates.
+        5) removing any previous blinking interval.
+        6) creating a blinking interval to repetively hide and show the caret.
+
+
+    Viper also contains a removeCaret(), which is used to remove the caret span
+    whenever the bounds of the range exceed the bounds of highest level element
+    that is currently editable.
+
+    Node Modification Event Methods
+    -------------------------------
+
+    Viper will fire events whenever any nodes are inserted, deleted or changed.
+    A plugin can be notified about these events by implementing the nodeInserted,
+    nodesDeleted and nodesChanged methods. The plugin manager will marshal these events
+    to each of the plugins, providing them with the appropriate information about
+    the nodes. The following information is provided for these three events:
+
+    Inserted:
+
+        Object {
+            type: Viper.TYPE_INSERT,
+            node: <Object DOMNode>,
+            path: /xpath/to/node
+        }
+
+    Deleted:
+
+        Object {
+            type: Viper.TYPE_DELETE,
+            node: <Object DOMNode>,
+            path: /xpath/to/node
+        }
+
+    Changed:
+
+        Object {
+            type: Viper.TYPE_CHANGE,
+            before: <String data>,
+            after: <String data>,
+            startOffset: <Integer>,
+            endOffset: <Integer>,
+            path: /xpath/to/node
+        }
+
+    Note that for deleted info the node will no longer be in the document, so
+    some properties, for example parentNode, will be undefined.
+
+    Every object has the path member. This represents the XPath path to the node
+    as it existed in the document. We use XPath rather than parent and offset within
+    parent as it more persistant and reliable if the infomation is used at an arbirtary
+    point in time after the event was fired. If we were to keep a reference to the
+    parent and the offset, they might be deleted some time in the future making
+    references to them useless.
+
+    At any time the node for a path can be found by utilising the XPath object,
+    invoking a call to  XPath.getNode():
+
+        var node = XPath.getNode(path);
+
+    You can also get the path to a node, if desired, by issuing a call to
+    XPath.getPath():
+
+        var path = XPath.getPath(node);
+
+    The implementation of XPath that viper uses is extremely basic, in that it only
+    implements a direct path approach. By doing this we can implement efficient
+    methods for traversing the DOM when the browser does not implement XPath
+    natively.
+
+    A good example of using this XPath implementation can be found in the
+    ViperRedoPlugin, which stores all the nodesInfo objects in a stack and then
+    replays them back whenever an undo/redo action is captured.
+
+
+Plugins
+-------
+
+    Overview
+    --------
+
+    ViperPlugin - All viper plugins should extend from the base ViperPlugin class.
+    A plugin can register itself by adding itself to the plugin manager with a call
+    similar to:
+
+    ViperPluginManager.addPlugin(ViperCoreStylesKBSPlugin);
+
+    Once viper has been contructed it asks the PluginManager to initialize itself.
+    The PluginManager then constructs an instance of each of the plugins, passing an
+    instance of viper to each of their constructors.
+
+    Each has the ability define the following methods:
+
+        public void start();
+        public void nodesDeleted(Object nodesInfo);
+        public void nodesInserted(Object nodesInfo);
+        public void nodesChanged(Object nodesInfo);
+        public void selectionChanged(DOMRange range);
+        public void setEnabled(boolean enabled);
+
+    The start method of each plugin will be called once all the plugins have been constructed.
+    This is so that a plugin can safely reference another plugin for communication. Plugins
+    can reference other plugins via the PluginManager by referencing their className:
+
+        var toolbarPlugin = PluginManager.getPlugin('ViperToolbarPlugin');
+        toolbarPlugin.addButton(...);
+
+    The setEnabled method will be called at any time that Viper has been asked to enable
+    or disable itself. A plugin should disable any elements that aid in editing content.
+
+    Modifiying Content from within a plugin.
+    ----------------------------------------
+
+    Plugins should always utilise the methods defined in the Viper class for modifying
+    content. This is so that other plugins can be aware of any changes as the nodesInserted,
+    nodesDeleted and nodesChanged methods are called appropriately and the range will be
+    updated accordingly. These methods are:
+
+        Viper.insertNodeAtCaret(DOMNode node);
+        Viper.insertTextAtCaret(String node);
+        Viper.deleteContents();
+        Viper.insertBefore(DOMNode insert, DOMNode ref);
+        Viper.insertAfter(DOMNode insert, DOMNode ref);
+
+    The same is true for modifiying the Range within Viper. The following methods are
+    supplied for updating the range in Viper:
+
+        Viper.caretLeft();
+        Viper.caretRight();
+        Viper.caretDown();
+        Viper.caretUp();
+
+    If your plugin has to absolutely modify the range through the range object, retreived
+    by viper.getCurrentRange(), ensure that you appropriately call:
+
+        ViperPluginManager.fireSelectionChanged();
+        Viper.updateCaret(boolean);
+
+    So that other plugins are aware of the change, and the caret is updated to the
+    new position of the range.
+
+    Listening to Key Press Events.
+    -----------------------------
+
+    A plugin may wish to listen for keypress events, and may also want to prevent
+    any default actions they produce, and further stop its propagation down to
+    viper itself. A plugin can listen for a series of keypresses in one action. This
+    is acheived through a call to addKeyListener in the ViperPluginManager:
+
+        addKeyPressListener('CTRL+B', this, 'handleBold');
+
+    This will add a listener function for the CTRL+B key combination (Bold). When
+    Viper captures this key combination, it first asks all the plugins that are
+    listening to perform their operation. If the method - handleBold in this scenario,
+    returns true, the event will be consumed so that viper does not act upon it. Any
+    browser specific operations will also be consumed.
+
+
